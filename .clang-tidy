@@ -1,0 +1,19 @@
+Checks: '
+    -*,
+    -*braces-around-statements,
+
+    modernize-*,
+    -modernize-avoid-c-arrays,
+    -modernize-use-auto,
+    -modernize-use-nodiscard,
+    -modernize-use-trailing-return-type,
+
+    performance-*,
+
+    readability-function-cognitive-complexity,
+'
+WarningsAsErrors: '
+  -*,
+'
+#HeaderFilterRegex: '^(?!.*[\/\\]Library*[\/\\]).*' # Ignoring header files from Library/
+HeaderFilterRegex: '.*'
