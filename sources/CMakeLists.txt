@@ -8,7 +8,10 @@ file(GLOB_RECURSE
 #
 #  QT Package
 #
-set(BASE_QT_DIR "E:/Programmation/Qt/6.2.0/mingw81_64")
+set(BASE_QT_DIR "" CACHE PATH "Path to QT6 library")
+if (NOT EXISTS ${BASE_QT_DIR})
+    message(FATAL_ERROR "Please give an existing Folder To find QT6 by setting BASE_QT_DIR")
+endif ()
 set(CMAKE_PREFIX_PATH ${BASE_QT_DIR})
 set(${PRJPREFIX}_QT_COMPONENTS_LIST Core Gui Widgets)
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
@@ -22,7 +25,7 @@ set(CMAKE_AUTOUIC ON)
 #
 #  Base Library
 #
-add_library(${CMAKE_PROJECT_NAME}_lib SHARED ${SRCS})
+add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib
         Qt::Core
         Qt::Gui

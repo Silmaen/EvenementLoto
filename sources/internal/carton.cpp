@@ -4,12 +4,13 @@
  *
  */
 #include "carton.h"
+#include "random.h"
 #include <sstream>
 #include <vector>
 
 namespace evl {
 
-void carton::resetCarton() {
+void Carton::resetCarton() {
     for(auto& line: lines) {
         for(auto& num: line) {
             num.checked= false;
@@ -18,7 +19,7 @@ void carton::resetCarton() {
     updateStatus();
 }
 
-std::string carton::asString() const {
+std::string Carton::asString() const {
     std::stringstream oss;
     oss << numero << ";;";
     for(auto& line: lines) {
@@ -30,15 +31,16 @@ std::string carton::asString() const {
     return oss.str();
 }
 
-void carton::fromString(std::string& s) {
+void Carton::fromString(const std::string& s) {
     std::vector<std::string> result;
     size_t pos;
     std::string token{s};
-    while((pos= s.find(';')) != std::string::npos) {
-        token= s.substr(0, pos);
+    while((pos= token.find(';')) != std::string::npos) {
         result.push_back(token.substr(0, pos));
         token.erase(0, pos + 1);
     }
+    if(result.size() < 1 + nb_ligne * (nb_colones + 1))
+        throw std::exception();
     pos   = 0;
     numero= std::atoi(result[pos].c_str());
     pos+= 2;
@@ -52,7 +54,7 @@ void carton::fromString(std::string& s) {
     resetCarton();
 }
 
-void carton::playNumber(const uint8_t num) {
+void Carton::playNumber(const uint8_t num) {
     bool change= false;
     for(auto& line: lines) {
         for(auto& _num: line) {
@@ -66,7 +68,7 @@ void carton::playNumber(const uint8_t num) {
     if(change) updateStatus();
 }
 
-void carton::unPlayNumber(const uint8_t num) {
+void Carton::unPlayNumber(const uint8_t num) {
     bool change= false;
     for(auto& line: lines) {
         for(auto& _num: line) {
@@ -80,7 +82,7 @@ void carton::unPlayNumber(const uint8_t num) {
     if(change) updateStatus();
 }
 
-void carton::updateStatus() {
+void Carton::updateStatus() {
     if(res == ResultCarton::HorsJeu)
         return;
     res= ResultCarton::EnCours;
@@ -113,6 +115,29 @@ void carton::updateStatus() {
             res= ResultCarton::UneLigne;
     } else if(nbAlmostFullLines >= 1) {
         res= ResultCarton::PresqueUneLigne;
+    }
+}
+
+void Carton::generate(const uint32_t& num) {
+    numero= num;
+    RandomNumberGenerator rng;
+    for(auto& line: lines) {
+        auto l= rng.generateLine();
+        for(uint8_t i= 0; i < nb_colones; ++i) {
+            line[i].numero = l[i];
+            line[i].checked= false;
+        }
+    }
+    updateStatus();
+}
+
+void Carton::print(std::ostream& oss) const {
+    oss << "Carton: " << numero << std::endl;
+    for(auto& line: lines) {
+        for(auto& _num: line) {
+            oss << (int)_num.numero << " ";
+        }
+        oss << std::endl;
     }
 }
 

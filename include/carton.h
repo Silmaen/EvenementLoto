@@ -6,6 +6,7 @@
 #pragma once
 #include "baseDefine.h"
 #include <array>
+#include <ostream>
 #include <string>
 
 namespace evl {
@@ -13,10 +14,10 @@ namespace evl {
 /**
  * @brief Classe de base pour définir un carton.
  */
-class carton {
+class Carton {
 public:
     /**
-     * @brief Les données d'une case de grille.
+     * @brief Les données d’une case de grille.
      */
     struct GCase {
         uint8_t numero : 7 {1};     ///< Le numéro de la case.
@@ -27,18 +28,24 @@ public:
      */
     enum class ResultCarton {
         EnCours,           ///< Le carton est toujours en jeu.
-        PresqueUneLigne,   ///< Il ne manque qu'un numéro pour qu'une ligne soit remplie.
+        PresqueUneLigne,   ///< Il ne manque qu’un numéro pour qu’une ligne soit remplie.
         UneLigne,          ///< Une ligne est entièrement remplie.
-        PresqueDeuxLignes, ///< Il ne manque qu'un numéro pour que 2 lignes soient remplies.
+        PresqueDeuxLignes, ///< Il ne manque qu’un numéro pour que deux lignes soient remplies.
         DeuxLignes,        ///< Deux lignes du carton sont remplies.
         PresqueCartonPlein,///< Il n'y a plus qu'un seul numéro.
         CartonPlein,       ///< Tout le carton est rempli.
-        HorsJeu            ///< Le carton n'est pas en jeu.
+        HorsJeu            ///< Le carton n’est pas en jeu.
     };
     /**
-     * @brief Remet à zéro l'état de case cochée.
+     * @brief Remet à zéro l’état de case cochée.
      */
     void resetCarton();
+
+    /**
+     * @brief Vérifie si le carton est actif.
+     * @return Vrai si le carton est actif.
+     */
+    bool isActive() const { return res != ResultCarton::HorsJeu; }
 
     /**
      * @brief Renvoie une chaine de caractère représentant le carton.
@@ -47,10 +54,10 @@ public:
     std::string asString() const;
 
     /**
-     * @brief Défini la grille à partir d'une chaine.
-     * @param s Chaine de définition d'une grille.
+     * @brief Défini la grille à partir d’une chaine.
+     * @param s Chaine de définition d’une grille.
      */
-    void fromString(std::string& s);
+    void fromString(const std::string& s);
 
     /**
      * @brief Mets à jour le carton avec le numéro joué.
@@ -88,10 +95,22 @@ public:
         updateStatus();
     }
 
+    /**
+     * @brief Génère aléatoirement une grille, celle-ci est active par défaut.
+     * @param num Le numéro de la grille
+     */
+    void generate(const uint32_t& num);
+
+    /**
+     * @brief Dessine le carton dans le stream donnée.
+     * @param oss Le stream dans lequel écrire
+     */
+    void print(std::ostream& oss) const;
+
 private:
-    uint32_t numero= 0;                                       ///< le numéro du carton
+    uint32_t numero= 0;                                       ///< Le numéro du carton
     std::array<std::array<GCase, nb_colones>, nb_ligne> lines;///< Les données du carton.
-    ResultCarton res= ResultCarton::EnCours;                  ///< l'état actuel du carton
+    ResultCarton res= ResultCarton::EnCours;                  ///< L’état actuel du carton
 };
 
 }// namespace evl
