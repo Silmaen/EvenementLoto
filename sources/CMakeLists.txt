@@ -1,5 +1,21 @@
 
 #
+#  Base Library
+#
+file(GLOB_RECURSE
+        SRCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/internal/*.cpp
+        )
+add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
+target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
+#
+#  Base Library
+#
+
+#
+#  UI Library
+#  ==========
+#
 #  QT Package
 #
 set(BASE_QT_DIR "" CACHE PATH "Path to QT6 library")
@@ -15,23 +31,6 @@ set(CMAKE_AUTOUIC ON)
 #
 #  QT Package
 #
-
-#
-#  Base Library
-#
-file(GLOB_RECURSE
-        SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/internal/*.cpp
-        )
-add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
-#
-#  Base Library
-#
-
-#
-#  UI Library
-#
 file(GLOB_RECURSE
         SRCS_UI
         ${CMAKE_CURRENT_SOURCE_DIR}/UI/*
@@ -43,7 +42,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_ui
         Qt::Widgets
         )
 target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
-#
+target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_ui_autogen/include)
+#  ==========
 #  UI Library
 #
 

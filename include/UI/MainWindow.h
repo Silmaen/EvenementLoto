@@ -16,7 +16,7 @@ namespace Ui {
 class MainWindow;
 }// namespace Ui
 
-namespace elv {
+namespace evl {
 
 /**
  * @brief Classe définissant les opérations de la page principale
@@ -34,7 +34,10 @@ public:
      */
     ~MainWindow() override;
 private slots:
-    virtual void about();
+    /**
+     * @brief Affichage de la page d'à propos.
+     */
+    virtual void showAbout();
 
 private:
     Ui::MainWindow* ui;///< Lien vers la page UI.

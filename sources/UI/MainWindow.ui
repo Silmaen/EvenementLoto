@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+    <author>Damien Lachouette</author>
     <class>MainWindow</class>
     <widget class="QMainWindow" name="MainWindow">
         <property name="geometry">
@@ -774,6 +775,9 @@
             <property name="text">
                 <string>À propos</string>
             </property>
+            <property name="shortcut">
+                <string>F1</string>
+            </property>
         </action>
         <action name="actionAide">
             <property name="text">
@@ -781,6 +785,28 @@
             </property>
         </action>
     </widget>
-    <resources/>
-    <connections/>
+    <resources>
+        <include location="../../resources/EvenementLoto.qrc"/>
+    </resources>
+    <connections>
+        <connection>
+            <sender>action_propos</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showAbout()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+    <slots>
+        <slot>showAbout()</slot>
+    </slots>
 </ui>
