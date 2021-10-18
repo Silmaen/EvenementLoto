@@ -1,10 +1,4 @@
 
-
-file(GLOB_RECURSE
-        SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/internal/*.cpp
-        )
-
 #
 #  QT Package
 #
@@ -25,15 +19,32 @@ set(CMAKE_AUTOUIC ON)
 #
 #  Base Library
 #
+file(GLOB_RECURSE
+        SRCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/internal/*.cpp
+        )
 add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib
+target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
+#
+#  Base Library
+#
+
+#
+#  UI Library
+#
+file(GLOB_RECURSE
+        SRCS_UI
+        ${CMAKE_CURRENT_SOURCE_DIR}/UI/*
+        )
+add_library(${CMAKE_PROJECT_NAME}_ui ${SRCS_UI})
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui
         Qt::Core
         Qt::Gui
         Qt::Widgets
         )
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
+target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
 #
-#  Base Library
+#  UI Library
 #
 
 #
@@ -41,9 +52,8 @@ target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_
 #
 add_executable(${CMAKE_PROJECT_NAME} main.cpp)
 target_link_libraries(${CMAKE_PROJECT_NAME}
-        Qt::Core
-        Qt::Gui
-        Qt::Widgets
+        ${CMAKE_PROJECT_NAME}_lib
+        ${CMAKE_PROJECT_NAME}_ui
         )
 
 # base includes
