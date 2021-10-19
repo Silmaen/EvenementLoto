@@ -28,6 +28,14 @@ public:
      * @param bs Le stream d’entrée.
      */
     void read(std::istream& bs) override;
+
+    /**
+     * @brief Remet la classe à zéro.
+     */
+    void fullReset() {
+        nom= "";
+        cartons.clear();
+    }
     /**
      * @brief Accès à la liste des cartons.
      * @return La liste des cartons.

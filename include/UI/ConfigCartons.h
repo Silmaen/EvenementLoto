@@ -4,8 +4,12 @@
  */
 #pragma once
 
+#include "core/PaquetCartons.h"
 #include <QAbstractButton>
+#include <QCheckBox>
 #include <QDialog>
+#include <QSpinBox>
+#include <array>
 
 namespace Ui {
 /**
@@ -31,16 +35,42 @@ public:
      * @brief Destructeur.
      */
     ~ConfigCartons() override;
+
+    /**
+     * @brief Accès aux données internes.
+     * @return Lien vers les données internes
+     */
+    core::PaquetCartons& getCartons() { return cartons; }
+
+    /**
+     * @brief Accès aux données internes.
+     * @return Lien vers les données internes
+     */
+    const core::PaquetCartons& getCartons() const { return cartons; }
+public slots:
+
+    int exec() override;
 private slots:
     /**
      * @brief Charge une configuration depuis un fichier
      */
     void LoadFile();
     /**
-     * @brief Réagit à une action sur les boutons du bas
-     * @param b Le bouton du bas qui est appuyé.
+     * @brief Charge une configuration depuis un fichier
      */
-    void BottomButton(QAbstractButton* b);
+    void SaveFile();
+    /**
+     * @brief Réagit à une action sur le bouton Apply.
+     */
+    void ClicApply();
+    /**
+     * @brief Réagit à une action sur le bouton cancel.
+     */
+    void ClicCancel();
+    /**
+     * @brief Réagit à une action sur le bouton ok.
+     */
+    void ClicOk();
     /**
      * @brief Sauvegarde le carton en cours dans la liste.
      */
@@ -62,8 +92,46 @@ private slots:
      */
     void UpdateGrid();
 
+    /**
+     * @brief Met à jour l’affichage.
+     */
+    void UpdateDisplay();
+
+    /**
+     * @brief Met à jour le nom dans les données.
+     */
+    void updateName();
+    /**
+     * @brief Recupère le nom du fichier depuis l’UI.
+     */
+    void updateFileName();
+
 private:
-    Ui::ConfigCartons* ui;///< Lien vers la page UI.
+    /**
+     * @brief Affiche une boite de dialogue disant que c’est en travaux.
+     * @param from Une chaine permettant de savoir d’où vient la demande.
+     */
+    void showNotImplemented(const QString& from);
+
+    Ui::ConfigCartons* ui;      ///< Lien vers la page UI.
+    core::PaquetCartons cartons;///< Les données internes.
+    QString path;               ///< Chemin vers le fichier
+
+    struct cell {
+        QSpinBox* spin  = nullptr;
+        QCheckBox* check= nullptr;
+        bool isValid() const {
+            return check != nullptr && spin != nullptr;
+        }
+        void toggle() {
+            if(!isValid()) return;
+            spin->setEnabled(check->isChecked());
+            if(!check->isChecked()) {
+                spin->setValue(0);
+            }
+        }
+    };
+    std::array<std::array<cell, 9>, 3> lines;
 };
 
 }// namespace evl::gui

@@ -4,6 +4,8 @@
 */
 #include "UI/MainWindow.h"
 #include "UI/About.h"
+#include "UI/ConfigCartons.h"
+#include <QMessageBox>
 
 // Les trucs de QT
 #include <UI/moc_MainWindow.cpp>
@@ -26,4 +28,63 @@ void MainWindow::showAbout() {
     AboutWindow.exec();
 }
 
-}// namespace elv
+void MainWindow::showHelp() {
+    showNotImplemented("aide");
+}
+
+void MainWindow::showParametresGeneraux() {
+    showNotImplemented("Paramètres généraux");
+}
+
+void MainWindow::showParametresCartons() {
+    //showNotImplemented("Configuration des cartons");
+    ConfigCartons cfg(this);
+    cfg.getCartons().getNom()= "default";
+    cfg.exec();
+}
+
+void MainWindow::showParametresParties() {
+    showNotImplemented("Configuration des parties");
+}
+
+void MainWindow::showParametresEvenement() {
+    showNotImplemented("Configuration de l’événement");
+}
+
+void MainWindow::fichierNew() {
+    showNotImplemented("Nouvel événement");
+}
+
+void MainWindow::fichierLoad() {
+    showNotImplemented("Charger événement");
+}
+
+void MainWindow::fichierSave() {
+    showNotImplemented("Sauver événement");
+}
+
+void MainWindow::fichierSaveAs() {
+    showNotImplemented("Sauver événement sous...");
+}
+
+void MainWindow::fichierCommencer() {
+    showNotImplemented("Commencer événement");
+}
+
+void MainWindow::fichierTerminer() {
+    showNotImplemented("Terminer événement");
+}
+
+void MainWindow::fichierQuitter() {
+    close();
+}
+void MainWindow::showNotImplemented(const QString& from) {
+    QMessageBox message;
+    message.setIcon(QMessageBox::Warning);
+    message.setWindowTitle(from);
+    message.setText("Ce programme est encore en construction");
+    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
+    message.exec();
+}
+
+}// namespace evl::gui

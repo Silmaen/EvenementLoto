@@ -35,11 +35,65 @@ public:
     ~MainWindow() override;
 private slots:
     /**
-     * @brief Affichage de la page d'à propos.
+     * @brief Affichage de la page d’à propos.
      */
     void showAbout();
+    /**
+     * @brief Affiche la fenêtre d’aide.
+     */
+    void showHelp();
+    /**
+     * @brief Affiche la fenêtre des paramètres généraux.
+     */
+    void showParametresGeneraux();
+    /**
+     * @brief Affiche la fenêtre de configuration des cartons.
+     */
+    void showParametresCartons();
+    /**
+     * @brief Affiche la fenêtre de configuration des parties.
+     */
+    void showParametresParties();
+    /**
+     * @brief Affiche la fenêtre de configuration de l'événement.
+     */
+    void showParametresEvenement();
+    /**
+     * @brief Fonction Fichiers->Nouveau.
+     */
+    void fichierNew();
+    /**
+     * @brief Fonction Fichiers->Nouveau.
+     */
+    void fichierLoad();
+    /**
+     * @brief Fonction Fichiers->Sauver.
+     */
+    void fichierSave();
+    /**
+     * @brief Fonction Fichiers->Sauver sous.
+     */
+    void fichierSaveAs();
+    /**
+     * @brief Fonction Fichiers->Commencer.
+     */
+    void fichierCommencer();
+    /**
+     * @brief Fonction Fichiers->Terminer.
+     */
+    void fichierTerminer();
+    /**
+     * @brief Fonction Fichiers->Quitter.
+     */
+    void fichierQuitter();
 
 private:
+    /**
+     * @brief Affiche une boite de dialogue disant que c’est en travaux.
+     * @param from Une chaine permettant de savoir d’où vient la demande.
+     */
+    void showNotImplemented(const QString& from);
+
     Ui::MainWindow* ui;///< Lien vers la page UI.
 };
 
