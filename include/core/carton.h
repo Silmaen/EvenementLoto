@@ -1,6 +1,6 @@
 /**
- * \author Silmaen
- * \date 17/10/2021
+ * @author Silmaen
+ * @date 17/10/2021
  *
  */
 #pragma once
