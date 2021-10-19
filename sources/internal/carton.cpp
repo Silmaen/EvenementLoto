@@ -8,7 +8,7 @@
 #include <sstream>
 #include <vector>
 
-namespace evl {
+namespace evl::core {
 
 void Carton::resetCarton() {
     for(auto& line: lines) {

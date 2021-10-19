@@ -8,7 +8,7 @@
 #include "UI/moc_About.cpp"
 #include "UI/ui_About.h"
 
-namespace evl {
+namespace evl::gui {
 
 About::About(QWidget* parent):
     QDialog(parent),

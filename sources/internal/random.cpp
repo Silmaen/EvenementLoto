@@ -5,7 +5,7 @@
 #include "core/random.h"
 #include "baseDefine.h"
 
-namespace evl {
+namespace evl::core {
 
 bool RandomNumberGenerator::addPick(const uint8_t& num) {
     if(std::find(alreadyPicked.begin(), alreadyPicked.end(), num) != alreadyPicked.end())

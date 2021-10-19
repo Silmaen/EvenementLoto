@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 TEST(random, base) {
-    evl::RandomNumberGenerator rng(true);// random déterministe
+    evl::core::RandomNumberGenerator rng(true);// random déterministe
     EXPECT_EQ(rng.getPicked().size(), 0);
     uint8_t a= rng.pick();
     EXPECT_GE(a, 1);
@@ -20,7 +20,7 @@ TEST(random, base) {
 }
 
 TEST(random, manual) {
-    evl::RandomNumberGenerator rng;
+    evl::core::RandomNumberGenerator rng;
     EXPECT_TRUE(rng.addPick(16));
     EXPECT_TRUE(rng.addPick(72));
     EXPECT_TRUE(rng.addPick(66));

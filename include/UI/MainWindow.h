@@ -16,7 +16,7 @@ namespace Ui {
 class MainWindow;
 }// namespace Ui
 
-namespace evl {
+namespace evl::gui {
 
 /**
  * @brief Classe définissant les opérations de la page principale
