@@ -740,11 +740,26 @@
                 <property name="title">
                     <string>Fichiers</string>
                 </property>
+                <addaction name="actionNouvel_Evenement"/>
+                <addaction name="separator"/>
+                <addaction name="actionCharger_Evenement"/>
+                <addaction name="actionSauver_Evenement"/>
+                <addaction name="actionSauver_Evenement_sous"/>
+                <addaction name="separator"/>
+                <addaction name="actionCommencer_Evenement"/>
+                <addaction name="actionTerminer_Evenement"/>
+                <addaction name="separator"/>
+                <addaction name="actionQuitter"/>
             </widget>
             <widget class="QMenu" name="menuParam_tres">
                 <property name="title">
                     <string>Paramètres</string>
                 </property>
+                <addaction name="actionParam_tres_g_n_raux"/>
+                <addaction name="separator"/>
+                <addaction name="actionConfiguration_des_cartons"/>
+                <addaction name="actionConfiguration_des_parties"/>
+                <addaction name="actionConfiguration_de_l_v_nement"/>
             </widget>
             <widget class="QMenu" name="menuAide">
                 <property name="title">
@@ -754,19 +769,7 @@
                 <addaction name="separator"/>
                 <addaction name="actionAide"/>
             </widget>
-            <widget class="QMenu" name="menuEvenement">
-                <property name="title">
-                    <string>Evenement</string>
-                </property>
-            </widget>
-            <widget class="QMenu" name="menuPartie">
-                <property name="title">
-                    <string>Partie</string>
-                </property>
-            </widget>
             <addaction name="menuFichiers"/>
-            <addaction name="menuEvenement"/>
-            <addaction name="menuPartie"/>
             <addaction name="menuParam_tres"/>
             <addaction name="menuAide"/>
         </widget>
@@ -782,6 +785,61 @@
         <action name="actionAide">
             <property name="text">
                 <string>Aide</string>
+            </property>
+        </action>
+        <action name="actionParam_tres_g_n_raux">
+            <property name="text">
+                <string>Paramètres généraux</string>
+            </property>
+        </action>
+        <action name="actionConfiguration_des_cartons">
+            <property name="text">
+                <string>Configuration des cartons</string>
+            </property>
+        </action>
+        <action name="actionConfiguration_des_parties">
+            <property name="text">
+                <string>Configuration des parties</string>
+            </property>
+        </action>
+        <action name="actionConfiguration_de_l_v_nement">
+            <property name="text">
+                <string>Configuration de l'événement</string>
+            </property>
+        </action>
+        <action name="actionNouvel_Evenement">
+            <property name="text">
+                <string>Nouvel événement</string>
+            </property>
+        </action>
+        <action name="actionCharger_Evenement">
+            <property name="text">
+                <string>Charger événement</string>
+            </property>
+        </action>
+        <action name="actionSauver_Evenement">
+            <property name="text">
+                <string>Sauver événement</string>
+            </property>
+        </action>
+        <action name="actionCommencer_Evenement">
+            <property name="text">
+                <string>Commencer événement</string>
+            </property>
+        </action>
+        <action name="actionQuitter">
+            <property name="text">
+                <string>Quitter</string>
+            </property>
+        </action>
+        <action name="actionTerminer_Evenement">
+            <property name="text">
+                <string>Terminer événement</string>
+            </property>
+        </action>
+        <action name="actionSauver_Evenement_sous">
+            <property name="text">
+                <string>Sauver événement sous...</string>
             </property>
         </action>
     </widget>
@@ -805,8 +863,212 @@
                 </hint>
             </hints>
         </connection>
+        <connection>
+            <sender>actionAide</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showHelp()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionCharger_Evenement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierLoad()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionCommencer_Evenement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierCommencer()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionConfiguration_de_l_v_nement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showParametresEvenement()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionConfiguration_des_cartons</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showParametresCartons()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionConfiguration_des_parties</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showParametresParties()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionNouvel_Evenement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierNew()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionParam_tres_g_n_raux</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>showParametresGeneraux()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionQuitter</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierQuitter()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionSauver_Evenement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierSave()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionSauver_Evenement_sous</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierSaveAs()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>actionTerminer_Evenement</sender>
+            <signal>triggered()</signal>
+            <receiver>MainWindow</receiver>
+            <slot>fichierTerminer()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>-1</x>
+                    <y>-1</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>418</x>
+                    <y>352</y>
+                </hint>
+            </hints>
+        </connection>
     </connections>
     <slots>
         <slot>showAbout()</slot>
+        <slot>showHelp()</slot>
+        <slot>showParametresGeneraux()</slot>
+        <slot>showParametresCartons()</slot>
+        <slot>showParametresParties()</slot>
+        <slot>showParametresEvenement()</slot>
+        <slot>fichierNew()</slot>
+        <slot>fichierLoad()</slot>
+        <slot>fichierSave()</slot>
+        <slot>fichierSaveAs()</slot>
+        <slot>fichierCommencer()</slot>
+        <slot>fichierQuitter()</slot>
+        <slot>fichierTerminer()</slot>
     </slots>
 </ui>
