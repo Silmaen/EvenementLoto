@@ -9,7 +9,7 @@
 #include <UI/moc_MainWindow.cpp>
 #include <UI/ui_MainWindow.h>
 
-namespace evl {
+namespace evl::gui {
 
 MainWindow::MainWindow(QWidget* parent):
     QMainWindow(parent),
@@ -21,7 +21,7 @@ MainWindow::~MainWindow() {
     delete ui;
 }
 void MainWindow::showAbout() {
-    evl::About AboutWindow(this);
+    evl::gui::About AboutWindow(this);
     AboutWindow.setModal(true);
     AboutWindow.exec();
 }

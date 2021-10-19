@@ -1,7 +1,6 @@
 /**
  * @author Silmaen
- * @date 17/10/2021
- *
+ * @date 17/10/202
  */
 #pragma once
 #include "baseDefine.h"
@@ -9,7 +8,7 @@
 #include <ostream>
 #include <string>
 
-namespace evl {
+namespace evl::core {
 
 /**
  * @brief Classe de base pour définir un carton.

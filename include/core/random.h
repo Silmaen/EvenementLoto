@@ -6,7 +6,10 @@
 #include <random>
 #include <vector>
 
-namespace evl {
+/**
+ * @brief Namespace pour les fonctions centrales du programme.
+ */
+namespace evl::core {
 
 /**
  * @brief Class permettant de tirer aléatoirement des nombres entre 1 et 90 (inclus).

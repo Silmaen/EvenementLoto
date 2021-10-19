@@ -13,7 +13,7 @@ namespace Ui {
 class About;
 }// namespace Ui
 
-namespace evl {
+namespace evl::gui {
 
 /**
  * @brief Classe D'affichage de la boite de dialogue d'à propos.
