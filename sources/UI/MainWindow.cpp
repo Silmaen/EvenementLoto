@@ -1,6 +1,6 @@
 /**
 * @author Silmaen
-* @created 18/10/2021
+* @date 18/10/2021
 */
 #include "UI/MainWindow.h"
 #include "UI/About.h"

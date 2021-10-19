@@ -1,6 +1,6 @@
 /**
 * @author Silmaen
-* @created 18/10/2021
+* @date 18/10/2021
 */
 #pragma once
 
@@ -37,7 +37,7 @@ private slots:
     /**
      * @brief Affichage de la page d'à propos.
      */
-    virtual void showAbout();
+    void showAbout();
 
 private:
     Ui::MainWindow* ui;///< Lien vers la page UI.
