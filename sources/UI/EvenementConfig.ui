@@ -34,7 +34,11 @@
                             </widget>
                         </item>
                         <item row="0" column="1">
-                            <widget class="QLineEdit" name="EventName"/>
+                            <widget class="QLineEdit" name="EventName">
+                                <property name="toolTip">
+                                    <string>Définir le nom de l'événement organisé.</string>
+                                </property>
+                            </widget>
                         </item>
                         <item row="1" column="0">
                             <widget class="QLabel" name="label_2">
@@ -44,7 +48,85 @@
                             </widget>
                         </item>
                         <item row="1" column="1">
-                            <widget class="QLineEdit" name="EventLocation"/>
+                            <widget class="QLineEdit" name="EventLocation">
+                                <property name="toolTip">
+                                    <string>Définir le lieu de l'événement organisé.</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QGroupBox" name="groupBox_3">
+                    <property name="title">
+                        <string>Organisateur</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_2">
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="label_3">
+                                <property name="text">
+                                    <string>Nom de l'organisateur</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QLineEdit" name="lineEdit"/>
+                        </item>
+                        <item row="0" column="2" colspan="2">
+                            <spacer name="horizontalSpacer_5">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>247</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="1" column="0">
+                            <widget class="QLabel" name="label_4">
+                                <property name="text">
+                                    <string>Logo de l'organisateur:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="1">
+                            <widget class="QLineEdit" name="lineEdit_2"/>
+                        </item>
+                        <item row="1" column="2">
+                            <widget class="QPushButton" name="pushButton">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>24</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="3">
+                            <spacer name="horizontalSpacer_6">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>217</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
                         </item>
                     </layout>
                 </widget>

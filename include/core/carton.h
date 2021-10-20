@@ -98,6 +98,7 @@ public:
     /**
      * @brief Génère aléatoirement une grille, celle-ci est active par défaut.
      * @param num Le numéro de la grille
+     * @param rng Lien eventuel vers  un générateur de nombre aléatoire externe.
      */
     void generate(const uint32_t& num, RandomNumberGenerator* rng= nullptr);
 
@@ -109,13 +110,13 @@ public:
 
     /**
      * @brief Écriture dans un stream.
-     * @param bs Le stream où écrire.
+     * @param os Le stream où écrire.
      */
     void write(std::ostream& os) const override;
 
     /**
      * @brief Lecture depuis un stream
-     * @param bs Le stream d’entrée.
+     * @param is Le stream d’entrée.
      */
     void read(std::istream& is) override;
 

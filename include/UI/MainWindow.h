@@ -4,7 +4,9 @@
 */
 #pragma once
 
+#include "UI/baseDefinitions.h"
 #include <QMainWindow>
+#include <QSettings>
 
 /**
  * @brief Namespace permettant à QT d'opérer la conversion de fichier .ui
@@ -33,6 +35,18 @@ public:
      * @brief Destructeur.
      */
     ~MainWindow() override;
+
+    /**
+     * @brief Accès aux paramètres globaux.
+     * @return les paramètres
+     */
+    [[nodiscard]] QSettings& getSettings() { return settings; }
+public slots:
+    /**
+     * @brief Lit ou écrit le fichier de configuration de base.
+     */
+    void syncSettings();
+
 private slots:
     /**
      * @brief Affichage de la page d’à propos.
@@ -95,6 +109,7 @@ private:
     void showNotImplemented(const QString& from);
 
     Ui::MainWindow* ui;///< Lien vers la page UI.
+    QSettings settings;///< Les settings généraux.
 };
 
 }// namespace elv

@@ -120,12 +120,22 @@ private:
     core::PaquetCartons cartons;///< Les données internes.
     QString path;               ///< Chemin vers le fichier
 
+    /**
+     * @brief structure interne de cellul de grille.
+     */
     struct cell {
-        QSpinBox* spin  = nullptr;
-        QCheckBox* check= nullptr;
+        QSpinBox* spin  = nullptr;///< /ien vers le spinbox.
+        QCheckBox* check= nullptr;///< Lien vers la checkbox.
+        /**
+         * @brief test si la cellule est valide
+         * @return true si la cellule est valide.
+         */
         bool isValid() const {
             return check != nullptr && spin != nullptr;
         }
+        /**
+         * @brief Change l’activation de la cellule.
+         */
         void toggle() {
             if(!isValid()) return;
             spin->setEnabled(check->isChecked());
@@ -134,6 +144,7 @@ private:
             }
         }
     };
+    /// Les cellules en lignes.
     std::array<std::array<cell, 9>, 3> lines;
 };
 

@@ -66,6 +66,7 @@ public:
     /**
      * @brief Génère un certain nombre de cartons aléatoirement
      * @param number Le nombre de cartons à générer.
+     * @param rng Lien éventuel vers un générateur de nombre aléatoire externe.
      */
     void generate(const uint32_t& number, RandomNumberGenerator* rng= nullptr);
     /**
