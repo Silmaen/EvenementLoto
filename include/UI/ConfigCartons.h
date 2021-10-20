@@ -62,15 +62,15 @@ private slots:
     /**
      * @brief Réagit à une action sur le bouton Apply.
      */
-    void ClicApply();
+    void actApply();
     /**
      * @brief Réagit à une action sur le bouton cancel.
      */
-    void ClicCancel();
+    void actCancel();
     /**
      * @brief Réagit à une action sur le bouton ok.
      */
-    void ClicOk();
+    void actOk();
     /**
      * @brief Sauvegarde le carton en cours dans la liste.
      */

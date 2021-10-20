@@ -29,7 +29,7 @@ private:
     std::string Nom;            ///< Nom de l’événement.
     std::string Lieu;           ///< Lieu de l’événement.
     std::vector<Partie> parties;///< Liste des parties de l’événement.
-    PaquetCartons* cartons;     ///< Lien vers la liste des cartons
+    //PaquetCartons* cartons;     ///< Lien vers la liste des cartons
 };
 
 }// namespace evl::core

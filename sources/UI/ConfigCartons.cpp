@@ -83,16 +83,16 @@ void ConfigCartons::SaveFile() {
     showNotImplemented("SaveFile");
 }
 
-void ConfigCartons::ClicOk() {
+void ConfigCartons::actOk() {
     SaveFile();
     accept();
 }
 
-void ConfigCartons::ClicApply() {
+void ConfigCartons::actApply() {
     SaveFile();
 }
 
-void ConfigCartons::ClicCancel() {
+void ConfigCartons::actCancel() {
     cartons.fullReset();
     reject();
 }

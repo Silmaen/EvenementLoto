@@ -6,10 +6,10 @@
 
 namespace evl::core {
 
-void Evenement::read(std::istream& bs) {
+void Evenement::read(std::istream&) {
 }
 
-void Evenement::write(std::ostream& bs) const {
+void Evenement::write(std::ostream&) const {
 }
 
 }// namespace evl::core

@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>641</width>
-    <height>459</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,1347 +22,1547 @@
   <property name="minimumSize">
    <size>
     <width>641</width>
-    <height>459</height>
+       <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>641</width>
-    <height>459</height>
+       <height>483</height>
    </size>
   </property>
-  <property name="contextMenuPolicy">
-   <enum>Qt::NoContextMenu</enum>
-  </property>
-  <property name="windowTitle">
-   <string>Définition d'un ensemble de cartons</string>
-  </property>
-  <property name="modal">
-   <bool>true</bool>
-  </property>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>0</y>
-     <width>621</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Général</string>
-   </property>
-   <widget class="QLineEdit" name="UIListName">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>20</y>
-      <width>301</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Définir un nom pour la liste</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Nom de la liste:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>91</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Nom du fichier:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="UIFileName">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>50</y>
-      <width>301</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Le nom du chier dans lequel sauver la liste</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIDefaultPaths">
-    <property name="geometry">
-     <rect>
-      <x>410</x>
-      <y>50</y>
-      <width>211</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Si coché, le nom du fichier est déduit du nom de la liste et du chemin par défaut.</string>
-    </property>
-    <property name="text">
-     <string>Utilisation des chemins par défaut</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>80</y>
-      <width>211</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Nombre actuel de cartons dans la liste:</string>
-    </property>
-   </widget>
-   <widget class="QLCDNumber" name="UINumberCartons">
-    <property name="geometry">
-     <rect>
-      <x>220</x>
-         <y>80</y>
-         <width>141</width>
-         <height>23</height>
-     </rect>
-    </property>
-       <property name="smallDecimalPoint">
-           <bool>true</bool>
-       </property>
-       <property name="digitCount">
-           <number>9</number>
-       </property>
-       <property name="segmentStyle">
-           <enum>QLCDNumber::Flat</enum>
-       </property>
-       <property name="intValue" stdset="0">
-           <number>0</number>
-       </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_5">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>80</y>
-      <width>171</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Charge la liste depuis un fichier</string>
-    </property>
-    <property name="text">
-     <string>Charger un fichier</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>120</y>
-     <width>621</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Génértion aléatoire de cartons</string>
-   </property>
-   <widget class="QSpinBox" name="UIGenerateNumber">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>20</y>
-      <width>111</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Défini le nombre de carton à généreer aléatoiremnt.</string>
-    </property>
-    <property name="maximum">
-        <number>200000000</number>
-    </property>
-    <property name="stepType">
-     <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>161</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Nombre de carton à générer:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_4">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>20</y>
-         <width>141</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-        <string>(maximum: 2 000 000 000)</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="UIGenerateBtn">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>20</y>
-      <width>171</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Génère aléatoirment une série de carton et ajoute à la liste.</string>
-    </property>
-    <property name="text">
-     <string>Génération!</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>180</y>
-     <width>621</width>
-     <height>231</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Edition de carton</string>
-   </property>
-   <widget class="QSpinBox" name="UICell_L1_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="maximum">
-     <number>9</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="maximum">
-     <number>9</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="maximum">
-     <number>9</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="frame">
-     <bool>true</bool>
-    </property>
-    <property name="accelerated">
-     <bool>true</bool>
-    </property>
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>19</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>19</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>10</number>
-    </property>
-    <property name="maximum">
-     <number>19</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>20</number>
-    </property>
-    <property name="maximum">
-     <number>29</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>20</number>
-    </property>
-    <property name="maximum">
-     <number>29</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>20</number>
-    </property>
-    <property name="maximum">
-     <number>29</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::UpDownArrows</enum>
-    </property>
-    <property name="minimum">
-     <number>30</number>
-    </property>
-    <property name="maximum">
-     <number>39</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>30</number>
-    </property>
-    <property name="maximum">
-     <number>39</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>30</number>
-    </property>
-    <property name="maximum">
-     <number>39</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>40</number>
-    </property>
-    <property name="maximum">
-     <number>49</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>40</number>
-    </property>
-    <property name="maximum">
-     <number>49</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>40</number>
-    </property>
-    <property name="maximum">
-     <number>49</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>50</number>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>50</number>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>50</number>
-    </property>
-    <property name="maximum">
-     <number>59</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C6">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>60</number>
-    </property>
-    <property name="maximum">
-     <number>69</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C6">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>60</number>
-    </property>
-    <property name="maximum">
-     <number>69</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C6">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>60</number>
-    </property>
-    <property name="maximum">
-     <number>69</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>70</number>
-    </property>
-    <property name="maximum">
-     <number>79</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>70</number>
-    </property>
-    <property name="maximum">
-     <number>79</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>70</number>
-    </property>
-    <property name="maximum">
-     <number>79</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L1_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>50</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>80</number>
-    </property>
-    <property name="maximum">
-     <number>90</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L2_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>100</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>80</number>
-    </property>
-    <property name="maximum">
-     <number>90</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="UICell_L3_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>150</y>
-      <width>51</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>18</pointsize>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="minimum">
-     <number>80</number>
-    </property>
-    <property name="maximum">
-     <number>90</number>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="spinBox_29">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>20</y>
-      <width>71</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Définition du numéro (unique) du carton</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_6">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Numéro:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ligne 1</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_9">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>110</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ligne 2</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_10">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>160</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Ligne 3</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="UILoadCartonFromList">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>20</y>
-      <width>131</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Charge les informations de carton depuis la liste.</string>
-    </property>
-    <property name="text">
-     <string>Charger depuis la liste</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="UISaveCartonToList">
-    <property name="geometry">
-     <rect>
-      <x>290</x>
-      <y>20</y>
-      <width>121</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string>Sauve la configuration dans la liste (si le carton est valide).</string>
-    </property>
-    <property name="text">
-     <string>Sauver dans la liste</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="UIRawLine">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>200</y>
-      <width>471</width>
-      <height>21</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="UILoadRawLine">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>200</y>
-      <width>111</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Charger ligne brute</string>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C0">
-    <property name="geometry">
-     <rect>
-      <x>70</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C1">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C2">
-    <property name="geometry">
-     <rect>
-      <x>190</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C5">
-    <property name="geometry">
-     <rect>
-      <x>370</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C4">
-    <property name="geometry">
-     <rect>
-      <x>310</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C3">
-    <property name="geometry">
-     <rect>
-      <x>250</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C6">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L3_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>180</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C8">
-    <property name="geometry">
-     <rect>
-      <x>550</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C7">
-    <property name="geometry">
-     <rect>
-      <x>490</x>
-      <y>80</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L2_C6">
-    <property name="geometry">
-     <rect>
-      <x>430</x>
-      <y>130</y>
-      <width>21</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QCheckBox" name="UIChk_L1_C6">
-    <property name="geometry">
-     <rect>
-         <x>430</x>
-         <y>80</y>
-         <width>21</width>
-         <height>20</height>
-     </rect>
-    </property>
-       <property name="text">
-           <string/>
-       </property>
-   </widget>
-  </widget>
-     <widget class="QPushButton" name="pushButton">
-         <property name="geometry">
-             <rect>
-                 <x>170</x>
-                 <y>420</y>
-                 <width>91</width>
-                 <height>31</height>
-             </rect>
-         </property>
-         <property name="text">
-             <string>Ok</string>
-         </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_2">
-         <property name="geometry">
-             <rect>
-                 <x>280</x>
-                 <y>420</y>
-                 <width>91</width>
-                 <height>31</height>
-             </rect>
-         </property>
-         <property name="text">
-             <string>Appliquer</string>
-         </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_3">
-         <property name="geometry">
-             <rect>
-                 <x>390</x>
-                 <y>420</y>
-                 <width>91</width>
-                 <height>31</height>
-             </rect>
-         </property>
-         <property name="text">
-             <string>Annuler</string>
-         </property>
-     </widget>
+     <property name="contextMenuPolicy">
+         <enum>Qt::NoContextMenu</enum>
+     </property>
+     <property name="windowTitle">
+         <string>Définition d'un ensemble de cartons</string>
+     </property>
+     <property name="modal">
+         <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+             <widget class="QGroupBox" name="groupBox">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                     <size>
+                         <width>621</width>
+                         <height>111</height>
+                     </size>
+                 </property>
+                 <property name="title">
+                     <string>Général</string>
+                 </property>
+                 <widget class="QLineEdit" name="UIListName">
+                     <property name="geometry">
+                         <rect>
+                             <x>100</x>
+                             <y>20</y>
+                             <width>301</width>
+                             <height>21</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Définir un nom pour la liste</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>20</y>
+                             <width>91</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Nom de la liste:</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_2">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>50</y>
+                             <width>91</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Nom du fichier:</string>
+                     </property>
+                 </widget>
+                 <widget class="QLineEdit" name="UIFileName">
+                     <property name="geometry">
+                         <rect>
+                             <x>100</x>
+                             <y>50</y>
+                             <width>301</width>
+                             <height>21</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Le nom du chier dans lequel sauver la liste</string>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIDefaultPaths">
+                     <property name="geometry">
+                         <rect>
+                             <x>410</x>
+                             <y>50</y>
+                             <width>211</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Si coché, le nom du fichier est déduit du nom de la liste et du chemin par défaut.
+                         </string>
+                     </property>
+                     <property name="text">
+                         <string>Utilisation des chemins par défaut</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_5">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>80</y>
+                             <width>211</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Nombre actuel de cartons dans la liste:</string>
+                     </property>
+                 </widget>
+                 <widget class="QLCDNumber" name="UINumberCartons">
+                     <property name="geometry">
+                         <rect>
+                             <x>220</x>
+                             <y>80</y>
+                             <width>141</width>
+                             <height>23</height>
+                         </rect>
+                     </property>
+                     <property name="smallDecimalPoint">
+                         <bool>true</bool>
+                     </property>
+                     <property name="digitCount">
+                         <number>9</number>
+                     </property>
+                     <property name="segmentStyle">
+                         <enum>QLCDNumber::Flat</enum>
+                     </property>
+                     <property name="intValue" stdset="0">
+                         <number>0</number>
+                     </property>
+                 </widget>
+                 <widget class="QPushButton" name="pushButton_5">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>80</y>
+                             <width>171</width>
+                             <height>24</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Charge la liste depuis un fichier</string>
+                     </property>
+                     <property name="text">
+                         <string>Charger un fichier</string>
+                     </property>
+                 </widget>
+             </widget>
+         </item>
+         <item>
+             <widget class="QGroupBox" name="groupBox_2">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                     <size>
+                         <width>621</width>
+                         <height>61</height>
+                     </size>
+                 </property>
+                 <property name="title">
+                     <string>Génértion aléatoire de cartons</string>
+                 </property>
+                 <widget class="QSpinBox" name="UIGenerateNumber">
+                     <property name="geometry">
+                         <rect>
+                             <x>170</x>
+                             <y>20</y>
+                             <width>111</width>
+                             <height>22</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Défini le nombre de carton à généreer aléatoiremnt.</string>
+                     </property>
+                     <property name="maximum">
+                         <number>200000000</number>
+                     </property>
+                     <property name="stepType">
+                         <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_3">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>20</y>
+                             <width>161</width>
+                             <height>21</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Nombre de carton à générer:</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_4">
+                     <property name="geometry">
+                         <rect>
+                             <x>290</x>
+                             <y>20</y>
+                             <width>141</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>(maximum: 2 000 000 000)</string>
+                     </property>
+                 </widget>
+                 <widget class="QPushButton" name="UIGenerateBtn">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>20</y>
+                             <width>171</width>
+                             <height>24</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Génère aléatoirment une série de carton et ajoute à la liste.</string>
+                     </property>
+                     <property name="text">
+                         <string>Génération!</string>
+                     </property>
+                 </widget>
+             </widget>
+         </item>
+         <item>
+             <widget class="QGroupBox" name="groupBox_3">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                     <size>
+                         <width>621</width>
+                         <height>231</height>
+                     </size>
+                 </property>
+                 <property name="title">
+                     <string>Edition de carton</string>
+                 </property>
+                 <widget class="QSpinBox" name="UICell_L1_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="maximum">
+                         <number>9</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="maximum">
+                         <number>9</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="maximum">
+                         <number>9</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="frame">
+                         <bool>true</bool>
+                     </property>
+                     <property name="accelerated">
+                         <bool>true</bool>
+                     </property>
+                     <property name="minimum">
+                         <number>10</number>
+                     </property>
+                     <property name="maximum">
+                         <number>19</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>10</number>
+                     </property>
+                     <property name="maximum">
+                         <number>19</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>10</number>
+                     </property>
+                     <property name="maximum">
+                         <number>19</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>20</number>
+                     </property>
+                     <property name="maximum">
+                         <number>29</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>20</number>
+                     </property>
+                     <property name="maximum">
+                         <number>29</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>20</number>
+                     </property>
+                     <property name="maximum">
+                         <number>29</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="buttonSymbols">
+                         <enum>QAbstractSpinBox::UpDownArrows</enum>
+                     </property>
+                     <property name="minimum">
+                         <number>30</number>
+                     </property>
+                     <property name="maximum">
+                         <number>39</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>30</number>
+                     </property>
+                     <property name="maximum">
+                         <number>39</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>30</number>
+                     </property>
+                     <property name="maximum">
+                         <number>39</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>40</number>
+                     </property>
+                     <property name="maximum">
+                         <number>49</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>40</number>
+                     </property>
+                     <property name="maximum">
+                         <number>49</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>40</number>
+                     </property>
+                     <property name="maximum">
+                         <number>49</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>50</number>
+                     </property>
+                     <property name="maximum">
+                         <number>59</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>50</number>
+                     </property>
+                     <property name="maximum">
+                         <number>59</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>50</number>
+                     </property>
+                     <property name="maximum">
+                         <number>59</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>60</number>
+                     </property>
+                     <property name="maximum">
+                         <number>69</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>60</number>
+                     </property>
+                     <property name="maximum">
+                         <number>69</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>60</number>
+                     </property>
+                     <property name="maximum">
+                         <number>69</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>70</number>
+                     </property>
+                     <property name="maximum">
+                         <number>79</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>70</number>
+                     </property>
+                     <property name="maximum">
+                         <number>79</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>70</number>
+                     </property>
+                     <property name="maximum">
+                         <number>79</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L1_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>50</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>80</number>
+                     </property>
+                     <property name="maximum">
+                         <number>90</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L2_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>100</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>80</number>
+                     </property>
+                     <property name="maximum">
+                         <number>90</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="UICell_L3_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>150</y>
+                             <width>51</width>
+                             <height>31</height>
+                         </rect>
+                     </property>
+                     <property name="font">
+                         <font>
+                             <pointsize>18</pointsize>
+                             <bold>false</bold>
+                         </font>
+                     </property>
+                     <property name="minimum">
+                         <number>80</number>
+                     </property>
+                     <property name="maximum">
+                         <number>90</number>
+                     </property>
+                 </widget>
+                 <widget class="QSpinBox" name="spinBox_29">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>20</y>
+                             <width>71</width>
+                             <height>21</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Définition du numéro (unique) du carton</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_6">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>20</y>
+                             <width>49</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Numéro:</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_8">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>60</y>
+                             <width>49</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Ligne 1</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_9">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>110</y>
+                             <width>49</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Ligne 2</string>
+                     </property>
+                 </widget>
+                 <widget class="QLabel" name="label_10">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>160</y>
+                             <width>49</width>
+                             <height>16</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Ligne 3</string>
+                     </property>
+                 </widget>
+                 <widget class="QPushButton" name="UILoadCartonFromList">
+                     <property name="geometry">
+                         <rect>
+                             <x>150</x>
+                             <y>20</y>
+                             <width>131</width>
+                             <height>24</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Charge les informations de carton depuis la liste.</string>
+                     </property>
+                     <property name="text">
+                         <string>Charger depuis la liste</string>
+                     </property>
+                 </widget>
+                 <widget class="QPushButton" name="UISaveCartonToList">
+                     <property name="geometry">
+                         <rect>
+                             <x>290</x>
+                             <y>20</y>
+                             <width>121</width>
+                             <height>24</height>
+                         </rect>
+                     </property>
+                     <property name="toolTip">
+                         <string>Sauve la configuration dans la liste (si le carton est valide).</string>
+                     </property>
+                     <property name="text">
+                         <string>Sauver dans la liste</string>
+                     </property>
+                 </widget>
+                 <widget class="QLineEdit" name="UIRawLine">
+                     <property name="geometry">
+                         <rect>
+                             <x>10</x>
+                             <y>200</y>
+                             <width>471</width>
+                             <height>21</height>
+                         </rect>
+                     </property>
+                 </widget>
+                 <widget class="QPushButton" name="UILoadRawLine">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>200</y>
+                             <width>111</width>
+                             <height>24</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string>Charger ligne brute</string>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C0">
+                     <property name="geometry">
+                         <rect>
+                             <x>70</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C1">
+                     <property name="geometry">
+                         <rect>
+                             <x>130</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C2">
+                     <property name="geometry">
+                         <rect>
+                             <x>190</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C5">
+                     <property name="geometry">
+                         <rect>
+                             <x>370</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C4">
+                     <property name="geometry">
+                         <rect>
+                             <x>310</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C3">
+                     <property name="geometry">
+                         <rect>
+                             <x>250</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L3_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>180</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C8">
+                     <property name="geometry">
+                         <rect>
+                             <x>550</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C7">
+                     <property name="geometry">
+                         <rect>
+                             <x>490</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L2_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>130</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QCheckBox" name="UIChk_L1_C6">
+                     <property name="geometry">
+                         <rect>
+                             <x>430</x>
+                             <y>80</y>
+                             <width>21</width>
+                             <height>20</height>
+                         </rect>
+                     </property>
+                     <property name="text">
+                         <string/>
+                     </property>
+                 </widget>
+                 <widget class="QFrame" name="frame">
+                     <property name="geometry">
+                         <rect>
+                             <x>0</x>
+                             <y>230</y>
+                             <width>593</width>
+                             <height>44</height>
+                         </rect>
+                     </property>
+                     <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                         </sizepolicy>
+                     </property>
+                     <property name="frameShape">
+                         <enum>QFrame::StyledPanel</enum>
+                     </property>
+                     <property name="frameShadow">
+                         <enum>QFrame::Raised</enum>
+                     </property>
+                     <layout class="QHBoxLayout" name="horizontalLayout">
+                         <item>
+                             <spacer name="horizontalSpacer">
+                                 <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                 </property>
+                                 <property name="sizeHint" stdset="0">
+                                     <size>
+                                         <width>130</width>
+                                         <height>20</height>
+                                     </size>
+                                 </property>
+                             </spacer>
+                         </item>
+                         <item>
+                             <widget class="QPushButton" name="ButtonOk">
+                                 <property name="toolTip">
+                                     <string>Sauvegarde Et ferme La fenêtre</string>
+                                 </property>
+                                 <property name="text">
+                                     <string>Ok</string>
+                                 </property>
+                             </widget>
+                         </item>
+                         <item>
+                             <spacer name="horizontalSpacer_2">
+                                 <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                 </property>
+                                 <property name="sizeType">
+                                     <enum>QSizePolicy::Preferred</enum>
+                                 </property>
+                                 <property name="sizeHint" stdset="0">
+                                     <size>
+                                         <width>20</width>
+                                         <height>20</height>
+                                     </size>
+                                 </property>
+                             </spacer>
+                         </item>
+                         <item>
+                             <widget class="QPushButton" name="ButtonApply">
+                                 <property name="toolTip">
+                                     <string>Sauvegarde sans fermer la fenêtre</string>
+                                 </property>
+                                 <property name="text">
+                                     <string>Appliquer</string>
+                                 </property>
+                             </widget>
+                         </item>
+                         <item>
+                             <spacer name="horizontalSpacer_3">
+                                 <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                 </property>
+                                 <property name="sizeType">
+                                     <enum>QSizePolicy::Preferred</enum>
+                                 </property>
+                                 <property name="sizeHint" stdset="0">
+                                     <size>
+                                         <width>20</width>
+                                         <height>20</height>
+                                     </size>
+                                 </property>
+                             </spacer>
+                         </item>
+                         <item>
+                             <widget class="QPushButton" name="ButtonCancel">
+                                 <property name="toolTip">
+                                     <string>Ferme la fenêtre sans sauvegarder</string>
+                                 </property>
+                                 <property name="text">
+                                     <string>Annuler</string>
+                                 </property>
+                             </widget>
+                         </item>
+                         <item>
+                             <spacer name="horizontalSpacer_4">
+                                 <property name="orientation">
+                                     <enum>Qt::Horizontal</enum>
+                                 </property>
+                                 <property name="sizeHint" stdset="0">
+                                     <size>
+                                         <width>130</width>
+                                         <height>20</height>
+                                     </size>
+                                 </property>
+                             </spacer>
+                         </item>
+                     </layout>
+                 </widget>
+             </widget>
+         </item>
+         <item>
+             <widget class="QFrame" name="frame_2">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                     <item>
+                         <spacer name="horizontalSpacer_5">
+                             <property name="orientation">
+                                 <enum>Qt::Horizontal</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                                 <size>
+                                     <width>130</width>
+                                     <height>20</height>
+                                 </size>
+                             </property>
+                         </spacer>
+                     </item>
+                     <item>
+                         <widget class="QPushButton" name="ButtonOk_2">
+                             <property name="toolTip">
+                                 <string>Sauvegarde Et ferme La fenêtre</string>
+                             </property>
+                             <property name="text">
+                                 <string>Ok</string>
+                             </property>
+                         </widget>
+                     </item>
+                     <item>
+                         <spacer name="horizontalSpacer_6">
+                             <property name="orientation">
+                                 <enum>Qt::Horizontal</enum>
+                             </property>
+                             <property name="sizeType">
+                                 <enum>QSizePolicy::Preferred</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                                 <size>
+                                     <width>20</width>
+                                     <height>20</height>
+                                 </size>
+                             </property>
+                         </spacer>
+                     </item>
+                     <item>
+                         <widget class="QPushButton" name="ButtonApply_2">
+                             <property name="toolTip">
+                                 <string>Sauvegarde sans fermer la fenêtre</string>
+                             </property>
+                             <property name="text">
+                                 <string>Appliquer</string>
+                             </property>
+                         </widget>
+                     </item>
+                     <item>
+                         <spacer name="horizontalSpacer_7">
+                             <property name="orientation">
+                                 <enum>Qt::Horizontal</enum>
+                             </property>
+                             <property name="sizeType">
+                                 <enum>QSizePolicy::Preferred</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                                 <size>
+                                     <width>20</width>
+                                     <height>20</height>
+                                 </size>
+                             </property>
+                         </spacer>
+                     </item>
+                     <item>
+                         <widget class="QPushButton" name="ButtonCancel_2">
+                             <property name="toolTip">
+                                 <string>Ferme la fenêtre sans sauvegarder</string>
+                             </property>
+                             <property name="text">
+                                 <string>Annuler</string>
+                             </property>
+                         </widget>
+                     </item>
+                     <item>
+                         <spacer name="horizontalSpacer_8">
+                             <property name="orientation">
+                                 <enum>Qt::Horizontal</enum>
+                             </property>
+                             <property name="sizeHint" stdset="0">
+                                 <size>
+                                     <width>130</width>
+                                     <height>20</height>
+                                 </size>
+                             </property>
+                         </spacer>
+                     </item>
+                 </layout>
+             </widget>
+         </item>
+     </layout>
  </widget>
  <tabstops>
   <tabstop>UICell_L1_C0</tabstop>
@@ -1417,7 +1617,7 @@
      <y>91</y>
     </hint>
     <hint type="destinationlabel">
-     <x>654</x>
+        <x>640</x>
      <y>119</y>
     </hint>
    </hints>
@@ -1433,7 +1633,7 @@
      <y>153</y>
     </hint>
     <hint type="destinationlabel">
-     <x>645</x>
+        <x>640</x>
      <y>179</y>
     </hint>
    </hints>
@@ -1444,10 +1644,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>LoadFromList()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>229</x>
-     <y>211</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>228</x>
+           <y>224</y>
+       </hint>
     <hint type="destinationlabel">
      <x>639</x>
      <y>212</y>
@@ -1460,12 +1660,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>SaveInList()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>368</x>
-     <y>208</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>367</x>
+           <y>221</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>645</x>
+        <x>640</x>
      <y>246</y>
     </hint>
    </hints>
@@ -1476,12 +1676,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>LoadLine()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>573</x>
-     <y>392</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>572</x>
+           <y>405</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>652</x>
+        <x>640</x>
      <y>386</y>
     </hint>
    </hints>
@@ -1545,7 +1745,7 @@
      <y>247</y>
     </hint>
     <hint type="destinationlabel">
-     <x>-3</x>
+        <x>0</x>
      <y>199</y>
     </hint>
    </hints>
@@ -1577,7 +1777,7 @@
      <y>244</y>
     </hint>
     <hint type="destinationlabel">
-     <x>-1</x>
+        <x>0</x>
      <y>165</y>
     </hint>
    </hints>
@@ -1588,13 +1788,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>462</x>
-     <y>242</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>461</x>
+           <y>255</y>
+       </hint>
     <hint type="destinationlabel">
      <x>464</x>
-     <y>-18</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1610,7 +1810,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
-     <y>-14</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1620,13 +1820,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>568</x>
-     <y>241</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>567</x>
+           <y>254</y>
+       </hint>
     <hint type="destinationlabel">
      <x>448</x>
-     <y>-5</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1636,10 +1836,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>246</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>89</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>244</y>
@@ -1652,10 +1852,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>169</x>
-     <y>255</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>168</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>2</x>
      <y>232</y>
@@ -1668,10 +1868,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>222</x>
-     <y>250</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>221</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>2</x>
      <y>213</y>
@@ -1684,12 +1884,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>279</x>
-     <y>247</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>278</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-3</x>
+        <x>0</x>
      <y>199</y>
     </hint>
    </hints>
@@ -1700,10 +1900,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>342</x>
-     <y>249</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>341</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>1</x>
      <y>183</y>
@@ -1716,12 +1916,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>398</x>
-     <y>244</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>397</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-1</x>
+        <x>0</x>
      <y>165</y>
     </hint>
    </hints>
@@ -1732,13 +1932,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>462</x>
-     <y>242</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>461</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>464</x>
-     <y>-18</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1748,13 +1948,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>517</x>
-     <y>245</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>516</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>421</x>
-     <y>-14</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1764,13 +1964,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>568</x>
-     <y>241</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>567</x>
+           <y>293</y>
+       </hint>
     <hint type="destinationlabel">
      <x>448</x>
-     <y>-5</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1780,10 +1980,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>246</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>89</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>244</y>
@@ -1796,10 +1996,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>169</x>
-     <y>255</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>168</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>2</x>
      <y>232</y>
@@ -1812,10 +2012,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>222</x>
-     <y>250</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>221</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>2</x>
      <y>213</y>
@@ -1828,12 +2028,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>279</x>
-     <y>247</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>278</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-3</x>
+        <x>0</x>
      <y>199</y>
     </hint>
    </hints>
@@ -1844,10 +2044,10 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>342</x>
-     <y>249</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>341</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>1</x>
      <y>183</y>
@@ -1860,12 +2060,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>398</x>
-     <y>244</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>397</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-1</x>
+        <x>0</x>
      <y>165</y>
     </hint>
    </hints>
@@ -1876,13 +2076,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>462</x>
-     <y>242</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>461</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>464</x>
-     <y>-18</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1892,13 +2092,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>517</x>
-     <y>245</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>516</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>421</x>
-     <y>-14</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1908,13 +2108,13 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>568</x>
-     <y>241</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>567</x>
+           <y>343</y>
+       </hint>
     <hint type="destinationlabel">
      <x>448</x>
-     <y>-5</y>
+        <y>0</y>
     </hint>
    </hints>
   </connection>
@@ -1924,12 +2124,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>271</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>86</x>
+           <y>284</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>283</y>
     </hint>
    </hints>
@@ -1940,12 +2140,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>149</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -1956,12 +2156,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>199</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -1972,12 +2172,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>259</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -1988,12 +2188,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>319</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2004,12 +2204,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>379</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2020,12 +2220,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>439</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2036,12 +2236,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>499</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2052,12 +2252,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>559</x>
+           <y>279</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2068,12 +2268,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>271</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>86</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>283</y>
     </hint>
    </hints>
@@ -2084,12 +2284,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>149</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2100,12 +2300,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>199</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2116,12 +2316,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>259</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2132,12 +2332,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>319</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2148,12 +2348,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>379</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2164,12 +2364,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>439</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2180,12 +2380,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>499</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2196,12 +2396,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>559</x>
+           <y>323</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2212,12 +2412,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>87</x>
-     <y>271</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>86</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>283</y>
     </hint>
    </hints>
@@ -2228,12 +2428,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>149</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2244,12 +2444,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>199</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2260,12 +2460,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>259</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2276,12 +2476,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>319</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2292,12 +2492,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>379</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2308,12 +2508,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>439</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2324,12 +2524,12 @@
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>150</x>
-     <y>266</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>499</x>
+           <y>373</y>
+       </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+        <x>0</x>
      <y>274</y>
     </hint>
    </hints>
@@ -2339,65 +2539,17 @@
    <signal>clicked()</signal>
    <receiver>ConfigCartons</receiver>
    <slot>UpdateGrid()</slot>
-   <hints>
-       <hint type="sourcelabel">
-           <x>150</x>
-           <y>266</y>
-       </hint>
-       <hint type="destinationlabel">
-           <x>-4</x>
-           <y>274</y>
-       </hint>
-   </hints>
+      <hints>
+          <hint type="sourcelabel">
+              <x>559</x>
+              <y>373</y>
+          </hint>
+          <hint type="destinationlabel">
+              <x>0</x>
+              <y>274</y>
+          </hint>
+      </hints>
   </connection>
-     <connection>
-         <sender>pushButton</sender>
-         <signal>clicked()</signal>
-         <receiver>ConfigCartons</receiver>
-         <slot>ClicOk()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>204</x>
-                 <y>439</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>218</x>
-                 <y>-9</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>pushButton_2</sender>
-         <signal>clicked()</signal>
-         <receiver>ConfigCartons</receiver>
-         <slot>ClicApply()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>322</x>
-                 <y>428</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>301</x>
-                 <y>-12</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>pushButton_3</sender>
-         <signal>clicked()</signal>
-         <receiver>ConfigCartons</receiver>
-         <slot>ClicCancel()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>424</x>
-                 <y>430</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>384</x>
-                 <y>-20</y>
-             </hint>
-         </hints>
-     </connection>
      <connection>
          <sender>UIListName</sender>
          <signal>editingFinished()</signal>
@@ -2410,7 +2562,55 @@
              </hint>
              <hint type="destinationlabel">
                  <x>341</x>
-                 <y>-11</y>
+                 <y>0</y>
+             </hint>
+         </hints>
+     </connection>
+     <connection>
+         <sender>ButtonOk_2</sender>
+         <signal>clicked()</signal>
+         <receiver>ConfigCartons</receiver>
+         <slot>actOk()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>221</x>
+                 <y>448</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>218</x>
+                 <y>485</y>
+             </hint>
+         </hints>
+     </connection>
+     <connection>
+         <sender>ButtonApply_2</sender>
+         <signal>clicked()</signal>
+         <receiver>ConfigCartons</receiver>
+         <slot>actApply()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>314</x>
+                 <y>447</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>314</x>
+                 <y>483</y>
+             </hint>
+         </hints>
+     </connection>
+     <connection>
+         <sender>ButtonCancel_2</sender>
+         <signal>clicked()</signal>
+         <receiver>ConfigCartons</receiver>
+         <slot>actCancel()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>420</x>
+                 <y>452</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>429</x>
+                 <y>486</y>
              </hint>
          </hints>
      </connection>
@@ -2422,9 +2622,9 @@
         <slot>SaveInList()</slot>
         <slot>LoadLine()</slot>
         <slot>UpdateGrid()</slot>
-        <slot>ClicOk()</slot>
-        <slot>ClicApply()</slot>
-        <slot>ClicCancel()</slot>
+        <slot>actOk()</slot>
+        <slot>actApply()</slot>
+        <slot>actCancel()</slot>
         <slot>updateName()</slot>
     </slots>
 </ui>
