@@ -4,7 +4,6 @@
  *
  */
 #include "core/carton.h"
-#include "core/random.h"
 #include <sstream>
 #include <vector>
 
@@ -118,17 +117,23 @@ void Carton::updateStatus() {
     }
 }
 
-void Carton::generate(const uint32_t& num) {
+void Carton::generate(const uint32_t& num, RandomNumberGenerator* rng) {
+    bool cleaning= rng == nullptr;
+    if(cleaning)
+        rng= new RandomNumberGenerator;
+    else
+        rng->resetPick();
     numero= num;
-    RandomNumberGenerator rng;
     for(auto& line: lines) {
-        auto l= rng.generateLine();
+        auto l= rng->generateLine();
         for(uint8_t i= 0; i < nb_colones; ++i) {
             line[i].numero = l[i];
             line[i].checked= false;
         }
     }
     updateStatus();
+    if(cleaning)
+        delete rng;
 }
 
 void Carton::print(std::ostream& oss) const {
@@ -141,4 +146,24 @@ void Carton::print(std::ostream& oss) const {
     }
 }
 
-}// namespace evl
+void Carton::read(std::istream& is) {
+    is.read((char*)&numero, 4);
+    is.read((char*)&res, sizeof(ResultCarton));
+    for(const std::array<GCase, nb_colones>& line: lines) {
+        for(const GCase& _num: line) {
+            is.read((char*)&_num, sizeof(GCase));
+        }
+    }
+}
+
+void Carton::write(std::ostream& os) const {
+    os.write((char*)&numero, 4);
+    os.write((char*)&res, sizeof(ResultCarton));
+    for(const std::array<GCase, nb_colones>& line: lines) {
+        for(const GCase& _num: line) {
+            os.write((char*)&_num, sizeof(GCase));
+        }
+    }
+}
+
+}// namespace evl::core

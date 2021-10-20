@@ -67,7 +67,7 @@ public:
      * @brief Génère un certain nombre de cartons aléatoirement
      * @param number Le nombre de cartons à générer.
      */
-    void generate(const uint32_t& number);
+    void generate(const uint32_t& number, RandomNumberGenerator* rng);
     /**
      * @brief Génère une liste de cartons ayant le statut demandé
      * @param st Le status des cartons.

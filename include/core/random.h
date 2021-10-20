@@ -20,12 +20,7 @@ public:
      * @brief Constructeur de base.
      * @param debug Si mis à vrai, utilise une seed déterministe.
      */
-    RandomNumberGenerator(bool debug= false) {
-        if(debug)
-            std::srand(1234);
-        else
-            std::srand(time(nullptr));
-    }
+    RandomNumberGenerator(bool debug= false);
 
     /**
      * @brief Remet à zéro la liste des numéros déjà tiré.
