@@ -48,7 +48,10 @@ public:
      */
     const core::PaquetCartons& getCartons() const { return cartons; }
 public slots:
-
+    /**
+     * @brief Surcharge de la commande d’exécution.
+     * @return Code de retour.
+     */
     int exec() override;
 private slots:
     /**
