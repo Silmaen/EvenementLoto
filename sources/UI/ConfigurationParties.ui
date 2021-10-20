@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>Dialog</class>
-    <widget class="QDialog" name="Dialog">
+    <class>ConfigurationParties</class>
+    <widget class="QDialog" name="ConfigurationParties">
         <property name="geometry">
             <rect>
                 <x>0</x>
@@ -468,7 +468,7 @@
         <connection>
             <sender>ButtonOk</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>actOk()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -484,7 +484,7 @@
         <connection>
             <sender>ButtonApply</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>actApply()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -500,7 +500,7 @@
         <connection>
             <sender>ButtonCancel</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>actCancel()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -516,7 +516,7 @@
         <connection>
             <sender>BtnLoadPartie</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieLoad()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -532,7 +532,7 @@
         <connection>
             <sender>BtnCreatePArtie</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieCreate()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -548,7 +548,7 @@
         <connection>
             <sender>PartieMoveBefore</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieOrderBefore()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -564,7 +564,7 @@
         <connection>
             <sender>PartieMoveAfter</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieOrderAfter()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -580,7 +580,7 @@
         <connection>
             <sender>BtnSavePartie</sender>
             <signal>clicked()</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieSave()</slot>
             <hints>
                 <hint type="sourcelabel">
@@ -596,7 +596,7 @@
         <connection>
             <sender>PartieType</sender>
             <signal>currentTextChanged(QString)</signal>
-            <receiver>Dialog</receiver>
+            <receiver>ConfigurationParties</receiver>
             <slot>partieTypeChanged(QString)</slot>
             <hints>
                 <hint type="sourcelabel">

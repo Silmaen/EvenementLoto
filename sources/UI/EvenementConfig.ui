@@ -170,7 +170,7 @@
             <sender>ButtonOk</sender>
             <signal>clicked()</signal>
             <receiver>EvenementConfig</receiver>
-            <slot>ActOk()</slot>
+            <slot>actOk()</slot>
             <hints>
                 <hint type="sourcelabel">
                     <x>189</x>
@@ -186,7 +186,7 @@
             <sender>ButtonApply</sender>
             <signal>clicked()</signal>
             <receiver>EvenementConfig</receiver>
-            <slot>ActApply()</slot>
+            <slot>actApply()</slot>
             <hints>
                 <hint type="sourcelabel">
                     <x>313</x>
@@ -202,7 +202,7 @@
             <sender>ButtonCancel</sender>
             <signal>clicked()</signal>
             <receiver>EvenementConfig</receiver>
-            <slot>ActCancel()</slot>
+            <slot>actCancel()</slot>
             <hints>
                 <hint type="sourcelabel">
                     <x>418</x>
@@ -216,8 +216,8 @@
         </connection>
     </connections>
     <slots>
-        <slot>ActOk()</slot>
-        <slot>ActApply()</slot>
-        <slot>ActCancel()</slot>
+        <slot>actOk()</slot>
+        <slot>actApply()</slot>
+        <slot>actCancel()</slot>
     </slots>
 </ui>

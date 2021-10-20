@@ -5,6 +5,9 @@
 #include "UI/MainWindow.h"
 #include "UI/About.h"
 #include "UI/ConfigCartons.h"
+#include "UI/ConfigurationParties.h"
+#include "UI/EvenementConfig.h"
+#include "UI/GeneralConfig.h"
 #include <QMessageBox>
 
 // Les trucs de QT
@@ -33,7 +36,9 @@ void MainWindow::showHelp() {
 }
 
 void MainWindow::showParametresGeneraux() {
-    showNotImplemented("Paramètres généraux");
+    //showNotImplemented("Paramètres généraux");
+    GeneralConfig cfg(this);
+    cfg.exec();
 }
 
 void MainWindow::showParametresCartons() {
@@ -44,11 +49,15 @@ void MainWindow::showParametresCartons() {
 }
 
 void MainWindow::showParametresParties() {
-    showNotImplemented("Configuration des parties");
+    //showNotImplemented("Configuration des parties");
+    ConfigurationParties cfg;
+    cfg.exec();
 }
 
 void MainWindow::showParametresEvenement() {
-    showNotImplemented("Configuration de l’événement");
+    //showNotImplemented("Configuration de l’événement");
+    EvenementConfig cfg;
+    cfg.exec();
 }
 
 void MainWindow::fichierNew() {
