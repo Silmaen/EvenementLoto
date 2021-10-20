@@ -3,7 +3,10 @@
  * @date 20/10/2021
  */
 #include "UI/GeneralConfig.h"
+#include "UI/MainWindow.h"
+#include <QFileDialog>
 #include <QMessageBox>
+#include <iostream>
 
 // Les trucs de QT
 #include "UI/moc_GeneralConfig.cpp"
@@ -11,9 +14,9 @@
 
 namespace evl::gui {
 
-GeneralConfig::GeneralConfig(QWidget* parent):
+GeneralConfig::GeneralConfig(MainWindow* parent):
     QDialog(parent),
-    ui(new Ui::GeneralConfig) {
+    ui(new Ui::GeneralConfig), mwd(parent) {
     ui->setupUi(this);
 }
 
@@ -21,12 +24,12 @@ GeneralConfig::~GeneralConfig() {
     delete ui;
 }
 
-void GeneralConfig::LoadFile() {
-    showNotImplemented("LoadFile");
-}
-
 void GeneralConfig::SaveFile() {
-    showNotImplemented("SaveFile");
+    if(mwd != nullptr) {
+        mwd->getSettings().setValue("path/datapath", ui->DataLocation->text());
+        std::cout << "saved " << ui->DataLocation->text().toStdString() << " into path/datapath" << std::endl;
+        mwd->syncSettings();
+    }
 }
 
 void GeneralConfig::actOk() {
@@ -43,7 +46,12 @@ void GeneralConfig::actCancel() {
 }
 
 void GeneralConfig::searchFolder() {
-    showNotImplemented("searchFolder");
+    QFileDialog dia;
+    dia.setAcceptMode(QFileDialog::AcceptOpen);
+    dia.setFileMode(QFileDialog::FileMode::Directory);
+    if(dia.exec()) {
+        ui->DataLocation->setText(dia.selectedFiles()[0]);
+    }
 }
 
 void GeneralConfig::showNotImplemented(const QString& from) {
@@ -56,6 +64,9 @@ void GeneralConfig::showNotImplemented(const QString& from) {
 }
 
 int GeneralConfig::exec() {
+    if(mwd != nullptr) {
+        ui->DataLocation->setText(mwd->getSettings().value("path/datapath", "").toString());
+    }
     return QDialog::exec();
 }
 

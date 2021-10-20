@@ -3,7 +3,6 @@
  * @date 20/10/2021
  */
 #pragma once
-
 #include <QDialog>
 
 namespace Ui {
@@ -15,6 +14,8 @@ class GeneralConfig;
 
 namespace evl::gui {
 
+class MainWindow;
+
 /**
  * @brief Classe D’affichage de la Fenêtre permettant de configurer les cartons.
  */
@@ -25,7 +26,7 @@ public:
      * @brief Constructeur.
      * @param parent Le widget Parent.
      */
-    explicit GeneralConfig(QWidget* parent= nullptr);
+    explicit GeneralConfig(MainWindow* parent= nullptr);
     /**
      * @brief Destructeur.
      */
@@ -59,10 +60,6 @@ private:
     /**
      * @brief Charge une configuration depuis un fichier
      */
-    void LoadFile();
-    /**
-     * @brief Charge une configuration depuis un fichier
-     */
     void SaveFile();
     /**
      * @brief Affiche une boite de dialogue disant que c’est en travaux.
@@ -70,7 +67,8 @@ private:
      */
     void showNotImplemented(const QString& from);
 
-    Ui::GeneralConfig* ui;///< Lien vers la page UI.
+    Ui::GeneralConfig* ui;   ///< Lien vers la page UI.
+    MainWindow* mwd= nullptr;///< Lien vers la MainWindow
 };
 
 }// namespace evl::gui

@@ -9,6 +9,7 @@
 #include "UI/EvenementConfig.h"
 #include "UI/GeneralConfig.h"
 #include <QMessageBox>
+#include <iostream>
 
 // Les trucs de QT
 #include <UI/moc_MainWindow.cpp>
@@ -18,7 +19,8 @@ namespace evl::gui {
 
 MainWindow::MainWindow(QWidget* parent):
     QMainWindow(parent),
-    ui(new Ui::MainWindow) {
+    ui(new Ui::MainWindow),
+    settings{QString(getIniFile().generic_u8string().c_str()), QSettings::IniFormat} {
     ui->setupUi(this);
 }
 
@@ -38,6 +40,7 @@ void MainWindow::showHelp() {
 void MainWindow::showParametresGeneraux() {
     //showNotImplemented("Paramètres généraux");
     GeneralConfig cfg(this);
+    settings.value("path/datapath", "").toString();
     cfg.exec();
 }
 
@@ -87,6 +90,7 @@ void MainWindow::fichierTerminer() {
 void MainWindow::fichierQuitter() {
     close();
 }
+
 void MainWindow::showNotImplemented(const QString& from) {
     QMessageBox message;
     message.setIcon(QMessageBox::Warning);
@@ -94,6 +98,10 @@ void MainWindow::showNotImplemented(const QString& from) {
     message.setText("Ce programme est encore en construction");
     message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
     message.exec();
+}
+
+void MainWindow::syncSettings() {
+    settings.sync();
 }
 
 }// namespace evl::gui

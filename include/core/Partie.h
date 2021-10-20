@@ -9,6 +9,9 @@
 
 namespace evl::core {
 
+/**
+ * @brief Classe définissant une partie.
+ */
 class Partie: public Serializable {
 public:
     /**
