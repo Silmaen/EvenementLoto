@@ -4,8 +4,16 @@
 */
 #include "core/random.h"
 #include "baseDefine.h"
+#include <chrono>
 
 namespace evl::core {
+
+RandomNumberGenerator::RandomNumberGenerator(bool debug) {
+    if(debug)
+        std::srand(1234);
+    else
+        std::srand(std::chrono::steady_clock::now().time_since_epoch().count());
+}
 
 bool RandomNumberGenerator::addPick(const uint8_t& num) {
     if(std::find(alreadyPicked.begin(), alreadyPicked.end(), num) != alreadyPicked.end())

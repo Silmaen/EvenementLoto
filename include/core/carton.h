@@ -3,7 +3,8 @@
  * @date 17/10/202
  */
 #pragma once
-#include "baseDefine.h"
+#include "Serializable.h"
+#include "random.h"
 #include <array>
 #include <ostream>
 #include <string>
@@ -13,7 +14,7 @@ namespace evl::core {
 /**
  * @brief Classe de base pour définir un carton.
  */
-class Carton {
+class Carton: public Serializable {
 public:
     /**
      * @brief Les données d’une case de grille.
@@ -25,7 +26,7 @@ public:
     /**
      * @brief Les différents statut du carton
      */
-    enum class ResultCarton {
+    enum struct ResultCarton {
         EnCours,           ///< Le carton est toujours en jeu.
         PresqueUneLigne,   ///< Il ne manque qu’un numéro pour qu’une ligne soit remplie.
         UneLigne,          ///< Une ligne est entièrement remplie.
@@ -98,13 +99,25 @@ public:
      * @brief Génère aléatoirement une grille, celle-ci est active par défaut.
      * @param num Le numéro de la grille
      */
-    void generate(const uint32_t& num);
+    void generate(const uint32_t& num, RandomNumberGenerator* rng= nullptr);
 
     /**
      * @brief Dessine le carton dans le stream donnée.
      * @param oss Le stream dans lequel écrire
      */
     void print(std::ostream& oss) const;
+
+    /**
+     * @brief Écriture dans un stream.
+     * @param bs Le stream où écrire.
+     */
+    void write(std::ostream& os) const override;
+
+    /**
+     * @brief Lecture depuis un stream
+     * @param bs Le stream d’entrée.
+     */
+    void read(std::istream& is) override;
 
 private:
     uint32_t numero= 0;                                       ///< Le numéro du carton

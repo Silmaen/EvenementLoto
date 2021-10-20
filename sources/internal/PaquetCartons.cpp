@@ -9,24 +9,26 @@ namespace evl::core {
 PaquetCartons::PaquetCartons()= default;
 
 void PaquetCartons::write(std::ostream& bs) const {
-    bs << nom << std::endl;
-    bs << cartons.size() << std::endl;
-    for(auto& carton: cartons) {
-        bs.write((const char*)&carton, sizeof(carton));
-    }
+    std::string::size_type ss= nom.size();
+    bs.write((char*)&ss, sizeof(ss));
+    bs.write(nom.c_str(), nom.size());
+    std::vector<Carton>::size_type sv= cartons.size();
+    bs.write((char*)&sv, sizeof(sv));
+    for(const Carton& carton: cartons) carton.write(bs);
 }
 
 void PaquetCartons::read(std::istream& bs) {
-    std::getline(bs, nom);
-    std::string st_str;
-    std::getline(bs, st_str);
-    size_t s;
-    s= std::atoi(st_str.c_str());
+    std::string::size_type ss;
+    bs.read((char*)&ss, sizeof(ss));
+    nom.resize(ss);
+    for(std::string::size_type i= 0; i < ss; ++i)
+        bs.read(&(nom[i]), 1);
+    std::vector<Carton>::size_type sv;
+    bs.read((char*)&sv, sizeof(sv));
     cartons.clear();
-    cartons.resize(s);
-    for(auto& carton: cartons) {
-        bs.read((char*)&carton, sizeof(carton));
-    }
+    cartons.resize(sv);
+    for(std::string::size_type i= 0; i < sv; ++i)
+        cartons[i].read(bs);
 }
 
 std::vector<Carton> PaquetCartons::getCartonByStatus(const Carton::ResultCarton& st) const {
@@ -36,12 +38,17 @@ std::vector<Carton> PaquetCartons::getCartonByStatus(const Carton::ResultCarton&
     return resu;
 }
 
-void PaquetCartons::generate(const uint32_t& number) {
+void PaquetCartons::generate(const uint32_t& number, RandomNumberGenerator* rng) {
+    bool cleaning= rng == nullptr;
+    if(cleaning)
+        rng= new RandomNumberGenerator;
     for(uint32_t i= 0; i < number; ++i) {
         Carton a;
-        a.generate(cartons.size());
+        a.generate(cartons.size(), rng);
         cartons.push_back(a);
     }
+    if(cleaning)
+        delete rng;
 }
 
 }// namespace evl::core
