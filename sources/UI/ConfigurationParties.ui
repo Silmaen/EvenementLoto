@@ -34,7 +34,11 @@
                             </widget>
                         </item>
                         <item row="0" column="2">
-                            <widget class="QLCDNumber" name="PartiesNumber"/>
+                            <widget class="QLCDNumber" name="PartiesNumber">
+                                <property name="toolTip">
+                                    <string>Le nombre de parties de l'évnement en cours.</string>
+                                </property>
+                            </widget>
                         </item>
                         <item row="0" column="3" colspan="6">
                             <spacer name="horizontalSpacer_5">

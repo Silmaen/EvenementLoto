@@ -15,15 +15,16 @@ ConfigurationParties::ConfigurationParties(QWidget* parent):
     QDialog(parent),
     ui(new Ui::ConfigurationParties) {
     ui->setupUi(this);
+    ui->PartieType->addItems({"1 quine",
+                              "2 quines",
+                              "Carton Plein",
+                              "Inverse"});
 }
 
 ConfigurationParties::~ConfigurationParties() {
     delete ui;
 }
 
-void ConfigurationParties::LoadFile() {
-    showNotImplemented("LoadFile");
-}
 
 void ConfigurationParties::SaveFile() {
     showNotImplemented("SaveFile");
@@ -54,23 +55,40 @@ void ConfigurationParties::showNotImplemented(const QString& from) {
 int ConfigurationParties::exec() {
     return QDialog::exec();
 }
+
 void ConfigurationParties::partieCreate() {
     showNotImplemented("partieCreate");
 }
+
 void ConfigurationParties::partieLoad() {
     showNotImplemented("partieLoad");
 }
+
 void ConfigurationParties::partieOrderAfter() {
     showNotImplemented("partieOrderAfter");
 }
+
 void ConfigurationParties::partieOrderBefore() {
     showNotImplemented("partieOrderBefore");
 }
+
 void ConfigurationParties::partieSave() {
     showNotImplemented("partieSave");
 }
+
 void ConfigurationParties::partieTypeChanged(QString) {
     showNotImplemented("partieTypeChanged");
+}
+
+void ConfigurationParties::setEvenement(const core::Evenement& e) {
+    evenement= e;
+    updateDisplay();
+}
+
+void ConfigurationParties::updateDisplay() {
+    ui->PartiesNumber->display((int)evenement.getParties().size());
+
+    ui->SelectedPartie->clear();
 }
 
 }// namespace evl::gui

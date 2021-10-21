@@ -103,6 +103,12 @@ public:
      */
     void setLogo(const std::filesystem::path& logo);
 
+    /**
+     * @brief Accès auc parties
+     * @return Les parties.
+     */
+    std::vector<Partie>& getParties() { return parties; }
+
 private:
     /**
      * @brief Met à jour le statut de l’événement.
