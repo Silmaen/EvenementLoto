@@ -4,6 +4,7 @@
  */
 #pragma once
 
+#include "core/Evenement.h"
 #include <QDialog>
 
 namespace Ui {
@@ -15,6 +16,7 @@ class EvenementConfig;
 
 namespace evl::gui {
 
+class MainWindow;
 /**
  * @brief Classe D’affichage de la Fenêtre permettant de configurer les cartons.
  */
@@ -25,12 +27,22 @@ public:
      * @brief Constructeur.
      * @param parent Le widget Parent.
      */
-    explicit EvenementConfig(QWidget* parent= nullptr);
+    explicit EvenementConfig(MainWindow* parent= nullptr);
     /**
      * @brief Destructeur.
      */
     ~EvenementConfig() override;
 
+    /**
+     * @brief Accès à l’événement de la boite de dialogue
+     * @return L’événement.
+     */
+    const core::Evenement& getEvenement() const { return evenement; }
+    /**
+     * @brief Défini l’événement à éditer.
+     * @param e L’événement.
+     */
+    void setEvenement(const core::Evenement& e);
 public slots:
     /**
      * @brief Surcharge de la commande d’exécution.
@@ -51,11 +63,21 @@ private slots:
      */
     void actOk();
 
+    /**
+     * @brief Action de recherche de logo d’organisateur
+     */
+    void actSearchOrgaLogo();
+
+    /**
+     * @brief Action de recherche de logo d'événement.
+     */
+    void actSearchLogo();
+
 private:
     /**
-     * @brief Charge une configuration depuis un fichier
+     * @brief Met à jour l’affichage
      */
-    void LoadFile();
+    void updateDisplay();
     /**
      * @brief Charge une configuration depuis un fichier
      */
@@ -66,7 +88,12 @@ private:
      */
     void showNotImplemented(const QString& from);
 
-    Ui::EvenementConfig* ui;///< Lien vers la page UI.
+    /// Lien vers la page UI.
+    Ui::EvenementConfig* ui;
+    /// L’évenement en cours d'édition
+    core::Evenement evenement;
+    /// Lien vers la MainWindow
+    MainWindow* mwd= nullptr;
 };
 
 }// namespace evl::gui

@@ -4,6 +4,7 @@
  */
 #include "UI/GeneralConfig.h"
 #include "UI/MainWindow.h"
+#include "UI/baseDefinitions.h"
 #include <QFileDialog>
 #include <QMessageBox>
 #include <iostream>
@@ -26,8 +27,7 @@ GeneralConfig::~GeneralConfig() {
 
 void GeneralConfig::SaveFile() {
     if(mwd != nullptr) {
-        mwd->getSettings().setValue("path/datapath", ui->DataLocation->text());
-        std::cout << "saved " << ui->DataLocation->text().toStdString() << " into path/datapath" << std::endl;
+        mwd->getSettings().setValue(dataPathKey, ui->DataLocation->text());
         mwd->syncSettings();
     }
 }
@@ -65,7 +65,7 @@ void GeneralConfig::showNotImplemented(const QString& from) {
 
 int GeneralConfig::exec() {
     if(mwd != nullptr) {
-        ui->DataLocation->setText(mwd->getSettings().value("path/datapath", "").toString());
+        ui->DataLocation->setText(mwd->getSettings().value(dataPathKey, "").toString());
     }
     return QDialog::exec();
 }

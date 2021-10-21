@@ -4,9 +4,9 @@
 */
 #pragma once
 
-#include "UI/baseDefinitions.h"
 #include <QMainWindow>
 #include <QSettings>
+#include <core/Evenement.h>
 
 /**
  * @brief Namespace permettant à QT d'opérer la conversion de fichier .ui
@@ -103,13 +103,22 @@ private slots:
 
 private:
     /**
+     * @brief Met à jour l’affichage en fonction du contenu de l’événement courant
+     */
+    void updateDisplay();
+
+    /**
      * @brief Affiche une boite de dialogue disant que c’est en travaux.
      * @param from Une chaine permettant de savoir d’où vient la demande.
      */
     void showNotImplemented(const QString& from);
 
-    Ui::MainWindow* ui;///< Lien vers la page UI.
-    QSettings settings;///< Les settings généraux.
+    /// Lien vers la page UI.
+    Ui::MainWindow* ui;
+    /// Les settings généraux.
+    QSettings settings;
+    /// L'événement en cours de traitement
+    core::Evenement currentEvenement;
 };
 
 }// namespace elv

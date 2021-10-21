@@ -4,6 +4,7 @@
  *
  */
 #include "UI/MainWindow.h"
+#include "UI/baseDefinitions.h"
 #include <QApplication>
 
 using namespace evl::gui;

@@ -14,7 +14,7 @@
         <property name="windowTitle">
             <string>MainWindow</string>
         </property>
-        <widget class="QWidget" name="centralwidget">
+        <widget class="QWidget" name="EvenementControl">
             <layout class="QGridLayout" name="gridLayout">
                 <property name="leftMargin">
                     <number>3</number>
@@ -90,7 +90,7 @@
                                                 <property name="geometry">
                                                     <rect>
                                                         <x>10</x>
-                                                        <y>310</y>
+                                                        <y>360</y>
                                                         <width>401</width>
                                                         <height>81</height>
                                                     </rect>
@@ -757,9 +757,10 @@
                 </property>
                 <addaction name="actionParam_tres_g_n_raux"/>
                 <addaction name="separator"/>
+                <addaction name="actionConfiguration_de_l_v_nement"/>
+                <addaction name="separator"/>
                 <addaction name="actionConfiguration_des_cartons"/>
                 <addaction name="actionConfiguration_des_parties"/>
-                <addaction name="actionConfiguration_de_l_v_nement"/>
             </widget>
             <widget class="QMenu" name="menuAide">
                 <property name="title">
@@ -793,11 +794,17 @@
             </property>
         </action>
         <action name="actionConfiguration_des_cartons">
+            <property name="enabled">
+                <bool>true</bool>
+            </property>
             <property name="text">
                 <string>Configuration des cartons</string>
             </property>
         </action>
         <action name="actionConfiguration_des_parties">
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Configuration des parties</string>
             </property>
@@ -818,11 +825,17 @@
             </property>
         </action>
         <action name="actionSauver_Evenement">
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Sauver événement</string>
             </property>
         </action>
         <action name="actionCommencer_Evenement">
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Commencer événement</string>
             </property>
@@ -833,11 +846,17 @@
             </property>
         </action>
         <action name="actionTerminer_Evenement">
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Terminer événement</string>
             </property>
         </action>
         <action name="actionSauver_Evenement_sous">
+            <property name="enabled">
+                <bool>false</bool>
+            </property>
             <property name="text">
                 <string>Sauver événement sous...</string>
             </property>
