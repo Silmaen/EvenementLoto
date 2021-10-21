@@ -5,6 +5,7 @@
 #pragma once
 
 #include <QDialog>
+#include <core/Evenement.h>
 
 namespace Ui {
 /**
@@ -31,6 +32,16 @@ public:
      */
     ~ConfigurationParties() override;
 
+    /**
+     * @brief Accès à l’événement de la boite de dialogue
+     * @return L’événement.
+     */
+    const core::Evenement& getEvenement() const { return evenement; }
+    /**
+     * @brief Défini l’événement à éditer.
+     * @param e L’événement.
+     */
+    void setEvenement(const core::Evenement& e);
 public slots:
 
     /**
@@ -79,9 +90,9 @@ private slots:
 
 private:
     /**
-     * @brief Charge une configuration depuis un fichier
+     * @brief Met à jour l’affichage
      */
-    void LoadFile();
+    void updateDisplay();
     /**
      * @brief Charge une configuration depuis un fichier
      */
@@ -92,7 +103,12 @@ private:
      */
     void showNotImplemented(const QString& from);
 
-    Ui::ConfigurationParties* ui;///< Lien vers la page UI.
+    ///Lien vers la page UI.
+    Ui::ConfigurationParties* ui;
+    /// L’événement en cours d’édition
+    core::Evenement evenement;
+    /// La partie courante.
+    core::Partie currentPartie;
 };
 
 }// namespace evl::gui

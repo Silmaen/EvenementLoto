@@ -46,7 +46,11 @@
                             </widget>
                         </item>
                         <item row="0" column="1">
-                            <widget class="QLineEdit" name="DataLocation"/>
+                            <widget class="QLineEdit" name="DataLocation">
+                                <property name="statusTip">
+                                    <string>Répertoire par défaut dans lequel seront placés les données.</string>
+                                </property>
+                            </widget>
                         </item>
                         <item row="0" column="2">
                             <widget class="QPushButton" name="SearchFolder">
@@ -67,6 +71,9 @@
                                         <width>26</width>
                                         <height>24</height>
                                     </size>
+                                </property>
+                                <property name="statusTip">
+                                    <string>Ouvre une boite de dialogue pour choisir le dossier.</string>
                                 </property>
                                 <property name="text">
                                     <string>...</string>
@@ -206,8 +213,8 @@
             <slot>actOk()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>182</x>
-                    <y>187</y>
+                    <x>250</x>
+                    <y>307</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>117</x>
@@ -222,8 +229,8 @@
             <slot>actApply()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>280</x>
-                    <y>187</y>
+                    <x>357</x>
+                    <y>307</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>224</x>
@@ -238,8 +245,8 @@
             <slot>actCancel()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>402</x>
-                    <y>187</y>
+                    <x>464</x>
+                    <y>307</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>336</x>
@@ -254,8 +261,8 @@
             <slot>searchFolder()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>559</x>
-                    <y>46</y>
+                    <x>621</x>
+                    <y>58</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>260</x>

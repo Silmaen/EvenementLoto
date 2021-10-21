@@ -90,7 +90,7 @@ private:
 
     /// Lien vers la page UI.
     Ui::EvenementConfig* ui;
-    /// L’évenement en cours d'édition
+    /// L’événement en cours d’édition
     core::Evenement evenement;
     /// Lien vers la MainWindow
     MainWindow* mwd= nullptr;
