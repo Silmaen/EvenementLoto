@@ -4,6 +4,8 @@
  */
 
 #pragma once
+#include <QString>
+#include <QStringList>
 #include <filesystem>
 
 /**
@@ -15,6 +17,17 @@ namespace evl::gui {
 static std::filesystem::path baseExecPath;
 /// Nom du fichier de configuration générale de base.
 inline std::filesystem::path iniFile= "config.ini";
+
+/// Clé vers le dataPath.
+inline QString dataPathKey= "path/datapath";
+
+/// Listes des formats d’image supportés
+inline QStringList imageFilter= {
+        "Toutes les images supportées (*.png *.jpg *.jpeg *.bmp)",
+        "Fichiers png (*.png)",
+        "Fichiers jpg (*.jpg, *.jpeg)",
+        "Fichiers bmp (*.bmp)",
+};
 
 /**
  * @brief Construit le chemin vers le fichier de configuration initiale

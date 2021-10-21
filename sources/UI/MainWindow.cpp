@@ -8,7 +8,10 @@
 #include "UI/ConfigurationParties.h"
 #include "UI/EvenementConfig.h"
 #include "UI/GeneralConfig.h"
+#include "UI/baseDefinitions.h"
+#include <QFileDialog>
 #include <QMessageBox>
+#include <fstream>
 #include <iostream>
 
 // Les trucs de QT
@@ -38,9 +41,7 @@ void MainWindow::showHelp() {
 }
 
 void MainWindow::showParametresGeneraux() {
-    //showNotImplemented("Paramètres généraux");
     GeneralConfig cfg(this);
-    settings.value("path/datapath", "").toString();
     cfg.exec();
 }
 
@@ -58,21 +59,45 @@ void MainWindow::showParametresParties() {
 }
 
 void MainWindow::showParametresEvenement() {
-    //showNotImplemented("Configuration de l’événement");
     EvenementConfig cfg;
-    cfg.exec();
+    cfg.setEvenement(currentEvenement);
+    if(cfg.exec() == QDialog::Accepted) {
+        currentEvenement= cfg.getEvenement();
+        updateDisplay();
+    }
 }
 
 void MainWindow::fichierNew() {
-    showNotImplemented("Nouvel événement");
+    currentEvenement= core::Evenement();
+    updateDisplay();
 }
 
 void MainWindow::fichierLoad() {
-    showNotImplemented("Charger événement");
+
+    QFileDialog dia;
+    dia.setAcceptMode(QFileDialog::AcceptOpen);
+    dia.setFileMode(QFileDialog::FileMode::ExistingFile);
+    dia.setDirectory(settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString());
+    dia.setNameFilter("fichier événement (*.lev)");
+    if(dia.exec()) {
+        std::ifstream f;
+        f.open(dia.selectedFiles()[0].toStdString(), std::ios::in | std::ios::binary);
+        currentEvenement.read(f);
+        f.close();
+    }
+
+    updateDisplay();
 }
 
 void MainWindow::fichierSave() {
-    showNotImplemented("Sauver événement");
+    if(currentEvenement.getStatus() == core::Evenement::Status::Invalid)
+        return;
+    std::filesystem::path base= settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString().toStdString();
+    base/= currentEvenement.getNom() + ".lev";
+    std::ofstream f;
+    f.open(base, std::ios::out | std::ios::binary);
+    currentEvenement.write(f);
+    f.close();
 }
 
 void MainWindow::fichierSaveAs() {
@@ -102,6 +127,51 @@ void MainWindow::showNotImplemented(const QString& from) {
 
 void MainWindow::syncSettings() {
     settings.sync();
+}
+
+void MainWindow::updateDisplay() {
+    switch(currentEvenement.getStatus()) {
+    case core::Evenement::Status::Invalid:
+        ui->actionSauver_Evenement->setEnabled(false);
+        ui->actionSauver_Evenement_sous->setEnabled(false);
+        ui->actionCommencer_Evenement->setEnabled(false);
+        ui->actionTerminer_Evenement->setEnabled(false);
+        ui->actionConfiguration_des_parties->setEnabled(false);
+        ui->EvenementControl->setEnabled(false);
+        break;
+    case core::Evenement::Status::MissingParties:
+        ui->actionSauver_Evenement->setEnabled(true);
+        ui->actionSauver_Evenement_sous->setEnabled(false);
+        ui->actionCommencer_Evenement->setEnabled(false);
+        ui->actionTerminer_Evenement->setEnabled(false);
+        ui->actionConfiguration_des_parties->setEnabled(true);
+        ui->EvenementControl->setEnabled(false);
+        break;
+    case core::Evenement::Status::Ready:
+        ui->actionSauver_Evenement->setEnabled(true);
+        ui->actionSauver_Evenement_sous->setEnabled(false);
+        ui->actionCommencer_Evenement->setEnabled(true);
+        ui->actionTerminer_Evenement->setEnabled(false);
+        ui->actionConfiguration_des_parties->setEnabled(true);
+        ui->EvenementControl->setEnabled(false);
+        break;
+    case core::Evenement::Status::OnGoing:
+        ui->actionSauver_Evenement->setEnabled(true);
+        ui->actionSauver_Evenement_sous->setEnabled(false);
+        ui->actionCommencer_Evenement->setEnabled(false);
+        ui->actionTerminer_Evenement->setEnabled(true);
+        ui->actionConfiguration_des_parties->setEnabled(true);
+        ui->EvenementControl->setEnabled(true);
+        break;
+    case core::Evenement::Status::Finished:
+        ui->actionSauver_Evenement->setEnabled(true);
+        ui->actionSauver_Evenement_sous->setEnabled(false);
+        ui->actionCommencer_Evenement->setEnabled(false);
+        ui->actionTerminer_Evenement->setEnabled(false);
+        ui->actionConfiguration_des_parties->setEnabled(true);
+        ui->EvenementControl->setEnabled(false);
+        break;
+    }
 }
 
 }// namespace evl::gui

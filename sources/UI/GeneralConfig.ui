@@ -7,7 +7,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>641</width>
-                <height>192</height>
+                <height>327</height>
             </rect>
         </property>
         <property name="windowTitle">
@@ -77,11 +77,17 @@
                 </widget>
             </item>
             <item>
-                <widget class="QGroupBox" name="groupBox_2">
-                    <property name="title">
-                        <string>Autres options</string>
+                <spacer name="verticalSpacer">
+                    <property name="orientation">
+                        <enum>Qt::Vertical</enum>
                     </property>
-                </widget>
+                    <property name="sizeHint" stdset="0">
+                        <size>
+                            <width>20</width>
+                            <height>40</height>
+                        </size>
+                    </property>
+                </spacer>
             </item>
             <item>
                 <widget class="QFrame" name="frame">

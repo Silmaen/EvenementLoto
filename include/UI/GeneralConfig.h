@@ -66,9 +66,10 @@ private:
      * @param from Une chaine permettant de savoir d’où vient la demande.
      */
     void showNotImplemented(const QString& from);
-
-    Ui::GeneralConfig* ui;   ///< Lien vers la page UI.
-    MainWindow* mwd= nullptr;///< Lien vers la MainWindow
+    /// Lien vers la page UI.
+    Ui::GeneralConfig* ui;
+    /// Lien vers la MainWindow
+    MainWindow* mwd= nullptr;
 };
 
 }// namespace evl::gui
