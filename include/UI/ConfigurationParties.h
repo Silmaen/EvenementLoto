@@ -83,25 +83,45 @@ private slots:
      * @brief Action lors clic sur le bouton Sauver.
      */
     void partieSave();
-    /**
-     * @brief Action lors d'un changement du type de partie.
-     */
-    void partieTypeChanged(QString);
 
 private:
     /**
      * @brief Met à jour l’affichage
+     * @param loadLast Si c’est le dernier élément qui est à charger (utile lors de la création d'un nouvel élément)
      */
-    void updateDisplay();
+    void updateDisplay(bool loadLast= false);
     /**
      * @brief Charge une configuration depuis un fichier
      */
-    void SaveFile();
+    int SaveFile();
     /**
      * @brief Affiche une boite de dialogue disant que c’est en travaux.
      * @param from Une chaine permettant de savoir d’où vient la demande.
      */
     void showNotImplemented(const QString& from);
+
+    /**
+     * @brief
+     * @return
+     */
+    static QStringList getPartieTypes();
+
+    /**
+     * @brief Renvoie l’id dans le composant depuis un type de partie
+     * @param p Le type de partie
+     * @return L’id dans le composant.
+     */
+    static int getIdByPartyType(const core::Partie::Type& p);
+    /**
+     * @brief Retourne un type de partie basé sur la selection courante
+     * @return Le type de partie.
+     */
+    core::Partie::Type getCurrentPartyType();
+    /**
+     * @brief Renvoie la partie en cours d'édition.
+     * @return La partie en cours d'édition.
+     */
+    core::Partie& getCurrentPartie();
 
     ///Lien vers la page UI.
     Ui::ConfigurationParties* ui;

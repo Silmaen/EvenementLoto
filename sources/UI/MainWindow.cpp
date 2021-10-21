@@ -46,16 +46,18 @@ void MainWindow::showParametresGeneraux() {
 }
 
 void MainWindow::showParametresCartons() {
-    //showNotImplemented("Configuration des cartons");
     ConfigCartons cfg(this);
     cfg.getCartons().getNom()= "default";
     cfg.exec();
 }
 
 void MainWindow::showParametresParties() {
-    //showNotImplemented("Configuration des parties");
     ConfigurationParties cfg;
-    cfg.exec();
+    cfg.setEvenement(currentEvenement);
+    if(cfg.exec() == QDialog::Accepted) {
+        currentEvenement= cfg.getEvenement();
+        updateDisplay();
+    }
 }
 
 void MainWindow::showParametresEvenement() {
