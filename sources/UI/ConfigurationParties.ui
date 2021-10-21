@@ -33,14 +33,40 @@
                                 </property>
                             </widget>
                         </item>
-                        <item row="0" column="2">
-                            <widget class="QLCDNumber" name="PartiesNumber">
-                                <property name="toolTip">
-                                    <string>Le nombre de parties de l'évnement en cours.</string>
+                        <item row="1" column="8">
+                            <widget class="QPushButton" name="BtnCreatePArtie">
+                                <property name="text">
+                                    <string>Créer</string>
                                 </property>
                             </widget>
                         </item>
-                        <item row="0" column="3" colspan="6">
+                        <item row="1" column="6">
+                            <spacer name="horizontalSpacer_8">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>5</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="1" column="9">
+                            <spacer name="horizontalSpacer_7">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>50</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="0" column="3" colspan="7">
                             <spacer name="horizontalSpacer_5">
                                 <property name="orientation">
                                     <enum>Qt::Horizontal</enum>
@@ -60,22 +86,6 @@
                                 </property>
                             </widget>
                         </item>
-                        <item row="1" column="1" colspan="3">
-                            <widget class="QComboBox" name="SelectedPartie"/>
-                        </item>
-                        <item row="1" column="4">
-                            <spacer name="horizontalSpacer_6">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>24</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
                         <item row="1" column="5">
                             <widget class="QPushButton" name="BtnLoadPartie">
                                 <property name="text">
@@ -83,101 +93,18 @@
                                 </property>
                             </widget>
                         </item>
-                        <item row="1" column="6">
-                            <spacer name="horizontalSpacer_8">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>25</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="1" column="7">
-                            <widget class="QPushButton" name="BtnCreatePArtie">
-                                <property name="text">
-                                    <string>Créer</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="8">
-                            <spacer name="horizontalSpacer_7">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>110</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item>
-                <widget class="QGroupBox" name="groupBox_2">
-                    <property name="title">
-                        <string>Détail de la partie</string>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                        <item row="0" column="0" colspan="2">
-                            <widget class="QLabel" name="label_4">
-                                <property name="text">
-                                    <string>Ordre de la partie:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="2">
-                            <widget class="QLineEdit" name="PartieOrder">
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="3" colspan="2">
-                            <widget class="QPushButton" name="PartieMoveBefore">
-                                <property name="text">
-                                    <string>Avant</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="5">
-                            <widget class="QPushButton" name="PartieMoveAfter">
-                                <property name="text">
-                                    <string>Après</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="6" colspan="3">
-                            <spacer name="horizontalSpacer_9">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>168</width>
-                                        <height>21</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="1" column="0">
-                            <widget class="QLabel" name="label_3">
-                                <property name="text">
-                                    <string>Type de partie</string>
-                                </property>
-                            </widget>
-                        </item>
                         <item row="1" column="1" colspan="3">
-                            <widget class="QComboBox" name="PartieType"/>
+                            <widget class="QComboBox" name="SelectedPartie">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>180</width>
+                                        <height>0</height>
+                                    </size>
+                                </property>
+                            </widget>
                         </item>
-                        <item row="1" column="4" colspan="3">
-                            <spacer name="horizontalSpacer_16">
+                        <item row="1" column="4">
+                            <spacer name="horizontalSpacer_6">
                                 <property name="orientation">
                                     <enum>Qt::Horizontal</enum>
                                 </property>
@@ -189,27 +116,30 @@
                                 </property>
                             </spacer>
                         </item>
-                        <item row="1" column="7">
-                            <widget class="QPushButton" name="BtnSavePartie">
-                                <property name="text">
-                                    <string>Sauver</string>
+                        <item row="0" column="2">
+                            <widget class="QLCDNumber" name="PartiesNumber">
+                                <property name="toolTip">
+                                    <string>Le nombre de parties de l'évnement en cours.</string>
                                 </property>
                             </widget>
                         </item>
-                        <item row="1" column="8">
-                            <spacer name="horizontalSpacer_10">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QGroupBox" name="DetailPartie">
+                    <property name="title">
+                        <string>Détail de la partie</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_3">
+                        <item row="0" column="3" colspan="2">
+                            <widget class="QPushButton" name="PartieMoveBefore">
+                                <property name="text">
+                                    <string>Avant</string>
                                 </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>81</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
+                            </widget>
                         </item>
-                        <item row="2" column="0" colspan="9">
+                        <item row="2" column="0" colspan="11">
                             <widget class="QGroupBox" name="groupBox_3">
                                 <property name="title">
                                     <string>Statut:</string>
@@ -355,6 +285,96 @@
                                     </item>
                                 </layout>
                             </widget>
+                        </item>
+                        <item row="0" column="0" colspan="2">
+                            <widget class="QLabel" name="label_4">
+                                <property name="text">
+                                    <string>Ordre de la partie:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="5" colspan="4">
+                            <spacer name="horizontalSpacer_16">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>10</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="0" column="2">
+                            <widget class="QLineEdit" name="PartieOrder">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>50</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="readOnly">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="1" colspan="4">
+                            <widget class="QComboBox" name="PartieType"/>
+                        </item>
+                        <item row="0" column="5">
+                            <widget class="QPushButton" name="PartieMoveAfter">
+                                <property name="text">
+                                    <string>Après</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="9">
+                            <widget class="QPushButton" name="BtnSavePartie">
+                                <property name="text">
+                                    <string>Sauver</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="0">
+                            <widget class="QLabel" name="label_3">
+                                <property name="text">
+                                    <string>Type de partie</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="10">
+                            <spacer name="horizontalSpacer_10">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>81</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="0" column="9" colspan="2">
+                            <widget class="QLineEdit" name="PartieStatus">
+                                <property name="readOnly">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="6">
+                            <spacer name="horizontalSpacer_17">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>40</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
                         </item>
                     </layout>
                 </widget>
@@ -524,8 +544,8 @@
             <slot>partieLoad()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>270</x>
-                    <y>79</y>
+                    <x>374</x>
+                    <y>87</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>255</x>
@@ -540,8 +560,8 @@
             <slot>partieCreate()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>409</x>
-                    <y>81</y>
+                    <x>503</x>
+                    <y>87</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>375</x>
@@ -594,22 +614,6 @@
                 <hint type="destinationlabel">
                     <x>567</x>
                     <y>170</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>PartieType</sender>
-            <signal>currentTextChanged(QString)</signal>
-            <receiver>ConfigurationParties</receiver>
-            <slot>partieTypeChanged(QString)</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>117</x>
-                    <y>174</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>-6</x>
-                    <y>167</y>
                 </hint>
             </hints>
         </connection>

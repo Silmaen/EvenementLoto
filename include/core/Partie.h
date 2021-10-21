@@ -14,6 +14,8 @@ namespace evl::core {
  */
 class Partie: public Serializable {
 public:
+    /// type de date interne
+    using datetype= std::chrono::system_clock::time_point;
     /**
      * @brief Liste des types de parties connus.
      */
@@ -86,6 +88,23 @@ public:
      */
     void write(std::ostream& bs) const override;
 
+    /**
+     * @brief Accès à la date de départ
+     * @return La date de départ
+     */
+    const datetype& getStarting() const { return start; }
+
+    /**
+     * @brief Accès à la date de fin
+     * @return La date de fin
+     */
+    const datetype& getEnding() const { return end; }
+    /**
+     * @brief Accès au tirage
+     * @return les tirages.
+     */
+    const std::vector<uint8_t>& getTirage() { return Tirages; }
+
 private:
     /**
      * @brief Met à jour le statut.
@@ -95,7 +114,7 @@ private:
             status= Status::Invalid;
             return;
         }
-        std::chrono::time_point<std::chrono::steady_clock> epoch{};
+        datetype epoch{};
         if((start - epoch).count() == 0) {
             status= Status::Ready;
             end   = start;
@@ -110,14 +129,14 @@ private:
      * @return True si la partie est éditable
      */
     [[nodiscard]] bool isEditable() const {
-        return status == Status::Invalid || status == Status::Ready;
+        return status != Status::Started && status != Status::Finished;
     }
 
-    Type type    = Type::Aucun;                                ///< Le type de partie.
-    Status status= Status::Invalid;                            ///< Le type actuel de la partie.
-    std::chrono::time_point<std::chrono::steady_clock> start{};///< La date et heure de début de partie
-    std::chrono::time_point<std::chrono::steady_clock> end{};  ///< La date et heure de début de partie
-    std::vector<uint8_t> Tirages;                              ///< La liste des numéros tirés.
+    Type type    = Type::Aucun;    ///< Le type de partie.
+    Status status= Status::Invalid;///< Le type actuel de la partie.
+    datetype start{};              ///< La date et heure de début de partie
+    datetype end{};                ///< La date et heure de début de partie
+    std::vector<uint8_t> Tirages;  ///< La liste des numéros tirés.
 };
 
 }// namespace evl::core
