@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>ConfigEvent</class>
+    <widget class="QDialog" name="ConfigEvent">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>611</width>
+                <height>302</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Configuration événement</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <widget class="QGroupBox" name="groupBox">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Configuration événement</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout">
+                        <item row="2" column="0">
+                            <widget class="QLabel" name="label_5">
+                                <property name="text">
+                                    <string>Logo de l'événement:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="label">
+                                <property name="text">
+                                    <string>Nom de l'événement:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="2">
+                            <widget class="QLineEdit" name="EventLogo">
+                                <property name="toolTip">
+                                    <string>Un fichier d'image pour le logo de l'événement.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="0">
+                            <widget class="QLabel" name="label_2">
+                                <property name="text">
+                                    <string>Lieu de l'événement:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="2" column="3">
+                            <widget class="QPushButton" name="SearchLogo">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>24</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Ouvre une boite de dialogue de selection d'une image de logo.</string>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="2" colspan="2">
+                            <widget class="QLineEdit" name="EventLocation">
+                                <property name="toolTip">
+                                    <string>Définir le location de l'événement organisé.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="2" colspan="2">
+                            <widget class="QLineEdit" name="EventName">
+                                <property name="toolTip">
+                                    <string>Définir le name de l'événement organisé.</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QGroupBox" name="groupBox_3">
+                    <property name="title">
+                        <string>Organisateur</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_2">
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="label_3">
+                                <property name="text">
+                                    <string>Nom de l'organisateur</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QLineEdit" name="OrgaName">
+                                <property name="toolTip">
+                                    <string>Le name de l'organisateur de l'événement.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="2" colspan="2">
+                            <spacer name="horizontalSpacer_5">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>100</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item row="1" column="0">
+                            <widget class="QLabel" name="label_4">
+                                <property name="text">
+                                    <string>Logo de l'organisateur:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="1">
+                            <widget class="QLineEdit" name="OrgaLogo">
+                                <property name="toolTip">
+                                    <string>Fichier d'image définissant le logo de l'organisateur.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="2">
+                            <widget class="QPushButton" name="SearchOrgaLogo">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>24</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="toolTip">
+                                    <string>Ouvre une boite de dialogue pour choisir le log.</string>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="3">
+                            <spacer name="horizontalSpacer_6">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>100</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <spacer name="verticalSpacer">
+                    <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                        <size>
+                            <width>20</width>
+                            <height>40</height>
+                        </size>
+                    </property>
+                </spacer>
+            </item>
+            <item>
+                <widget class="QFrame" name="frame">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>QFrame::StyledPanel</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                        <item>
+                            <spacer name="horizontalSpacer">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>130</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonOk">
+                                <property name="toolTip">
+                                    <string>Sauvegarde Et ferme La fenêtre</string>
+                                </property>
+                                <property name="text">
+                                    <string>Ok</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_2">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonApply">
+                                <property name="toolTip">
+                                    <string>Sauvegarde sans fermer la fenêtre</string>
+                                </property>
+                                <property name="text">
+                                    <string>Appliquer</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_3">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonCancel">
+                                <property name="toolTip">
+                                    <string>Ferme la fenêtre sans sauvegarder</string>
+                                </property>
+                                <property name="text">
+                                    <string>Annuler</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_4">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>130</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <tabstops>
+        <tabstop>EventName</tabstop>
+        <tabstop>EventLocation</tabstop>
+        <tabstop>EventLogo</tabstop>
+        <tabstop>SearchLogo</tabstop>
+        <tabstop>OrgaName</tabstop>
+        <tabstop>OrgaLogo</tabstop>
+        <tabstop>SearchOrgaLogo</tabstop>
+        <tabstop>ButtonOk</tabstop>
+        <tabstop>ButtonApply</tabstop>
+        <tabstop>ButtonCancel</tabstop>
+    </tabstops>
+    <resources/>
+    <connections>
+        <connection>
+            <sender>ButtonOk</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigEvent</receiver>
+            <slot>actOk()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>189</x>
+                    <y>274</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>299</x>
+                    <y>189</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonApply</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigEvent</receiver>
+            <slot>actApply()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>313</x>
+                    <y>279</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>427</x>
+                    <y>189</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonCancel</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigEvent</receiver>
+            <slot>actCancel()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>418</x>
+                    <y>274</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>474</x>
+                    <y>189</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>SearchOrgaLogo</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigEvent</receiver>
+            <slot>actSearchOrgaLogo()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>361</x>
+                    <y>196</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>613</x>
+                    <y>152</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>SearchLogo</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigEvent</receiver>
+            <slot>actSearchLogo()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>586</x>
+                    <y>107</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>614</x>
+                    <y>109</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+    <slots>
+        <slot>actOk()</slot>
+        <slot>actApply()</slot>
+        <slot>actCancel()</slot>
+        <slot>actSearchOrgaLogo()</slot>
+        <slot>actSearchLogo()</slot>
+    </slots>
+</ui>

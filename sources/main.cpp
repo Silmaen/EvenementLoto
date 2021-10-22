@@ -1,10 +1,12 @@
 /**
+ * @file main.cpp
  * @author Silmaen
  * @date 17/10/2021
- *
+ * Copyright © 2021 All rights reserved.
+ * All modification must get authorization from the author.
  */
-#include "UI/MainWindow.h"
-#include "UI/baseDefinitions.h"
+#include "gui/MainWindow.h"
+#include "gui/baseDefinitions.h"
 #include <QApplication>
 
 using namespace evl::gui;
