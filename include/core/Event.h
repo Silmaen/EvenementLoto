@@ -163,7 +163,7 @@ private:
     std::chrono::time_point<std::chrono::steady_clock> end{};
 
     /// Lien vers la liste des cartons
-    [[maybe_unused]] CardPack* cartons= nullptr;
+    //[[maybe_unused]] CardPack* cartons= nullptr;
 };
 
 }// namespace evl::core

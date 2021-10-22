@@ -31,18 +31,53 @@ endif ()
 # ---=== base flags ===---
 #
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror")
-    if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-        set(CMAKE_EXE_LINKER_FLAGS "-lm -lpthread")
-    else ()
-        set(CMAKE_EXE_LINKER_FLAGS "-lm -lpthread -ldl -lcrypt")
-    endif ()
+    add_compile_options(-Wall -Wextra -pedantic -Werror)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror")
+    add_compile_options(-Wall -Wextra -pedantic -Werror)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /EHsc /GR /MD /TP /Zc:wchar_t /W4 /GS /Zi /Ob0 /Od /RTC1") # /wd"4251" /wd"4275" /wd"4702"
+    add_compile_options(/W4 /WX)
 else ()
     message(FATAL_ERROR "Unsupported Compiler '${CMAKE_CXX_COMPILER_ID}'")
+endif ()
+
+if (${PRJPREFIX}_COVERAGE AND ${PRJPREFIX}_PROFILING)
+    message(FATAL_ERROR "Incompatible option activated at the same time: ${PRJPREFIX}_COVERAGE and ${PRJPREFIX}_PROFILING")
+endif ()
+
+if (${PRJPREFIX}_COVERAGE)
+    find_program(GCOVR gcovr)
+    if (GCOVR-NOTFOUND)
+        message(FATAL_ERROR "unable to find gcovr: no coverage report is possible")
+    else ()
+        message(STATUS "Found GCOVR at location: ${GCOVR}")
+    endif ()
+    # options for coverage
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        add_compile_options(--coverage)
+        link_libraries(gcov)
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(--coverage)
+        add_link_options(--coverage)
+        get_filename_component(COMPILER_PATH ${CMAKE_CXX_COMPILER} DIRECTORY)
+        set(${PRJPREFIX}_GCOV "${COMPILER_PATH}/llvm-cov gcov")
+        if (WIN32)
+            string(REPLACE "/" "\\\\" ${PRJPREFIX}_GCOV ${${PRJPREFIX}_GCOV})
+        endif ()
+    else ()
+        message(FATAL_ERROR "Unsupported Compiler '${CMAKE_CXX_COMPILER_ID}' for coverage")
+    endif ()
+endif ()
+
+if (${PRJPREFIX}_PROFILING)
+    #options for profiling
+    if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        add_compile_options(-pg)
+
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        # todo
+    else ()
+        message(FATAL_ERROR "Unsupported Compiler '${CMAKE_CXX_COMPILER_ID}' for profiling")
+    endif ()
 endif ()
 
 #
