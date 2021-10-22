@@ -123,17 +123,17 @@ public:
      */
     void stopEvent();
 
-private:
-    /**
-     * @brief Met à jour le statut de l’événement.
-     */
-    void updateStatus();
-
     /**
      * @brief Vérifie s’il est possible d’éditer l’événement
      * @return True si éditable.
      */
     bool isEditable() const;
+
+private:
+    /**
+     * @brief Met à jour le statut de l’événement.
+     */
+    void updateStatus();
 
     /// Le statut de l’événement
     Status status;

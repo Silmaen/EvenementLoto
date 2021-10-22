@@ -47,6 +47,8 @@ int ConfigGameRounds::SaveFile() {
 }
 
 void ConfigGameRounds::actOk() {
+    if(!gameEvent.isEditable())
+        reject();
     if(SaveFile() > 0)
         accept();
 }
@@ -97,7 +99,6 @@ void ConfigGameRounds::actMoveGameRoundAfter() {
     std::swap(gameEvent.getGameRounds()[idx], gameEvent.getGameRounds()[idx + 1]);
     ui->SelectedPartie->setCurrentIndex(idx + 1);
     updateDisplay();
-    //showNotImplemented("partieOrderAfter");
 }
 
 void ConfigGameRounds::actMoveGameRoundBefore() {
@@ -107,7 +108,6 @@ void ConfigGameRounds::actMoveGameRoundBefore() {
     std::swap(gameEvent.getGameRounds()[idx], gameEvent.getGameRounds()[idx - 1]);
     ui->SelectedPartie->setCurrentIndex(idx - 1);
     updateDisplay();
-    //showNotImplemented("partieOrderBefore");
 }
 
 void ConfigGameRounds::actSaveGameRound() {
@@ -172,6 +172,16 @@ void ConfigGameRounds::updateDisplay(bool loadLast) {
         std::time_t t= std::chrono::system_clock::to_time_t(par.getEnding());
         QString s(std::ctime(&t));
         ui->PartieEndingDate->setText(s);
+    }
+    // désactive les boutons modifiants les parties si événement démarré
+    if(!gameEvent.isEditable()) {
+        ui->BtnSupprimePartie->setEnabled(false);
+        ui->BtnCreatePArtie->setEnabled(false);
+        ui->PartieMoveAfter->setEnabled(false);
+        ui->PartieType->setEnabled(false);
+        ui->PartieMoveBefore->setEnabled(false);
+        ui->BtnSavePartie->setEnabled(false);
+        ui->ButtonApply->setEnabled(false);
     }
 }
 

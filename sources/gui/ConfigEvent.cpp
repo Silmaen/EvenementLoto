@@ -36,6 +36,8 @@ void ConfigEvent::SaveFile() {
 }
 
 void ConfigEvent::actOk() {
+    if(!gameEvent.isEditable())
+        reject();
     SaveFile();
     accept();
 }
@@ -96,6 +98,17 @@ void ConfigEvent::updateDisplay() {
     ui->EventLogo->setText(QString::fromStdString(gameEvent.getLogo().string()));
     ui->OrgaName->setText(QString::fromStdString(gameEvent.getOrganizerName()));
     ui->OrgaLogo->setText(QString::fromStdString(gameEvent.getOrganizerLogo().string()));
+
+    if(!gameEvent.isEditable()) {
+        ui->EventName->setEnabled(false);
+        ui->EventLocation->setEnabled(false);
+        ui->EventLogo->setEnabled(false);
+        ui->SearchLogo->setEnabled(false);
+        ui->OrgaName->setEnabled(false);
+        ui->OrgaLogo->setEnabled(false);
+        ui->SearchOrgaLogo->setEnabled(false);
+        ui->ButtonApply->setEnabled(false);
+    }
 }
 
 }// namespace evl::gui
