@@ -23,7 +23,7 @@ When building Google Test as a standalone project, the typical workflow starts w
 
     mkdir mybuild       # Create a directory to hold the build output.
     cd mybuild
-    cmake ${GTEST_DIR}  # Generate native build scripts.
+    cmake ${GTEST_DIR}  # actGenerate native build scripts.
 
 If you want to build Google Test's samples, you should replace the last command with
 

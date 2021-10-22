@@ -33,7 +33,7 @@ set(CMAKE_AUTOUIC ON)
 #
 file(GLOB_RECURSE
         SRCS_UI
-        ${CMAKE_CURRENT_SOURCE_DIR}/UI/*
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*
         )
 add_library(${CMAKE_PROJECT_NAME}_ui ${SRCS_UI})
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui
