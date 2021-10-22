@@ -110,10 +110,29 @@ void MainWindow::actSaveAsFile() {
 }
 
 void MainWindow::actStartEvent() {
+    QMessageBox message;
+    message.setIcon(QMessageBox::Question);
+    message.setWindowTitle("Démarrage de l’événement.");
+    message.setText("Êtes-vous sûr de vouloir démarrer l’événement ?");
+    message.setInformativeText("Une fois démarré, la configuration de l’événement et de ses parties ne pourra plus être modifié.");
+    message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+    if(message.exec() != QMessageBox::StandardButton::Yes)
+        return;
+    currentEvent.startEvent();
+    updateDisplay();
 }
 
 void MainWindow::actEndEvent() {
-    showNotImplemented("Terminer événement");
+    QMessageBox message;
+    message.setIcon(QMessageBox::Question);
+    message.setWindowTitle("Terminer de l’événement.");
+    message.setText("Êtes-vous sûr de vouloir terminer l’événement ?");
+    message.setInformativeText("Une fois terminé, l’événement ne pourra plus être démarré à nouveau.");
+    message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+    if(message.exec() != QMessageBox::StandardButton::Yes)
+        return;
+    currentEvent.stopEvent();
+    updateDisplay();
 }
 
 void MainWindow::actQuit() {
