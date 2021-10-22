@@ -68,6 +68,10 @@ private slots:
      */
     void partieCreate();
     /**
+     * @brief Action lors du click sur le bouton de suppression de partie.
+     */
+    void partieSupprime();
+    /**
      * @brief Action lors du clic sur le bouton de chargement d'une partie
      */
     void partieLoad();
@@ -118,10 +122,15 @@ private:
      */
     core::Partie::Type getCurrentPartyType();
     /**
-     * @brief Renvoie la partie en cours d'édition.
-     * @return La partie en cours d'édition.
+     * @brief Renvoie la partie en cours d’édition.
+     * @return La partie en cours d’édition.
      */
     core::Partie& getCurrentPartie();
+    /**
+    * @brief Renvoie la partie en cours d’édition.
+    * @return La partie en cours d’édition.
+    */
+    int getCurrentPartieIndex();
 
     ///Lien vers la page UI.
     Ui::ConfigurationParties* ui;
