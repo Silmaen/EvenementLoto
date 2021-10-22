@@ -19,17 +19,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #
 if (CMAKE_SYSTEM_NAME MATCHES "OpenBSD")
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
+    set(${PRJPREFIX}_GNU_MINIMAL 11.2)
+    set(${PRJPREFIX}_Clang_MINIMAL 11.1)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(${PRJPREFIX}_GNU_MINIMAL 11.2)
+    set(${PRJPREFIX}_Clang_MINIMAL 13.0)
+    set(${PRJPREFIX}_MSVC_MINIMAL 19.65)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(${PRJPREFIX}_GNU_MINIMAL 11.2)
+    set(${PRJPREFIX}_Clang_MINIMAL 13.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
 endif ()
 
+# check minimal Compiler version
+if (${CMAKE_CXX_COMPILER_VERSION} LESS ${${PRJPREFIX}_${CMAKE_CXX_COMPILER_ID}_MINIMAL})
+    message(FATAL_ERROR "gcovr: Too old version of ${CMAKE_CXX_COMPILER_ID}, minimum required is ${${PRJPREFIX}_${CMAKE_CXX_COMPILER_ID}_MINIMAL} (found ${CMAKE_CXX_COMPILER_VERSION})")
+endif ()
+
 #
 # ---=== base flags ===---
 #
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Wall -Wextra -pedantic -Werror)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -45,11 +58,25 @@ if (${PRJPREFIX}_COVERAGE AND ${PRJPREFIX}_PROFILING)
 endif ()
 
 if (${PRJPREFIX}_COVERAGE)
+    if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
+        message(FATAL_ERROR "Coverage only works on debug builds")
+    endif ()
     find_program(GCOVR gcovr)
     if (GCOVR-NOTFOUND)
         message(FATAL_ERROR "unable to find gcovr: no coverage report is possible")
     else ()
-        message(STATUS "Found GCOVR at location: ${GCOVR}")
+        # Get gcov version
+        execute_process(COMMAND ${GCOVR} --version
+                OUTPUT_VARIABLE GCOVR_VERSION)
+        string(REPLACE "\n" ";" GCOVR_VERSION ${GCOVR_VERSION})
+        list(SUBLIST GCOVR_VERSION 0 1 GCOVR_VERSION)
+        string(REPLACE " " ";" GCOVR_VERSION ${GCOVR_VERSION})
+        list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
+
+        message(STATUS "Found gcovr version ${GCOVR_VERSION} at location: ${GCOVR} ")
+        if (${GCOVR_VERSION} LESS 5.0)
+            message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.0")
+        endif ()
     endif ()
     # options for coverage
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")

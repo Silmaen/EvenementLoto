@@ -42,7 +42,7 @@ if (${PRJPREFIX}_COVERAGE)
         set(COVERAGE_GCOV "--gcov-executable \"llvm-cov gcov\"" --gcov-ignore-parse-errors)
     endif ()
     add_custom_command(TARGET Generate_test_coverage_report POST_BUILD
-            COMMAND ${GCOVR} -kbp -r ${CMAKE_SOURCE_DIR} -o ${CMAKE_BINARY_DIR}/Coverage/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .
+            COMMAND ${GCOVR} -bup -r ${CMAKE_SOURCE_DIR} -o ${CMAKE_BINARY_DIR}/Coverage/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             USES_TERMINAL)
 endif ()
