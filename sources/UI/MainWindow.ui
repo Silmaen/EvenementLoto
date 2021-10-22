@@ -12,7 +12,7 @@
             </rect>
         </property>
         <property name="windowTitle">
-            <string>MainWindow</string>
+            <string>Evénement Loto</string>
         </property>
         <widget class="QWidget" name="EvenementControl">
             <layout class="QGridLayout" name="gridLayout">

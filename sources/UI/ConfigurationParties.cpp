@@ -25,7 +25,7 @@ ConfigurationParties::~ConfigurationParties() {
 
 int ConfigurationParties::SaveFile() {
     bool good= true;
-    for(auto p: evenement.getParties()) {
+    for(const auto& p: evenement.getParties()) {
         if(p.getStatus() == core::Partie::Status::Invalid) {
             good= false;
             break;
@@ -66,7 +66,7 @@ void ConfigurationParties::showNotImplemented(const QString& from) {
 }
 
 int ConfigurationParties::exec() {
-    updateDisplay();
+    updateDisplay(true);
     return QDialog::exec();
 }
 
@@ -74,21 +74,36 @@ void ConfigurationParties::partieCreate() {
     evenement.getParties().emplace_back();
     updateDisplay(true);
 }
+void ConfigurationParties::partieSupprime() {
+    int idx= ui->SelectedPartie->currentIndex();
+    if(idx < 0) return;
+    evenement.getParties().erase(std::next(evenement.getParties().begin(), idx));
+    ui->SelectedPartie->setCurrentIndex(idx - 1);
+    updateDisplay();
+}
 
 void ConfigurationParties::partieLoad() {
     updateDisplay();
 }
 
 void ConfigurationParties::partieOrderAfter() {
-    if(ui->SelectedPartie->currentIndex() >= (int)evenement.getParties().size() - 1)
+    int idx= getCurrentPartieIndex();
+    if(idx >= (int)evenement.getParties().size() - 1)
         return;
-    showNotImplemented("partieOrderAfter");
+    std::swap(evenement.getParties()[idx], evenement.getParties()[idx + 1]);
+    ui->SelectedPartie->setCurrentIndex(idx + 1);
+    updateDisplay();
+    //showNotImplemented("partieOrderAfter");
 }
 
 void ConfigurationParties::partieOrderBefore() {
-    if(ui->SelectedPartie->currentIndex() <= 0)
+    int idx= getCurrentPartieIndex();
+    if(idx <= 0)
         return;
-    showNotImplemented("partieOrderBefore");
+    std::swap(evenement.getParties()[idx], evenement.getParties()[idx - 1]);
+    ui->SelectedPartie->setCurrentIndex(idx - 1);
+    updateDisplay();
+    //showNotImplemented("partieOrderBefore");
 }
 
 void ConfigurationParties::partieSave() {
@@ -110,7 +125,7 @@ void ConfigurationParties::updateDisplay(bool loadLast) {
     }
     ui->SelectedPartie->clear();
     uint16_t c= 1;
-    for(auto p: evenement.getParties()) {
+    for(const auto& p: evenement.getParties()) {
         ui->SelectedPartie->addItem("Partie " + QVariant(c).toString() + " - " + QString::fromStdString(p.getTypeStr()));
         c++;
     }
@@ -144,8 +159,8 @@ void ConfigurationParties::updateDisplay(bool loadLast) {
         QString s(std::ctime(&t));
         ui->PartieStartingDate->setText(s);
         QString text;
-        for(auto t: par.getTirage()) {
-            text+= QVariant(t).toString() + " ";
+        for(auto tt: par.getTirage()) {
+            text+= QVariant(tt).toString() + " ";
         }
         ui->ListTirage->setText(text);
     }
@@ -185,8 +200,11 @@ core::Partie::Type ConfigurationParties::getCurrentPartyType() {
 }
 
 core::Partie& ConfigurationParties::getCurrentPartie() {
-    int i= ui->PartieOrder->text().toInt() - 1;
-    return evenement.getParties()[i];
+    return evenement.getParties()[getCurrentPartieIndex()];
+}
+
+int ConfigurationParties::getCurrentPartieIndex() {
+    return ui->PartieOrder->text().toInt() - 1;
 }
 
 }// namespace evl::gui
