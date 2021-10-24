@@ -14,7 +14,7 @@
  */
 namespace evl {
 
-constexpr uint8_t nb_ligne  = 3;///< Nombre de ligne sur un carton
-constexpr uint8_t nb_colones= 5;///< Nombre de colonne sur un carton
+constexpr uint8_t nb_ligne  = 3;///< Nombre de lignes sur un carton
+constexpr uint8_t nb_colones= 5;///< Nombre de colonnes sur un carton
 
 }// namespace evl

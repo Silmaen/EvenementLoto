@@ -178,7 +178,12 @@ void MainWindow::updateDisplay() {
         ui->actionConfiguration_des_parties->setEnabled(true);
         ui->EvenementControl->setEnabled(false);
         break;
-    case core::Event::Status::OnGoing:
+    case core::Event::Status::EventStarted:
+    case core::Event::Status::Paused:
+    case core::Event::Status::GamePaused:
+    case core::Event::Status::GameStart:
+    case core::Event::Status::GameRunning:
+    case core::Event::Status::GameFinished:
         ui->actionSauver_Evenement->setEnabled(true);
         ui->actionSauver_Evenement_sous->setEnabled(false);
         ui->actionCommencer_Evenement->setEnabled(false);

@@ -20,6 +20,16 @@ void GridCard::reset() {
     updateStatus();
 }
 
+void GridCard::deactivate() {
+    res= Status::OutGame;
+    updateStatus();
+}
+
+void GridCard::activate() {
+    res= Status::InGame;
+    updateStatus();
+}
+
 std::string GridCard::asString() const {
     std::stringstream oss;
     oss << IdNumber << ";;";
@@ -136,16 +146,6 @@ void GridCard::generate(const uint32_t& num, RandomNumberGenerator* rng) {
     updateStatus();
     if(cleaning)
         delete rng;
-}
-
-void GridCard::print(std::ostream& oss) const {
-    oss << "Carton: " << IdNumber << std::endl;
-    for(auto& line: lines) {
-        for(auto& _num: line) {
-            oss << (int)_num.number << " ";
-        }
-        oss << std::endl;
-    }
 }
 
 void GridCard::read(std::istream& is) {

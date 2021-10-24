@@ -37,7 +37,12 @@ public:
         Invalid,       ///< N'est pas valide
         MissingParties,///< L’événement est bien défini, mais il n’a pas de parties définies
         Ready,         ///< Prêt à être utilisé
-        OnGoing,       ///< Est en cours
+        EventStarted,  ///< Écran de début d’événement
+        Paused,        ///< Est en pause
+        GamePaused,    ///< Est en pause en cours de partie
+        GameStart,     ///< Est en début de partie
+        GameRunning,   ///< Est en cours de partie
+        GameFinished,  ///< Est en fin de partie
         Finished       ///< Est fini
     };
 
@@ -108,10 +113,36 @@ public:
     void setLogo(const std::filesystem::path& logo);
 
     /**
-     * @brief Accès auc parties
+     * @brief Accès aux parties
      * @return Les parties.
      */
-    std::vector<GameRound>& getGameRounds() { return gameRounds; }
+    const std::vector<GameRound>& getGameRounds() const { return gameRounds; }
+
+    /// Itérateur sur les parties
+    using itGameround= std::vector<GameRound>::iterator;
+
+    /**
+     * @brief Renvoie l’itérateur de fin de parties.
+     * @return L’itérateur de fin de parties.
+     */
+    itGameround getGREnd() { return gameRounds.end(); }
+
+    /**
+     * @brief Cherche la première partie non terminée de la liste.
+     * @return La première partie non terminée de la liste.
+     */
+    itGameround findFirstNotFinished();
+
+    /**
+     * @brief Ajoute une partie au jeu
+     * @param round La partie à ajouter.
+     */
+    void pushGameRound(const GameRound& round);
+
+    void startCurrentRound();
+
+    void endCurrentRound();
+    void closeCurrentRound();
 
     /**
      * @brief Démarre l’événement
@@ -124,6 +155,16 @@ public:
     void stopEvent();
 
     /**
+     * @brief Pause l’événement
+     */
+    void pauseEvent();
+
+    /**
+     * @brief Reprend l’événement.
+     */
+    void resumeEvent();
+
+    /**
      * @brief Vérifie s’il est possible d’éditer l’événement
      * @return True si éditable.
      */
@@ -131,25 +172,27 @@ public:
 
 private:
     /**
+     * @brief Si l'événement est en phase d'édition, met à jour son statuT.
+     */
+    void checkValidConfig();
+    /**
      * @brief Met à jour le statut de l’événement.
      */
     void updateStatus();
 
     /// Le statut de l’événement
-    Status status;
+    Status status= Status::Invalid;
+    /// Si l’événement est en pause
+    bool paused= true;
 
     /// Le nom de l’organisateur (requit pour validité)
     std::string organizerName;
-
     /// Logo de l’organisateur.
     std::filesystem::path organizerLogo;
-
     /// Nom de l’événement. (requit pour validité)
     std::string name;
-
     /// Logo de l’événement.
     std::filesystem::path logo;
-
     /// Lieu de l’événement.
     std::string location;
 
@@ -157,10 +200,10 @@ private:
     std::vector<GameRound> gameRounds;
 
     /// La date et heure de début de l’événement
-    std::chrono::time_point<std::chrono::steady_clock> start{};
+    std::chrono::system_clock::time_point start{};
 
     /// La date et heure de début de l’événement
-    std::chrono::time_point<std::chrono::steady_clock> end{};
+    std::chrono::system_clock::time_point end{};
 
     /// Lien vers la liste des cartons
     //[[maybe_unused]] CardPack* cartons= nullptr;

@@ -77,7 +77,9 @@ void Event::write(std::ostream& os) const {
     // TODO: gérer les cartons
 }
 
-void Event::updateStatus() {
+void Event::checkValidConfig() {
+    if(!isEditable())
+        return;
     if(organizerName.empty() || name.empty()) {
         status= Status::Invalid;
         return;
@@ -86,58 +88,157 @@ void Event::updateStatus() {
         status= Status::MissingParties;
         return;
     }
-    std::chrono::time_point<std::chrono::steady_clock> epoch{};
-    if(start == epoch) {
-        status= Status::Ready;
+    status= Status::Ready;
+}
+
+void Event::updateStatus() {
+    checkValidConfig();
+    if(status == Status::Invalid || status == Status::MissingParties)
+        return;
+    std::chrono::system_clock::time_point epoch{};
+    if(start == epoch)
+        return;
+    if(paused && (gameRounds.front().getStatus() == GameRound::Status::Ready)) {
+        status= Status::EventStarted;
         return;
     }
-    if(end == epoch) {
-        status= Status::OnGoing;
+    itGameround gr= findFirstNotFinished();
+    if(gr == getGREnd()) {
+        status= Status::Finished;
+        if(end == epoch)
+            end= std::chrono::system_clock::now();
         return;
     }
-    status= Status::Finished;
+    if(end != epoch) {
+        status= Status::Finished;
+        return;
+    }
+    if(paused) {
+        status= Status::Paused;
+        return;
+    }
+    if(gr->getStatus() == GameRound::Status::Ready) {
+        status= Status::GameStart;
+    }
+    if(gr->getStatus() == GameRound::Status::Started) {
+        status= Status::GameRunning;
+    }
+    if(gr->getStatus() == GameRound::Status::Result) {
+        status= Status::GameFinished;
+    }
+    if(gr->getStatus() == GameRound::Status::Paused) {
+        status= Status::GamePaused;
+    }
 }
 
 bool Event::isEditable() const {
-    return status != Status::OnGoing && status != Status::Finished;
+    return status == Status::Invalid || status == Status::MissingParties || status == Status::Ready;
 }
 
 void Event::setOrganizerName(const std::string& _name) {
-    if(!isEditable()) return;
+    if(!isEditable())
+        return;
     organizerName= _name;
     updateStatus();
 }
 
 void Event::setName(const std::string& _name) {
-    if(!isEditable()) return;
+    if(!isEditable())
+        return;
     name= _name;
     updateStatus();
 }
 
 void Event::setLocation(const std::string& _location) {
-    if(!isEditable()) return;
+    if(!isEditable())
+        return;
     location= _location;
     updateStatus();
 }
 
 void Event::setLogo(const std::filesystem::path& _logo) {
-    if(!isEditable()) return;
+    if(!isEditable())
+        return;
     logo= _logo;
     updateStatus();
 }
 
 void Event::setOrganizerLogo(const std::filesystem::path& _logo) {
-    if(!isEditable()) return;
+    if(!isEditable())
+        return;
     organizerLogo= _logo;
     updateStatus();
 }
 
 void Event::startEvent() {
-    status= Status::OnGoing;
+    if(status != Status::Ready)
+        return;
+    start= std::chrono::system_clock::now();
+    updateStatus();
+}
+
+void Event::pushGameRound(const GameRound& round) {
+    if(!isEditable())
+        return;
+    if(round.getStatus() != GameRound::Status::Ready)
+        return;
+    gameRounds.push_back(round);
+    updateStatus();
+}
+
+void Event::startCurrentRound() {
+    if(status != Status::GameStart)
+        return;
+    findFirstNotFinished()->startGameRound();
+    updateStatus();
+}
+
+void Event::endCurrentRound() {
+    if(status != Status::GameRunning)
+        return;
+    findFirstNotFinished()->endGameRound();
+    updateStatus();
+}
+void Event::closeCurrentRound() {
+    if(status != Status::GameFinished)
+        return;
+    findFirstNotFinished()->closeGameRound();
+    updateStatus();
+}
+
+void Event::pauseEvent() {
+    if(status != Status::GameFinished && status != Status::GameRunning)
+        return;
+    if(status == Status::GameFinished)
+        paused= true;
+    if(status == Status::GameRunning) {
+        findFirstNotFinished()->pauseGameRound();
+    }
+    updateStatus();
+}
+
+void Event::resumeEvent() {
+    if(status != Status::Paused && status != Status::EventStarted && status != Status::GamePaused)
+        return;
+    paused= false;
+    if(status == Status::GamePaused) {
+        findFirstNotFinished()->resumeGameRound();
+    }
+    updateStatus();
 }
 
 void Event::stopEvent() {
-    status= Status::Finished;
+    if(status != Status::GameFinished)
+        return;
+    end= std::chrono::system_clock::now();
+    updateStatus();
 }
 
+Event::itGameround Event::findFirstNotFinished() {
+    for(itGameround it= gameRounds.begin(); it != gameRounds.end(); ++it) {
+        if(it->getStatus() != GameRound::Status::Finished)
+            return it;
+    }
+    return gameRounds.end();
+}
 }// namespace evl::core

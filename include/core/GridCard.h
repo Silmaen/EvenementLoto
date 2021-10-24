@@ -91,15 +91,12 @@ public:
     /**
      * @brief Sort ce carton du jeu
      */
-    void deactivate() { res= Status::OutGame; }
+    void deactivate();
 
     /**
      * @brief Met ce carton en jeu
      */
-    void activate() {
-        res= Status::InGame;
-        updateStatus();
-    }
+    void activate();
 
     /**
      * @brief Génère aléatoirement une grille, celle-ci est active par défaut.
@@ -107,12 +104,6 @@ public:
      * @param rng Lien éventuel vers un générateur de nombre aléatoire externe.
      */
     void generate(const uint32_t& num, RandomNumberGenerator* rng= nullptr);
-
-    /**
-     * @brief Dessine le carton dans le stream donnée.
-     * @param oss Le stream dans lequel écrire
-     */
-    void print(std::ostream& oss) const;
 
     /**
      * @brief Écriture dans un stream.

@@ -62,7 +62,7 @@ if (${PRJPREFIX}_COVERAGE)
         message(FATAL_ERROR "Coverage only works on debug builds")
     endif ()
     find_program(GCOVR gcovr)
-    if (GCOVR-NOTFOUND)
+    if (${GCOVR} STREQUAL GCOVR-NOTFOUND)
         message(FATAL_ERROR "unable to find gcovr: no coverage report is possible")
     else ()
         # Get gcov version

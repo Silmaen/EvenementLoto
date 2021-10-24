@@ -35,14 +35,14 @@ if (${PRJPREFIX}_COVERAGE)
     set(COVERAGE_TITLE "Evenement Loto: couverture de tests")
     set(COVERAGE_HTML --html --html-details --html-details-syntax-highlighting --html-title ${COVERAGE_TITLE} --source-encoding utf-8)
     set(COVERAGE_FILTER -e ".*third_party/.*" -e ".*test/.*")
-
+    set(COVERAGE_OPTION -bups --exclude-throw-branches --exclude-unreachable-branches --exclude-lines-by-pattern ".* delete .*")
     if ("d${${PRJPREFIX}_GCOV}" STREQUAL "d")
         set(COVERAGE_GCOV)
     else ()
         set(COVERAGE_GCOV "--gcov-executable \"llvm-cov gcov\"" --gcov-ignore-parse-errors)
     endif ()
     add_custom_command(TARGET Generate_test_coverage_report POST_BUILD
-            COMMAND ${GCOVR} -bup -r ${CMAKE_SOURCE_DIR} -o ${CMAKE_BINARY_DIR}/Coverage/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .
+            COMMAND ${GCOVR} ${COVERAGE_OPTION} -r ${CMAKE_SOURCE_DIR} -o ${CMAKE_BINARY_DIR}/Coverage/index.html ${COVERAGE_GCOV} ${COVERAGE_HTML} ${COVERAGE_FILTER} .
             WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
             USES_TERMINAL)
 endif ()
