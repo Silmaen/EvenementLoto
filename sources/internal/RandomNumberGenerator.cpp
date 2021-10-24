@@ -56,4 +56,9 @@ std::vector<uint8_t> RandomNumberGenerator::generateLine() {
     return res;
 }
 
-}// namespace evl
+void RandomNumberGenerator::popNum() {
+    if(!alreadyPicked.empty())
+        alreadyPicked.pop_back();
+}
+
+}// namespace evl::core

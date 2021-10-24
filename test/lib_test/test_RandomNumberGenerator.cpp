@@ -25,6 +25,7 @@ TEST(RandomNumberGenerator, base) {
 
 TEST(RandomNumberGenerator, manual) {
     RandomNumberGenerator rng;
+    rng.popNum();
     EXPECT_TRUE(rng.addPick(16));
     EXPECT_TRUE(rng.addPick(72));
     EXPECT_TRUE(rng.addPick(66));
@@ -34,4 +35,13 @@ TEST(RandomNumberGenerator, manual) {
     EXPECT_EQ(rng.getPicked().back(), 16);
     rng.resetPick();
     EXPECT_EQ(rng.getPicked().size(), 0);
+}
+
+TEST(RandomNumberGenerator, LargePick) {
+    RandomNumberGenerator rng(true);
+    uint8_t a;
+    for(uint8_t i= 0; i < 250; ++i)
+        a= rng.pick();
+    EXPECT_EQ(a, 255);
+    EXPECT_EQ(rng.getPicked().size(), 90);
 }

@@ -52,9 +52,7 @@ public:
     /**
      * @brief Retire le dernier numéro tiré de la liste.
      */
-    void popNum() {
-        if(!alreadyPicked.empty()) alreadyPicked.pop_back();
-    }
+    void popNum();
 
     /**
      * @brief Génère une ligne de grille de loto.

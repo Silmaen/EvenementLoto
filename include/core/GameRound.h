@@ -48,7 +48,8 @@ public:
      * @param t
      */
     void setType(const Type& t) {
-        if(!isEditable()) return;
+        if(!isEditable())
+            return;
         type= t;
         updateStatus();
     }
@@ -60,13 +61,15 @@ public:
         Invalid,///< Le statut d’erreur
         Ready,  ///< La partie est prête à être jouée
         Started,///< La partie est démarrée
+        Paused, ///< Est en pause
+        Result, ///< Est en affichage de résultat.
         Finished///< La partie est finie
     };
     /**
      * @brief Renvoie une chaine contenant le type de partie.
      * @return Le type de partie.
      */
-    [[nodiscard]] std::string getStatusStr() const;
+    [[nodiscard]] std::string getStatusStr();
 
     /**
      * @brief Renvoie le type de partie.
@@ -74,15 +77,36 @@ public:
      */
     [[nodiscard]] const Status& getStatus() const { return status; }
 
+#ifdef EVL_DEBUG
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void invalidStatus() {
+        status= Status{-1};
+    }
+#endif
+
     /**
      * @brief Débute la partie.
      */
     void startGameRound();
 
     /**
+     * @brief Pause la Partie
+     */
+    void pauseGameRound();
+    /**
+     * @brief Reprend la Partie
+     */
+    void resumeGameRound();
+    /**
      * @brief Termine la Partie
      */
     void endGameRound();
+    /**
+     * @brief Close la Partie
+     */
+    void closeGameRound();
 
     /**
      * @brief Lecture depuis un stream
@@ -109,6 +133,12 @@ public:
     const datetype& getEnding() const { return end; }
 
     /**
+     * @brief Ajoute le numéro dans la liste des numéros tirés
+     * @param num
+     */
+    void addPickedNumber(const uint8_t& num);
+
+    /**
      * @brief Accès au tirage
      * @return Les tirages.
      */
@@ -118,29 +148,13 @@ private:
     /**
      * @brief Met à jour le statut.
      */
-    void updateStatus() {
-        if(type == Type::None) {
-            status= Status::Invalid;
-            return;
-        }
-        datetype epoch{};
-        if((start - epoch).count() == 0) {
-            status= Status::Ready;
-            end   = start;
-        } else if((end - epoch).count() == 0) {
-            status= Status::Started;
-        } else {
-            status= Status::Finished;
-        }
-    }
+    void updateStatus();
 
     /**
      * @brief Determine si la partie peut être éditée.
      * @return True si la partie est éditable
      */
-    [[nodiscard]] bool isEditable() const {
-        return status != Status::Started && status != Status::Finished;
-    }
+    [[nodiscard]] bool isEditable() const;
 
     /// Le type de partie.
     Type type= Type::None;
@@ -150,7 +164,8 @@ private:
 
     /// La date et heure de début de partie
     datetype start{};
-
+    /// Si la partie est en pause
+    bool paused= false;
     /// La date et heure de début de partie
     datetype end{};
 
