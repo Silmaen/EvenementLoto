@@ -145,7 +145,7 @@ private:
      * @brief Renvoie la partie en cours d’édition.
      * @return La partie en cours d’édition.
      */
-    core::GameRound& getCurrentGameRound();
+    core::Event::itGameround getCurrentGameRound();
 
     /**
     * @brief Renvoie la partie en cours d’édition.

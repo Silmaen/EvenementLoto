@@ -40,6 +40,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_ui
         Qt::Core
         Qt::Gui
         Qt::Widgets
+        ${CMAKE_PROJECT_NAME}_lib
         )
 target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
 target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_PROJECT_NAME}_ui_autogen/include)
@@ -58,7 +59,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
 # base includes
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
-target_link_libraries(${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_NAME}_lib)
 if (WIN32)
     set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
     if (NOT EXISTS "${QT_INSTALL_PATH}/bin")

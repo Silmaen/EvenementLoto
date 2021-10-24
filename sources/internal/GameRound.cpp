@@ -44,6 +44,24 @@ std::string GameRound::getStatusStr() {
     return "Statut inconnu";
 }
 
+std::string GameRound::getStatusStr() const {
+    switch(status) {
+    case Status::Invalid:
+        return "Partie invalide";
+    case Status::Ready:
+        return "Partie prête";
+    case Status::Started:
+        return "Partie démarrée";
+    case Status::Finished:
+        return "Partie finie";
+    case Status::Paused:
+        return "Partie en pause";
+    case Status::Result:
+        return "Partie en affichage";
+    }
+    return "Statut inconnu";
+}
+
 void GameRound::startGameRound() {
     if(status != Status::Ready)
         return;// start allowed only if ready

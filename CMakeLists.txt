@@ -74,7 +74,7 @@ if (${PRJPREFIX}_COVERAGE)
         list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
 
         message(STATUS "Found gcovr version ${GCOVR_VERSION} at location: ${GCOVR} ")
-        if (${GCOVR_VERSION} LESS 5.0)
+        if (${GCOVR_VERSION} VERSION_LESS 5.0)
             message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.0")
         endif ()
     endif ()
@@ -143,6 +143,9 @@ find_package(Doxygen
         REQUIRED dot)
 if (DOXYGEN_FOUND)
     message(STATUS "found doxygen version: ${DOXYGEN_VERSION}")
+    if (${DOXYGEN_VERSION} VERSION_LESS 1.9)
+        message(FATAL_ERROR "Doxygen version 19.0 or higher is required")
+    endif ()
     add_custom_target(documentation
             COMMAND ${DOXYGEN_EXECUTABLE}
             WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}

@@ -128,6 +128,13 @@ public:
     itGameround getGREnd() { return gameRounds.end(); }
 
     /**
+     * @brief Renvoie un itérateur vers la partie à l’index donné
+     * @param idx L’index de la partie
+     * @return La partie
+     */
+    itGameround getGameRound(const uint16_t& idx);
+
+    /**
      * @brief Cherche la première partie non terminée de la liste.
      * @return La première partie non terminée de la liste.
      */
@@ -139,9 +146,32 @@ public:
      */
     void pushGameRound(const GameRound& round);
 
+    /**
+     * @brief Supprime un round basé sur son index
+     * @param idx L'index du round à supprimer.
+     */
+    void deleteRoundByIndex(const uint16_t& idx);
+
+    /**
+     * @brief Interverti deux rounds
+     * @param idx Indice du premier round à échanger.
+     * @param idx2 Indice du second round à échanger.
+     */
+    void swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2);
+
+    /**
+     * @brief Démarre le round actuel.
+     */
     void startCurrentRound();
 
+    /**
+     * @brief Termine la partie en cours.
+     */
     void endCurrentRound();
+
+    /**
+     * @brief Clos la partie en cours.
+     */
     void closeCurrentRound();
 
     /**

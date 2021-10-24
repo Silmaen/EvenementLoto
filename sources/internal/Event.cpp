@@ -186,6 +186,18 @@ void Event::pushGameRound(const GameRound& round) {
     updateStatus();
 }
 
+void Event::deleteRoundByIndex(const uint16_t& idx) {
+    if(!isEditable())
+        return;
+    gameRounds.erase(std::next(gameRounds.begin(), idx));
+}
+
+void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
+    if(!isEditable())
+        return;
+    std::swap(gameRounds[idx], gameRounds[idx2]);
+}
+
 void Event::startCurrentRound() {
     if(status != Status::GameStart)
         return;
@@ -241,4 +253,9 @@ Event::itGameround Event::findFirstNotFinished() {
     }
     return gameRounds.end();
 }
+
+Event::itGameround Event::getGameRound(const uint16_t& idx) {
+    return std::next(gameRounds.begin(), idx);
+}
+
 }// namespace evl::core

@@ -76,14 +76,14 @@ int ConfigGameRounds::exec() {
 }
 
 void ConfigGameRounds::actCreateGameRound() {
-    gameEvent.getGameRounds().emplace_back();
+    gameEvent.pushGameRound(core::GameRound());
     updateDisplay(true);
 }
 
 void ConfigGameRounds::actDeleteGameRound() {
     int idx= ui->SelectedPartie->currentIndex();
     if(idx < 0) return;
-    gameEvent.getGameRounds().erase(std::next(gameEvent.getGameRounds().begin(), idx));
+    gameEvent.deleteRoundByIndex(idx);
     ui->SelectedPartie->setCurrentIndex(idx - 1);
     updateDisplay();
 }
@@ -96,7 +96,7 @@ void ConfigGameRounds::actMoveGameRoundAfter() {
     int idx= getCurrentGameRoundIndex();
     if(idx >= (int)gameEvent.getGameRounds().size() - 1)
         return;
-    std::swap(gameEvent.getGameRounds()[idx], gameEvent.getGameRounds()[idx + 1]);
+    gameEvent.swapRoundByIndex(idx, idx + 1);
     ui->SelectedPartie->setCurrentIndex(idx + 1);
     updateDisplay();
 }
@@ -105,13 +105,13 @@ void ConfigGameRounds::actMoveGameRoundBefore() {
     int idx= getCurrentGameRoundIndex();
     if(idx <= 0)
         return;
-    std::swap(gameEvent.getGameRounds()[idx], gameEvent.getGameRounds()[idx - 1]);
+    gameEvent.swapRoundByIndex(idx, idx - 1);
     ui->SelectedPartie->setCurrentIndex(idx - 1);
     updateDisplay();
 }
 
 void ConfigGameRounds::actSaveGameRound() {
-    getCurrentGameRound().setType(getCurrentGameRoundType());
+    getCurrentGameRound()->setType(getCurrentGameRoundType());
     updateDisplay();
 }
 
@@ -144,8 +144,8 @@ void ConfigGameRounds::updateDisplay(bool loadLast) {
     ui->BtnLoadPartie->setEnabled(true);
 
     ui->PartieOrder->setText(QVariant(a + 1).toString());
-    core::GameRound& par= gameEvent.getGameRounds()[a];
-    int b               = getIdByGameRoundType(par.getType());
+    const core::GameRound& par= gameEvent.getGameRounds()[a];
+    int b                     = getIdByGameRoundType(par.getType());
     ui->PartieType->setCurrentIndex(b);
     if(b < 0) {
         ui->PartieType->setEditText("<Sélectionnez un type>");
@@ -213,8 +213,8 @@ core::GameRound::Type ConfigGameRounds::getCurrentGameRoundType() {
     return core::GameRound::Type::None;
 }
 
-core::GameRound& ConfigGameRounds::getCurrentGameRound() {
-    return gameEvent.getGameRounds()[getCurrentGameRoundIndex()];
+core::Event::itGameround ConfigGameRounds::getCurrentGameRound() {
+    return gameEvent.getGameRound(getCurrentGameRoundIndex());
 }
 
 int ConfigGameRounds::getCurrentGameRoundIndex() {
