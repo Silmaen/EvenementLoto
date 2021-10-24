@@ -70,6 +70,11 @@ public:
      * @return Le type de partie.
      */
     [[nodiscard]] std::string getStatusStr();
+    /**
+     * @brief Renvoie une chaine contenant le type de partie.
+     * @return Le type de partie.
+     */
+    [[nodiscard]] std::string getStatusStr() const;
 
     /**
      * @brief Renvoie le type de partie.
@@ -142,7 +147,7 @@ public:
      * @brief Accès au tirage
      * @return Les tirages.
      */
-    const std::vector<uint8_t>& getDraws() { return Draws; }
+    const std::vector<uint8_t>& getDraws() const { return Draws; }
 
 private:
     /**
