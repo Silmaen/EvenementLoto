@@ -7,6 +7,7 @@
  */
 #pragma once
 #include "Serializable.h"
+#include "timeFunctions.h"
 #include <chrono>
 #include <vector>
 
@@ -17,8 +18,6 @@ namespace evl::core {
  */
 class GameRound: public Serializable {
 public:
-    /// type de date interne
-    using datetype= std::chrono::system_clock::time_point;
 
     /**
      * @brief Liste des types de parties connus.
@@ -69,7 +68,7 @@ public:
      * @brief Renvoie une chaine contenant le type de partie.
      * @return Le type de partie.
      */
-    [[nodiscard]] std::string getStatusStr();
+    //[[nodiscard]] std::string getStatusStr();
     /**
      * @brief Renvoie une chaine contenant le type de partie.
      * @return Le type de partie.
@@ -88,6 +87,12 @@ public:
      */
     void invalidStatus() {
         status= Status{-1};
+    }
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void restoreStatus() {
+        updateStatus();
     }
 #endif
 
@@ -129,13 +134,13 @@ public:
      * @brief Accès à la date de départ
      * @return La date de départ
      */
-    const datetype& getStarting() const { return start; }
+    const timePoint& getStarting() const { return start; }
 
     /**
      * @brief Accès à la date de fin
      * @return La date de fin
      */
-    const datetype& getEnding() const { return end; }
+    const timePoint& getEnding() const { return end; }
 
     /**
      * @brief Ajoute le numéro dans la liste des numéros tirés
@@ -173,11 +178,11 @@ private:
     Status status= Status::Invalid;
 
     /// La date et heure de début de partie
-    datetype start{};
+    timePoint start{};
     /// Si la partie est en pause
     bool paused= false;
     /// La date et heure de début de partie
-    datetype end{};
+    timePoint end{};
 
     /// La liste des numéros tirés.
     std::vector<uint8_t> Draws;

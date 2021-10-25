@@ -8,12 +8,19 @@
 
 #pragma once
 #include <chrono>
+#include <iomanip>
+#include <sstream>
 #include <string>
 
 namespace evl::core {
 
+/// Définition d’un point dans le temps.
 using timePoint= std::chrono::system_clock::time_point;
-using duration = std::chrono::duration<double>;
+/// Définition d’une durée, la différence entre deux points du temps.
+using duration= std::chrono::duration<double>;
+
+/// Point de référence dans le temps.
+constexpr timePoint epoch{};
 
 inline std::string formatCalendar(const timePoint& t) {
     std::stringstream oss;

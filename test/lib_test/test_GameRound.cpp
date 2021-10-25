@@ -18,6 +18,7 @@ TEST(GameRound, Invalid) {
 #ifdef EVL_DEBUG
     partie.invalidStatus();
     EXPECT_STREQ(partie.getStatusStr().c_str(), "Statut inconnu");
+    partie.restoreStatus();
 #endif
     partie.setType(GameRound::Type::FullCard);
     partie.startGameRound();
@@ -74,15 +75,18 @@ TEST(GameRound, flowNumber) {
     EXPECT_STREQ(partie.getStatusStr().c_str(), "Partie prête");
     partie.addPickedNumber(90);
     partie.startGameRound();
+    partie.removeLastPick();
     partie.addPickedNumber(78);
     partie.addPickedNumber(18);
     partie.addPickedNumber(44);
+    partie.addPickedNumber(65);
     partie.closeGameRound();
     EXPECT_STREQ(partie.getStatusStr().c_str(), "Partie démarrée");
     partie.endGameRound();
     EXPECT_STREQ(partie.getStatusStr().c_str(), "Partie en affichage");
     partie.closeGameRound();
     EXPECT_STREQ(partie.getStatusStr().c_str(), "Partie finie");
+    partie.removeLastPick();
     EXPECT_EQ(partie.getDraws(), (std::vector<uint8_t>{78, 18, 44}));
 }
 

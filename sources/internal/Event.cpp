@@ -95,7 +95,6 @@ void Event::updateStatus() {
     checkValidConfig();
     if(status == Status::Invalid || status == Status::MissingParties)
         return;
-    std::chrono::system_clock::time_point epoch{};
     if(start == epoch)
         return;
     if(paused && (gameRounds.front().getStatus() == GameRound::Status::Ready)) {
