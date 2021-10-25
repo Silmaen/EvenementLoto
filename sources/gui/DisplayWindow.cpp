@@ -6,6 +6,7 @@
 * All modification must get authorization from the author.
 */
 #include "gui/DisplayWindow.h"
+#include "core/timeFunctions.h"
 
 // Les trucs de QT
 #include <gui/moc_DisplayWindow.cpp>
@@ -14,7 +15,7 @@
 namespace evl::gui {
 
 DisplayWindow::DisplayWindow(core::Event* evt, QWidget* parent):
-    QDialog(parent),
+    QMainWindow(parent),
     ui(new Ui::DisplayWindow),
     timer(new QTimer(this)),
     event(evt) {
@@ -38,6 +39,7 @@ void DisplayWindow::updateDisplay() {
     case core::Event::Status::Ready:
     case core::Event::Status::EventStarted:
         ui->PageManager->setCurrentIndex(0);
+        updateEventTitlePage();
         return;
     case core::Event::Status::Paused:
         ui->PageManager->setCurrentIndex(5);
@@ -57,6 +59,48 @@ void DisplayWindow::updateDisplay() {
     case core::Event::Status::Finished:
         ui->PageManager->setCurrentIndex(6);
         return;
+    }
+}
+
+void DisplayWindow::updateEventTitlePage() {
+    ui->ET_EventDate->setText(QString::fromUtf8(core::formatCalendar(event->getStarting())));
+    ui->ET_EventTitle->setText(QString::fromUtf8(event->getName()));
+    ui->ET_OrganizerName->setText(QString::fromUtf8(event->getOrganizerName()));
+    if(event->getLocation().empty()) {
+        ui->ET_EventLocation->setVisible(false);
+    } else {
+        ui->ET_EventLocation->setVisible(true);
+        ui->ET_EventLocation->setText(QString::fromUtf8(event->getLocation()));
+    }
+    if(event->getOrganizerLogo().empty()) {
+        ui->ET_OrganizerLogo->setVisible(false);
+    } else {
+        if(!exists(event->getOrganizerLogo())) {
+            ui->ET_OrganizerLogo->setVisible(false);
+        } else {
+            QString imgName(QString::fromUtf8(event->getOrganizerLogo().string()));
+            if(ui->ET_OrganizerLogo->text() != imgName) {// charge l’image seulement une fois
+                ui->ET_OrganizerLogo->setText(imgName);
+                QImage img;
+                img.load(imgName);
+                ui->ET_OrganizerLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_OrganizerLogo->size())));
+            }
+        }
+    }
+    if(event->getLogo().empty()) {
+        ui->ET_EventLogo->setVisible(false);
+    } else {
+        if(!exists(event->getLogo())) {
+            ui->ET_EventLogo->setVisible(false);
+        } else {
+            QString imgName(QString::fromUtf8(event->getLogo().string()));
+            if(ui->ET_EventLogo->text() != imgName) {// charge l’image seulement une fois
+                ui->ET_EventLogo->setText(imgName);
+                QImage img;
+                img.load(imgName);
+                ui->ET_EventLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_EventLogo->size())));
+            }
+        }
     }
 }
 
