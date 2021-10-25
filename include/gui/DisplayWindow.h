@@ -6,7 +6,7 @@
 * All modification must get authorization from the author.
 */
 #pragma once
-#include <QDialog>
+#include <QMainWindow>
 #include <QTimer>
 #include <core/Event.h>
 
@@ -20,11 +20,12 @@ class DisplayWindow;
 
 namespace evl::gui {
 
-class DisplayWindow: public QDialog {
+class DisplayWindow: public QMainWindow {
     Q_OBJECT
 public:
     /**
      * @brief Constructeur.
+     * @param evt Pointeur vers l’événement.
      * @param parent Le widget Parent.
      */
     explicit DisplayWindow(core::Event* evt, QWidget* parent= nullptr);
@@ -41,6 +42,8 @@ private slots:
     void updateDisplay();
 
 private:
+    void updateEventTitlePage();
+
     /// Lien vers la page UI.
     Ui::DisplayWindow* ui;
     /// Lien vers le timer.
