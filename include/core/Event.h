@@ -18,6 +18,8 @@ namespace evl::core {
  */
 class Event: public Serializable {
 public:
+    /// type de date interne
+    using datetype= std::chrono::system_clock::time_point;
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
@@ -148,7 +150,7 @@ public:
 
     /**
      * @brief Supprime un round basé sur son index
-     * @param idx L'index du round à supprimer.
+     * @param idx L’index du round à supprimer.
      */
     void deleteRoundByIndex(const uint16_t& idx);
 
@@ -200,9 +202,21 @@ public:
      */
     bool isEditable() const;
 
+    /**
+     * @brief Accès à la date de départ
+     * @return La date de départ
+     */
+    const datetype& getStarting() const { return start; }
+
+    /**
+     * @brief Accès à la date de fin
+     * @return La date de fin
+     */
+    const datetype& getEnding() const { return end; }
+
 private:
     /**
-     * @brief Si l'événement est en phase d'édition, met à jour son statuT.
+     * @brief Si l’événement est en phase d’édition, met à jour son statuT.
      */
     void checkValidConfig();
     /**

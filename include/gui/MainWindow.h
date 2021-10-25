@@ -7,8 +7,10 @@
  */
 #pragma once
 
+#include "DisplayWindow.h"
 #include <QMainWindow>
 #include <QSettings>
+#include <QTimer>
 #include <core/Event.h>
 
 /**
@@ -120,11 +122,50 @@ private slots:
      */
     void actQuit();
 
+    /**
+     * @brief Fonction démarrage et fin d'une partie
+     */
+    void actStartStopRound();
+
+    /**
+     * @brief Fonction pause et reprise d'une partie
+     */
+    void actPauseResumeRound();
+
+    /**
+     * @brief Fonction Tirage aléatoire
+     */
+    void actRandomPick();
+
+    /**
+     * @brief Fonction annulation de tirage
+     */
+    void actCancelPick();
+
+    /**
+     * @brief action de changement du radio bouton de type de tirage.
+     */
+    void actRadioPureRandom();
+
+    /**
+     * @brief action de changement du radio bouton de type de tirage.
+     */
+    void actRadioPureManual();
+
+    /**
+     * @brief action de changement du radio bouton de type de tirage.
+     */
+    void actRadioBoth();
+
 private:
     /**
      * @brief Met à jour l’affichage en fonction du contenu de l’événement courant
      */
     void updateDisplay();
+    /**
+     * @brief Mise à jour de l’affichage, spéciale in game.
+     */
+    void updateInGameDisplay();
 
     /**
      * @brief Affiche une boite de dialogue disant que c’est en travaux.
@@ -140,6 +181,12 @@ private:
 
     /// L’événement en cours de traitement
     core::Event currentEvent;
+
+    /// Timer interne
+    QTimer* timer;
+
+    /// Fenêtre d’affichage sur le second écran.
+    DisplayWindow* displayWindow= nullptr;
 };
 
-}// namespace elv
+}// namespace evl::gui

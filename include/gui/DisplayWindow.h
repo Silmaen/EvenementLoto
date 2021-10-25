@@ -7,6 +7,8 @@
 */
 #pragma once
 #include <QDialog>
+#include <QTimer>
+#include <core/Event.h>
 
 namespace Ui {
 
@@ -25,7 +27,7 @@ public:
      * @brief Constructeur.
      * @param parent Le widget Parent.
      */
-    explicit DisplayWindow(QWidget* parent= nullptr);
+    explicit DisplayWindow(core::Event* evt, QWidget* parent= nullptr);
 
     /**
      * @brief Destructeur.
@@ -33,9 +35,18 @@ public:
     ~DisplayWindow() override;
 public slots:
 private slots:
+    /**
+     * @brief Mise à jour de l'affichage.
+     */
+    void updateDisplay();
+
 private:
     /// Lien vers la page UI.
     Ui::DisplayWindow* ui;
+    /// Lien vers le timer.
+    QTimer* timer;
+    /// Lien vers l’événement en cours
+    core::Event* event;
 };
 
 }// namespace evl::gui
