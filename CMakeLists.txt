@@ -36,7 +36,7 @@ endif ()
 
 # check minimal Compiler version
 if (${CMAKE_CXX_COMPILER_VERSION} LESS ${${PRJPREFIX}_${CMAKE_CXX_COMPILER_ID}_MINIMAL})
-    message(FATAL_ERROR "gcovr: Too old version of ${CMAKE_CXX_COMPILER_ID}, minimum required is ${${PRJPREFIX}_${CMAKE_CXX_COMPILER_ID}_MINIMAL} (found ${CMAKE_CXX_COMPILER_VERSION})")
+    message(FATAL_ERROR "Too old version of ${CMAKE_CXX_COMPILER_ID}, minimum required is ${${PRJPREFIX}_${CMAKE_CXX_COMPILER_ID}_MINIMAL} (found ${CMAKE_CXX_COMPILER_VERSION})")
 endif ()
 
 #

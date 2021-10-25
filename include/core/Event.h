@@ -177,6 +177,12 @@ public:
     void closeCurrentRound();
 
     /**
+     * @brief Renvoie l'index de la partie courante
+     * @return Index de la partie courante
+     */
+    int getCurrentIndex();
+
+    /**
      * @brief Démarre l’événement
      */
     void startEvent();

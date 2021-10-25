@@ -166,6 +166,10 @@ private:
      * @brief Mise à jour de l’affichage, spéciale in game.
      */
     void updateInGameDisplay();
+    /**
+    * @brief Mise à jour de l’affichage, spéciale in game.
+    */
+    void updateClocks();
 
     /**
      * @brief Affiche une boite de dialogue disant que c’est en travaux.
@@ -187,6 +191,12 @@ private:
 
     /// Fenêtre d’affichage sur le second écran.
     DisplayWindow* displayWindow= nullptr;
+
+    enum struct DrawMode {
+        Both,
+        PickOnly,
+        ManualOnly
+    } currentMode;
 };
 
 }// namespace evl::gui
