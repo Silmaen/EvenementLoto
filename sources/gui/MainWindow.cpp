@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "gui/MainWindow.h"
+#include "core/timeFunctions.h"
 #include "gui/About.h"
 #include "gui/ConfigCardPack.h"
 #include "gui/ConfigEvent.h"
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent):
     // initialise l'ui depuis le fichier ui.
     ui->setupUi(this);
     // connecte le timer à la fonction de mise à jour de l’affichage en jeu.
-    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateInGameDisplay));
+    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateClocks));
     timer->setInterval(500);
     updateInGameDisplay();
 }
@@ -128,6 +129,7 @@ void MainWindow::actStartEvent() {
         return;
     currentEvent.startEvent();
     updateDisplay();
+    updateInGameDisplay();
     timer->start();
     displayWindow= new DisplayWindow(&currentEvent, this);
     displayWindow->show();
@@ -147,6 +149,7 @@ void MainWindow::actEndEvent() {
     displayWindow->hide();
     delete displayWindow;
     displayWindow= nullptr;
+    updateInGameDisplay();
     updateDisplay();
 }
 
@@ -184,18 +187,18 @@ void MainWindow::actCancelPick() {
 }
 
 void MainWindow::actRadioPureRandom() {
-    /// TODO
-    showNotImplemented("actRadioPureRandom");
+    currentMode= DrawMode::PickOnly;
+    updateInGameDisplay();
 }
 
 void MainWindow::actRadioPureManual() {
-    /// TODO
-    showNotImplemented("actRadioPureManual");
+    currentMode= DrawMode::ManualOnly;
+    updateInGameDisplay();
 }
 
 void MainWindow::actRadioBoth() {
-    /// TODO
-    showNotImplemented("actRadioBoth");
+    currentMode= DrawMode::Both;
+    updateInGameDisplay();
 }
 
 void MainWindow::showNotImplemented(const QString& from) {
@@ -212,6 +215,12 @@ void MainWindow::syncSettings() {
 }
 
 void MainWindow::updateDisplay() {
+    ui->actionSauver_Evenement->setEnabled(false);
+    ui->actionSauver_Evenement_sous->setEnabled(false);
+    ui->actionCommencer_Evenement->setEnabled(false);
+    ui->actionTerminer_Evenement->setEnabled(false);
+    ui->actionConfiguration_des_parties->setEnabled(false);
+    ui->EvenementControl->setEnabled(false);
     switch(currentEvent.getStatus()) {
     case core::Event::Status::Invalid:
         ui->actionSauver_Evenement->setEnabled(false);
@@ -262,36 +271,79 @@ void MainWindow::updateDisplay() {
     }
 }
 
-void MainWindow::updateInGameDisplay() {
-    // les dates et heures
+void MainWindow::updateClocks() {
     std::chrono::system_clock::time_point epoch{};
-    {
-        std::stringstream oss;
-        auto tt= std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        oss << std::put_time(std::localtime(&tt), "%H:%M:%S");
-        ui->CurrentTime->setText(QString::fromStdString(oss.str()));
+    ui->CurrentTime->setText(QString::fromStdString(core::formatClock(std::chrono::system_clock::now())));
+    if(currentEvent.getStarting() == epoch) {
+        ui->CurrentDate->setText("");
+    } else {
+        ui->CurrentDate->setText(QString::fromStdString(core::formatCalendar(currentEvent.getStarting())));
     }
+
+    if(currentEvent.getStarting() == epoch) {
+        ui->Duration->setText("");
+    } else {
+        ui->StartingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getStarting())));
+        auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
+        ui->Duration->setText(QString::fromStdString(core::formatDuration(length)));
+    }
+
+    core::Event::itGameround cur= currentEvent.findFirstNotFinished();
+    if(cur == currentEvent.getGREnd())
+        return;
+    if(cur->getStarting() == epoch) {
+        ui->RoundStartTime->setText("");
+        ui->RoundDuration->setText("");
+    } else {
+        ui->RoundStartTime->setText(QString::fromStdString(core::formatClock(cur->getStarting())));
+        auto length= std::chrono::system_clock::now() - cur->getStarting();
+        ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(length)));
+    }
+}
+
+void MainWindow::updateInGameDisplay() {
+
+    // les radios boutons
     {
-        if(currentEvent.getStarting() == epoch) {
-            ui->CurrentDate->setText("");
-        } else {
-            std::stringstream oss;
-            auto tt= std::chrono::system_clock::to_time_t(currentEvent.getStarting());
-            oss << std::put_time(std::localtime(&tt), "%d %B %Y");
-            ui->CurrentDate->setText(QString::fromStdString(oss.str()));
+        switch(currentMode) {
+        case DrawMode::Both:
+            ui->radioBtnPureManual->setChecked(false);
+            ui->radioBtnPureRandom->setChecked(false);
+            ui->radioBtnBoth->setChecked(true);
+            ui->RandomPick->setEnabled(true);
+            ui->GroupPickManual->setEnabled(true);
+            break;
+        case DrawMode::PickOnly:
+            ui->radioBtnPureManual->setChecked(false);
+            ui->radioBtnPureRandom->setChecked(true);
+            ui->radioBtnBoth->setChecked(false);
+            ui->RandomPick->setEnabled(true);
+            ui->GroupPickManual->setEnabled(false);
+            break;
+        case DrawMode::ManualOnly:
+            ui->radioBtnPureManual->setChecked(true);
+            ui->radioBtnPureRandom->setChecked(false);
+            ui->radioBtnBoth->setChecked(false);
+            ui->RandomPick->setEnabled(false);
+            ui->GroupPickManual->setEnabled(true);
+            break;
+        }
+        ui->CancelLastPick->setEnabled(true);
+        if(currentEvent.getStatus() != core::Event::Status::GameRunning) {
+            ui->RandomPick->setEnabled(false);
+            ui->GroupPickManual->setEnabled(false);
+            ui->CancelLastPick->setEnabled(false);
         }
     }
-    {
-        if(currentEvent.getStarting() == epoch) {
-            ui->Duration->setText("");
-        } else {
-            std::stringstream oss;
-            auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
-            oss << std::chrono::duration_cast<std::chrono::hours>(length).count() << ":"
-                << std::chrono::duration_cast<std::chrono::minutes>(length).count() << ":"
-                << std::chrono::duration_cast<std::chrono::seconds>(length).count();
-            ui->Duration->setText(QString::fromStdString(oss.str()));
-        }
+    // le bouton de pause
+    ui->PauseResumeGame->setEnabled(false);
+    if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
+        ui->PauseResumeGame->setEnabled(true);
+        ui->PauseResumeGame->setText("Pause partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
+        ui->PauseResumeGame->setEnabled(true);
+        ui->PauseResumeGame->setText("Reprise partie");
     }
     // le bouton de debut/fin de round
     ui->StartEndGameRound->setEnabled(false);
@@ -310,6 +362,29 @@ void MainWindow::updateInGameDisplay() {
     if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
         ui->StartEndGameRound->setEnabled(true);
         ui->StartEndGameRound->setText("Passer à la partie suivante");
+    }
+    // informations parties
+    ui->Progression->setRange(0, currentEvent.getGameRounds().size());
+    ui->Progression->setValue(currentEvent.getCurrentIndex());
+    if(currentEvent.getStatus() == core::Event::Status::GameStart ||
+       currentEvent.getStatus() == core::Event::Status::GameRunning ||
+       currentEvent.getStatus() == core::Event::Status::GameFinished ||
+       currentEvent.getStatus() == core::Event::Status::GamePaused) {
+        std::chrono::system_clock::time_point epoch{};
+        core::Event::itGameround cur= currentEvent.findFirstNotFinished();
+        ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
+        ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex()) + " - " + QString::fromStdString(cur->getTypeStr()));
+        if(cur->getStarting() == epoch) {
+            ui->RoundDraws->setText("0");
+        } else {
+            ui->RoundDraws->setText(QString::number(cur->getDraws().size()));
+        }
+    } else {
+        ui->RoundStartTime->setText("");
+        ui->RoundDuration->setText("");
+        ui->RoundDraws->setText("");
+        ui->RoundName->setText("");
+        ui->RoundPhase->setText("");
     }
     if(!timer->isActive())
         timer->start();

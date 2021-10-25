@@ -258,4 +258,13 @@ Event::itGameround Event::getGameRound(const uint16_t& idx) {
     return std::next(gameRounds.begin(), idx);
 }
 
+int Event::getCurrentIndex() {
+    int i= 0;
+    for(itGameround it= gameRounds.begin(); it != gameRounds.cend(); ++it, ++i) {
+        if(it->getStatus() != GameRound::Status::Finished)
+            return i;
+    }
+    return -1;
+}
+
 }// namespace evl::core
