@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DisplayWindow.h"
+#include "WidgetNumberGrid.h"
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
@@ -157,6 +158,12 @@ private slots:
      */
     void actRadioBoth();
 
+    /**
+     * @brief
+     * @param value
+     */
+    void actGridPushed(int value);
+
 private:
     /**
      * @brief Met à jour l’affichage en fonction du contenu de l’événement courant
@@ -191,6 +198,12 @@ private:
 
     /// Fenêtre d’affichage sur le second écran.
     DisplayWindow* displayWindow= nullptr;
+
+    /// Le widget de boutons
+    WidgetNumberGrid* numberGrid= nullptr;
+
+    /// Le générateur de nombre aléatoire
+    core::RandomNumberGenerator rng;
 
     enum struct DrawMode {
         Both,

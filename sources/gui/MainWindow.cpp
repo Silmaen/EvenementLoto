@@ -28,9 +28,16 @@ MainWindow::MainWindow(QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     settings{QString(getIniFile().generic_u8string().c_str()), QSettings::IniFormat},
-    timer(new QTimer(this)) {
+    timer(new QTimer(this)),
+    numberGrid(new WidgetNumberGrid(ui->GroupPickManual)) {
     // initialise l'ui depuis le fichier ui.
     ui->setupUi(this);
+    // initialise la numberGrid
+    auto layout= new QGridLayout(ui->GroupPickManual);
+    numberGrid->setParent(ui->GroupPickManual);
+    numberGrid->setObjectName(QString::fromUtf8("numberGrid"));
+    layout->addWidget(numberGrid, 0, 0, 1, 1);
+    connect(numberGrid, &WidgetNumberGrid::buttonPushed, this, &MainWindow::actGridPushed);
     // connecte le timer à la fonction de mise à jour de l’affichage en jeu.
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateClocks));
     timer->setInterval(500);
@@ -40,6 +47,7 @@ MainWindow::MainWindow(QWidget* parent):
 MainWindow::~MainWindow() {
     delete ui;
     delete timer;
+    delete numberGrid;
     if(displayWindow != nullptr)
         delete displayWindow;
 }
@@ -88,7 +96,6 @@ void MainWindow::actNewFile() {
 }
 
 void MainWindow::actLoadFile() {
-
     QFileDialog dia;
     dia.setAcceptMode(QFileDialog::AcceptOpen);
     dia.setFileMode(QFileDialog::FileMode::ExistingFile);
@@ -167,6 +174,8 @@ void MainWindow::actStartStopRound() {
         currentEvent.endCurrentRound();
     } else if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
         currentEvent.closeCurrentRound();
+        numberGrid->resetPushed();
+        rng.resetPick();
     }
     updateInGameDisplay();
 }
@@ -177,13 +186,19 @@ void MainWindow::actPauseResumeRound() {
 }
 
 void MainWindow::actRandomPick() {
-    /// TODO
-    showNotImplemented("actRandomPick");
+    auto number= rng.pick();
+    numberGrid->setPushed(number);
+    currentEvent.findFirstNotFinished()->addPickedNumber(number);
+    updateDisplay();
 }
 
 void MainWindow::actCancelPick() {
-    /// TODO
-    showNotImplemented("actCancelPick");
+    core::Event::itGameround cur= currentEvent.findFirstNotFinished();
+    if(cur->getDraws().size() == 0)
+        return;
+    numberGrid->resetPushed(cur->getDraws().back());
+    cur->removeLastPick();
+    updateInGameDisplay();
 }
 
 void MainWindow::actRadioPureRandom() {
@@ -245,7 +260,6 @@ void MainWindow::updateDisplay() {
         ui->actionTerminer_Evenement->setEnabled(false);
         ui->actionConfiguration_des_parties->setEnabled(true);
         ui->EvenementControl->setEnabled(false);
-        updateInGameDisplay();
         break;
     case core::Event::Status::EventStarted:
     case core::Event::Status::Paused:
@@ -269,6 +283,7 @@ void MainWindow::updateDisplay() {
         ui->EvenementControl->setEnabled(false);
         break;
     }
+    updateInGameDisplay();
 }
 
 void MainWindow::updateClocks() {
@@ -285,9 +300,15 @@ void MainWindow::updateClocks() {
     } else {
         ui->StartingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getStarting())));
         auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
+        if(currentEvent.getEnding() != epoch)
+            length= currentEvent.getEnding() - currentEvent.getStarting();
         ui->Duration->setText(QString::fromStdString(core::formatDuration(length)));
     }
-
+    if(currentEvent.getEnding() == epoch) {
+        ui->EndingHour->setText("");
+    } else {
+        ui->EndingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getEnding())));
+    }
     core::Event::itGameround cur= currentEvent.findFirstNotFinished();
     if(cur == currentEvent.getGREnd())
         return;
@@ -297,6 +318,8 @@ void MainWindow::updateClocks() {
     } else {
         ui->RoundStartTime->setText(QString::fromStdString(core::formatClock(cur->getStarting())));
         auto length= std::chrono::system_clock::now() - cur->getStarting();
+        if(cur->getEnding() != epoch)
+            length= cur->getEnding() - cur->getStarting();
         ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(length)));
     }
 }
@@ -373,21 +396,66 @@ void MainWindow::updateInGameDisplay() {
         std::chrono::system_clock::time_point epoch{};
         core::Event::itGameround cur= currentEvent.findFirstNotFinished();
         ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
-        ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex()) + " - " + QString::fromStdString(cur->getTypeStr()));
+        ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
         if(cur->getStarting() == epoch) {
             ui->RoundDraws->setText("0");
         } else {
             ui->RoundDraws->setText(QString::number(cur->getDraws().size()));
         }
+        if(cur->getDraws().size() > 0) {
+            ui->CancelLastPick->setEnabled(true);
+            auto it= cur->getDraws().rbegin();
+            ui->CurrentDraw->display(*it);
+            ++it;
+            if(it != cur->getDraws().rend()) {
+                ui->LastNumber1->display(*it);
+                ++it;
+                if(it != cur->getDraws().rend()) {
+                    ui->LastNumber2->display(*it);
+                    ++it;
+                    if(it != cur->getDraws().rend()) {
+                        ui->LastNumber3->display(*it);
+                    } else {
+                        ui->LastNumber3->display(0);
+                    }
+                } else {
+                    ui->LastNumber2->display(0);
+                }
+            } else {
+                ui->LastNumber1->display(0);
+            }
+        } else {
+            ui->CancelLastPick->setEnabled(false);
+            ui->RoundStartTime->setText("");
+            ui->RoundDuration->setText("");
+            ui->RoundDraws->setText("");
+            ui->RoundName->setText("");
+            ui->RoundPhase->setText("");
+            ui->CurrentDraw->display(0);
+            ui->LastNumber1->display(0);
+            ui->LastNumber2->display(0);
+            ui->LastNumber3->display(0);
+        }
     } else {
+        ui->CancelLastPick->setEnabled(false);
         ui->RoundStartTime->setText("");
         ui->RoundDuration->setText("");
         ui->RoundDraws->setText("");
         ui->RoundName->setText("");
         ui->RoundPhase->setText("");
+        ui->CurrentDraw->display(0);
+        ui->LastNumber1->display(0);
+        ui->LastNumber2->display(0);
+        ui->LastNumber3->display(0);
     }
     if(!timer->isActive())
         timer->start();
+}
+
+void MainWindow::actGridPushed(int value) {
+    currentEvent.findFirstNotFinished()->addPickedNumber(value);
+    rng.addPick(value);
+    updateDisplay();
 }
 
 }// namespace evl::gui
