@@ -24,7 +24,7 @@ std::string GameRound::getTypeStr() const {
     }
     return "Type de partie inconnu";
 }
-
+/*
 std::string GameRound::getStatusStr() {
     switch(status) {
     case Status::Invalid:
@@ -42,7 +42,7 @@ std::string GameRound::getStatusStr() {
     }
     updateStatus();
     return "Statut inconnu";
-}
+}*/
 
 std::string GameRound::getStatusStr() const {
     switch(status) {
@@ -103,7 +103,6 @@ void GameRound::updateStatus() {
         status= Status::Invalid;
         return;
     }
-    datetype epoch{};
     if((start - epoch).count() == 0) {
         status= Status::Ready;
         end   = start;

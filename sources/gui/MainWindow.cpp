@@ -287,24 +287,23 @@ void MainWindow::updateDisplay() {
 }
 
 void MainWindow::updateClocks() {
-    std::chrono::system_clock::time_point epoch{};
     ui->CurrentTime->setText(QString::fromStdString(core::formatClock(std::chrono::system_clock::now())));
-    if(currentEvent.getStarting() == epoch) {
+    if(currentEvent.getStarting() == core::epoch) {
         ui->CurrentDate->setText("");
     } else {
         ui->CurrentDate->setText(QString::fromStdString(core::formatCalendar(currentEvent.getStarting())));
     }
 
-    if(currentEvent.getStarting() == epoch) {
+    if(currentEvent.getStarting() == core::epoch) {
         ui->Duration->setText("");
     } else {
         ui->StartingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getStarting())));
         auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
-        if(currentEvent.getEnding() != epoch)
+        if(currentEvent.getEnding() != core::epoch)
             length= currentEvent.getEnding() - currentEvent.getStarting();
         ui->Duration->setText(QString::fromStdString(core::formatDuration(length)));
     }
-    if(currentEvent.getEnding() == epoch) {
+    if(currentEvent.getEnding() == core::epoch) {
         ui->EndingHour->setText("");
     } else {
         ui->EndingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getEnding())));
@@ -312,13 +311,13 @@ void MainWindow::updateClocks() {
     core::Event::itGameround cur= currentEvent.findFirstNotFinished();
     if(cur == currentEvent.getGREnd())
         return;
-    if(cur->getStarting() == epoch) {
+    if(cur->getStarting() == core::epoch) {
         ui->RoundStartTime->setText("");
         ui->RoundDuration->setText("");
     } else {
         ui->RoundStartTime->setText(QString::fromStdString(core::formatClock(cur->getStarting())));
         auto length= std::chrono::system_clock::now() - cur->getStarting();
-        if(cur->getEnding() != epoch)
+        if(cur->getEnding() != core::epoch)
             length= cur->getEnding() - cur->getStarting();
         ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(length)));
     }
@@ -393,11 +392,10 @@ void MainWindow::updateInGameDisplay() {
        currentEvent.getStatus() == core::Event::Status::GameRunning ||
        currentEvent.getStatus() == core::Event::Status::GameFinished ||
        currentEvent.getStatus() == core::Event::Status::GamePaused) {
-        std::chrono::system_clock::time_point epoch{};
         core::Event::itGameround cur= currentEvent.findFirstNotFinished();
         ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
         ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
-        if(cur->getStarting() == epoch) {
+        if(cur->getStarting() == core::epoch) {
             ui->RoundDraws->setText("0");
         } else {
             ui->RoundDraws->setText(QString::number(cur->getDraws().size()));

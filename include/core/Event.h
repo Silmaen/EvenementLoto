@@ -18,8 +18,6 @@ namespace evl::core {
  */
 class Event: public Serializable {
 public:
-    /// type de date interne
-    using datetype= std::chrono::system_clock::time_point;
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
@@ -212,13 +210,13 @@ public:
      * @brief Accès à la date de départ
      * @return La date de départ
      */
-    const datetype& getStarting() const { return start; }
+    const timePoint& getStarting() const { return start; }
 
     /**
      * @brief Accès à la date de fin
      * @return La date de fin
      */
-    const datetype& getEnding() const { return end; }
+    const timePoint& getEnding() const { return end; }
 
 private:
     /**
@@ -250,10 +248,10 @@ private:
     std::vector<GameRound> gameRounds;
 
     /// La date et heure de début de l’événement
-    std::chrono::system_clock::time_point start{};
+    timePoint start{};
 
     /// La date et heure de début de l’événement
-    std::chrono::system_clock::time_point end{};
+    timePoint end{};
 
     /// Lien vers la liste des cartons
     //[[maybe_unused]] CardPack* cartons= nullptr;

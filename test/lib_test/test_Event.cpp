@@ -65,6 +65,27 @@ TEST(Event, DefinesAfterStart) {
     EXPECT_STREQ(event.getLogo().generic_string().c_str(), "toto.png");
 }
 
+TEST(Event, RoundManipulation) {
+    Event event;
+    event.setOrganizerName("toto");
+    event.setName("evenement de toto");
+    GameRound gr;
+    gr.setType(GameRound::Type::OneQuine);
+    event.pushGameRound(gr);
+    gr.setType(GameRound::Type::FullCard);
+    event.pushGameRound(gr);
+    gr.setType(GameRound::Type::TwoQuines);
+    event.pushGameRound(gr);
+    EXPECT_EQ(event.getGameRound(1)->getType(), GameRound::Type::FullCard);
+    event.swapRoundByIndex(1, 2);
+    EXPECT_EQ(event.getGameRound(1)->getType(), GameRound::Type::TwoQuines);
+    event.deleteRoundByIndex(0);
+    event.startEvent();
+    event.swapRoundByIndex(0, 1);
+    event.deleteRoundByIndex(0);
+    EXPECT_EQ(event.getGameRound(1)->getType(), GameRound::Type::FullCard);
+}
+
 TEST(Event, BaseToReady) {
     Event event;
     EXPECT_EQ(event.getStatus(), Event::Status::Invalid);
@@ -129,6 +150,7 @@ TEST(Event, WorkflowPauseRound) {
     EXPECT_EQ(event.getStatus(), Event::Status::GamePaused);
     event.resumeEvent();
     EXPECT_EQ(event.getStatus(), Event::Status::GameRunning);
+    EXPECT_EQ(event.getCurrentIndex(), 0);
     event.endCurrentRound();
     event.stopEvent();
     EXPECT_EQ(event.getStatus(), Event::Status::Finished);
@@ -142,8 +164,11 @@ TEST(Event, WorkflowFinished) {
     GameRound gr;
     gr.setType(GameRound::Type::FullCard);
     event.pushGameRound(gr);
-    // bad actions
+
+    EXPECT_EQ(event.getStarting(), epoch);
     event.startEvent();
+    EXPECT_NE(event.getStarting(), epoch);
+    EXPECT_EQ(event.getEnding(), epoch);
     event.resumeEvent();
     event.startCurrentRound();
     event.endCurrentRound();
@@ -155,7 +180,9 @@ TEST(Event, WorkflowFinished) {
     event.endCurrentRound();
     event.closeCurrentRound();
     event.stopEvent();
+    EXPECT_NE(event.getEnding(), epoch);
     EXPECT_EQ(event.getStatus(), Event::Status::Finished);
+    EXPECT_EQ(event.getCurrentIndex(), -1);
 }
 
 TEST(Event, Serialize) {
