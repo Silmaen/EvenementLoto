@@ -35,7 +35,7 @@ public:
      * @param num Le numéro à ajouter.
      * @return False si le numéro est déjà dans la liste.
      */
-    [[nodiscard]] bool addPick(const uint8_t& num);
+    bool addPick(const uint8_t& num);
 
     /**
      * @brief Tire au sort un numéro non déjà tiré.

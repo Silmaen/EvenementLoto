@@ -149,6 +149,11 @@ public:
      */
     const std::vector<uint8_t>& getDraws() const { return Draws; }
 
+    /**
+     * @brief Supprime le dernier tirage.
+     */
+    void removeLastPick();
+
 private:
     /**
      * @brief Met à jour le statut.

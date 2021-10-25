@@ -151,4 +151,10 @@ void GameRound::addPickedNumber(const uint8_t& num) {
     Draws.push_back(num);
 }
 
+void GameRound::removeLastPick() {
+    if(Draws.size() == 0)
+        return;
+    Draws.pop_back();
+}
+
 }// namespace evl::core
