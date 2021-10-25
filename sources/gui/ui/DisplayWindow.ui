@@ -19,105 +19,509 @@
         <property name="windowTitle">
             <string>Dialog</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout_2">
+        <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
-                <widget class="QStackedWidget" name="stackedWidget">
+                <widget class="QStackedWidget" name="PageManager">
                     <property name="currentIndex">
                         <number>0</number>
                     </property>
-                    <widget class="QWidget" name="pageGameRound">
-                        <layout class="QGridLayout" name="gridLayout">
-                            <item row="0" column="0" rowspan="2">
-                                <widget class="QFrame" name="frTopLeft">
-                                    <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                            <horstretch>2</horstretch>
-                                            <verstretch>2</verstretch>
-                                        </sizepolicy>
-                                    </property>
-                                    <property name="minimumSize">
-                                        <size>
-                                            <width>400</width>
-                                            <height>400</height>
-                                        </size>
-                                    </property>
-                                    <property name="baseSize">
-                                        <size>
-                                            <width>200</width>
-                                            <height>200</height>
-                                        </size>
-                                    </property>
-                                </widget>
-                            </item>
+                    <widget class="QWidget" name="pageEventTitle">
+                        <layout class="QGridLayout" name="gridLayout_2">
                             <item row="0" column="1">
-                                <widget class="QFrame" name="frTopRight">
-                                    <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                            <horstretch>1</horstretch>
-                                            <verstretch>1</verstretch>
-                                        </sizepolicy>
+                                <spacer name="verticalSpacer_2">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
                                     </property>
-                                    <property name="minimumSize">
+                                    <property name="sizeHint" stdset="0">
                                         <size>
-                                            <width>200</width>
-                                            <height>200</height>
+                                            <width>20</width>
+                                            <height>278</height>
                                         </size>
                                     </property>
-                                    <property name="baseSize">
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_2">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
                                         <size>
-                                            <width>100</width>
-                                            <height>100</height>
+                                            <width>320</width>
+                                            <height>20</height>
                                         </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Titre De l'événement</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
                                     </property>
                                 </widget>
                             </item>
-                            <item row="1" column="1" rowspan="2">
-                                <widget class="QFrame" name="frBottmRight">
-                                    <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                            <horstretch>1</horstretch>
-                                            <verstretch>2</verstretch>
-                                        </sizepolicy>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
                                     </property>
-                                    <property name="minimumSize">
+                                    <property name="sizeHint" stdset="0">
                                         <size>
-                                            <width>200</width>
-                                            <height>400</height>
+                                            <width>320</width>
+                                            <height>20</height>
                                         </size>
                                     </property>
-                                    <property name="baseSize">
-                                        <size>
-                                            <width>100</width>
-                                            <height>200</height>
-                                        </size>
-                                    </property>
-                                </widget>
+                                </spacer>
                             </item>
-                            <item row="2" column="0">
-                                <widget class="QFrame" name="frBottomLeft">
-                                    <property name="sizePolicy">
-                                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                            <horstretch>2</horstretch>
-                                            <verstretch>1</verstretch>
-                                        </sizepolicy>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
                                     </property>
-                                    <property name="minimumSize">
+                                    <property name="sizeHint" stdset="0">
                                         <size>
-                                            <width>400</width>
-                                            <height>200</height>
+                                            <width>20</width>
+                                            <height>275</height>
                                         </size>
                                     </property>
-                                    <property name="baseSize">
-                                        <size>
-                                            <width>200</width>
-                                            <height>100</height>
-                                        </size>
-                                    </property>
-                                </widget>
+                                </spacer>
                             </item>
                         </layout>
                     </widget>
-                    <widget class="QWidget" name="page_2"/>
+                    <widget class="QWidget" name="pageRoundTitle">
+                        <layout class="QGridLayout" name="gridLayout_3">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_4">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_4">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>414</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_2">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Titre du round</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_3">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>414</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_3">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="PageRoundRunning">
+                        <layout class="QGridLayout" name="gridLayout_4">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_6">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_6">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>397</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_3">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Round Running</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_5">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>396</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_5">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="pageRoundPause">
+                        <layout class="QGridLayout" name="gridLayout_5">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_7">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_7">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>435</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_4">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Round Pause</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_8">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>434</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_8">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="pageRoundEnd">
+                        <layout class="QGridLayout" name="gridLayout_6">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_9">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_9">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>465</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_5">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Round End</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_10">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>464</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_10">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="PageEventPause">
+                        <layout class="QGridLayout" name="gridLayout_7">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_11">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_11">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>450</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_6">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>Event Pause</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_12">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>449</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_12">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
+                    <widget class="QWidget" name="pageEventEnd">
+                        <layout class="QGridLayout" name="gridLayout_8">
+                            <item row="0" column="1">
+                                <spacer name="verticalSpacer_13">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>278</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="0">
+                                <spacer name="horizontalSpacer_13">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>480</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="1" column="1">
+                                <widget class="QLabel" name="label_7">
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>50</pointsize>
+                                        </font>
+                                    </property>
+                                    <property name="text">
+                                        <string>End Event</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item row="1" column="2">
+                                <spacer name="horizontalSpacer_14">
+                                    <property name="orientation">
+                                        <enum>Qt::Horizontal</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>479</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item row="2" column="1">
+                                <spacer name="verticalSpacer_14">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>275</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                        </layout>
+                    </widget>
                 </widget>
             </item>
         </layout>

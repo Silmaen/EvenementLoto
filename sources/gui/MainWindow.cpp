@@ -26,12 +26,21 @@ namespace evl::gui {
 MainWindow::MainWindow(QWidget* parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    settings{QString(getIniFile().generic_u8string().c_str()), QSettings::IniFormat} {
+    settings{QString(getIniFile().generic_u8string().c_str()), QSettings::IniFormat},
+    timer(new QTimer(this)) {
+    // initialise l'ui depuis le fichier ui.
     ui->setupUi(this);
+    // connecte le timer à la fonction de mise à jour de l’affichage en jeu.
+    connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateInGameDisplay));
+    timer->setInterval(500);
+    updateInGameDisplay();
 }
 
 MainWindow::~MainWindow() {
     delete ui;
+    delete timer;
+    if(displayWindow != nullptr)
+        delete displayWindow;
 }
 void MainWindow::actShowAbout() {
     evl::gui::About AboutWindow(this);
@@ -90,7 +99,6 @@ void MainWindow::actLoadFile() {
         currentEvent.read(f);
         f.close();
     }
-
     updateDisplay();
 }
 
@@ -120,6 +128,9 @@ void MainWindow::actStartEvent() {
         return;
     currentEvent.startEvent();
     updateDisplay();
+    timer->start();
+    displayWindow= new DisplayWindow(&currentEvent, this);
+    displayWindow->show();
 }
 
 void MainWindow::actEndEvent() {
@@ -132,11 +143,59 @@ void MainWindow::actEndEvent() {
     if(message.exec() != QMessageBox::StandardButton::Yes)
         return;
     currentEvent.stopEvent();
+    timer->stop();
+    displayWindow->hide();
+    delete displayWindow;
+    displayWindow= nullptr;
     updateDisplay();
 }
 
 void MainWindow::actQuit() {
     close();
+}
+
+void MainWindow::actStartStopRound() {
+    timer->stop();
+    if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
+        currentEvent.resumeEvent();
+    } else if(currentEvent.getStatus() == core::Event::Status::GameStart) {
+        currentEvent.startCurrentRound();
+    } else if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
+        currentEvent.endCurrentRound();
+    } else if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
+        currentEvent.closeCurrentRound();
+    }
+    updateInGameDisplay();
+}
+
+void MainWindow::actPauseResumeRound() {
+    /// TODO
+    showNotImplemented("actPauseResumeRound");
+}
+
+void MainWindow::actRandomPick() {
+    /// TODO
+    showNotImplemented("actRandomPick");
+}
+
+void MainWindow::actCancelPick() {
+    /// TODO
+    showNotImplemented("actCancelPick");
+}
+
+void MainWindow::actRadioPureRandom() {
+    /// TODO
+    showNotImplemented("actRadioPureRandom");
+}
+
+void MainWindow::actRadioPureManual() {
+    /// TODO
+    showNotImplemented("actRadioPureManual");
+}
+
+void MainWindow::actRadioBoth() {
+    /// TODO
+    showNotImplemented("actRadioBoth");
 }
 
 void MainWindow::showNotImplemented(const QString& from) {
@@ -177,6 +236,7 @@ void MainWindow::updateDisplay() {
         ui->actionTerminer_Evenement->setEnabled(false);
         ui->actionConfiguration_des_parties->setEnabled(true);
         ui->EvenementControl->setEnabled(false);
+        updateInGameDisplay();
         break;
     case core::Event::Status::EventStarted:
     case core::Event::Status::Paused:
@@ -200,6 +260,59 @@ void MainWindow::updateDisplay() {
         ui->EvenementControl->setEnabled(false);
         break;
     }
+}
+
+void MainWindow::updateInGameDisplay() {
+    // les dates et heures
+    std::chrono::system_clock::time_point epoch{};
+    {
+        std::stringstream oss;
+        auto tt= std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        oss << std::put_time(std::localtime(&tt), "%H:%M:%S");
+        ui->CurrentTime->setText(QString::fromStdString(oss.str()));
+    }
+    {
+        if(currentEvent.getStarting() == epoch) {
+            ui->CurrentDate->setText("");
+        } else {
+            std::stringstream oss;
+            auto tt= std::chrono::system_clock::to_time_t(currentEvent.getStarting());
+            oss << std::put_time(std::localtime(&tt), "%d %B %Y");
+            ui->CurrentDate->setText(QString::fromStdString(oss.str()));
+        }
+    }
+    {
+        if(currentEvent.getStarting() == epoch) {
+            ui->Duration->setText("");
+        } else {
+            std::stringstream oss;
+            auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
+            oss << std::chrono::duration_cast<std::chrono::hours>(length).count() << ":"
+                << std::chrono::duration_cast<std::chrono::minutes>(length).count() << ":"
+                << std::chrono::duration_cast<std::chrono::seconds>(length).count();
+            ui->Duration->setText(QString::fromStdString(oss.str()));
+        }
+    }
+    // le bouton de debut/fin de round
+    ui->StartEndGameRound->setEnabled(false);
+    if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Afficher première partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameStart) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Démarrer la partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Terminer la partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Passer à la partie suivante");
+    }
+    if(!timer->isActive())
+        timer->start();
 }
 
 }// namespace evl::gui
