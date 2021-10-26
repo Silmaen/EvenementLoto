@@ -7,9 +7,11 @@
  */
 
 #pragma once
+#include <QCoreApplication>
 #include <QMessageBox>
 #include <QString>
 #include <QStringList>
+#include <QTime>
 #include <filesystem>
 
 /**

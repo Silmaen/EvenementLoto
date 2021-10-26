@@ -59,11 +59,7 @@ public:
      */
     uint8_t getNumberPushed();
 
-#ifdef EVL_DEBUG
 public slots:
-#else
-private slots:
-#endif
 
     /**
      * @brief Fonction d’appui bouton.
