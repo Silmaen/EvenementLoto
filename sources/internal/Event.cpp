@@ -179,7 +179,7 @@ void Event::startEvent() {
 void Event::pushGameRound(const GameRound& round) {
     if(!isEditable())
         return;
-    if(round.getStatus() != GameRound::Status::Ready)
+    if(round.getStatus() != GameRound::Status::Ready && round.getStatus() != GameRound::Status::Invalid)
         return;
     gameRounds.push_back(round);
     updateStatus();

@@ -68,11 +68,6 @@ public:
      * @brief Renvoie une chaine contenant le type de partie.
      * @return Le type de partie.
      */
-    //[[nodiscard]] std::string getStatusStr();
-    /**
-     * @brief Renvoie une chaine contenant le type de partie.
-     * @return Le type de partie.
-     */
     [[nodiscard]] std::string getStatusStr() const;
 
     /**
