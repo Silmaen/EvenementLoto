@@ -34,14 +34,22 @@ public:
      * @brief Destructeur.
      */
     ~DisplayWindow() override;
-public slots:
-private slots:
+
     /**
-     * @brief Mise à jour de l'affichage.
+     * @brief Accès direct aux éléments de l’UI
+     * @return Pointeur vers l’UI
+     */
+    const Ui::DisplayWindow* getUi() const { return ui; }
+
+    /**
+     * @brief Mise à jour de l’affichage.
      */
     void updateDisplay();
 
 private:
+    /**
+     * @brief Mise à jour de l’affichage de la page de titre.
+     */
     void updateEventTitlePage();
 
     /// Lien vers la page UI.

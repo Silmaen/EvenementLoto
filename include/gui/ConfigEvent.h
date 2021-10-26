@@ -52,11 +52,7 @@ public:
      */
     void setEvent(const core::Event& e);
 
-#ifdef EVL_DEBUG
 public slots:
-#else
-private slots:
-#endif
 
     /**
      * @brief Réagit à une action sur le bouton Apply.

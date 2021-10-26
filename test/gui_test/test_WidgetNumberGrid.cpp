@@ -21,9 +21,7 @@ TEST(gui_WidgetNumberGrid, base) {
 TEST(gui_WidgetNumberGrid, push_all_button) {
     test::initialize();
     WidgetNumberGrid w{};
-    for(uint8_t i= 1; i <= 91; ++i) {
-        w.setPushed(i);
-    }
+    for(uint8_t i= 1; i <= 91; ++i) w.setPushed(i);
     EXPECT_EQ(w.getNumberPushed(), 90);
     w.resetPushed();
     EXPECT_EQ(w.getNumberPushed(), 0);

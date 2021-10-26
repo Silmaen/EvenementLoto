@@ -45,9 +45,6 @@ public slots:
      * @return Code de retour.
      */
     int exec() override;
-#ifndef EVL_DEBUG
-private slots:
-#endif
 
     /**
      * @brief Réagit à une action sur le bouton Apply.

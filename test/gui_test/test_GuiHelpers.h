@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+#include "gui/baseDefinitions.h"
 #include <QApplication>
 
 namespace evl::gui::test {
