@@ -34,15 +34,8 @@ int ConfigGameRounds::SaveFile() {
             break;
         }
     }
-    if(!good) {
-        QMessageBox message;
-        message.setIcon(QMessageBox::Critical);
-        message.setWindowTitle("Sauvegarde impossible");
-        message.setText("Sauvegarde impossible");
-        message.setInformativeText("Certaines parties on un statut invalide, veuillez corriger avant de continuer.");
-        message.exec();
+    if(!good)
         return 0;
-    }
     return 1;
 }
 
@@ -108,7 +101,7 @@ void ConfigGameRounds::actSaveGameRound() {
 
 void ConfigGameRounds::setEvent(const core::Event& e) {
     gameEvent= e;
-    updateDisplay();
+    updateDisplay(true);
 }
 
 void ConfigGameRounds::updateDisplay(bool loadLast) {

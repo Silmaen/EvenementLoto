@@ -49,6 +49,8 @@ public:
      * @param e L’événement.
      */
     void setEvent(const core::Event& e);
+
+    const Ui::ConfigGameRounds* getUi() const { return ui; }
 public slots:
 
     /**
@@ -56,8 +58,6 @@ public slots:
      * @return Code de retour.
      */
     int exec() override;
-
-private slots:
 
     /**
      * @brief Réagit à une action sur le bouton Apply.
