@@ -74,19 +74,6 @@ void ConfigEvent::actSearchLogo() {
     }
 }
 
-void ConfigEvent::showNotImplemented(const QString& from) {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Warning);
-    message.setWindowTitle(from);
-    message.setText("Ce programme est encore en construction");
-    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
-    message.exec();
-}
-
-int ConfigEvent::exec() {
-    return QDialog::exec();
-}
-
 void ConfigEvent::setEvent(const core::Event& e) {
     gameEvent= e;
     updateDisplay();

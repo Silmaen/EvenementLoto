@@ -52,7 +52,19 @@ public:
      * @brief
      */
     void resetPushed();
+
+    /**
+     * @brief Compte le nombre de boutons poussés
+     * @return Le nombre.
+     */
+    uint8_t getNumberPushed();
+
+#ifdef EVL_DEBUG
+public slots:
+#else
 private slots:
+#endif
+
     /**
      * @brief Fonction d’appui bouton.
      */
@@ -413,6 +425,7 @@ private slots:
      * @brief Fonction d’appui bouton.
      */
     void slot90();
+
 signals:
     /**
      * @brief

@@ -117,12 +117,6 @@ private:
     int SaveFile();
 
     /**
-     * @brief Affiche une boite de dialogue disant que c’est en travaux.
-     * @param from Une chaine permettant de savoir d’où vient la demande.
-     */
-    void showNotImplemented(const QString& from);
-
-    /**
      * @brief Renvoie la liste des types de partie.
      * @return La liste des types de partie.
      */

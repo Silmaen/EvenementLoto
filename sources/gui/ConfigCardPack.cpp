@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "gui/ConfigCardPack.h"
+#include "gui/baseDefinitions.h"
 #include <QMessageBox>
 
 // Les trucs de QT
@@ -139,15 +140,6 @@ void ConfigCardPack::actUpdateGrid() {
             }
         }
     }
-}
-
-void ConfigCardPack::showNotImplemented(const QString& from) {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Warning);
-    message.setWindowTitle(from);
-    message.setText("Ce programme est encore en construction");
-    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
-    message.exec();
 }
 
 void ConfigCardPack::actUpdateDisplay() {

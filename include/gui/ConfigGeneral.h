@@ -45,8 +45,9 @@ public slots:
      * @return Code de retour.
      */
     int exec() override;
-
+#ifndef EVL_DEBUG
 private slots:
+#endif
 
     /**
      * @brief Réagit à une action sur le bouton Apply.
@@ -73,12 +74,6 @@ private:
      * @brief Charge une configuration depuis un fichier
      */
     void SaveFile();
-
-    /**
-     * @brief Affiche une boite de dialogue disant que c’est en travaux.
-     * @param from Une chaine permettant de savoir d’où vient la demande.
-     */
-    void showNotImplemented(const QString& from);
 
     /// Lien vers la page UI.
     Ui::ConfigGeneral* ui;

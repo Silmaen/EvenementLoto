@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include <QMessageBox>
 #include <QString>
 #include <QStringList>
 #include <filesystem>
@@ -45,5 +46,18 @@ class ConfigEvent;
 class ConfigGeneral;
 class ConfigCardPack;
 class About;
+
+/**
+ * @brief Affiche une boite de dialogue disant que c’est en travaux.
+ * @param from Une chaine permettant de savoir d’où vient la demande.
+ */
+inline void showNotImplemented(const QString& from){
+    QMessageBox message;
+    message.setIcon(QMessageBox::Warning);
+    message.setWindowTitle(from);
+    message.setText("Ce programme est encore en construction");
+    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
+    message.exec();
+}
 
 }// namespace evl::gui

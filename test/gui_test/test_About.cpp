@@ -7,16 +7,14 @@
 */
 
 #include "gui/About.h"
-#include <QApplication>
+#include "test_GuiHelpers.h"
 #include <gtest/gtest.h>
 
 using namespace evl::gui;
 
 TEST(gui_About, base) {
-    char arg0[] = "test";
-    char* argv[]= {&arg0[0]};
-    int argc    = 1;
-    QApplication aa(argc, argv);
+    test::initialize();
     About a;
     EXPECT_TRUE(a.isEnabled());
+    test::finalize();
 }

@@ -418,4 +418,12 @@ void WidgetNumberGrid::resetPushed() {
     }
 }
 
+uint8_t WidgetNumberGrid::getNumberPushed() {
+    uint8_t count= 0;
+    for(uint8_t i= 1; i <= 90; ++i) {
+        count+= getButton(i)->isFlat();
+    }
+    return count;
+}
+
 }// namespace evl::gui

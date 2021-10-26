@@ -38,7 +38,7 @@ public:
      * @brief Remet la classe à zéro.
      */
     void fullReset() {
-        nom= "";
+        nom.clear();
         cartons.clear();
     }
 

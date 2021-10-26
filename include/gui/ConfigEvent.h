@@ -52,15 +52,11 @@ public:
      */
     void setEvent(const core::Event& e);
 
+#ifdef EVL_DEBUG
 public slots:
-
-    /**
-     * @brief Surcharge de la commande d’exécution.
-     * @return Code de retour.
-     */
-    int exec() override;
-
+#else
 private slots:
+#endif
 
     /**
      * @brief Réagit à une action sur le bouton Apply.
@@ -97,12 +93,6 @@ private:
      * @brief Charge une configuration depuis un fichier
      */
     void SaveFile();
-
-    /**
-     * @brief Affiche une boite de dialogue disant que c’est en travaux.
-     * @param from Une chaine permettant de savoir d’où vient la demande.
-     */
-    void showNotImplemented(const QString& from);
 
     /// Lien vers la page UI.
     Ui::ConfigEvent* ui;

@@ -216,15 +216,6 @@ void MainWindow::actRadioBoth() {
     updateInGameDisplay();
 }
 
-void MainWindow::showNotImplemented(const QString& from) {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Warning);
-    message.setWindowTitle(from);
-    message.setText("Ce programme est encore en construction");
-    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
-    message.exec();
-}
-
 void MainWindow::syncSettings() {
     settings.sync();
 }

@@ -9,6 +9,7 @@
 #pragma once
 #include <chrono>
 #include <iomanip>
+#include <locale>
 #include <sstream>
 #include <string>
 
