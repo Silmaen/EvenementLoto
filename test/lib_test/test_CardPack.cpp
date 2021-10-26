@@ -75,3 +75,12 @@ TEST(CardPack, Selection) {
     EXPECT_EQ(p.getGridCardsByStatus(GridCard::Status::OutGame).size(), 0);
     EXPECT_EQ(p.getGridCardsByStatus(GridCard::Status::InGame).size(), 200);
 }
+
+TEST(CardPack, Reset) {
+    CardPack p;
+    p.getName()= "Mon  Loto";
+    p.generate(200);
+    p.fullReset();
+    EXPECT_EQ(p.size(), 0);
+    EXPECT_STREQ(p.getName().c_str(), "");
+}

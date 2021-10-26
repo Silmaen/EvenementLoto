@@ -57,15 +57,6 @@ void ConfigGeneral::actSearchFolder() {
     }
 }
 
-void ConfigGeneral::showNotImplemented(const QString& from) {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Warning);
-    message.setWindowTitle(from);
-    message.setText("Ce programme est encore en construction");
-    message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
-    message.exec();
-}
-
 int ConfigGeneral::exec() {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(dataPathKey, "").toString());
