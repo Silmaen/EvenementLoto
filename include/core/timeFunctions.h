@@ -14,9 +14,10 @@
 #include <string>
 
 namespace evl::core {
-
+/// Le type d'horloge
+using clock= std::chrono::system_clock;
 /// Définition d’un point dans le temps.
-using timePoint= std::chrono::system_clock::time_point;
+using timePoint= clock::time_point;
 /// Définition d’une durée, la différence entre deux points du temps.
 using duration= std::chrono::duration<double>;
 
@@ -25,14 +26,14 @@ constexpr timePoint epoch{};
 
 inline std::string formatCalendar(const timePoint& t) {
     std::stringstream oss;
-    auto tt= std::chrono::system_clock::to_time_t(t);
+    auto tt= clock::to_time_t(t);
     oss << std::put_time(std::localtime(&tt), "%d %B %Y");
     return oss.str();
 }
 
 inline std::string formatClock(const timePoint& t) {
     std::stringstream oss;
-    auto tt= std::chrono::system_clock::to_time_t(t);
+    auto tt= clock::to_time_t(t);
     oss << std::put_time(std::localtime(&tt), "%H:%M:%S");
     return oss.str();
 }

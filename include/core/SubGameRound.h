@@ -64,6 +64,15 @@ public:
     uint32_t getWinner() const { return winner; }
 
     /**
+     * @brief Défini le numéro du gagnant
+     * @param w Le numéro de la grille gagnante
+     */
+    void setWinner(const uint32_t w) {
+        if(w > 0)
+            winner= w;
+    }
+
+    /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
      */

@@ -13,9 +13,10 @@ using namespace evl::core;
 
 TEST(SubGameRound, serialize) {
     SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto");
+    partie.setWinner(666);
     fs::path tmp= fs::temp_directory_path() / "test";
     fs::create_directories(tmp);
-    fs::path file= tmp / "testGameRound.sdeg";
+    fs::path file= tmp / "testSubGameRound.sdeg";
 
     std::ofstream fileSave;
     fileSave.open(file, std::ios::out | std::ios::binary);
@@ -29,7 +30,7 @@ TEST(SubGameRound, serialize) {
     fileRead.close();
 
     EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);
-    EXPECT_EQ(partie2.getWinner(), 0);
+    EXPECT_EQ(partie2.getWinner(), 666);
     EXPECT_STREQ(partie2.getPrices().c_str(), "une moto");
 
     fs::remove_all(tmp);

@@ -105,7 +105,7 @@ void Event::updateStatus() {
     if(gr == getGREnd()) {
         status= Status::Finished;
         if(end == epoch)
-            end= std::chrono::system_clock::now();
+            end= clock::now();
         return;
     }
     if(end != epoch) {
@@ -121,12 +121,6 @@ void Event::updateStatus() {
     }
     if(gr->getStatus() == GameRound::Status::Started) {
         status= Status::GameRunning;
-    }
-    if(gr->getStatus() == GameRound::Status::Result) {
-        status= Status::GameFinished;
-    }
-    if(gr->getStatus() == GameRound::Status::Paused) {
-        status= Status::GamePaused;
     }
 }
 
@@ -172,14 +166,14 @@ void Event::setOrganizerLogo(const std::filesystem::path& _logo) {
 void Event::startEvent() {
     if(status != Status::Ready)
         return;
-    start= std::chrono::system_clock::now();
+    start= clock::now();
     updateStatus();
 }
 
 void Event::pushGameRound(const GameRound& round) {
     if(!isEditable())
         return;
-    if(round.getStatus() != GameRound::Status::Ready && round.getStatus() != GameRound::Status::Invalid)
+    if(round.getStatus() != GameRound::Status::Ready)
         return;
     gameRounds.push_back(round);
     updateStatus();
@@ -207,7 +201,7 @@ void Event::startCurrentRound() {
 void Event::endCurrentRound() {
     if(status != Status::GameRunning)
         return;
-    findFirstNotFinished()->endGameRound();
+
     updateStatus();
 }
 void Event::closeCurrentRound() {
@@ -222,9 +216,6 @@ void Event::pauseEvent() {
         return;
     if(status == Status::GameFinished)
         paused= true;
-    if(status == Status::GameRunning) {
-        findFirstNotFinished()->pauseGameRound();
-    }
     updateStatus();
 }
 
@@ -232,16 +223,13 @@ void Event::resumeEvent() {
     if(status != Status::Paused && status != Status::EventStarted && status != Status::GamePaused)
         return;
     paused= false;
-    if(status == Status::GamePaused) {
-        findFirstNotFinished()->resumeGameRound();
-    }
     updateStatus();
 }
 
 void Event::stopEvent() {
     if(status != Status::GameFinished)
         return;
-    end= std::chrono::system_clock::now();
+    end= clock::now();
     updateStatus();
 }
 

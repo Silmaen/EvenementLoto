@@ -194,9 +194,9 @@ void MainWindow::actRandomPick() {
 
 void MainWindow::actCancelPick() {
     core::Event::itGameround cur= currentEvent.findFirstNotFinished();
-    if(cur->getDraws().size() == 0)
+    if(cur->sizeDraws() == 0)
         return;
-    numberGrid->resetPushed(cur->getDraws().back());
+    numberGrid->resetPushed(*cur->beginReverseDraws());
     cur->removeLastPick();
     updateInGameDisplay();
 }
@@ -278,7 +278,7 @@ void MainWindow::updateDisplay() {
 }
 
 void MainWindow::updateClocks() {
-    ui->CurrentTime->setText(QString::fromStdString(core::formatClock(std::chrono::system_clock::now())));
+    ui->CurrentTime->setText(QString::fromStdString(core::formatClock(core::clock::now())));
     if(currentEvent.getStarting() == core::epoch) {
         ui->CurrentDate->setText("");
     } else {
@@ -289,7 +289,7 @@ void MainWindow::updateClocks() {
         ui->Duration->setText("");
     } else {
         ui->StartingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getStarting())));
-        auto length= std::chrono::system_clock::now() - currentEvent.getStarting();
+        auto length= core::clock::now() - currentEvent.getStarting();
         if(currentEvent.getEnding() != core::epoch)
             length= currentEvent.getEnding() - currentEvent.getStarting();
         ui->Duration->setText(QString::fromStdString(core::formatDuration(length)));
@@ -307,7 +307,7 @@ void MainWindow::updateClocks() {
         ui->RoundDuration->setText("");
     } else {
         ui->RoundStartTime->setText(QString::fromStdString(core::formatClock(cur->getStarting())));
-        auto length= std::chrono::system_clock::now() - cur->getStarting();
+        auto length= core::clock::now() - cur->getStarting();
         if(cur->getEnding() != core::epoch)
             length= cur->getEnding() - cur->getStarting();
         ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(length)));
@@ -389,20 +389,20 @@ void MainWindow::updateInGameDisplay() {
         if(cur->getStarting() == core::epoch) {
             ui->RoundDraws->setText("0");
         } else {
-            ui->RoundDraws->setText(QString::number(cur->getDraws().size()));
+            ui->RoundDraws->setText(QString::number(cur->sizeDraws()));
         }
-        if(cur->getDraws().size() > 0) {
+        if(cur->sizeDraws() > 0) {
             ui->CancelLastPick->setEnabled(true);
-            auto it= cur->getDraws().rbegin();
+            auto it= cur->beginReverseDraws();
             ui->CurrentDraw->display(*it);
             ++it;
-            if(it != cur->getDraws().rend()) {
+            if(it != cur->endReverseDraws()) {
                 ui->LastNumber1->display(*it);
                 ++it;
-                if(it != cur->getDraws().rend()) {
+                if(it != cur->endReverseDraws()) {
                     ui->LastNumber2->display(*it);
                     ++it;
-                    if(it != cur->getDraws().rend()) {
+                    if(it != cur->endReverseDraws()) {
                         ui->LastNumber3->display(*it);
                     } else {
                         ui->LastNumber3->display(0);

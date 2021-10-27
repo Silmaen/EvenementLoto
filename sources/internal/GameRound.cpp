@@ -9,109 +9,116 @@
 
 namespace evl::core {
 
-std::string GameRound::getTypeStr() const {
+// --- constructeurs ----
+GameRound::GameRound(GameRound::Type t) {
+    setType(t);
+}
+
+// ---- manipulation du type de partie ----
+string GameRound::getTypeStr() const {
     switch(type) {
-    case Type::None:
-        return "Aucun type défini";
-    case Type::OneQuine:
-        return "Un quine";
-    case Type::TwoQuines:
-        return "Deux quines";
-    case Type::FullCard:
-        return "Carton plein";
+    case Type::Normal:
+        return "Normal";
+    case Type::Enfant:
+        return "Enfant";
     case Type::Inverse:
         return "Inverse";
     }
-    return "Type de partie inconnu";
+    return "inconnu";
 }
 
-std::string GameRound::getStatusStr() const {
+void GameRound::setType(const Type& t) {
+    if(!isEditable())
+        return;
+    type= t;
+    subGames.clear();
+    switch(type) {
+    case Type::Normal:
+        subGames.emplace_back(SubGameRound::Type::OneQuine);
+        subGames.emplace_back(SubGameRound::Type::TwoQuines);
+        subGames.emplace_back(SubGameRound::Type::FullCard);
+        break;
+    case Type::Enfant:
+        subGames.emplace_back(SubGameRound::Type::OneQuine);
+        break;
+    case Type::Inverse:
+        subGames.emplace_back(SubGameRound::Type::FullCard);
+        break;
+    }
+}
+
+// ---- manipulation du statut ----
+string GameRound::getStatusStr() const {
     switch(status) {
-    case Status::Invalid:
-        return "Partie invalide";
     case Status::Ready:
-        return "Partie prête";
+        return "prête";
     case Status::Started:
-        return "Partie démarrée";
+        return "démarrée";
     case Status::Finished:
-        return "Partie finie";
-    case Status::Paused:
-        return "Partie en pause";
-    case Status::Result:
-        return "Partie en affichage";
+        return "finie";
+    case Status::DisplayResult:
+        return "en affichage";
     }
     return "Statut inconnu";
 }
 
+// ---- flux du jeu ----
 void GameRound::startGameRound() {
     if(status != Status::Ready)
         return;// start allowed only if ready
-    start= std::chrono::system_clock::now();
-    updateStatus();
+    start = clock::now();
+    status= Status::Started;
 }
 
-void GameRound::pauseGameRound() {
+void GameRound::addPickedNumber(const uint8_t& num) {
     if(status != Status::Started)
         return;
-    paused= true;
-    updateStatus();
+    draws.push_back(num);
 }
 
-void GameRound::resumeGameRound() {
-    if(status != Status::Paused)
-        return;
-    paused= false;
-    updateStatus();
-}
-
-void GameRound::endGameRound() {
+void GameRound::removeLastPick() {
     if(status != Status::Started)
-        return;// start allowed only if already started
-    end   = std::chrono::system_clock::now();
-    paused= true;
-    updateStatus();
+        return;
+    if(draws.size() == 0)
+        return;
+    draws.pop_back();
+}
+
+void GameRound::addWinner(uint32_t win) {
+    if(status != Status::Started)
+        return;
+    auto i= getCurrentSubRound();
+    i->setWinner(win);
+    // on vérifie qu’on a encore des sous-parties à faire
+    i= getCurrentSubRound();
+    if(i == subGames.end()) {
+        end   = clock::now();
+        status= Status::DisplayResult;
+    }
 }
 
 void GameRound::closeGameRound() {
-    if(status != Status::Result)
+    if(status != Status::DisplayResult)
         return;
-    paused= false;
-    updateStatus();
+    status= Status::Finished;
 }
 
-void GameRound::updateStatus() {
-    if(type == Type::None) {
-        status= Status::Invalid;
-        return;
-    }
-    if((start - epoch).count() == 0) {
-        status= Status::Ready;
-        end   = start;
-    } else if((end - epoch).count() == 0) {
-        status= Status::Started;
-        if(paused)
-            status= Status::Paused;
-    } else {
-        status= Status::Finished;
-        if(paused)
-            status= Status::Result;
-    }
-}
-
-bool GameRound::isEditable() const {
-    return status == Status::Invalid || status == Status::Ready;
-}
-
+// ---- Serialisation ----
 void GameRound::read(std::istream& is) {
     is.read(reinterpret_cast<char*>(&type), sizeof(type));
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
-    std::vector<uint8_t>::size_type l;
-    is.read(reinterpret_cast<char*>(&l), sizeof(std::vector<uint8_t>::size_type));
-    Draws.resize(l);
-    for(std::vector<uint8_t>::size_type i= 0; i < l; ++i)
-        is.read(reinterpret_cast<char*>(&(Draws[i])), sizeof(std::vector<uint8_t>::value_type));
+    drawsType::size_type l;
+    is.read(reinterpret_cast<char*>(&l), sizeof(drawsType::size_type));
+    draws.resize(l);
+    for(drawsType::size_type i= 0; i < l; ++i)
+        is.read(reinterpret_cast<char*>(&(draws[i])), sizeof(drawsType::value_type));
+    subRoundsType::size_type l2;
+    is.read(reinterpret_cast<char*>(&l2), sizeof(subRoundsType::size_type));
+    subGames.resize(l2);
+    for(subRoundsType::size_type i= 0; i < l2; ++i)
+        subGames[i].read(is);
 }
 
 void GameRound::write(std::ostream& os) const {
@@ -119,22 +126,26 @@ void GameRound::write(std::ostream& os) const {
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
     os.write(reinterpret_cast<const char*>(&end), sizeof(end));
-    std::vector<uint8_t>::size_type l= Draws.size();
-    os.write(reinterpret_cast<const char*>(&l), sizeof(std::vector<uint8_t>::size_type));
-    for(std::vector<uint8_t>::size_type i= 0; i < l; ++i)
-        os.write(reinterpret_cast<const char*>(&(Draws[i])), sizeof(std::vector<uint8_t>::value_type));
+    drawsType::size_type l= draws.size();
+    os.write(reinterpret_cast<const char*>(&l), sizeof(drawsType::size_type));
+    for(drawsType::size_type i= 0; i < l; ++i)
+        os.write(reinterpret_cast<const char*>(&(draws[i])), sizeof(drawsType::value_type));
+    subRoundsType::size_type l2= subGames.size();
+    os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
+    for(subRoundsType::size_type i= 0; i < l2; ++i)
+        subGames[i].write(os);
 }
 
-void GameRound::addPickedNumber(const uint8_t& num) {
-    if(status != Status::Started)
-        return;
-    Draws.push_back(num);
+bool GameRound::isEditable() const {
+    return status == Status::Ready;
 }
 
-void GameRound::removeLastPick() {
-    if(Draws.size() == 0)
-        return;
-    Draws.pop_back();
+std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
+    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return s.getWinner() == 0; });
+}
+
+std::vector<SubGameRound>::const_iterator GameRound::getCurrentCSubRound() const {
+    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner() == 0; });
 }
 
 }// namespace evl::core
