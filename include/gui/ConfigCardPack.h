@@ -60,9 +60,7 @@ public slots:
      * @brief Surcharge de la commande d’exécution.
      * @return Code de retour.
      */
-    int exec() override;
-
-private slots:
+    void preExec();
 
     /**
      * @brief Charge une configuration depuis un fichier

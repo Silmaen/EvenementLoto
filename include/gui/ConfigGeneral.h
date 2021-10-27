@@ -44,7 +44,7 @@ public slots:
      * @brief Surcharge de la commande d’exécution.
      * @return Code de retour.
      */
-    int exec() override;
+    void preExec();
 
     /**
      * @brief Réagit à une action sur le bouton Apply.

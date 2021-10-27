@@ -6,331 +6,343 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>577</width>
-                <height>522</height>
+                <width>985</width>
+                <height>640</height>
             </rect>
         </property>
         <property name="windowTitle">
-            <string>Configuration des parties</string>
+            <string>Dialog</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-            <item>
-                <widget class="QGroupBox" name="groupBox">
+        <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+                <widget class="QFrame" name="GroupEdit">
                     <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                             <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
+                            <verstretch>2</verstretch>
                         </sizepolicy>
                     </property>
-                    <property name="title">
-                        <string>Configuration parties</string>
+                    <property name="frameShape">
+                        <enum>QFrame::StyledPanel</enum>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout">
-                        <item row="1" column="1" colspan="3">
-                            <widget class="QComboBox" name="SelectedPartie">
-                                <property name="minimumSize">
-                                    <size>
-                                        <width>180</width>
-                                        <height>0</height>
-                                    </size>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="7">
-                            <widget class="QPushButton" name="BtnSupprimePartie">
-                                <property name="text">
-                                    <string>Supprimer</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="0">
-                            <widget class="QLabel" name="label_2">
-                                <property name="text">
-                                    <string>Parties:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="8">
-                            <spacer name="horizontalSpacer_8">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>5</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="1" column="5">
-                            <widget class="QPushButton" name="BtnLoadPartie">
-                                <property name="text">
-                                    <string>Charger</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="4">
-                            <spacer name="horizontalSpacer_6">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>10</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="1" column="10">
-                            <widget class="QPushButton" name="BtnCreatePArtie">
-                                <property name="text">
-                                    <string>Créer</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="0" colspan="2">
-                            <widget class="QLabel" name="label">
-                                <property name="text">
-                                    <string>Nombre de parties:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="11">
-                            <spacer name="horizontalSpacer_7">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>10</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="0" column="3" colspan="9">
-                            <spacer name="horizontalSpacer_5">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>345</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="0" column="2">
-                            <widget class="QLCDNumber" name="PartiesNumber">
-                                <property name="toolTip">
-                                    <string>Le nombre de gameRounds de l'événement en cours.</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="6">
-                            <spacer name="horizontalSpacer_9">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>5</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item>
-                <widget class="QGroupBox" name="DetailPartie">
-                    <property name="title">
-                        <string>Détail de la partie</string>
+                    <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout_3">
-                        <item row="0" column="3" colspan="2">
-                            <widget class="QPushButton" name="PartieMoveBefore">
-                                <property name="text">
-                                    <string>Avant</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="2" column="0" colspan="11">
+                    <layout class="QGridLayout" name="gridLayout_2">
+                        <item row="0" column="0">
                             <widget class="QGroupBox" name="groupBox_3">
                                 <property name="title">
-                                    <string>Statut:</string>
+                                    <string>Liste des Parties</string>
                                 </property>
-                                <layout class="QGridLayout" name="gridLayout_2">
+                                <layout class="QGridLayout" name="gridLayout_3">
                                     <item row="0" column="0">
-                                        <widget class="QLabel" name="label_5">
+                                        <widget class="QPushButton" name="pushButton">
+                                            <property name="sizePolicy">
+                                                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
                                             <property name="text">
-                                                <string>Date de début:</string>
+                                                <string>+</string>
                                             </property>
                                         </widget>
                                     </item>
-                                    <item row="0" column="1" colspan="2">
-                                        <widget class="QLineEdit" name="PartieStartingDate">
-                                            <property name="readOnly">
-                                                <bool>true</bool>
+                                    <item row="0" column="1">
+                                        <widget class="QPushButton" name="pushButton_2">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>-</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item row="0" column="2">
+                                        <widget class="QPushButton" name="pushButton_3">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>^</string>
                                             </property>
                                         </widget>
                                     </item>
                                     <item row="0" column="3">
-                                        <spacer name="horizontalSpacer_11">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
+                                        <widget class="QPushButton" name="pushButton_4">
+                                            <property name="minimumSize">
                                                 <size>
-                                                    <width>59</width>
-                                                    <height>20</height>
+                                                    <width>24</width>
+                                                    <height>24</height>
                                                 </size>
                                             </property>
-                                        </spacer>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>v</string>
+                                            </property>
+                                        </widget>
                                     </item>
                                     <item row="0" column="4">
-                                        <widget class="QLabel" name="label_7">
-                                            <property name="text">
-                                                <string>Durée:</string>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="5">
-                                        <widget class="QLineEdit" name="PartieDuration">
-                                            <property name="readOnly">
-                                                <bool>true</bool>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="6">
-                                        <spacer name="horizontalSpacer_13">
+                                        <spacer name="horizontalSpacer_5">
                                             <property name="orientation">
                                                 <enum>Qt::Horizontal</enum>
                                             </property>
                                             <property name="sizeHint" stdset="0">
                                                 <size>
-                                                    <width>58</width>
+                                                    <width>139</width>
                                                     <height>20</height>
                                                 </size>
                                             </property>
                                         </spacer>
                                     </item>
-                                    <item row="1" column="0">
-                                        <widget class="QLabel" name="label_6">
+                                    <item row="1" column="0" colspan="5">
+                                        <widget class="QListWidget" name="listGameRound"/>
+                                    </item>
+                                </layout>
+                            </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QGroupBox" name="groupBox_4">
+                                <property name="title">
+                                    <string>Phases de la partie</string>
+                                </property>
+                                <layout class="QGridLayout" name="gridLayout_4">
+                                    <item row="0" column="0" colspan="4">
+                                        <widget class="QLabel" name="label">
                                             <property name="text">
-                                                <string>Date de fin:</string>
+                                                <string>Type de partie:</string>
                                             </property>
                                         </widget>
                                     </item>
-                                    <item row="1" column="1" colspan="2">
-                                        <widget class="QLineEdit" name="PartieEndingDate">
-                                            <property name="readOnly">
-                                                <bool>true</bool>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="1" column="3">
-                                        <spacer name="horizontalSpacer_12">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
+                                    <item row="1" column="0" colspan="5">
+                                        <widget class="QComboBox" name="GameRoundTypes">
+                                            <property name="maximumSize">
                                                 <size>
-                                                    <width>59</width>
-                                                    <height>20</height>
+                                                    <width>300</width>
+                                                    <height>16777215</height>
                                                 </size>
-                                            </property>
-                                        </spacer>
-                                    </item>
-                                    <item row="1" column="4">
-                                        <widget class="QLabel" name="label_8">
-                                            <property name="text">
-                                                <string>Carton gagnant:</string>
                                             </property>
                                         </widget>
                                     </item>
                                     <item row="1" column="5">
-                                        <widget class="QLineEdit" name="IdWinnerGrid">
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="readOnly">
-                                                <bool>true</bool>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="1" column="6">
-                                        <spacer name="horizontalSpacer_14">
+                                        <spacer name="horizontalSpacer_7">
                                             <property name="orientation">
                                                 <enum>Qt::Horizontal</enum>
                                             </property>
                                             <property name="sizeHint" stdset="0">
                                                 <size>
-                                                    <width>58</width>
+                                                    <width>150</width>
                                                     <height>20</height>
                                                 </size>
                                             </property>
                                         </spacer>
                                     </item>
-                                    <item row="2" column="0" colspan="2">
-                                        <widget class="QLabel" name="label_9">
+                                    <item row="2" column="0">
+                                        <widget class="QPushButton" name="pushButton_5">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
                                             <property name="text">
-                                                <string>Draws:</string>
+                                                <string>+</string>
                                             </property>
                                         </widget>
                                     </item>
-                                    <item row="2" column="2" colspan="5">
-                                        <spacer name="horizontalSpacer_15">
+                                    <item row="2" column="1">
+                                        <widget class="QPushButton" name="pushButton_6">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>-</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item row="2" column="2">
+                                        <widget class="QPushButton" name="pushButton_7">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>^</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item row="2" column="3">
+                                        <widget class="QPushButton" name="pushButton_8">
+                                            <property name="minimumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="maximumSize">
+                                                <size>
+                                                    <width>24</width>
+                                                    <height>24</height>
+                                                </size>
+                                            </property>
+                                            <property name="text">
+                                                <string>v</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item row="2" column="4" colspan="2">
+                                        <spacer name="horizontalSpacer_6">
                                             <property name="orientation">
                                                 <enum>Qt::Horizontal</enum>
                                             </property>
                                             <property name="sizeHint" stdset="0">
                                                 <size>
-                                                    <width>374</width>
+                                                    <width>156</width>
                                                     <height>20</height>
                                                 </size>
                                             </property>
                                         </spacer>
                                     </item>
-                                    <item row="3" column="0" colspan="7">
-                                        <widget class="QTextEdit" name="ListTirage">
-                                            <property name="readOnly">
-                                                <bool>true</bool>
+                                    <item row="3" column="0" colspan="6">
+                                        <widget class="QListWidget" name="listSubRound"/>
+                                    </item>
+                                </layout>
+                            </widget>
+                        </item>
+                        <item row="0" column="2">
+                            <widget class="QGroupBox" name="groupBox_5">
+                                <property name="title">
+                                    <string>Configuration de la phase:</string>
+                                </property>
+                                <layout class="QGridLayout" name="gridLayout_5">
+                                    <item row="0" column="2">
+                                        <widget class="QComboBox" name="SubRoundTypes"/>
+                                    </item>
+                                    <item row="1" column="0">
+                                        <widget class="QLabel" name="label_3">
+                                            <property name="text">
+                                                <string>Lots:</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item row="1" column="1" colspan="2">
+                                        <spacer name="horizontalSpacer_8">
+                                            <property name="orientation">
+                                                <enum>Qt::Horizontal</enum>
+                                            </property>
+                                            <property name="sizeHint" stdset="0">
+                                                <size>
+                                                    <width>300</width>
+                                                    <height>20</height>
+                                                </size>
+                                            </property>
+                                        </spacer>
+                                    </item>
+                                    <item row="2" column="0" colspan="3">
+                                        <widget class="QTextEdit" name="TextLots"/>
+                                    </item>
+                                    <item row="0" column="0" colspan="2">
+                                        <widget class="QLabel" name="label_2">
+                                            <property name="text">
+                                                <string>Condition de victoire:</string>
                                             </property>
                                         </widget>
                                     </item>
                                 </layout>
                             </widget>
                         </item>
-                        <item row="0" column="0" colspan="2">
-                            <widget class="QLabel" name="label_4">
-                                <property name="text">
-                                    <string>Ordre de la partie:</string>
+                    </layout>
+                </widget>
+            </item>
+            <item row="1" column="0">
+                <widget class="QGroupBox" name="groupResult">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>1</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="title">
+                        <string>Résultats de la partie</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_6">
+                        <item row="1" column="3" rowspan="6">
+                            <widget class="QTextEdit" name="TextDraws">
+                                <property name="readOnly">
+                                    <bool>true</bool>
                                 </property>
                             </widget>
                         </item>
-                        <item row="1" column="5" colspan="4">
-                            <spacer name="horizontalSpacer_16">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
+                        <item row="4" column="0">
+                            <widget class="QLabel" name="label_6">
+                                <property name="text">
+                                    <string>Durée</string>
                                 </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>10</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
+                            </widget>
                         </item>
-                        <item row="0" column="2">
-                            <widget class="QLineEdit" name="PartieOrder">
+                        <item row="1" column="1" rowspan="2" colspan="2">
+                            <widget class="QLineEdit" name="StartingDate">
                                 <property name="maximumSize">
                                     <size>
-                                        <width>50</width>
+                                        <width>300</width>
                                         <height>16777215</height>
                                     </size>
                                 </property>
@@ -339,67 +351,97 @@
                                 </property>
                             </widget>
                         </item>
-                        <item row="1" column="1" colspan="4">
-                            <widget class="QComboBox" name="PartieType"/>
-                        </item>
-                        <item row="0" column="5">
-                            <widget class="QPushButton" name="PartieMoveAfter">
-                                <property name="text">
-                                    <string>Après</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="9">
-                            <widget class="QPushButton" name="BtnSavePartie">
-                                <property name="text">
-                                    <string>Sauver</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="0">
-                            <widget class="QLabel" name="label_3">
-                                <property name="text">
-                                    <string>Type de partie</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="10">
-                            <spacer name="horizontalSpacer_10">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
+                        <item row="4" column="1" colspan="2">
+                            <widget class="QLineEdit" name="Duration">
+                                <property name="maximumSize">
                                     <size>
-                                        <width>81</width>
-                                        <height>20</height>
+                                        <width>300</width>
+                                        <height>16777215</height>
                                     </size>
                                 </property>
-                            </spacer>
+                            </widget>
                         </item>
-                        <item row="0" column="9" colspan="2">
-                            <widget class="QLineEdit" name="PartieStatus">
+                        <item row="1" column="0" rowspan="2">
+                            <widget class="QLabel" name="label_4">
+                                <property name="text">
+                                    <string>Début:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="4" rowspan="6">
+                            <widget class="QListWidget" name="ListWinners"/>
+                        </item>
+                        <item row="5" column="0" colspan="2">
+                            <widget class="QLabel" name="label_7">
+                                <property name="text">
+                                    <string>Nombre de Tirages</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="4">
+                            <widget class="QLabel" name="label_9">
+                                <property name="text">
+                                    <string>Grilles gagnantes</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="3" column="0">
+                            <widget class="QLabel" name="label_5">
+                                <property name="text">
+                                    <string>Fin</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="5" column="2">
+                            <widget class="QLineEdit" name="NumberDraws">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>240</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
                                 <property name="readOnly">
                                     <bool>true</bool>
                                 </property>
                             </widget>
                         </item>
-                        <item row="0" column="6">
-                            <spacer name="horizontalSpacer_17">
+                        <item row="6" column="2">
+                            <spacer name="verticalSpacer">
                                 <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
+                                    <enum>Qt::Vertical</enum>
                                 </property>
                                 <property name="sizeHint" stdset="0">
                                     <size>
-                                        <width>40</width>
-                                        <height>20</height>
+                                        <width>20</width>
+                                        <height>40</height>
                                     </size>
                                 </property>
                             </spacer>
                         </item>
+                        <item row="3" column="1" colspan="2">
+                            <widget class="QLineEdit" name="EndingDate">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>300</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="readOnly">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="3">
+                            <widget class="QLabel" name="label_8">
+                                <property name="text">
+                                    <string>Tirages:</string>
+                                </property>
+                            </widget>
+                        </item>
                     </layout>
                 </widget>
             </item>
-            <item>
+            <item row="2" column="0">
                 <widget class="QFrame" name="frame">
                     <property name="sizePolicy">
                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -516,12 +558,12 @@
             <slot>actOk()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>266</x>
-                    <y>491</y>
+                    <x>397</x>
+                    <y>610</y>
                 </hint>
                 <hint type="destinationlabel">
-                    <x>177</x>
-                    <y>510</y>
+                    <x>392</x>
+                    <y>642</y>
                 </hint>
             </hints>
         </connection>
@@ -532,12 +574,12 @@
             <slot>actApply()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>373</x>
-                    <y>491</y>
+                    <x>493</x>
+                    <y>611</y>
                 </hint>
                 <hint type="destinationlabel">
-                    <x>285</x>
-                    <y>510</y>
+                    <x>491</x>
+                    <y>646</y>
                 </hint>
             </hints>
         </connection>
@@ -548,108 +590,188 @@
             <slot>actCancel()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>480</x>
-                    <y>491</y>
+                    <x>592</x>
+                    <y>605</y>
                 </hint>
                 <hint type="destinationlabel">
-                    <x>402</x>
-                    <y>510</y>
+                    <x>589</x>
+                    <y>641</y>
                 </hint>
             </hints>
         </connection>
         <connection>
-            <sender>BtnLoadPartie</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actLoadGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>368</x>
-                    <y>87</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>255</x>
-                    <y>0</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>BtnCreatePArtie</sender>
+            <sender>pushButton</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actCreateGameRound()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>614</x>
-                    <y>87</y>
+                    <x>39</x>
+                    <y>56</y>
                 </hint>
                 <hint type="destinationlabel">
-                    <x>375</x>
-                    <y>0</y>
+                    <x>4</x>
+                    <y>54</y>
                 </hint>
             </hints>
         </connection>
         <connection>
-            <sender>PartieMoveBefore</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveGameRoundBefore()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>243</x>
-                    <y>144</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>566</x>
-                    <y>105</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>PartieMoveAfter</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveGameRoundAfter()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>323</x>
-                    <y>143</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>567</x>
-                    <y>134</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>BtnSavePartie</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actSaveGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>540</x>
-                    <y>183</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>567</x>
-                    <y>170</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>BtnSupprimePartie</sender>
+            <sender>pushButton_2</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actDeleteGameRound()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>452</x>
-                    <y>75</y>
+                    <x>71</x>
+                    <y>66</y>
                 </hint>
                 <hint type="destinationlabel">
-                    <x>442</x>
-                    <y>-12</y>
+                    <x>4</x>
+                    <y>89</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_3</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actMoveGameRoundBefore()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>98</x>
+                    <y>61</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>1</x>
+                    <y>121</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_4</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actMoveSubGameRoundAfter()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>133</x>
+                    <y>61</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>2</x>
+                    <y>155</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>GameRoundTypes</sender>
+            <signal>currentIndexChanged(int)</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actChangeGameRoundType(int)</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>369</x>
+                    <y>76</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>186</x>
+                    <y>1</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>SubRoundTypes</sender>
+            <signal>activated(int)</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actChangeSubGameRoundType(int)</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>857</x>
+                    <y>58</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>830</x>
+                    <y>3</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>TextLots</sender>
+            <signal>textChanged()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actEndEditingPrice()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>885</x>
+                    <y>172</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>979</x>
+                    <y>134</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_5</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actCreateSubGameRound()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>325</x>
+                    <y>105</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>217</x>
+                    <y>6</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_6</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actDeleteSubGameRound()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>356</x>
+                    <y>109</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>240</x>
+                    <y>-6</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_7</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actMoveSubGameRoundBefore()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>391</x>
+                    <y>110</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>383</x>
+                    <y>-5</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>pushButton_8</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actMoveSubGameRoundBefore()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>417</x>
+                    <y>106</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>420</x>
+                    <y>-7</y>
                 </hint>
             </hints>
         </connection>
@@ -658,11 +780,18 @@
         <slot>actOk()</slot>
         <slot>actApply()</slot>
         <slot>actCancel()</slot>
-        <slot>actLoadGameRound()</slot>
         <slot>actCreateGameRound()</slot>
+        <slot>actDeleteGameRound()</slot>
         <slot>actMoveGameRoundBefore()</slot>
         <slot>actMoveGameRoundAfter()</slot>
-        <slot>actSaveGameRound()</slot>
-        <slot>actDeleteGameRound()</slot>
+        <slot>actChangeGameRoundType(int)</slot>
+        <slot>actChangeSubGameRoundType(int)</slot>
+        <slot>actEndEditingPrice()</slot>
+        <slot>actCreateSubGameRound()</slot>
+        <slot>actDeleteSubGameRound()</slot>
+        <slot>actMoveSubGameRoundBefore()</slot>
+        <slot>actMoveSubGameRoundAfter()</slot>
+        <slot>actChangeSelectedGameRound()</slot>
+        <slot>actChangeSelectedSubGameRound()</slot>
     </slots>
 </ui>

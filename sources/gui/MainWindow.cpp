@@ -63,18 +63,21 @@ void MainWindow::actShowHelp() {
 
 void MainWindow::actShowGlobalParameters() {
     ConfigGeneral cfg(this);
+    cfg.preExec();
     cfg.exec();
 }
 
 void MainWindow::actShowCardPackParameters() {
     ConfigCardPack cfg(this);
     cfg.getCardPack().getName()= "default";
+    cfg.preExec();
     cfg.exec();
 }
 
 void MainWindow::actShowGameRoundsParameters() {
     ConfigGameRounds cfg;
     cfg.setEvent(currentEvent);
+    cfg.preExec();
     if(cfg.exec() == QDialog::Accepted) {
         currentEvent= cfg.getEvent();
         updateDisplay();
