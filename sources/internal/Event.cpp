@@ -70,8 +70,6 @@ void Event::write(std::ostream& os) const {
 }
 
 void Event::checkValidConfig() {
-    if(!isEditable())
-        return;
     if(organizerName.empty() || name.empty()) {
         status= Status::Invalid;
         return;
@@ -144,11 +142,7 @@ void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
 }
 
 Event::roundsType::iterator Event::findFirstNotFinished() {
-    for(roundsType::iterator it= gameRounds.begin(); it != gameRounds.end(); ++it) {
-        if(it->getStatus() != GameRound::Status::Finished)
-            return it;
-    }
-    return gameRounds.end();
+    return std::find_if(gameRounds.begin(), gameRounds.end(), [](GameRound gr) { return gr.getStatus() != GameRound::Status::Finished; });
 }
 
 Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {
@@ -156,12 +150,10 @@ Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {
 }
 
 int Event::getCurrentIndex() {
-    int i= 0;
-    for(auto it= gameRounds.begin(); it != gameRounds.cend(); ++it, ++i) {
-        if(it->getStatus() != GameRound::Status::Finished)
-            return i;
-    }
-    return -1;
+    unsigned int i= findFirstNotFinished() - gameRounds.begin();
+    if(i >= gameRounds.size())
+        return -1;
+    return i;
 }
 
 // ----- Action sur le flow -----
@@ -207,6 +199,12 @@ void Event::startEvent() {
         return;
     start = clock::now();
     status= Status::EventStarted;
+}
+
+void Event::ActiveFirstRound() {
+    if(status != Status::EventStarted)
+        return;
+    status= Status::GameStart;
 }
 
 void Event::pauseEvent() {

@@ -195,6 +195,10 @@ public:
      * @brief Démarre l’événement
      */
     void startEvent();
+    /**
+     * @brief Passe du titre au premier round
+     */
+    void ActiveFirstRound();
 
     /**
      * @brief Pause l’événement

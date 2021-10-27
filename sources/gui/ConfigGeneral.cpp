@@ -57,11 +57,10 @@ void ConfigGeneral::actSearchFolder() {
     }
 }
 
-int ConfigGeneral::exec() {
+void ConfigGeneral::preExec() {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(dataPathKey, "").toString());
     }
-    return QDialog::exec();
 }
 
 }// namespace evl::gui

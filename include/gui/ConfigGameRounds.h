@@ -57,7 +57,7 @@ public slots:
      * @brief Surcharge de la commande d’exécution.
      * @return Code de retour.
      */
-    int exec() override;
+    void preExec();
 
     /**
      * @brief Réagit à une action sur le bouton Apply.
@@ -85,11 +85,6 @@ public slots:
     void actDeleteGameRound();
 
     /**
-     * @brief Action lors du clic sur le bouton de chargement d’une partie
-     */
-    void actLoadGameRound();
-
-    /**
      * @brief Action lors clic sur le bouton Avant.
      */
     void actMoveGameRoundAfter();
@@ -100,52 +95,62 @@ public slots:
     void actMoveGameRoundBefore();
 
     /**
-     * @brief Action lors clic sur le bouton Sauver.
+     * @brief
+     * @param newIndex
      */
-    void actSaveGameRound();
+    void actChangeGameRoundType(int newIndex);
+
+    /**
+     * @brief
+     * @param newIndex
+     */
+    void actChangeSubGameRoundType(int newIndex);
+
+    /**
+     * @brief
+     */
+    void actEndEditingPrice();
+
+    /**
+     * @brief
+     */
+    void actCreateSubGameRound();
+
+    /**
+     * @brief
+     */
+    void actDeleteSubGameRound();
+    /**
+     * @brief Action lors clic sur le bouton Avant.
+     */
+    void actMoveSubGameRoundAfter();
+
+    /**
+     * @brief Action lors clic sur le bouton Après.
+     */
+    void actMoveSubGameRoundBefore();
+
+    /**
+     * @brief
+     * @param newIndex
+     */
+    void actChangeSelectedGameRound(int newIndex);
+
+    /**
+     * @brief
+     * @param newIndex
+     */
+    void actChangeSelectedSubGameRound(int newIndex);
 
 private:
     /**
      * @brief Met à jour l’affichage
-     * @param loadLast Si c’est le dernier élément qui est à charger (utile lors de la création d’un nouvel élément)
      */
-    void updateDisplay(bool loadLast= false);
+    void updateDisplay();
 
-    /**
-     * @brief Charge une configuration depuis un fichier
-     */
-    int SaveFile();
+    void updateDisplayEdits();
 
-    /**
-     * @brief Renvoie la liste des types de partie.
-     * @return La liste des types de partie.
-     */
-    static QStringList getGameRoundTypes();
-
-    /**
-     * @brief Renvoie l’id dans le composant depuis un type de partie
-     * @param p Le type de partie
-     * @return L’id dans le composant.
-     */
-    static int getIdByGameRoundType(const core::GameRound::Type& p);
-
-    /**
-     * @brief Retourne un type de partie basé sur la selection courante
-     * @return Le type de partie.
-     */
-    core::GameRound::Type getCurrentGameRoundType();
-
-    /**
-     * @brief Renvoie la partie en cours d’édition.
-     * @return La partie en cours d’édition.
-     */
-    core::Event::roundsType::iterator getCurrentGameRound();
-
-    /**
-    * @brief Renvoie la partie en cours d’édition.
-    * @return La partie en cours d’édition.
-    */
-    int getCurrentGameRoundIndex();
+    void updateDisplayResults();
 
     ///Lien vers la page UI.
     Ui::ConfigGameRounds* ui;

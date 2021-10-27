@@ -7,7 +7,6 @@
  */
 #include "gui/ConfigGameRounds.h"
 #include "core/timeFunctions.h"
-#include <QMessageBox>
 
 // Les trucs de QT
 #include "gui/moc_ConfigGameRounds.cpp"
@@ -19,180 +18,122 @@ ConfigGameRounds::ConfigGameRounds(QWidget* parent):
     QDialog(parent),
     ui(new Ui::ConfigGameRounds) {
     ui->setupUi(this);
-    ui->PartieType->addItems(getGameRoundTypes());
 }
 
 ConfigGameRounds::~ConfigGameRounds() {
     delete ui;
 }
 
-int ConfigGameRounds::SaveFile() {
-
-    return 1;
-}
-
 void ConfigGameRounds::actOk() {
     if(!gameEvent.isEditable())
         reject();
-    if(SaveFile() > 0)
-        accept();
+    accept();
 }
 
 void ConfigGameRounds::actApply() {
-    SaveFile();
 }
 
 void ConfigGameRounds::actCancel() {
     reject();
 }
 
-int ConfigGameRounds::exec() {
-    updateDisplay(true);
-    return QDialog::exec();
+void ConfigGameRounds::preExec() {
+    updateDisplay();
 }
 
 void ConfigGameRounds::actCreateGameRound() {
     gameEvent.pushGameRound(core::GameRound());
-    updateDisplay(true);
-}
-
-void ConfigGameRounds::actDeleteGameRound() {
-    int idx= ui->SelectedPartie->currentIndex();
-    if(idx < 0) return;
-    gameEvent.deleteRoundByIndex(idx);
-    ui->SelectedPartie->setCurrentIndex(idx - 1);
     updateDisplay();
 }
 
-void ConfigGameRounds::actLoadGameRound() {
+void ConfigGameRounds::actDeleteGameRound() {
+    int cur= ui->listGameRound->currentRow();
+    if(cur < 0)// rien de sélectionné
+        return;
+    gameEvent.deleteRoundByIndex(cur);
     updateDisplay();
 }
 
 void ConfigGameRounds::actMoveGameRoundAfter() {
-    int idx= getCurrentGameRoundIndex();
-    if(idx >= (int)gameEvent.sizeRounds() - 1)
+    int cur= ui->listGameRound->currentRow();
+    if(cur < 0)// rien de sélectionné
         return;
-    gameEvent.swapRoundByIndex(idx, idx + 1);
-    ui->SelectedPartie->setCurrentIndex(idx + 1);
+    if(cur >= (int)gameEvent.sizeRounds() - 1)// déjà en dernière position
+        return;
+    gameEvent.swapRoundByIndex(cur, cur + 1);
     updateDisplay();
 }
 
 void ConfigGameRounds::actMoveGameRoundBefore() {
-    int idx= getCurrentGameRoundIndex();
-    if(idx <= 0)
+    int cur= ui->listGameRound->currentRow();
+    if(cur < 1)// rien de sélectionné ou déjà en première position
         return;
-    gameEvent.swapRoundByIndex(idx, idx - 1);
-    ui->SelectedPartie->setCurrentIndex(idx - 1);
+    gameEvent.swapRoundByIndex(cur, cur - 1);
     updateDisplay();
 }
 
-void ConfigGameRounds::actSaveGameRound() {
-    getCurrentGameRound()->setType(getCurrentGameRoundType());
+void ConfigGameRounds::actChangeGameRoundType([[maybe_unused]] int newIndex) {
+}
+
+void ConfigGameRounds::actChangeSubGameRoundType([[maybe_unused]] int newIndex) {
+}
+
+void ConfigGameRounds::actEndEditingPrice() {
+}
+
+void ConfigGameRounds::actCreateSubGameRound() {
+}
+
+void ConfigGameRounds::actDeleteSubGameRound() {
+}
+
+void ConfigGameRounds::actMoveSubGameRoundAfter() {
+}
+
+void ConfigGameRounds::actMoveSubGameRoundBefore() {
+}
+
+void ConfigGameRounds::actChangeSelectedGameRound([[maybe_unused]] int newIndex) {
+    updateDisplay();
+}
+
+void ConfigGameRounds::actChangeSelectedSubGameRound([[maybe_unused]] int newIndex) {
     updateDisplay();
 }
 
 void ConfigGameRounds::setEvent(const core::Event& e) {
     gameEvent= e;
-    updateDisplay(true);
+    updateDisplay();
 }
 
-void ConfigGameRounds::updateDisplay(bool loadLast) {
-    ui->PartiesNumber->display((int)gameEvent.sizeRounds());
-
-    int a= ui->SelectedPartie->currentIndex();
-    if(loadLast) {
-        a= gameEvent.sizeRounds() - 1;
-    }
-    ui->SelectedPartie->clear();
-    uint16_t c= 1;
-    //for(const auto& p: gameEvent.getGameRounds()) {
-    for(auto p= gameEvent.beginRounds(); p != gameEvent.endRounds(); ++p) {
-        ui->SelectedPartie->addItem("Partie " + QVariant(c).toString() + " - " + QString::fromStdString(p->getTypeStr()));
-        c++;
-    }
-    ui->SelectedPartie->setCurrentIndex(a);
-
-    if(a < 0) {
-        ui->DetailPartie->setEnabled(false);
-        ui->BtnLoadPartie->setEnabled(false);
-        return;
-    }
-    ui->DetailPartie->setEnabled(true);
-    ui->BtnLoadPartie->setEnabled(true);
-
-    ui->PartieOrder->setText(QVariant(a + 1).toString());
-    auto par= gameEvent.getGameRound(a);
-    int b   = getIdByGameRoundType(par->getType());
-    ui->PartieType->setCurrentIndex(b);
-    if(b < 0) {
-        ui->PartieType->setEditText("<Sélectionnez un type>");
-    }
-    ui->PartieStatus->setText(QString::fromStdString(par->getStatusStr()));
-
-    // nettoyage affichage
-    ui->PartieStartingDate->clear();
-    ui->PartieEndingDate->clear();
-    ui->PartieDuration->clear();
-    ui->IdWinnerGrid->clear();
-    ui->ListTirage->clear();
-    if(par->getStatus() == core::GameRound::Status::Started || par->getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= core::clock::to_time_t(par->getStarting());
-        QString s(std::ctime(&t));
-        ui->PartieStartingDate->setText(s);
-        QString text;
-        for(auto tt= par->beginDraws(); tt != par->endDraws(); ++tt) {
-            text+= QVariant(*tt).toString() + " ";
-        }
-        ui->ListTirage->setText(text);
-    }
-    if(par->getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= core::clock::to_time_t(par->getEnding());
-        QString s(std::ctime(&t));
-        ui->PartieEndingDate->setText(s);
-    }
-    // désactive les boutons modifiants les parties si événement démarré
-    if(!gameEvent.isEditable()) {
-        ui->BtnSupprimePartie->setEnabled(false);
-        ui->BtnCreatePArtie->setEnabled(false);
-        ui->PartieMoveAfter->setEnabled(false);
-        ui->PartieType->setEnabled(false);
-        ui->PartieMoveBefore->setEnabled(false);
-        ui->BtnSavePartie->setEnabled(false);
-        ui->ButtonApply->setEnabled(false);
+void ConfigGameRounds::updateDisplay() {
+    if(gameEvent.isEditable()) {
+        ui->groupResult->setEnabled(false);
+        ui->GroupEdit->setEnabled(true);
+        updateDisplayEdits();
+    } else {
+        ui->groupResult->setEnabled(true);
+        ui->GroupEdit->setEnabled(false);
+        updateDisplayResults();
     }
 }
 
-QStringList ConfigGameRounds::getGameRoundTypes() {
-    return {"Un quine",
-            "Deux quines",
-            "Carton Plein",
-            "Inverse"};
-}
-
-int ConfigGameRounds::getIdByGameRoundType(const core::GameRound::Type& p) {
-    switch(p) {
-    case core::GameRound::Type::Normal: return 0;
-    case core::GameRound::Type::Enfant: return 1;
-    case core::GameRound::Type::Inverse: return 2;
+void ConfigGameRounds::updateDisplayEdits() {
+    // remplissage de la liste des parties
+    int cur= ui->listGameRound->currentRow();
+    ui->listGameRound->clear();
+    int idx= 1;
+    for(auto it= gameEvent.beginRounds(); it != gameEvent.endRounds(); ++it) {
+        ui->listGameRound->addItem("Partie " + QString::number(idx) + " : " + QString::fromUtf8(it->getTypeStr()));
     }
-    return -1;
-}
-
-core::GameRound::Type ConfigGameRounds::getCurrentGameRoundType() {
-    switch(ui->PartieType->currentIndex()) {
-    case 0: return core::GameRound::Type::Normal;
-    case 1: return core::GameRound::Type::Enfant;
-    case 2: return core::GameRound::Type::Inverse;
+    if(cur >= ui->listGameRound->count()) {
+        ui->listGameRound->setCurrentRow(ui->listGameRound->count());
+    } else {
+        ui->listGameRound->setCurrentRow(cur);
     }
-    return core::GameRound::Type::Normal;
 }
 
-core::Event::roundsType::iterator ConfigGameRounds::getCurrentGameRound() {
-    return gameEvent.getGameRound(getCurrentGameRoundIndex());
-}
-
-int ConfigGameRounds::getCurrentGameRoundIndex() {
-    return ui->PartieOrder->text().toInt() - 1;
+void ConfigGameRounds::updateDisplayResults() {
 }
 
 }// namespace evl::gui

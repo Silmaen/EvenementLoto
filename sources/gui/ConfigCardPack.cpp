@@ -156,10 +156,9 @@ void ConfigCardPack::actUpdateFileName() {
     path= ui->UIFileName->text();
 }
 
-int ConfigCardPack::exec() {
+void ConfigCardPack::preExec() {
     actUpdateDisplay();
     actUpdateGrid();
-    return QDialog::exec();
 }
 
 }// namespace evl::gui

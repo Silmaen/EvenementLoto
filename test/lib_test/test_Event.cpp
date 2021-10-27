@@ -67,6 +67,7 @@ TEST(Event, DefinesAfterStart) {
 
 TEST(Event, RoundManipulation) {
     Event evt;
+    evt.ActiveFirstRound();
     evt.setName("toto");
     evt.setOrganizerName("toto tata");
     evt.pushGameRound(GameRound());
@@ -80,15 +81,52 @@ TEST(Event, RoundManipulation) {
 }
 
 TEST(Event, Workflow) {
-
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
+    evt.startEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
+    evt.ActiveFirstRound();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
+    evt.startCurrentRound();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
+    evt.addWinnerToCurrentRound(153);
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
+    evt.closeCurrentRound();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
+    evt.startCurrentRound();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
+    evt.addWinnerToCurrentRound(152);
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
+    evt.closeCurrentRound();
+    EXPECT_EQ(evt.getStatus(), Event::Status::Finished);
 }
 
 TEST(Event, WorkflowPauseRound) {
-
-}
-
-TEST(Event, WorkflowFinished) {
-
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
+    evt.startEvent();
+    evt.ActiveFirstRound();
+    evt.startCurrentRound();
+    evt.pauseEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GamePaused);
+    evt.resumeEvent();
+    evt.addWinnerToCurrentRound(153);
+    evt.pauseEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
+    evt.resumeEvent();
+    evt.closeCurrentRound();
+    evt.startCurrentRound();
+    evt.addWinnerToCurrentRound(152);
+    evt.closeCurrentRound();
+    EXPECT_EQ(evt.findFirstNotFinished(), evt.endRounds());
 }
 
 TEST(Event, Serialize) {
