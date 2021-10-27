@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <string>
 
 /**
  * @brief namespace de base.
@@ -18,5 +19,12 @@ namespace evl {
 constexpr uint8_t nb_ligne= 3;
 /// Nombre de colonnes sur un carton
 constexpr uint8_t nb_colones= 5;
+
+/// Définition des chaines de caractères
+using string= std::string;
+/// Le type définissant la taille de la chaine
+using sizeType= std::string::size_type;
+/// La taille mémoire d’un caractère de chaine.
+constexpr auto charSize= sizeof(string::value_type);
 
 }// namespace evl
