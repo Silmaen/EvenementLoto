@@ -30,7 +30,6 @@ TEST(gui_ConfigEvent, ControlButtons) {
     evt.setLogo("ttt");
     evt.setOrganizerLogo("ttt");
     evl::core::GameRound gr;
-    gr.setType(evl::core::GameRound::Type::FullCard);
     evt.pushGameRound(gr);
     a.setEvent(evt);
     a.actOk();

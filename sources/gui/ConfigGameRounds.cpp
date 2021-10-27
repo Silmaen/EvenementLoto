@@ -6,8 +6,8 @@
  * All modification must get authorization from the author.
  */
 #include "gui/ConfigGameRounds.h"
+#include "core/timeFunctions.h"
 #include <QMessageBox>
-#include <ctime>
 
 // Les trucs de QT
 #include "gui/moc_ConfigGameRounds.cpp"
@@ -27,15 +27,7 @@ ConfigGameRounds::~ConfigGameRounds() {
 }
 
 int ConfigGameRounds::SaveFile() {
-    bool good= true;
-    for(const auto& p: gameEvent.getGameRounds()) {
-        if(p.getStatus() == core::GameRound::Status::Invalid) {
-            good= false;
-            break;
-        }
-    }
-    if(!good)
-        return 0;
+
     return 1;
 }
 
@@ -143,17 +135,17 @@ void ConfigGameRounds::updateDisplay(bool loadLast) {
     ui->IdWinnerGrid->clear();
     ui->ListTirage->clear();
     if(par.getStatus() == core::GameRound::Status::Started || par.getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= std::chrono::system_clock::to_time_t(par.getStarting());
+        std::time_t t= core::clock::to_time_t(par.getStarting());
         QString s(std::ctime(&t));
         ui->PartieStartingDate->setText(s);
         QString text;
-        for(auto tt: par.getDraws()) {
-            text+= QVariant(tt).toString() + " ";
+        for(auto tt= par.beginDraws(); tt != par.endDraws(); ++tt) {
+            text+= QVariant(*tt).toString() + " ";
         }
         ui->ListTirage->setText(text);
     }
     if(par.getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= std::chrono::system_clock::to_time_t(par.getEnding());
+        std::time_t t= core::clock::to_time_t(par.getEnding());
         QString s(std::ctime(&t));
         ui->PartieEndingDate->setText(s);
     }
@@ -178,23 +170,20 @@ QStringList ConfigGameRounds::getGameRoundTypes() {
 
 int ConfigGameRounds::getIdByGameRoundType(const core::GameRound::Type& p) {
     switch(p) {
-    case core::GameRound::Type::None: return -1;
-    case core::GameRound::Type::OneQuine: return 0;
-    case core::GameRound::Type::TwoQuines: return 1;
-    case core::GameRound::Type::FullCard: return 2;
-    case core::GameRound::Type::Inverse: return 3;
+    case core::GameRound::Type::Normal: return 0;
+    case core::GameRound::Type::Enfant: return 1;
+    case core::GameRound::Type::Inverse: return 2;
     }
     return -1;
 }
 
 core::GameRound::Type ConfigGameRounds::getCurrentGameRoundType() {
     switch(ui->PartieType->currentIndex()) {
-    case 0: return core::GameRound::Type::OneQuine;
-    case 1: return core::GameRound::Type::TwoQuines;
-    case 2: return core::GameRound::Type::FullCard;
-    case 3: return core::GameRound::Type::Inverse;
+    case 0: return core::GameRound::Type::Normal;
+    case 1: return core::GameRound::Type::Enfant;
+    case 2: return core::GameRound::Type::Inverse;
     }
-    return core::GameRound::Type::None;
+    return core::GameRound::Type::Normal;
 }
 
 core::Event::itGameround ConfigGameRounds::getCurrentGameRound() {
