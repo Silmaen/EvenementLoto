@@ -70,7 +70,7 @@ void ConfigGameRounds::actLoadGameRound() {
 
 void ConfigGameRounds::actMoveGameRoundAfter() {
     int idx= getCurrentGameRoundIndex();
-    if(idx >= (int)gameEvent.getGameRounds().size() - 1)
+    if(idx >= (int)gameEvent.sizeRounds() - 1)
         return;
     gameEvent.swapRoundByIndex(idx, idx + 1);
     ui->SelectedPartie->setCurrentIndex(idx + 1);
@@ -97,16 +97,17 @@ void ConfigGameRounds::setEvent(const core::Event& e) {
 }
 
 void ConfigGameRounds::updateDisplay(bool loadLast) {
-    ui->PartiesNumber->display((int)gameEvent.getGameRounds().size());
+    ui->PartiesNumber->display((int)gameEvent.sizeRounds());
 
     int a= ui->SelectedPartie->currentIndex();
     if(loadLast) {
-        a= gameEvent.getGameRounds().size() - 1;
+        a= gameEvent.sizeRounds() - 1;
     }
     ui->SelectedPartie->clear();
     uint16_t c= 1;
-    for(const auto& p: gameEvent.getGameRounds()) {
-        ui->SelectedPartie->addItem("Partie " + QVariant(c).toString() + " - " + QString::fromStdString(p.getTypeStr()));
+    //for(const auto& p: gameEvent.getGameRounds()) {
+    for(auto p= gameEvent.beginRounds(); p != gameEvent.endRounds(); ++p) {
+        ui->SelectedPartie->addItem("Partie " + QVariant(c).toString() + " - " + QString::fromStdString(p->getTypeStr()));
         c++;
     }
     ui->SelectedPartie->setCurrentIndex(a);
@@ -120,13 +121,13 @@ void ConfigGameRounds::updateDisplay(bool loadLast) {
     ui->BtnLoadPartie->setEnabled(true);
 
     ui->PartieOrder->setText(QVariant(a + 1).toString());
-    const core::GameRound& par= gameEvent.getGameRounds()[a];
-    int b                     = getIdByGameRoundType(par.getType());
+    auto par= gameEvent.getGameRound(a);
+    int b   = getIdByGameRoundType(par->getType());
     ui->PartieType->setCurrentIndex(b);
     if(b < 0) {
         ui->PartieType->setEditText("<Sélectionnez un type>");
     }
-    ui->PartieStatus->setText(QString::fromStdString(par.getStatusStr()));
+    ui->PartieStatus->setText(QString::fromStdString(par->getStatusStr()));
 
     // nettoyage affichage
     ui->PartieStartingDate->clear();
@@ -134,18 +135,18 @@ void ConfigGameRounds::updateDisplay(bool loadLast) {
     ui->PartieDuration->clear();
     ui->IdWinnerGrid->clear();
     ui->ListTirage->clear();
-    if(par.getStatus() == core::GameRound::Status::Started || par.getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= core::clock::to_time_t(par.getStarting());
+    if(par->getStatus() == core::GameRound::Status::Started || par->getStatus() == core::GameRound::Status::Finished) {
+        std::time_t t= core::clock::to_time_t(par->getStarting());
         QString s(std::ctime(&t));
         ui->PartieStartingDate->setText(s);
         QString text;
-        for(auto tt= par.beginDraws(); tt != par.endDraws(); ++tt) {
+        for(auto tt= par->beginDraws(); tt != par->endDraws(); ++tt) {
             text+= QVariant(*tt).toString() + " ";
         }
         ui->ListTirage->setText(text);
     }
-    if(par.getStatus() == core::GameRound::Status::Finished) {
-        std::time_t t= core::clock::to_time_t(par.getEnding());
+    if(par->getStatus() == core::GameRound::Status::Finished) {
+        std::time_t t= core::clock::to_time_t(par->getEnding());
         QString s(std::ctime(&t));
         ui->PartieEndingDate->setText(s);
     }
@@ -186,7 +187,7 @@ core::GameRound::Type ConfigGameRounds::getCurrentGameRoundType() {
     return core::GameRound::Type::Normal;
 }
 
-core::Event::itGameround ConfigGameRounds::getCurrentGameRound() {
+core::Event::roundsType::iterator ConfigGameRounds::getCurrentGameRound() {
     return gameEvent.getGameRound(getCurrentGameRoundIndex());
 }
 

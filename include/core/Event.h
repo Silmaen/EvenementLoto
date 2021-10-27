@@ -18,6 +18,26 @@ namespace evl::core {
  */
 class Event: public Serializable {
 public:
+    // ---- définition des types ----
+    /// Le type de la liste des rounds
+    using roundsType= std::vector<GameRound>;
+    /**
+     * @brief Liste des statuts possibles.
+     */
+    enum struct Status {
+        Invalid,       ///< N'est pas valide
+        MissingParties,///< L’événement est bien défini, mais il n’a pas de parties définies
+        Ready,         ///< Prêt à être utilisé
+        EventStarted,  ///< Écran de début d’événement
+        Paused,        ///< Est en pause
+        GameStart,     ///< Est en début de partie
+        GameRunning,   ///< Est en cours de partie
+        GamePaused,    ///< Est en pause
+        GameFinished,  ///< Est en fin de partie
+        Finished       ///< Est fini
+    };
+
+    // ---- Serialisation ----
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
@@ -30,57 +50,43 @@ public:
      */
     void write(std::ostream& bs) const override;
 
-    /**
-     * @brief Liste des statuts possibles.
-     */
-    enum struct Status {
-        Invalid,       ///< N'est pas valide
-        MissingParties,///< L’événement est bien défini, mais il n’a pas de parties définies
-        Ready,         ///< Prêt à être utilisé
-        EventStarted,  ///< Écran de début d’événement
-        Paused,        ///< Est en pause
-        GamePaused,    ///< Est en pause en cours de partie
-        GameStart,     ///< Est en début de partie
-        GameRunning,   ///< Est en cours de partie
-        GameFinished,  ///< Est en fin de partie
-        Finished       ///< Est fini
-    };
-
+    // ---- manipulation du statut ----
     /**
      * @brief Accès au statut de l’événement.
      * @return Le statut de l’événement.
      */
     const Status& getStatus() const { return status; }
 
+    // ---- manipulation des Données propres ----
     /**
      * @brief Accès au nom de l’organisateur
      * @return Le nom de l’organisateur
      */
-    const std::string& getOrganizerName() const { return organizerName; }
+    const string& getOrganizerName() const { return organizerName; }
 
     /**
      * @brief Definition du nom de l’organisateur.
      * @param name Le nom de l’organisateur.
      */
-    void setOrganizerName(const std::string& name);
+    void setOrganizerName(const string& name);
 
     /**
      * @brief Accès au nom de l’événement
      * @return Le nom de l’événement
      */
-    const std::string& getName() const { return name; }
+    const string& getName() const { return name; }
 
     /**
      * @brief Definition du nom de l’événement.
      * @param name Le nom de l’événement.
      */
-    void setName(const std::string& name);
+    void setName(const string& name);
 
     /**
      * @brief Accès au lieu de l’événement
      * @return Le lieu de l’événement
      */
-    const std::string& getLocation() const { return location; }
+    const string& getLocation() const { return location; }
 
     /**
      * @brief Definition du lieu de l’événement.
@@ -112,33 +118,41 @@ public:
      */
     void setLogo(const std::filesystem::path& logo);
 
+    // ----- Manipulation des rounds ----
     /**
-     * @brief Accès aux parties
-     * @return Les parties.
+     * @brief Renvoie l’itérateur constant de début de parties.
+     * @return L’itérateur constant de début de parties.
      */
-    const std::vector<GameRound>& getGameRounds() const { return gameRounds; }
-
-    /// Itérateur sur les parties
-    using itGameround= std::vector<GameRound>::iterator;
-
+    roundsType::const_iterator beginRounds() const { return gameRounds.cbegin(); }
     /**
      * @brief Renvoie l’itérateur de fin de parties.
      * @return L’itérateur de fin de parties.
      */
-    itGameround getGREnd() { return gameRounds.end(); }
+    roundsType::const_iterator endRounds() const { return gameRounds.cend(); }
 
+    /**
+     * @brief Renvoie le nombre de parties.
+     * @return Le nombre de parties.
+     */
+    roundsType::size_type sizeRounds() const { return gameRounds.size(); }
     /**
      * @brief Renvoie un itérateur vers la partie à l’index donné
      * @param idx L’index de la partie
      * @return La partie
      */
-    itGameround getGameRound(const uint16_t& idx);
+    roundsType::iterator getGameRound(const uint16_t& idx);
 
     /**
      * @brief Cherche la première partie non terminée de la liste.
      * @return La première partie non terminée de la liste.
      */
-    itGameround findFirstNotFinished();
+    roundsType::iterator findFirstNotFinished();
+
+    /**
+     * @brief Renvoie l’index de la partie courante
+     * @return Index de la partie courante
+     */
+    int getCurrentIndex();
 
     /**
      * @brief Ajoute une partie au jeu
@@ -159,6 +173,7 @@ public:
      */
     void swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2);
 
+    // ----- Action sur le flow -----
     /**
      * @brief Démarre le round actuel.
      */
@@ -166,29 +181,20 @@ public:
 
     /**
      * @brief Termine la partie en cours.
+     * @param w le numéro de la grille à ajouter
      */
-    void endCurrentRound();
+    void addWinnerToCurrentRound(const uint32_t w);
 
     /**
      * @brief Clos la partie en cours.
      */
     void closeCurrentRound();
 
-    /**
-     * @brief Renvoie l'index de la partie courante
-     * @return Index de la partie courante
-     */
-    int getCurrentIndex();
-
+    // ----- Flow de l'événement -----
     /**
      * @brief Démarre l’événement
      */
     void startEvent();
-
-    /**
-     * @brief Termine l’événement.
-     */
-    void stopEvent();
 
     /**
      * @brief Pause l’événement
@@ -206,6 +212,7 @@ public:
      */
     bool isEditable() const;
 
+    // ---- accès aux timers ----
     /**
      * @brief Accès à la date de départ
      * @return La date de départ
@@ -223,10 +230,6 @@ private:
      * @brief Si l’événement est en phase d’édition, met à jour son statuT.
      */
     void checkValidConfig();
-    /**
-     * @brief Met à jour le statut de l’événement.
-     */
-    void updateStatus();
 
     /// Le statut de l’événement
     Status status= Status::Invalid;
@@ -234,18 +237,18 @@ private:
     bool paused= true;
 
     /// Le nom de l’organisateur (requit pour validité)
-    std::string organizerName;
+    string organizerName;
     /// Logo de l’organisateur.
     std::filesystem::path organizerLogo;
     /// Nom de l’événement. (requit pour validité)
-    std::string name;
+    string name;
     /// Logo de l’événement.
     std::filesystem::path logo;
     /// Lieu de l’événement.
-    std::string location;
+    string location;
 
     /// Liste des parties de l’événement.
-    std::vector<GameRound> gameRounds;
+    roundsType gameRounds;
 
     /// La date et heure de début de l’événement
     timePoint start{};
