@@ -12,46 +12,71 @@ namespace fs= std::filesystem;
 
 using namespace evl::core;
 
+TEST(Event, DefaultDefines) {
+    Event evt;
+    EXPECT_EQ(evt.sizeRounds(), 0);
+    EXPECT_EQ(evt.getEnding(), epoch);
+    EXPECT_EQ(evt.getStarting(), epoch);
+    EXPECT_EQ(evt.getStatus(), Event::Status::Invalid);
+    EXPECT_STREQ(evt.getName().c_str(), "");
+    EXPECT_STREQ(evt.getOrganizerName().c_str(), "");
+    EXPECT_STREQ(evt.getLocation().c_str(), "");
+    EXPECT_STREQ(evt.getLogo().string().c_str(), "");
+    EXPECT_STREQ(evt.getOrganizerLogo().string().c_str(), "");
+    evt.pushGameRound(GameRound());
+    EXPECT_EQ(evt.sizeRounds(), 1);
+    evt.startEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::Invalid);
+}
+
 TEST(Event, BaseDefines) {
-    /*
-    Event event;
-    event.setOrganizerName("toto");
-    event.setName("evenement de toto");
-    event.setLocation("quelque part");
-    event.setLogo("toto.png");
-    event.setOrganizerLogo("toto.png");
-    EXPECT_STREQ(event.getOrganizerName().c_str(), "toto");
-    EXPECT_STREQ(event.getOrganizerLogo().generic_string().c_str(), "toto.png");
-    EXPECT_STREQ(event.getName().c_str(), "evenement de toto");
-    EXPECT_STREQ(event.getLocation().c_str(), "quelque part");
-    EXPECT_STREQ(event.getLogo().generic_string().c_str(), "toto.png");
-    GameRound gr;
-    gr.setType(GameRound::Type::Normal);
-    event.pushGameRound(gr);
-    event.startEvent();
-    event.setOrganizerName("toto2");
-    event.setName("evenement de toto2");
-    event.setLocation("quelque part2");
-    event.setLogo("toto2.png");
-    event.setOrganizerLogo("toto2.png");
-    EXPECT_STREQ(event.getOrganizerName().c_str(), "toto");
-    EXPECT_STREQ(event.getOrganizerLogo().generic_string().c_str(), "toto.png");
-    EXPECT_STREQ(event.getName().c_str(), "evenement de toto");
-    EXPECT_STREQ(event.getLocation().c_str(), "quelque part");
-    EXPECT_STREQ(event.getLogo().generic_string().c_str(), "toto.png");
-     */
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.setOrganizerLogo("toto.png");
+    evt.setLocation("toto toto");
+    evt.setLogo("toto.jpg");
+    EXPECT_STREQ(evt.getName().c_str(), "toto");
+    EXPECT_STREQ(evt.getOrganizerName().c_str(), "toto tata");
+    EXPECT_STREQ(evt.getLocation().c_str(), "toto toto");
+    EXPECT_STREQ(evt.getLogo().string().c_str(), "toto.jpg");
+    EXPECT_STREQ(evt.getOrganizerLogo().string().c_str(), "toto.png");
+    EXPECT_EQ(evt.getStatus(), Event::Status::MissingParties);
+    evt.pushGameRound(GameRound());
+    EXPECT_EQ(evt.sizeRounds(), 1);
+    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
 }
 
 TEST(Event, DefinesAfterStart) {
-
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.pushGameRound(GameRound());
+    evt.pauseEvent();
+    evt.resumeEvent();
+    evt.startCurrentRound();
+    evt.closeCurrentRound();
+    evt.startEvent();
+    evt.swapRoundByIndex(0, 0);
+    evt.pushGameRound(GameRound());
+    evt.deleteRoundByIndex(0);
+    evt.addWinnerToCurrentRound(156);
+    EXPECT_EQ(evt.sizeRounds(), 1);
+    EXPECT_EQ(evt.getCurrentIndex(), 0);
 }
 
 TEST(Event, RoundManipulation) {
-
-}
-
-TEST(Event, BaseToReady) {
-
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.pushGameRound(GameRound());
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.pushGameRound(GameRound(GameRound::Type::Inverse));
+    evt.deleteRoundByIndex(1);
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.pushGameRound(GameRound(GameRound::Type::Normal));
+    evt.swapRoundByIndex(2, 3);
+    EXPECT_EQ(evt.getGameRound(3)->getType(), GameRound::Type::Enfant);
 }
 
 TEST(Event, Workflow) {
@@ -67,5 +92,29 @@ TEST(Event, WorkflowFinished) {
 }
 
 TEST(Event, Serialize) {
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.setOrganizerLogo("toto.png");
+    evt.setLocation("toto toto");
+    evt.setLogo("toto.jpg");
+    evt.pushGameRound(GameRound());
 
+    fs::path tmp= fs::temp_directory_path() / "test";
+    fs::create_directories(tmp);
+    fs::path file= tmp / "testGameRound.sdeg";
+
+    std::ofstream fileSave;
+    fileSave.open(file, std::ios::out | std::ios::binary);
+    evt.write(fileSave);
+    fileSave.close();
+
+    Event evt2;
+    std::ifstream fileRead;
+    fileRead.open(file, std::ios::in | std::ios::binary);
+    evt2.read(fileRead);
+    fileRead.close();
+
+    EXPECT_EQ(evt2.getName(), evt.getName());
+    fs::remove_all(tmp);
 }

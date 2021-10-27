@@ -9,64 +9,56 @@
 
 namespace evl::core {
 
+// ---- Serialisation ----
 void Event::read(std::istream& is) {
-    std::string::size_type l, i;
+    is.read(reinterpret_cast<char*>(&status), sizeof(status));
+    sizeType l, i;
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     organizerName.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(organizerName[i]), sizeof(std::string::value_type));
-
-    std::string temp;
+    for(i= 0; i < l; ++i) is.read(&(organizerName[i]), charSize);
+    string temp;
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     temp.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(temp[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) is.read(&(temp[i]), charSize);
     organizerLogo= temp;
-
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     name.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(name[i]), sizeof(std::string::value_type));
-
+    for(i= 0; i < l; ++i) is.read(&(name[i]), charSize);
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     temp.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(temp[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) is.read(&(temp[i]), charSize);
     logo= temp;
-
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     location.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(location[i]), sizeof(std::string::value_type));
-
-    std::vector<GameRound>::size_type lv, iv;
+    for(i= 0; i < l; ++i) is.read(&(location[i]), charSize);
+    roundsType::size_type lv, iv;
     is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
     gameRounds.resize(lv);
     for(iv= 0; iv < lv; ++iv) gameRounds[iv].read(is);
-
-    updateStatus();
-
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
-
-    // TODO: gérer les cartons
-    updateStatus();
 }
 
 void Event::write(std::ostream& os) const {
-    std::string::size_type l, i;
+    os.write(reinterpret_cast<const char*>(&status), sizeof(status));
+    sizeType l, i;
     l= organizerName.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(organizerName[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) os.write(&(organizerName[i]), charSize);
     l= organizerLogo.string().size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(organizerLogo.string()[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) os.write(&(organizerLogo.string()[i]), charSize);
     l= name.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(name[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) os.write(&(name[i]), charSize);
     l= logo.string().size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(logo.string()[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) os.write(&(logo.string()[i]), charSize);
     l= location.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(location[i]), sizeof(std::string::value_type));
+    for(i= 0; i < l; ++i) os.write(&(location[i]), charSize);
 
-    std::vector<GameRound>::size_type lv, iv;
+    roundsType::size_type lv, iv;
     lv= gameRounds.size();
     os.write(reinterpret_cast<char*>(&lv), sizeof(lv));
     for(iv= 0; iv < lv; ++iv) gameRounds[iv].write(os);
@@ -91,92 +83,52 @@ void Event::checkValidConfig() {
     status= Status::Ready;
 }
 
-void Event::updateStatus() {
-    checkValidConfig();
-    if(status == Status::Invalid || status == Status::MissingParties)
-        return;
-    if(start == epoch)
-        return;
-    if(paused && (gameRounds.front().getStatus() == GameRound::Status::Ready)) {
-        status= Status::EventStarted;
-        return;
-    }
-    itGameround gr= findFirstNotFinished();
-    if(gr == getGREnd()) {
-        status= Status::Finished;
-        if(end == epoch)
-            end= clock::now();
-        return;
-    }
-    if(end != epoch) {
-        status= Status::Finished;
-        return;
-    }
-    if(paused) {
-        status= Status::Paused;
-        return;
-    }
-    if(gr->getStatus() == GameRound::Status::Ready) {
-        status= Status::GameStart;
-    }
-    if(gr->getStatus() == GameRound::Status::Started) {
-        status= Status::GameRunning;
-    }
-}
-
 bool Event::isEditable() const {
     return status == Status::Invalid || status == Status::MissingParties || status == Status::Ready;
 }
 
+// ---- manipulation des Données propres ----
 void Event::setOrganizerName(const std::string& _name) {
     if(!isEditable())
         return;
     organizerName= _name;
-    updateStatus();
+    checkValidConfig();
 }
 
 void Event::setName(const std::string& _name) {
     if(!isEditable())
         return;
     name= _name;
-    updateStatus();
+    checkValidConfig();
 }
 
 void Event::setLocation(const std::string& _location) {
     if(!isEditable())
         return;
     location= _location;
-    updateStatus();
+    checkValidConfig();
 }
 
 void Event::setLogo(const std::filesystem::path& _logo) {
     if(!isEditable())
         return;
     logo= _logo;
-    updateStatus();
+    checkValidConfig();
 }
 
 void Event::setOrganizerLogo(const std::filesystem::path& _logo) {
     if(!isEditable())
         return;
     organizerLogo= _logo;
-    updateStatus();
+    checkValidConfig();
 }
 
-void Event::startEvent() {
-    if(status != Status::Ready)
-        return;
-    start= clock::now();
-    updateStatus();
-}
-
+// ----- Manipulation des rounds ----
 void Event::pushGameRound(const GameRound& round) {
     if(!isEditable())
         return;
-    if(round.getStatus() != GameRound::Status::Ready)
-        return;
     gameRounds.push_back(round);
-    updateStatus();
+    checkValidConfig();
 }
 
 void Event::deleteRoundByIndex(const uint16_t& idx) {
@@ -191,67 +143,84 @@ void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
     std::swap(gameRounds[idx], gameRounds[idx2]);
 }
 
-void Event::startCurrentRound() {
-    if(status != Status::GameStart)
-        return;
-    findFirstNotFinished()->startGameRound();
-    updateStatus();
-}
-
-void Event::endCurrentRound() {
-    if(status != Status::GameRunning)
-        return;
-
-    updateStatus();
-}
-void Event::closeCurrentRound() {
-    if(status != Status::GameFinished)
-        return;
-    findFirstNotFinished()->closeGameRound();
-    updateStatus();
-}
-
-void Event::pauseEvent() {
-    if(status != Status::GameFinished && status != Status::GameRunning)
-        return;
-    if(status == Status::GameFinished)
-        paused= true;
-    updateStatus();
-}
-
-void Event::resumeEvent() {
-    if(status != Status::Paused && status != Status::EventStarted && status != Status::GamePaused)
-        return;
-    paused= false;
-    updateStatus();
-}
-
-void Event::stopEvent() {
-    if(status != Status::GameFinished)
-        return;
-    end= clock::now();
-    updateStatus();
-}
-
-Event::itGameround Event::findFirstNotFinished() {
-    for(itGameround it= gameRounds.begin(); it != gameRounds.end(); ++it) {
+Event::roundsType::iterator Event::findFirstNotFinished() {
+    for(roundsType::iterator it= gameRounds.begin(); it != gameRounds.end(); ++it) {
         if(it->getStatus() != GameRound::Status::Finished)
             return it;
     }
     return gameRounds.end();
 }
 
-Event::itGameround Event::getGameRound(const uint16_t& idx) {
+Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {
     return std::next(gameRounds.begin(), idx);
 }
 
 int Event::getCurrentIndex() {
     int i= 0;
-    for(itGameround it= gameRounds.begin(); it != gameRounds.cend(); ++it, ++i) {
+    for(auto it= gameRounds.begin(); it != gameRounds.cend(); ++it, ++i) {
         if(it->getStatus() != GameRound::Status::Finished)
             return i;
     }
     return -1;
+}
+
+// ----- Action sur le flow -----
+
+void Event::startCurrentRound() {
+    if(status != Status::GameStart)
+        return;
+    auto it= findFirstNotFinished();
+    it->startGameRound();
+    if(it->getStatus() == GameRound::Status::Started) {
+        status= Status::GameRunning;
+    }
+}
+
+void Event::addWinnerToCurrentRound(const uint32_t w) {
+    if(status != Status::GameRunning)
+        return;
+    auto it= findFirstNotFinished();
+    it->addWinner(w);
+    if(it->getStatus() == GameRound::Status::DisplayResult) {
+        status= Status::GameFinished;
+    }
+}
+
+void Event::closeCurrentRound() {
+    if(status != Status::GameFinished)
+        return;
+    auto it= findFirstNotFinished();
+    it->closeGameRound();
+    if(it->getStatus() == GameRound::Status::Finished) {
+        status= Status::GameStart;
+        ++it;
+        if(it == endRounds()) {
+            status= Status::Finished;
+            end   = clock::now();
+        }
+    }
+}
+
+// ----- Flow de l'événement -----
+void Event::startEvent() {
+    if(status != Status::Ready)
+        return;
+    start = clock::now();
+    status= Status::EventStarted;
+}
+
+void Event::pauseEvent() {
+    if(status == Status::GameFinished)
+        status= Status::Paused;
+    if(status == Status::GameRunning)
+        status= Status::GamePaused;
+}
+
+void Event::resumeEvent() {
+    if(status == Status::Paused)
+        status= Status::GameFinished;
+    if(status == Status::GamePaused)
+        status= Status::GameRunning;
 }
 
 }// namespace evl::core

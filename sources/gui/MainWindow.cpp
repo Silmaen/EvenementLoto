@@ -151,7 +151,6 @@ void MainWindow::actEndEvent() {
     message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
     if(message.exec() != QMessageBox::StandardButton::Yes)
         return;
-    currentEvent.stopEvent();
     timer->stop();
     displayWindow->hide();
     delete displayWindow;
@@ -171,7 +170,7 @@ void MainWindow::actStartStopRound() {
     } else if(currentEvent.getStatus() == core::Event::Status::GameStart) {
         currentEvent.startCurrentRound();
     } else if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-        currentEvent.endCurrentRound();
+        currentEvent.addWinnerToCurrentRound(111);
     } else if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
         currentEvent.closeCurrentRound();
         numberGrid->resetPushed();
@@ -193,7 +192,7 @@ void MainWindow::actRandomPick() {
 }
 
 void MainWindow::actCancelPick() {
-    core::Event::itGameround cur= currentEvent.findFirstNotFinished();
+    auto cur= currentEvent.findFirstNotFinished();
     if(cur->sizeDraws() == 0)
         return;
     numberGrid->resetPushed(*cur->beginReverseDraws());
@@ -299,8 +298,8 @@ void MainWindow::updateClocks() {
     } else {
         ui->EndingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getEnding())));
     }
-    core::Event::itGameround cur= currentEvent.findFirstNotFinished();
-    if(cur == currentEvent.getGREnd())
+    auto cur= currentEvent.findFirstNotFinished();
+    if(cur == currentEvent.endRounds())
         return;
     if(cur->getStarting() == core::epoch) {
         ui->RoundStartTime->setText("");
@@ -377,13 +376,13 @@ void MainWindow::updateInGameDisplay() {
         ui->StartEndGameRound->setText("Passer à la partie suivante");
     }
     // informations parties
-    ui->Progression->setRange(0, currentEvent.getGameRounds().size());
+    ui->Progression->setRange(0, currentEvent.sizeRounds());
     ui->Progression->setValue(currentEvent.getCurrentIndex());
     if(currentEvent.getStatus() == core::Event::Status::GameStart ||
        currentEvent.getStatus() == core::Event::Status::GameRunning ||
        currentEvent.getStatus() == core::Event::Status::GameFinished ||
        currentEvent.getStatus() == core::Event::Status::GamePaused) {
-        core::Event::itGameround cur= currentEvent.findFirstNotFinished();
+        auto cur= currentEvent.findFirstNotFinished();
         ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
         ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
         if(cur->getStarting() == core::epoch) {
