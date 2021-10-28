@@ -188,9 +188,10 @@ void ConfigGameRounds::updateDisplayEdits() {
             ui->SubRoundTypes->clear();
             ui->SubRoundTypes->addItems(getVictoryType(round->getType()));
             ui->SubRoundTypes->setCurrentIndex(getVictoryIndex(round->getType(), subRound->getType()));
+            auto p= ui->TextPrices->textCursor();
             ui->TextPrices->clear();
             ui->TextPrices->setText(QString::fromUtf8(subRound->getPrices()));
-            ui->TextPrices->moveCursor(QTextCursor::EndOfBlock);/// TODO: conserver la position du curseur de texte
+            ui->TextPrices->setTextCursor(p);
         } else {
             ui->groupPhase->setEnabled(false);
             ui->SubRoundTypes->clear();
