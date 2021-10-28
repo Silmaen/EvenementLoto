@@ -147,5 +147,8 @@ std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
 std::vector<SubGameRound>::const_iterator GameRound::getCurrentCSubRound() const {
     return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner() == 0; });
 }
+std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {
+    return std::next(subGames.begin(), index);
+}
 
 }// namespace evl::core

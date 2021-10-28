@@ -178,9 +178,14 @@ public:
     // ---- accès aux sub rounds (lecture seule) ----
     /**
      * @brief Accès à la sous-partie courante
-     * @return Pointeur vers la sous-partie courante
+     * @return Itérateur constant sur la sous-partie courante
      */
     subRoundsType::const_iterator getCurrentCSubRound() const;
+    /**
+     * @brief Accès à la sous-partie courante
+     * @return Itérateur constant sur la sous-partie courante
+     */
+    subRoundsType::iterator getSubRound(uint32_t index);
     /**
      * @brief Renvoie un itérateur constant sur le début de la liste des subround.
      * @return Itérateur constant sur le début de la liste des subround.

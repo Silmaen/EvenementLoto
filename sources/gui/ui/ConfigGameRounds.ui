@@ -30,13 +30,13 @@
                     </property>
                     <layout class="QGridLayout" name="gridLayout_2">
                         <item row="0" column="0">
-                            <widget class="QGroupBox" name="groupBox_3">
+                            <widget class="QGroupBox" name="groupGameRound">
                                 <property name="title">
                                     <string>Liste des Parties</string>
                                 </property>
                                 <layout class="QGridLayout" name="gridLayout_3">
                                     <item row="0" column="0">
-                                        <widget class="QPushButton" name="pushButton">
+                                        <widget class="QPushButton" name="btnAddRound">
                                             <property name="sizePolicy">
                                                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                                                     <horstretch>0</horstretch>
@@ -61,7 +61,7 @@
                                         </widget>
                                     </item>
                                     <item row="0" column="1">
-                                        <widget class="QPushButton" name="pushButton_2">
+                                        <widget class="QPushButton" name="btnDelRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -80,7 +80,7 @@
                                         </widget>
                                     </item>
                                     <item row="0" column="2">
-                                        <widget class="QPushButton" name="pushButton_3">
+                                        <widget class="QPushButton" name="btnUpRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -99,7 +99,7 @@
                                         </widget>
                                     </item>
                                     <item row="0" column="3">
-                                        <widget class="QPushButton" name="pushButton_4">
+                                        <widget class="QPushButton" name="btnDownRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -137,7 +137,7 @@
                             </widget>
                         </item>
                         <item row="0" column="1">
-                            <widget class="QGroupBox" name="groupBox_4">
+                            <widget class="QGroupBox" name="groupSubRound">
                                 <property name="title">
                                     <string>Phases de la partie</string>
                                 </property>
@@ -173,7 +173,7 @@
                                         </spacer>
                                     </item>
                                     <item row="2" column="0">
-                                        <widget class="QPushButton" name="pushButton_5">
+                                        <widget class="QPushButton" name="btnAddSubRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -192,7 +192,7 @@
                                         </widget>
                                     </item>
                                     <item row="2" column="1">
-                                        <widget class="QPushButton" name="pushButton_6">
+                                        <widget class="QPushButton" name="btnDelSubRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -211,7 +211,7 @@
                                         </widget>
                                     </item>
                                     <item row="2" column="2">
-                                        <widget class="QPushButton" name="pushButton_7">
+                                        <widget class="QPushButton" name="btnUpSubround">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -230,7 +230,7 @@
                                         </widget>
                                     </item>
                                     <item row="2" column="3">
-                                        <widget class="QPushButton" name="pushButton_8">
+                                        <widget class="QPushButton" name="btnDownSubRound">
                                             <property name="minimumSize">
                                                 <size>
                                                     <width>24</width>
@@ -268,7 +268,7 @@
                             </widget>
                         </item>
                         <item row="0" column="2">
-                            <widget class="QGroupBox" name="groupBox_5">
+                            <widget class="QGroupBox" name="groupPhase">
                                 <property name="title">
                                     <string>Configuration de la phase:</string>
                                 </property>
@@ -297,7 +297,11 @@
                                         </spacer>
                                     </item>
                                     <item row="2" column="0" colspan="3">
-                                        <widget class="QTextEdit" name="TextLots"/>
+                                        <widget class="QTextEdit" name="TextPrices">
+                                            <property name="undoRedoEnabled">
+                                                <bool>false</bool>
+                                            </property>
+                                        </widget>
                                     </item>
                                     <item row="0" column="0" colspan="2">
                                         <widget class="QLabel" name="label_2">
@@ -600,7 +604,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton</sender>
+            <sender>btnAddRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actCreateGameRound()</slot>
@@ -616,7 +620,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_2</sender>
+            <sender>btnDelRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actDeleteGameRound()</slot>
@@ -632,7 +636,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_3</sender>
+            <sender>btnUpRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actMoveGameRoundBefore()</slot>
@@ -648,7 +652,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_4</sender>
+            <sender>btnDownRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actMoveSubGameRoundAfter()</slot>
@@ -696,7 +700,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>TextLots</sender>
+            <sender>TextPrices</sender>
             <signal>textChanged()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actEndEditingPrice()</slot>
@@ -712,7 +716,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_5</sender>
+            <sender>btnAddSubRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actCreateSubGameRound()</slot>
@@ -728,7 +732,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_6</sender>
+            <sender>btnDelSubRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actDeleteSubGameRound()</slot>
@@ -744,7 +748,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_7</sender>
+            <sender>btnUpSubround</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actMoveSubGameRoundBefore()</slot>
@@ -760,7 +764,7 @@
             </hints>
         </connection>
         <connection>
-            <sender>pushButton_8</sender>
+            <sender>btnDownSubRound</sender>
             <signal>clicked()</signal>
             <receiver>ConfigGameRounds</receiver>
             <slot>actMoveSubGameRoundBefore()</slot>
@@ -772,6 +776,38 @@
                 <hint type="destinationlabel">
                     <x>420</x>
                     <y>-7</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>listGameRound</sender>
+            <signal>currentRowChanged(int)</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actChangeSelectedGameRound()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>71</x>
+                    <y>301</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>1</x>
+                    <y>302</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>listSubRound</sender>
+            <signal>currentRowChanged(int)</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actChangeSelectedSubGameRound()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>485</x>
+                    <y>310</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>1</x>
+                    <y>346</y>
                 </hint>
             </hints>
         </connection>

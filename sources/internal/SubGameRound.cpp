@@ -10,6 +10,20 @@
 
 namespace evl::core {
 
+const string SubGameRound::getTypeStr() const {
+    switch(type) {
+    case Type::OneQuine:
+        return "une quine";
+    case Type::TwoQuines:
+        return "deux quines";
+    case Type::FullCard:
+        return "carton plein";
+    case Type::Inverse:
+        return "inverse";
+    }
+    return evl::string("Type Inconnu");
+}
+
 void SubGameRound::read(std::istream& bs) {
     bs.read((char*)&type, sizeof(Type));
     bs.read((char*)&winner, sizeof(uint32_t));
