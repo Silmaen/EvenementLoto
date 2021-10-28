@@ -58,6 +58,12 @@ public:
     const Type& getType() const { return type; }
 
     /**
+     * @brief Renvoie le nom du type de sous-partie
+     * @return le nom du type de sous-partie
+     */
+    const string getTypeStr() const;
+
+    /**
      * @brief Renvoie le numéro de la grille gagnante.
      * @return Le numéro de la grille gagnante.
      */

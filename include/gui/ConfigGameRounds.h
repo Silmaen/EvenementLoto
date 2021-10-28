@@ -134,13 +134,13 @@ public slots:
      * @brief
      * @param newIndex
      */
-    void actChangeSelectedGameRound(int newIndex);
+    void actChangeSelectedGameRound();
 
     /**
      * @brief
      * @param newIndex
      */
-    void actChangeSelectedSubGameRound(int newIndex);
+    void actChangeSelectedSubGameRound();
 
 private:
     /**
@@ -148,9 +148,36 @@ private:
      */
     void updateDisplay();
 
+    /**
+     * @brief Met à jour l’affichage de la partie d’édition
+     */
     void updateDisplayEdits();
 
+    /**
+     * @brief Mets à jour l’affichage de la partie d’affichage de résultat
+     */
     void updateDisplayResults();
+
+    /**
+     * @brief Renvoie la liste des types de partie
+     * @return La liste des types de partie
+     */
+    static QStringList getRoundTypes();
+
+    /**
+     * @brief Renvoie la liste des conditions de victoire en fonction du type de partie
+     * @param t Le type de partie.
+     * @return La liste des conditions de victoires.
+     */
+    static QStringList getVictoryType(const core::GameRound::Type& t);
+
+    /**
+     * @brief Renvoie l’index dans le menu déroulant en fonction de son remplissage
+     * @param t Le type de partie
+     * @param st Le type de phase
+     * @return L'index/
+     */
+    static int getVictoryIndex(const core::GameRound::Type& t, const core::SubGameRound::Type& st);
 
     ///Lien vers la page UI.
     Ui::ConfigGameRounds* ui;
