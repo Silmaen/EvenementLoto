@@ -10,9 +10,6 @@
                 <height>800</height>
             </rect>
         </property>
-        <property name="cursor">
-            <cursorShape>BlankCursor</cursorShape>
-        </property>
         <property name="windowTitle">
             <string>Affichage</string>
         </property>
@@ -29,6 +26,9 @@
             <layout class="QGridLayout" name="gridLayout">
                 <item row="0" column="0">
                     <widget class="QStackedWidget" name="PageManager">
+                        <property name="currentIndex">
+                            <number>2</number>
+                        </property>
                         <widget class="QWidget" name="pageEventTitle">
                             <layout class="QGridLayout" name="gridLayout_2">
                                 <item row="0" column="0" rowspan="2">
@@ -218,68 +218,493 @@
                             </layout>
                         </widget>
                         <widget class="QWidget" name="pageRoundTitle">
-                            <widget class="QLabel" name="label_7">
-                                <property name="geometry">
-                                    <rect>
-                                        <x>300</x>
-                                        <y>250</y>
-                                        <width>601</width>
-                                        <height>221</height>
-                                    </rect>
-                                </property>
-                                <property name="font">
-                                    <font>
-                                        <pointsize>45</pointsize>
-                                    </font>
-                                </property>
-                                <property name="text">
-                                    <string>Round Title</string>
-                                </property>
-                                <property name="scaledContents">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="alignment">
-                                    <set>Qt::AlignCenter</set>
-                                </property>
-                                <property name="wordWrap">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="textInteractionFlags">
-                                    <set>Qt::NoTextInteraction</set>
-                                </property>
-                            </widget>
+                            <layout class="QGridLayout" name="gridLayout_3">
+                                <item row="0" column="0">
+                                    <spacer name="horizontalSpacer_6">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>514</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="0" column="1">
+                                    <widget class="QLabel" name="RT_RoundTitle">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>1</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="baseSize">
+                                            <size>
+                                                <width>0</width>
+                                                <height>1</height>
+                                            </size>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <pointsize>45</pointsize>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Partie 1</string>
+                                        </property>
+                                        <property name="scaledContents">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
+                                        <property name="wordWrap">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="textInteractionFlags">
+                                            <set>Qt::NoTextInteraction</set>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="0" column="2">
+                                    <spacer name="horizontalSpacer_7">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>514</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="1" column="0" colspan="3">
+                                    <widget class="QFrame" name="frame">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>3</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="frameShape">
+                                            <enum>QFrame::StyledPanel</enum>
+                                        </property>
+                                        <property name="frameShadow">
+                                            <enum>QFrame::Raised</enum>
+                                        </property>
+                                        <layout class="QVBoxLayout" name="verticalLayout">
+                                            <item>
+                                                <widget class="QLabel" name="RT_SubRound_1">
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>25</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>TextLabel</string>
+                                                    </property>
+                                                    <property name="textInteractionFlags">
+                                                        <set>Qt::NoTextInteraction</set>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QLabel" name="RT_SubRound_2">
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>25</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>TextLabel</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QLabel" name="RT_SubRound_3">
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>25</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>TextLabel</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </widget>
+                                </item>
+                            </layout>
                         </widget>
                         <widget class="QWidget" name="pageRoundRunning">
-                            <widget class="QLabel" name="label_8">
-                                <property name="geometry">
-                                    <rect>
-                                        <x>310</x>
-                                        <y>230</y>
-                                        <width>601</width>
-                                        <height>221</height>
-                                    </rect>
-                                </property>
-                                <property name="font">
-                                    <font>
-                                        <pointsize>45</pointsize>
-                                    </font>
-                                </property>
-                                <property name="text">
-                                    <string>Round Running</string>
-                                </property>
-                                <property name="scaledContents">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="alignment">
-                                    <set>Qt::AlignCenter</set>
-                                </property>
-                                <property name="wordWrap">
-                                    <bool>true</bool>
-                                </property>
-                                <property name="textInteractionFlags">
-                                    <set>Qt::NoTextInteraction</set>
-                                </property>
-                            </widget>
+                            <layout class="QGridLayout" name="gridLayout_5">
+                                <item row="0" column="0">
+                                    <spacer name="horizontalSpacer_8">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>QSizePolicy::Preferred</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>475</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="0" column="1">
+                                    <widget class="QLabel" name="RR_Title">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>1</horstretch>
+                                                <verstretch>0</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <pointsize>45</pointsize>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>Partie 1</string>
+                                        </property>
+                                        <property name="scaledContents">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
+                                        <property name="wordWrap">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="textInteractionFlags">
+                                            <set>Qt::NoTextInteraction</set>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="3" column="0" colspan="3">
+                                    <widget class="QFrame" name="frame_2">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>1</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="frameShape">
+                                            <enum>QFrame::StyledPanel</enum>
+                                        </property>
+                                        <property name="frameShadow">
+                                            <enum>QFrame::Raised</enum>
+                                        </property>
+                                        <layout class="QGridLayout" name="gridLayout_4">
+                                            <item row="0" column="0">
+                                                <widget class="QLabel" name="RR_SubRoundVictoryCondition">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                            <horstretch>3</horstretch>
+                                                            <verstretch>1</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>15</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Condition de gain: Une Ligne</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="0" column="1" rowspan="2">
+                                                <widget class="QLabel" name="RR_Logo">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                            <horstretch>1</horstretch>
+                                                            <verstretch>0</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>Logo</string>
+                                                    </property>
+                                                    <property name="alignment">
+                                                        <set>Qt::AlignCenter</set>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item row="1" column="0">
+                                                <widget class="QLabel" name="RR_SubRoundPrice">
+                                                    <property name="sizePolicy">
+                                                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                            <horstretch>0</horstretch>
+                                                            <verstretch>3</verstretch>
+                                                        </sizepolicy>
+                                                    </property>
+                                                    <property name="text">
+                                                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Gain:&lt;/p&gt;&lt;p&gt;un
+                                                            petit vélo en plastique&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+                                                        </string>
+                                                    </property>
+                                                    <property name="textInteractionFlags">
+                                                        <set>Qt::NoTextInteraction</set>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </widget>
+                                </item>
+                                <item row="1" column="3" rowspan="3">
+                                    <widget class="QFrame" name="frame_3">
+                                        <property name="frameShape">
+                                            <enum>QFrame::StyledPanel</enum>
+                                        </property>
+                                        <property name="frameShadow">
+                                            <enum>QFrame::Raised</enum>
+                                        </property>
+                                        <layout class="QVBoxLayout" name="verticalLayout_2">
+                                            <item>
+                                                <widget class="QGroupBox" name="groupBox_11">
+                                                    <property name="minimumSize">
+                                                        <size>
+                                                            <width>250</width>
+                                                            <height>200</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="maximumSize">
+                                                        <size>
+                                                            <width>250</width>
+                                                            <height>200</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>20</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="title">
+                                                        <string>Numéro tiré</string>
+                                                    </property>
+                                                    <layout class="QGridLayout" name="gridLayout_12">
+                                                        <item row="0" column="0">
+                                                            <widget class="QLCDNumber" name="RR_CurrentDraw">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>160</width>
+                                                                        <height>120</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="maximumSize">
+                                                                    <size>
+                                                                        <width>160</width>
+                                                                        <height>144</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="digitCount">
+                                                                    <number>2</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QGroupBox" name="groupBox_12">
+                                                    <property name="minimumSize">
+                                                        <size>
+                                                            <width>250</width>
+                                                            <height>100</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="maximumSize">
+                                                        <size>
+                                                            <width>250</width>
+                                                            <height>100</height>
+                                                        </size>
+                                                    </property>
+                                                    <property name="font">
+                                                        <font>
+                                                            <pointsize>20</pointsize>
+                                                        </font>
+                                                    </property>
+                                                    <property name="title">
+                                                        <string>Derniers numéros</string>
+                                                    </property>
+                                                    <layout class="QGridLayout" name="gridLayout_13">
+                                                        <item row="0" column="0">
+                                                            <widget class="QLCDNumber" name="RR_LastNumber1">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>49</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="maximumSize">
+                                                                    <size>
+                                                                        <width>49</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="digitCount">
+                                                                    <number>2</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="1">
+                                                            <widget class="QLCDNumber" name="RR_LastNumber2">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>50</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="maximumSize">
+                                                                    <size>
+                                                                        <width>50</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="digitCount">
+                                                                    <number>2</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                        <item row="0" column="2">
+                                                            <widget class="QLCDNumber" name="RR_LastNumber3">
+                                                                <property name="minimumSize">
+                                                                    <size>
+                                                                        <width>49</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="maximumSize">
+                                                                    <size>
+                                                                        <width>49</width>
+                                                                        <height>35</height>
+                                                                    </size>
+                                                                </property>
+                                                                <property name="digitCount">
+                                                                    <number>2</number>
+                                                                </property>
+                                                            </widget>
+                                                        </item>
+                                                    </layout>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <spacer name="verticalSpacer">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Vertical</enum>
+                                                    </property>
+                                                    <property name="sizeHint" stdset="0">
+                                                        <size>
+                                                            <width>20</width>
+                                                            <height>343</height>
+                                                        </size>
+                                                    </property>
+                                                </spacer>
+                                            </item>
+                                        </layout>
+                                    </widget>
+                                </item>
+                                <item row="0" column="2" colspan="2">
+                                    <spacer name="horizontalSpacer_9">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeType">
+                                            <enum>QSizePolicy::MinimumExpanding</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>273</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="2" column="0" colspan="2">
+                                    <widget class="QTableWidget" name="RR_NumberGrid">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                                <horstretch>1</horstretch>
+                                                <verstretch>3</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="verticalScrollBarPolicy">
+                                            <enum>Qt::ScrollBarAlwaysOff</enum>
+                                        </property>
+                                        <property name="horizontalScrollBarPolicy">
+                                            <enum>Qt::ScrollBarAlwaysOff</enum>
+                                        </property>
+                                        <property name="sizeAdjustPolicy">
+                                            <enum>QAbstractScrollArea::AdjustToContents</enum>
+                                        </property>
+                                        <property name="tabKeyNavigation">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="showDropIndicator" stdset="0">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="dragDropOverwriteMode">
+                                            <bool>false</bool>
+                                        </property>
+                                        <property name="selectionMode">
+                                            <enum>QAbstractItemView::NoSelection</enum>
+                                        </property>
+                                        <property name="showGrid">
+                                            <bool>true</bool>
+                                        </property>
+                                        <property name="rowCount">
+                                            <number>9</number>
+                                        </property>
+                                        <property name="columnCount">
+                                            <number>10</number>
+                                        </property>
+                                        <attribute name="horizontalHeaderVisible">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="horizontalHeaderHighlightSections">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="horizontalHeaderStretchLastSection">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="verticalHeaderVisible">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="verticalHeaderHighlightSections">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <attribute name="verticalHeaderStretchLastSection">
+                                            <bool>false</bool>
+                                        </attribute>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <row/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                        <column/>
+                                    </widget>
+                                </item>
+                            </layout>
                         </widget>
                         <widget class="QWidget" name="pageRoundPause">
                             <widget class="QLabel" name="label_9">

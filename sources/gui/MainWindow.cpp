@@ -169,7 +169,7 @@ void MainWindow::actQuit() {
 void MainWindow::actStartStopRound() {
     timer->stop();
     if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
-        currentEvent.resumeEvent();
+        currentEvent.ActiveFirstRound();
     } else if(currentEvent.getStatus() == core::Event::Status::GameStart) {
         currentEvent.startCurrentRound();
     } else if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
@@ -204,17 +204,17 @@ void MainWindow::actCancelPick() {
 }
 
 void MainWindow::actRadioPureRandom() {
-    currentMode= DrawMode::PickOnly;
+    currentDrawMode= DrawMode::PickOnly;
     updateInGameDisplay();
 }
 
 void MainWindow::actRadioPureManual() {
-    currentMode= DrawMode::ManualOnly;
+    currentDrawMode= DrawMode::ManualOnly;
     updateInGameDisplay();
 }
 
 void MainWindow::actRadioBoth() {
-    currentMode= DrawMode::Both;
+    currentDrawMode= DrawMode::Both;
     updateInGameDisplay();
 }
 
@@ -320,7 +320,7 @@ void MainWindow::updateInGameDisplay() {
 
     // les radios boutons
     {
-        switch(currentMode) {
+        switch(currentDrawMode) {
         case DrawMode::Both:
             ui->radioBtnPureManual->setChecked(false);
             ui->radioBtnPureRandom->setChecked(false);

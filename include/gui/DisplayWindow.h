@@ -51,6 +51,17 @@ private:
      * @brief Mise à jour de l’affichage de la page de titre.
      */
     void updateEventTitlePage();
+    /**
+     * @brief Mise à jour de l’affichage de la page de titre du round.
+     */
+    void updateRoundTitlePage();
+    /**
+     * @brief Mise à jour de l’affichage de la page de partie.
+     */
+    void updateRoundRunning();
+
+    void initializeNumberGrid();
+    void resizeGrid();
 
     /// Lien vers la page UI.
     Ui::DisplayWindow* ui;

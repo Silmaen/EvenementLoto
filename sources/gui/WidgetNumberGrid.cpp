@@ -298,7 +298,7 @@ void WidgetNumberGrid::setValue(int value) {
     emit buttonPushed(value);
 }
 
-void buttonPushed(int) {}
+void buttonPushed(int) {} /*---UNCOVER---*/
 
 QPushButton* WidgetNumberGrid::getButton(int idx) {
     switch(idx) {

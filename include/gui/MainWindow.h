@@ -203,7 +203,7 @@ private:
         Both,
         PickOnly,
         ManualOnly
-    } currentMode;
+    } currentDrawMode= DrawMode::Both;
 };
 
 }// namespace evl::gui
