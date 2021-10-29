@@ -105,6 +105,7 @@ TEST(GameRound, TypeNormal) {
     EXPECT_EQ(it->getType(), SubGameRound::Type::TwoQuines);
     ++it;
     EXPECT_EQ(it->getType(), SubGameRound::Type::FullCard);
+    EXPECT_EQ(gr.getSubRound(0)->getType(), SubGameRound::Type::OneQuine);
 }
 
 TEST(GameRound, TypeReverse) {
