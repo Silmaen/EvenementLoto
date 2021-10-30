@@ -38,6 +38,13 @@ inline std::string formatClock(const timePoint& t) {
     return oss.str();
 }
 
+inline std::string formatClockNoSecond(const timePoint& t) {
+    std::stringstream oss;
+    auto tt= clock::to_time_t(t);
+    oss << std::put_time(std::localtime(&tt), "%H:%M");
+    return oss.str();
+}
+
 inline std::string formatDuration(const duration& d) {
     std::stringstream oss;
     auto h= std::chrono::duration_cast<std::chrono::hours>(d).count();

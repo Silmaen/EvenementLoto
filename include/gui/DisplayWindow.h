@@ -46,6 +46,16 @@ public:
      */
     void updateDisplay();
 
+    /**
+     * @brief Initialise l’affichage de tous les éléments non dynamiques.
+     */
+    void initializeDisplay();
+
+    /**
+     * @brief Redimensionnement de la grille
+     */
+    void resize();
+
 private:
     /**
      * @brief Mise à jour de l’affichage de la page de titre.
@@ -60,8 +70,15 @@ private:
      */
     void updateRoundRunning();
 
+    /**
+     * @brief Initialisation des numéros dans la grille.
+     */
     void initializeNumberGrid();
-    void resizeGrid();
+
+    /**
+     * @brief remise à zéro de l'affichage de la grille
+     */
+    void resetGrid();
 
     /// Lien vers la page UI.
     Ui::DisplayWindow* ui;
@@ -69,6 +86,8 @@ private:
     QTimer* timer;
     /// Lien vers l’événement en cours
     core::Event* event;
+    /// La taille actuelle de l’image
+    QSize currentSize;
 };
 
 }// namespace evl::gui
