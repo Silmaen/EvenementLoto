@@ -33,9 +33,9 @@ Le programme a été correctement compilé avec :
 ## TODOs
 
 * Affichage:
-    * [ ] Affichage logo organisateur dans les vues intermédiaires
-    * [ ] Affichage du règlement
-        * [ ] Bouton permettant le ré-affichage à n’importe quel moment
+  * [X] Affichage logo organisateur dans les vues intermédiaires
+  * [ ] Affichage du règlement
+    * [ ] Bouton permettant le ré-affichage à n’importe quel moment
     * [ ] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
     * [ ] Permettre Affichage en plein écran sur le second écran
     * [x] Modification des labels cartons et partie si partie démarrée.
