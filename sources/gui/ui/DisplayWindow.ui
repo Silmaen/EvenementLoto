@@ -6,8 +6,8 @@
             <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>930</width>
-                <height>672</height>
+                <width>967</width>
+                <height>701</height>
             </rect>
         </property>
         <property name="font">
@@ -33,7 +33,7 @@
                 <item row="0" column="0">
                     <widget class="QStackedWidget" name="PageManager">
                         <property name="currentIndex">
-                            <number>0</number>
+                            <number>5</number>
                         </property>
                         <widget class="QWidget" name="pageEventTitle">
                             <layout class="QGridLayout" name="gridLayout_2">
@@ -282,19 +282,6 @@
                                         </property>
                                     </widget>
                                 </item>
-                                <item row="0" column="2">
-                                    <spacer name="horizontalSpacer_7">
-                                        <property name="orientation">
-                                            <enum>Qt::Horizontal</enum>
-                                        </property>
-                                        <property name="sizeHint" stdset="0">
-                                            <size>
-                                                <width>514</width>
-                                                <height>20</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </item>
                                 <item row="1" column="0" colspan="3">
                                     <widget class="QFrame" name="frame">
                                         <property name="sizePolicy">
@@ -353,6 +340,41 @@
                                                 </widget>
                                             </item>
                                         </layout>
+                                    </widget>
+                                </item>
+                                <item row="0" column="2">
+                                    <spacer name="horizontalSpacer_7">
+                                        <property name="orientation">
+                                            <enum>Qt::Horizontal</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>514</width>
+                                                <height>20</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="2" column="0" colspan="3">
+                                    <widget class="QLabel" name="RT_Logo">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>1</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="font">
+                                            <font>
+                                                <pointsize>20</pointsize>
+                                                <kerning>false</kerning>
+                                            </font>
+                                        </property>
+                                        <property name="text">
+                                            <string>TextLabel</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
                                     </widget>
                                 </item>
                             </layout>
@@ -701,11 +723,6 @@
                                                                 <property name="title">
                                                                     <string>Durée partie</string>
                                                                 </property>
-                                                                <property name="alignment">
-                                                                    <set>
-                                                                        Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter
-                                                                    </set>
-                                                                </property>
                                                                 <property name="flat">
                                                                     <bool>true</bool>
                                                                 </property>
@@ -736,11 +753,6 @@
                                                                             <property name="text">
                                                                                 <string>00:15</string>
                                                                             </property>
-                                                                            <property name="alignment">
-                                                                                <set>
-                                                                                    Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter
-                                                                                </set>
-                                                                            </property>
                                                                         </widget>
                                                                     </item>
                                                                 </layout>
@@ -756,11 +768,6 @@
                                                                 </property>
                                                                 <property name="title">
                                                                     <string>Heure</string>
-                                                                </property>
-                                                                <property name="alignment">
-                                                                    <set>
-                                                                        Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter
-                                                                    </set>
                                                                 </property>
                                                                 <property name="flat">
                                                                     <bool>true</bool>
@@ -788,11 +795,6 @@
                                                                             </property>
                                                                             <property name="text">
                                                                                 <string>15:25</string>
-                                                                            </property>
-                                                                            <property name="alignment">
-                                                                                <set>
-                                                                                    Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter
-                                                                                </set>
                                                                             </property>
                                                                         </widget>
                                                                     </item>
@@ -930,6 +932,42 @@
                         </widget>
                         <widget class="QWidget" name="pageRoundEnd">
                             <layout class="QGridLayout" name="gridLayout_9">
+                                <item row="3" column="0">
+                                    <spacer name="verticalSpacer_3">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>234</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="1" column="0">
+                                    <spacer name="verticalSpacer_2">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>235</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="2" column="0">
+                                    <widget class="QLabel" name="label">
+                                        <property name="text">
+                                            <string>Veuillez démarquer vos cartons.</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
+                                    </widget>
+                                </item>
                                 <item row="0" column="0">
                                     <widget class="QLabel" name="RE_RoundEndTitle">
                                         <property name="font">
@@ -955,48 +993,70 @@
                                         </property>
                                     </widget>
                                 </item>
-                                <item row="1" column="0">
-                                    <spacer name="verticalSpacer_2">
-                                        <property name="orientation">
-                                            <enum>Qt::Vertical</enum>
+                                <item row="4" column="0">
+                                    <widget class="QLabel" name="RE_Logo">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>2</verstretch>
+                                            </sizepolicy>
                                         </property>
-                                        <property name="sizeHint" stdset="0">
-                                            <size>
-                                                <width>20</width>
-                                                <height>235</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </item>
-                                <item row="2" column="0">
-                                    <widget class="QLabel" name="label">
                                         <property name="text">
-                                            <string>Veuillez démarquer vos cartons.</string>
+                                            <string>TextLabel</string>
                                         </property>
                                         <property name="alignment">
                                             <set>Qt::AlignCenter</set>
                                         </property>
                                     </widget>
                                 </item>
-                                <item row="3" column="0">
-                                    <spacer name="verticalSpacer_3">
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="pageEventPause">
+                            <layout class="QGridLayout" name="gridLayout_10">
+                                <item row="5" column="0">
+                                    <spacer name="verticalSpacer_10">
                                         <property name="orientation">
                                             <enum>Qt::Vertical</enum>
                                         </property>
                                         <property name="sizeHint" stdset="0">
                                             <size>
                                                 <width>20</width>
-                                                <height>234</height>
+                                                <height>40</height>
                                             </size>
                                         </property>
                                     </spacer>
                                 </item>
-                            </layout>
-                        </widget>
-                        <widget class="QWidget" name="pageEventPause">
-                            <layout class="QGridLayout" name="gridLayout_10">
-                                <item row="0" column="0">
-                                    <spacer name="verticalSpacer_4">
+                                <item row="5" column="1">
+                                    <widget class="QLabel" name="EP_Logo">
+                                        <property name="sizePolicy">
+                                            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                <horstretch>0</horstretch>
+                                                <verstretch>2</verstretch>
+                                            </sizepolicy>
+                                        </property>
+                                        <property name="text">
+                                            <string>TextLabel</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="5" column="2">
+                                    <spacer name="verticalSpacer_11">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>40</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="4" column="0" colspan="3">
+                                    <spacer name="verticalSpacer_6">
                                         <property name="orientation">
                                             <enum>Qt::Vertical</enum>
                                         </property>
@@ -1008,7 +1068,30 @@
                                         </property>
                                     </spacer>
                                 </item>
-                                <item row="1" column="0">
+                                <item row="3" column="0" colspan="3">
+                                    <widget class="QLabel" name="label_2">
+                                        <property name="text">
+                                            <string>Une buvette est à votre disposition</string>
+                                        </property>
+                                        <property name="alignment">
+                                            <set>Qt::AlignCenter</set>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="2" column="0" colspan="3">
+                                    <spacer name="verticalSpacer_5">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>154</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="1" column="0" colspan="3">
                                     <widget class="QLabel" name="label_11">
                                         <property name="font">
                                             <font>
@@ -1033,31 +1116,8 @@
                                         </property>
                                     </widget>
                                 </item>
-                                <item row="2" column="0">
-                                    <spacer name="verticalSpacer_5">
-                                        <property name="orientation">
-                                            <enum>Qt::Vertical</enum>
-                                        </property>
-                                        <property name="sizeHint" stdset="0">
-                                            <size>
-                                                <width>20</width>
-                                                <height>154</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
-                                </item>
-                                <item row="3" column="0">
-                                    <widget class="QLabel" name="label_2">
-                                        <property name="text">
-                                            <string>Une buvette est à votre disposition</string>
-                                        </property>
-                                        <property name="alignment">
-                                            <set>Qt::AlignCenter</set>
-                                        </property>
-                                    </widget>
-                                </item>
-                                <item row="4" column="0">
-                                    <spacer name="verticalSpacer_6">
+                                <item row="0" column="0" colspan="3">
+                                    <spacer name="verticalSpacer_4">
                                         <property name="orientation">
                                             <enum>Qt::Vertical</enum>
                                         </property>
@@ -1073,7 +1133,14 @@
                         </widget>
                         <widget class="QWidget" name="pageEventEnd">
                             <layout class="QGridLayout" name="gridLayout_11">
-                                <item row="0" column="0">
+                                <item row="1" column="0">
+                                    <widget class="QLabel" name="EE_LogoA">
+                                        <property name="text">
+                                            <string>TextLabel</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="1" column="1">
                                     <spacer name="verticalSpacer_8">
                                         <property name="orientation">
                                             <enum>Qt::Vertical</enum>
@@ -1086,7 +1153,27 @@
                                         </property>
                                     </spacer>
                                 </item>
-                                <item row="1" column="0" colspan="2">
+                                <item row="5" column="1">
+                                    <spacer name="verticalSpacer_9">
+                                        <property name="orientation">
+                                            <enum>Qt::Vertical</enum>
+                                        </property>
+                                        <property name="sizeHint" stdset="0">
+                                            <size>
+                                                <width>20</width>
+                                                <height>148</height>
+                                            </size>
+                                        </property>
+                                    </spacer>
+                                </item>
+                                <item row="1" column="2">
+                                    <widget class="QLabel" name="EE_LogoB">
+                                        <property name="text">
+                                            <string>TextLabel</string>
+                                        </property>
+                                    </widget>
+                                </item>
+                                <item row="2" column="0" colspan="3">
                                     <widget class="QLabel" name="label_12">
                                         <property name="font">
                                             <font>
@@ -1111,7 +1198,7 @@
                                         </property>
                                     </widget>
                                 </item>
-                                <item row="2" column="0">
+                                <item row="3" column="0" colspan="3">
                                     <spacer name="verticalSpacer_7">
                                         <property name="orientation">
                                             <enum>Qt::Vertical</enum>
@@ -1124,7 +1211,7 @@
                                         </property>
                                     </spacer>
                                 </item>
-                                <item row="3" column="0" colspan="2">
+                                <item row="4" column="0" colspan="3">
                                     <widget class="QLabel" name="label_13">
                                         <property name="font">
                                             <font>
@@ -1148,19 +1235,6 @@
                                             <set>Qt::NoTextInteraction</set>
                                         </property>
                                     </widget>
-                                </item>
-                                <item row="4" column="1">
-                                    <spacer name="verticalSpacer_9">
-                                        <property name="orientation">
-                                            <enum>Qt::Vertical</enum>
-                                        </property>
-                                        <property name="sizeHint" stdset="0">
-                                            <size>
-                                                <width>20</width>
-                                                <height>148</height>
-                                            </size>
-                                        </property>
-                                    </spacer>
                                 </item>
                             </layout>
                         </widget>

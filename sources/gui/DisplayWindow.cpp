@@ -35,29 +35,43 @@ DisplayWindow::~DisplayWindow() {
     delete timer;
 }
 
+void setPixMap(QLabel* where, const QString& name, const QImage& img) {
+    if(where->text() != name) {// charge l’image seulement une fois
+        where->setText(name);
+        where->setPixmap(QPixmap::fromImage(img.scaled(where->size(), Qt::KeepAspectRatio)));
+    }
+}
+
 void DisplayWindow::initializeDisplay() {
     //  les images
     if(event->getOrganizerLogo().string().empty()) {
         ui->ET_OrganizerLogo->setVisible(false);
         ui->RR_Logo->setVisible(false);
+        ui->RT_Logo->setVisible(false);
+        ui->RE_Logo->setVisible(false);
+        ui->EP_Logo->setVisible(false);
+        ui->EE_LogoA->setVisible(false);
+        ui->EE_LogoB->setVisible(false);
     } else {
         if(!exists(event->getOrganizerLogo())) {
             ui->ET_OrganizerLogo->setVisible(false);
             ui->RR_Logo->setVisible(false);
+            ui->RT_Logo->setVisible(false);
+            ui->RE_Logo->setVisible(false);
+            ui->EP_Logo->setVisible(false);
+            ui->EE_LogoA->setVisible(false);
+            ui->EE_LogoB->setVisible(false);
         } else {
             QString imgName(QString::fromUtf8(event->getOrganizerLogo().string()));
-            if(ui->ET_OrganizerLogo->text() != imgName) {// charge l’image seulement une fois
-                ui->ET_OrganizerLogo->setText(imgName);
-                QImage img;
-                img.load(imgName);
-                ui->ET_OrganizerLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_OrganizerLogo->size(), Qt::KeepAspectRatio)));
-            }
-            if(ui->RR_Logo->text() != imgName) {// charge l’image seulement une fois
-                ui->RR_Logo->setText(imgName);
-                QImage img;
-                img.load(imgName);
-                ui->RR_Logo->setPixmap(QPixmap::fromImage(img.scaled(ui->RR_Logo->size(), Qt::KeepAspectRatio)));
-            }
+            QImage img;
+            img.load(imgName);
+            setPixMap(ui->ET_OrganizerLogo, imgName, img);
+            setPixMap(ui->RR_Logo, imgName, img);
+            setPixMap(ui->RT_Logo, imgName, img);
+            setPixMap(ui->RE_Logo, imgName, img);
+            setPixMap(ui->EP_Logo, imgName, img);
+            setPixMap(ui->EE_LogoA, imgName, img);
+            setPixMap(ui->EE_LogoB, imgName, img);
         }
     }
     if(event->getLogo().empty()) {
@@ -67,12 +81,9 @@ void DisplayWindow::initializeDisplay() {
             ui->ET_EventLogo->setVisible(false);
         } else {
             QString imgName(QString::fromUtf8(event->getLogo().string()));
-            if(ui->ET_EventLogo->text() != imgName) {// charge l’image seulement une fois
-                ui->ET_EventLogo->setText(imgName);
-                QImage img;
-                img.load(imgName);
-                ui->ET_EventLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_EventLogo->size(), Qt::KeepAspectRatio)));
-            }
+            QImage img;
+            img.load(imgName);
+            setPixMap(ui->ET_EventLogo, imgName, img);
         }
     }
 }
@@ -80,11 +91,6 @@ void DisplayWindow::initializeDisplay() {
 void DisplayWindow::updateDisplay() {
     if(event == nullptr)
         return;
-    // action de redimensionnement
-    if(currentSize != size() || currentStatus != event->getStatus()) {
-        resize();
-        currentStatus= event->getStatus();
-    }
     switch(event->getStatus()) {
     case core::Event::Status::Invalid:
     case core::Event::Status::MissingParties:
@@ -92,27 +98,39 @@ void DisplayWindow::updateDisplay() {
     case core::Event::Status::EventStarted:
         ui->PageManager->setCurrentIndex(0);
         updateEventTitlePage();
-        return;
+        break;
     case core::Event::Status::Paused:
         ui->PageManager->setCurrentIndex(5);
-        return;
+        break;
     case core::Event::Status::GamePaused:
         ui->PageManager->setCurrentIndex(3);
-        return;
+        break;
     case core::Event::Status::GameStart:
         ui->PageManager->setCurrentIndex(1);
         updateRoundTitlePage();
-        return;
+        break;
     case core::Event::Status::GameRunning:
         ui->PageManager->setCurrentIndex(2);
         updateRoundRunning();
-        return;
+        break;
     case core::Event::Status::GameFinished:
         ui->PageManager->setCurrentIndex(4);
-        return;
+        break;
     case core::Event::Status::Finished:
         ui->PageManager->setCurrentIndex(6);
-        return;
+        break;
+    }
+    // action de redimensionnement
+    if(currentSize != size() || currentStatus != event->getStatus()) {
+        ui->ET_OrganizerLogo->setText("");
+        ui->RR_Logo->setText("");
+        ui->RT_Logo->setText("");
+        ui->RE_Logo->setText("");
+        ui->EP_Logo->setText("");
+        ui->EE_LogoA->setText("");
+        ui->EE_LogoB->setText("");
+        resize();
+        currentStatus= event->getStatus();
     }
 }
 
