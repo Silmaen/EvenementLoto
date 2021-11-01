@@ -328,74 +328,6 @@
                         <string>Résultats de la partie</string>
                     </property>
                     <layout class="QGridLayout" name="gridLayout_6">
-                        <item row="1" column="3" rowspan="6">
-                            <widget class="QTextEdit" name="TextDraws">
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="4" column="0">
-                            <widget class="QLabel" name="label_6">
-                                <property name="text">
-                                    <string>Durée</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="1" rowspan="2" colspan="2">
-                            <widget class="QLineEdit" name="StartingDate">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>300</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="4" column="1" colspan="2">
-                            <widget class="QLineEdit" name="Duration">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>300</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="0" rowspan="2">
-                            <widget class="QLabel" name="label_4">
-                                <property name="text">
-                                    <string>Début:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="4" rowspan="6">
-                            <widget class="QListWidget" name="ListWinners"/>
-                        </item>
-                        <item row="5" column="0" colspan="2">
-                            <widget class="QLabel" name="label_7">
-                                <property name="text">
-                                    <string>Nombre de Tirages</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="4">
-                            <widget class="QLabel" name="label_9">
-                                <property name="text">
-                                    <string>Grilles gagnantes</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="3" column="0">
-                            <widget class="QLabel" name="label_5">
-                                <property name="text">
-                                    <string>Fin</string>
-                                </property>
-                            </widget>
-                        </item>
                         <item row="5" column="2">
                             <widget class="QLineEdit" name="NumberDraws">
                                 <property name="maximumSize">
@@ -422,6 +354,33 @@
                                 </property>
                             </spacer>
                         </item>
+                        <item row="0" column="4">
+                            <widget class="QLabel" name="label_9">
+                                <property name="text">
+                                    <string>Grilles gagnantes</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="3">
+                            <widget class="QLabel" name="label_8">
+                                <property name="text">
+                                    <string>Tirages:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="1" rowspan="2" colspan="2">
+                            <widget class="QLineEdit" name="StartingDate">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>300</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                                <property name="readOnly">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
                         <item row="3" column="1" colspan="2">
                             <widget class="QLineEdit" name="EndingDate">
                                 <property name="maximumSize">
@@ -435,10 +394,55 @@
                                 </property>
                             </widget>
                         </item>
-                        <item row="0" column="3">
-                            <widget class="QLabel" name="label_8">
+                        <item row="4" column="1" colspan="2">
+                            <widget class="QLineEdit" name="Duration">
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>300</width>
+                                        <height>16777215</height>
+                                    </size>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="5" column="0" colspan="2">
+                            <widget class="QLabel" name="label_7">
                                 <property name="text">
-                                    <string>Tirages:</string>
+                                    <string>Nombre de Tirages</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="3" rowspan="6">
+                            <widget class="QTextEdit" name="TextDraws">
+                                <property name="readOnly">
+                                    <bool>true</bool>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="0" rowspan="2">
+                            <widget class="QLabel" name="label_4">
+                                <property name="text">
+                                    <string>Début:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="3" column="0">
+                            <widget class="QLabel" name="label_5">
+                                <property name="text">
+                                    <string>Fin</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="4" column="0">
+                            <widget class="QLabel" name="label_6">
+                                <property name="text">
+                                    <string>Durée</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="1" column="4" rowspan="6">
+                            <widget class="QTextEdit" name="ListWinners">
+                                <property name="readOnly">
+                                    <bool>true</bool>
                                 </property>
                             </widget>
                         </item>

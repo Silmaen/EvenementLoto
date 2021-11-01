@@ -152,6 +152,10 @@ private:
      * @brief Met à jour l’affichage de la partie d’édition
      */
     void updateDisplayEdits();
+    /**
+     * @brief Met à jour l’affichage de la partie d’édition
+     */
+    void updateDisplayRoundList();
 
     /**
      * @brief Mets à jour l’affichage de la partie d’affichage de résultat
@@ -184,6 +188,8 @@ private:
 
     /// L’événement en cours d’édition
     core::Event gameEvent;
+
+    bool onUpdate= false;
 };
 
 }// namespace evl::gui
