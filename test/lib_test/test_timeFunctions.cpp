@@ -13,6 +13,7 @@ TEST(timeFunction, timePoint) {
     evl::core::timePoint t= evl::core::epoch;
     EXPECT_STREQ(evl::core::formatCalendar(t).c_str(), "01 January 1970");
     EXPECT_STREQ(evl::core::formatClock(t).c_str(), "01:00:00");
+    EXPECT_STREQ(evl::core::formatClockNoSecond(t).c_str(), "01:00");
 }
 TEST(timeFunction, duration) {
     evl::core::duration t(0);

@@ -140,6 +140,13 @@ bool GameRound::isEditable() const {
     return status == Status::Ready;
 }
 
+bool GameRound::isCurrentSubRoundLast() const {
+    if(subGames.size() <= 1) return true;
+    if(subGames[subGames.size() - 2].getWinner() == 0) return false;
+    if(subGames[subGames.size() - 1].getWinner() == 0) return true;
+    return false;
+}
+
 std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
     return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return s.getWinner() == 0; });
 }
