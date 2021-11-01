@@ -26,6 +26,7 @@ DisplayWindow::DisplayWindow(core::Event* evt, QWidget* parent):
         timer->start();
         initializeNumberGrid();
         resize();
+        currentStatus= event->getStatus();
     }
 }
 
@@ -79,6 +80,11 @@ void DisplayWindow::initializeDisplay() {
 void DisplayWindow::updateDisplay() {
     if(event == nullptr)
         return;
+    // action de redimensionnement
+    if(currentSize != size() || currentStatus != event->getStatus()) {
+        resize();
+        currentStatus= event->getStatus();
+    }
     switch(event->getStatus()) {
     case core::Event::Status::Invalid:
     case core::Event::Status::MissingParties:
@@ -120,7 +126,6 @@ void DisplayWindow::updateEventTitlePage() {
         ui->ET_EventLocation->setVisible(true);
         ui->ET_EventLocation->setText(QString::fromUtf8(event->getLocation()));
     }
-    resize();
 }
 
 void DisplayWindow::updateRoundTitlePage() {
@@ -147,10 +152,7 @@ void DisplayWindow::updateRoundTitlePage() {
 }
 
 void DisplayWindow::updateRoundRunning() {
-
-    // action de redimensionnement
-    if(currentSize != size())
-        resize();
+    resize();
     ui->RR_Title->setText("Partie " + QString::number(event->getCurrentIndex() + 1));
     auto round= event->getGameRound(event->getCurrentIndex());
     // mise à jour de l’heure et durée
@@ -163,7 +165,17 @@ void DisplayWindow::updateRoundRunning() {
     QBrush br;
     br.setColor(QColor(255, 112, 0));
     br.setStyle(Qt::BrushStyle::SolidPattern);
-    for(auto iDraw= round->beginDraws(); iDraw != round->endDraws(); ++iDraw) {
+    int i= 0;
+    for(auto iDraw= round->beginReverseDraws(); iDraw != round->endReverseDraws(); ++iDraw) {
+        if(i == 0) {
+            br.setColor(QColor(255, 112, 0));
+        } else if(i == 1) {
+            br.setColor(QColor(255, 132, 20));
+        } else if(i == 2) {
+            br.setColor(QColor(255, 162, 50));
+        } else
+            br.setColor(QColor(255, 212, 100));
+        ++i;
         int row= (*iDraw - 1) / 10;
         int col= (*iDraw - 1) % 10;
         ui->RR_NumberGrid->item(row, col)->setBackground(br);

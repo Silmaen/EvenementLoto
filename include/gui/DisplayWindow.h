@@ -88,6 +88,8 @@ private:
     core::Event* event;
     /// La taille actuelle de l’image
     QSize currentSize;
+    /// sauvegarde du statut
+    core::Event::Status currentStatus;
 };
 
 }// namespace evl::gui
