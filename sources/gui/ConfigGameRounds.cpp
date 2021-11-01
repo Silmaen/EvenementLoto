@@ -142,11 +142,20 @@ void ConfigGameRounds::updateDisplay() {
         ui->groupResult->setEnabled(false);
         ui->groupSubRound->setEnabled(true);
         ui->groupPhase->setEnabled(true);
+        ui->btnAddRound->setEnabled(true);
+        ui->btnAddRound->setEnabled(true);
+        ui->btnDelRound->setEnabled(true);
+        ui->btnDownRound->setEnabled(true);
+        ui->btnUpRound->setEnabled(true);
         updateDisplayEdits();
     } else {
         ui->groupResult->setEnabled(true);
         ui->groupSubRound->setEnabled(false);
         ui->groupPhase->setEnabled(false);
+        ui->btnAddRound->setEnabled(false);
+        ui->btnDelRound->setEnabled(false);
+        ui->btnDownRound->setEnabled(false);
+        ui->btnUpRound->setEnabled(false);
         updateDisplayResults();
     }
     onUpdate= false;

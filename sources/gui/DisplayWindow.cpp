@@ -71,7 +71,7 @@ void DisplayWindow::initializeDisplay() {
                 ui->ET_EventLogo->setText(imgName);
                 QImage img;
                 img.load(imgName);
-                ui->ET_EventLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_EventLogo->size())));
+                ui->ET_EventLogo->setPixmap(QPixmap::fromImage(img.scaled(ui->ET_EventLogo->size(), Qt::KeepAspectRatio)));
             }
         }
     }
