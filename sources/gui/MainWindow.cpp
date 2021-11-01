@@ -233,32 +233,21 @@ void MainWindow::updateDisplay() {
     ui->actionSauver_Evenement_sous->setEnabled(false);
     ui->actionCommencer_Evenement->setEnabled(false);
     ui->actionTerminer_Evenement->setEnabled(false);
-    ui->actionConfiguration_des_parties->setEnabled(false);
+    ui->actionConfigRounds->setEnabled(false);
     ui->EvenementControl->setEnabled(false);
+    ui->actionConfigRounds->setText("Configuration des parties");
+    ui->actionConfigEvent->setText("Configuration de l’événement");
+    ui->actionConfigCard->setText("Configuration des cartons");
+
     switch(currentEvent.getStatus()) {
     case core::Event::Status::Invalid:
-        ui->actionSauver_Evenement->setEnabled(false);
-        ui->actionSauver_Evenement_sous->setEnabled(false);
-        ui->actionCommencer_Evenement->setEnabled(false);
-        ui->actionTerminer_Evenement->setEnabled(false);
-        ui->actionConfiguration_des_parties->setEnabled(false);
-        ui->EvenementControl->setEnabled(false);
-        break;
-    case core::Event::Status::MissingParties:
-        ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionSauver_Evenement_sous->setEnabled(false);
-        ui->actionCommencer_Evenement->setEnabled(false);
-        ui->actionTerminer_Evenement->setEnabled(false);
-        ui->actionConfiguration_des_parties->setEnabled(true);
-        ui->EvenementControl->setEnabled(false);
         break;
     case core::Event::Status::Ready:
-        ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionSauver_Evenement_sous->setEnabled(false);
         ui->actionCommencer_Evenement->setEnabled(true);
-        ui->actionTerminer_Evenement->setEnabled(false);
-        ui->actionConfiguration_des_parties->setEnabled(true);
-        ui->EvenementControl->setEnabled(false);
+        [[fallthrough]];
+    case core::Event::Status::MissingParties:
+        ui->actionSauver_Evenement->setEnabled(true);
+        ui->actionConfigRounds->setEnabled(true);
         break;
     case core::Event::Status::EventStarted:
     case core::Event::Status::Paused:
@@ -266,20 +255,15 @@ void MainWindow::updateDisplay() {
     case core::Event::Status::GameStart:
     case core::Event::Status::GameRunning:
     case core::Event::Status::GameFinished:
-        ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionSauver_Evenement_sous->setEnabled(false);
-        ui->actionCommencer_Evenement->setEnabled(false);
         ui->actionTerminer_Evenement->setEnabled(true);
-        ui->actionConfiguration_des_parties->setEnabled(true);
         ui->EvenementControl->setEnabled(true);
-        break;
+        [[fallthrough]];
     case core::Event::Status::Finished:
         ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionSauver_Evenement_sous->setEnabled(false);
-        ui->actionCommencer_Evenement->setEnabled(false);
-        ui->actionTerminer_Evenement->setEnabled(false);
-        ui->actionConfiguration_des_parties->setEnabled(true);
-        ui->EvenementControl->setEnabled(false);
+        ui->actionConfigRounds->setEnabled(true);
+        ui->actionConfigRounds->setText("Visualisation des parties");
+        ui->actionConfigEvent->setText("Configuration de l’événement");
+        ui->actionConfigCard->setText("Visualisation des cartons");
         break;
     }
     updateInGameDisplay();
