@@ -54,7 +54,9 @@ TEST(GameRound, startStop) {
     gr.removeLastPick();
     gr.addWinner(4875);
     gr.addWinner(4876);
+    EXPECT_TRUE(gr.isCurrentSubRoundLast());
     gr.addWinner(4877);
+    EXPECT_FALSE(gr.isCurrentSubRoundLast());
     EXPECT_EQ(gr.getStatusStr(), "en affichage");
     gr.closeGameRound();
     EXPECT_EQ(gr.getStatusStr(), "finie");
@@ -99,6 +101,7 @@ TEST(GameRound, serialize) {
 TEST(GameRound, TypeNormal) {
     GameRound gr{GameRound::Type::Normal};
     EXPECT_EQ(gr.sizeSubRound(), 3);
+    EXPECT_FALSE(gr.isCurrentSubRoundLast());
     auto it= gr.beginSubRound();
     EXPECT_EQ(it->getType(), SubGameRound::Type::OneQuine);
     ++it;
@@ -110,6 +113,7 @@ TEST(GameRound, TypeNormal) {
 
 TEST(GameRound, TypeReverse) {
     GameRound gr{GameRound::Type::Inverse};
+    EXPECT_TRUE(gr.isCurrentSubRoundLast());
     EXPECT_EQ(gr.sizeSubRound(), 1);
     auto it= gr.beginSubRound();
     EXPECT_EQ(it->getType(), SubGameRound::Type::FullCard);

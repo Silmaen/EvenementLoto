@@ -237,8 +237,6 @@ private:
 
     /// Le statut de l’événement
     Status status= Status::Invalid;
-    /// Si l’événement est en pause
-    bool paused= true;
 
     /// Le nom de l’organisateur (requit pour validité)
     string organizerName;

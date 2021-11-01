@@ -21,11 +21,12 @@ DisplayWindow::DisplayWindow(core::Event* evt, QWidget* parent):
     event(evt) {
     ui->setupUi(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&DisplayWindow::updateDisplay));
-    timer->setInterval(200);
-    timer->start();
-    initializeNumberGrid();
-
-    resize();
+    if(event != nullptr) {
+        timer->setInterval(200);
+        timer->start();
+        initializeNumberGrid();
+        resize();
+    }
 }
 
 DisplayWindow::~DisplayWindow() {
@@ -35,7 +36,7 @@ DisplayWindow::~DisplayWindow() {
 
 void DisplayWindow::initializeDisplay() {
     //  les images
-    if(event->getOrganizerLogo().empty()) {
+    if(event->getOrganizerLogo().string().empty()) {
         ui->ET_OrganizerLogo->setVisible(false);
         ui->RR_Logo->setVisible(false);
     } else {
@@ -119,6 +120,7 @@ void DisplayWindow::updateEventTitlePage() {
         ui->ET_EventLocation->setVisible(true);
         ui->ET_EventLocation->setText(QString::fromUtf8(event->getLocation()));
     }
+    resize();
 }
 
 void DisplayWindow::updateRoundTitlePage() {

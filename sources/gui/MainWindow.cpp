@@ -184,7 +184,13 @@ void MainWindow::actStartStopRound() {
 
 void MainWindow::actPauseResumeRound() {
     /// TODO
-    showNotImplemented("actPauseResumeRound");
+    //showNotImplemented("actPauseResumeRound");
+    if(currentEvent.getStatus() == core::Event::Status::GameFinished || currentEvent.getStatus() == core::Event::Status::GameRunning) {
+        currentEvent.pauseEvent();
+    } else if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
+        currentEvent.resumeEvent();
+    }
+    updateInGameDisplay();
 }
 
 void MainWindow::actRandomPick() {
@@ -351,32 +357,44 @@ void MainWindow::updateInGameDisplay() {
         }
     }
     // le bouton de pause
-    ui->PauseResumeGame->setEnabled(false);
-    if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-        ui->PauseResumeGame->setEnabled(true);
-        ui->PauseResumeGame->setText("Pause partie");
-    }
-    if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
-        ui->PauseResumeGame->setEnabled(true);
-        ui->PauseResumeGame->setText("Reprise partie");
+    {
+        ui->PauseResumeGame->setEnabled(false);
+        if(currentEvent.getStatus() == core::Event::Status::GameRunning || currentEvent.getStatus() == core::Event::Status::GameFinished) {
+            ui->PauseResumeGame->setEnabled(true);
+            ui->PauseResumeGame->setText("Pause partie");
+            if(currentEvent.getStatus() == core::Event::Status::GameFinished)
+                ui->PauseResumeGame->setText("Pause événement");
+        }
+        if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
+            ui->PauseResumeGame->setEnabled(true);
+            ui->PauseResumeGame->setText("Reprise partie");
+            if(currentEvent.getStatus() == core::Event::Status::Paused)
+                ui->PauseResumeGame->setText("Reprise événement");
+        }
     }
     // le bouton de debut/fin de round
-    ui->StartEndGameRound->setEnabled(false);
-    if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
-        ui->StartEndGameRound->setEnabled(true);
-        ui->StartEndGameRound->setText("Afficher première partie");
-    }
-    if(currentEvent.getStatus() == core::Event::Status::GameStart) {
-        ui->StartEndGameRound->setEnabled(true);
-        ui->StartEndGameRound->setText("Démarrer la partie");
-    }
-    if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-        ui->StartEndGameRound->setEnabled(true);
-        ui->StartEndGameRound->setText("Terminer la partie");
-    }
-    if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
-        ui->StartEndGameRound->setEnabled(true);
-        ui->StartEndGameRound->setText("Passer à la partie suivante");
+    {
+        ui->StartEndGameRound->setEnabled(false);
+        if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
+            ui->StartEndGameRound->setEnabled(true);
+            ui->StartEndGameRound->setText("Afficher première partie");
+        }
+        if(currentEvent.getStatus() == core::Event::Status::GameStart) {
+            ui->StartEndGameRound->setEnabled(true);
+            ui->StartEndGameRound->setText("Démarrer la partie");
+        }
+        if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
+            ui->StartEndGameRound->setEnabled(true);
+            auto round= currentEvent.getGameRound(currentEvent.getCurrentIndex());
+            if(round->isCurrentSubRoundLast())
+                ui->StartEndGameRound->setText("Terminer la partie");
+            else
+                ui->StartEndGameRound->setText("Terminer la sous-partie");
+        }
+        if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
+            ui->StartEndGameRound->setEnabled(true);
+            ui->StartEndGameRound->setText("Passer à la partie suivante");
+        }
     }
     // informations parties
     ui->Progression->setRange(0, currentEvent.sizeRounds());

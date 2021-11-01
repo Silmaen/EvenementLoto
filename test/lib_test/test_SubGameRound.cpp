@@ -11,6 +11,17 @@
 namespace fs= std::filesystem;
 using namespace evl::core;
 
+TEST(SubGameRound, types) {
+    SubGameRound partie(SubGameRound::Type::OneQuine, "");
+    EXPECT_STREQ(partie.getTypeStr().c_str(), "une quine");
+    SubGameRound partie2(SubGameRound::Type::FullCard, "");
+    EXPECT_STREQ(partie2.getTypeStr().c_str(), "carton plein");
+    SubGameRound partie3(SubGameRound::Type::Inverse, "");
+    EXPECT_STREQ(partie3.getTypeStr().c_str(), "inverse");
+    SubGameRound partie4(SubGameRound::Type{-1}, "une moto");
+    EXPECT_STREQ(partie4.getTypeStr().c_str(), "Type Inconnu");
+}
+
 TEST(SubGameRound, serialize) {
     SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto");
     partie.setWinner(666);
@@ -30,6 +41,7 @@ TEST(SubGameRound, serialize) {
     fileRead.close();
 
     EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);
+    EXPECT_STREQ(partie2.getTypeStr().c_str(), "deux quines");
     EXPECT_EQ(partie2.getWinner(), 666);
     EXPECT_STREQ(partie2.getPrices().c_str(), "une moto");
 

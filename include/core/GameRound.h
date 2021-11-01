@@ -177,7 +177,12 @@ public:
 
     // ---- accès aux sub rounds (lecture seule) ----
     /**
-     * @brief Accès à la sous-partie courante
+     * @brief Renvoie si la sous-partie actuelle est la dernière de la liste
+     * @return true si on est à la dernière sous-partie.
+     */
+    bool isCurrentSubRoundLast() const;
+    /**
+     * @brief Accès à la sous-partie courante l’interface
      * @return Itérateur constant sur la sous-partie courante
      */
     subRoundsType::const_iterator getCurrentCSubRound() const;
