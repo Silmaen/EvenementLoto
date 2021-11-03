@@ -9,6 +9,22 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="satellite (8ced286d-fc3d-425f-a2e0-6440ea9b6ec7)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/argawaen/sources/EvenementLoto" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-satellite" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-clang-obsd" />
+            <excludedPath local="true" path="cmake-*" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-clang" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-gcc-coverage" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-gcc-obsd" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
     </serverData>
   </component>
 </project>
