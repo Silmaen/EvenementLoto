@@ -36,9 +36,9 @@ Le programme a été correctement compilé avec :
   * [X] Affichage logo organisateur dans les vues intermédiaires
   * [ ] Affichage du règlement
     * [ ] Bouton permettant le ré-affichage à n’importe quel moment
-    * [ ] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
-    * [ ] Permettre Affichage en plein écran sur le second écran
-    * [x] Modification des labels cartons et partie si partie démarrée.
+  * [ ] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
+  * [ ] Permettre Affichage en plein écran sur le second écran
+  * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
     * [ ] Ajout d’icones sur les boutons et actions
     * [ ] Choix du thème graphique
@@ -49,5 +49,5 @@ Le programme a été correctement compilé avec :
     * [ ] Statistiques cartons
     * [x] Désactivation boutons modification partie lors de l’affichage
 * Compilation
-    * [ ] Test compilation OpenBSD
-    * [ ] Test compilation msvc (et clang-cl et clang natif)
+  * [x] Test compilation OpenBSD
+  * [ ] Test compilation msvc (et clang-cl et clang natif)
