@@ -32,8 +32,8 @@ public:
         Paused,        ///< Est en pause
         GameStart,     ///< Est en début de partie
         GameRunning,   ///< Est en cours de partie
-        GamePaused,    ///< Est en pause
         GameFinished,  ///< Est en fin de partie
+        DisplayRules,  ///< En affichage des règles de l'événement
         Finished       ///< Est fini
     };
 
@@ -202,8 +202,15 @@ public:
 
     /**
      * @brief Pause l’événement
+     * resumeEvent() permet de retourner au statut précédent.
      */
     void pauseEvent();
+
+    /**
+     * @brief Passe l'événement en mode d'affichage des règles.
+     * resumeEvent() permet de retourner au statut précédent.
+     */
+    void displayRules();
 
     /**
      * @brief Reprend l’événement.
@@ -235,8 +242,20 @@ private:
      */
     void checkValidConfig();
 
+    /**
+     * @brief Bascule à un nouveau statut et sauvegarde le précédent statut
+     * @param newStatus le nouveau statut à adopter
+     */
+    void changeStatus(const Status& newStatus);
+
+    /**
+     * @brief Remet l’événement au statut précédent
+     */
+    void restoreStatus();
+
     /// Le statut de l’événement
-    Status status= Status::Invalid;
+    Status status        = Status::Invalid;
+    Status previousStatus= Status::Invalid;
 
     /// Le nom de l’organisateur (requit pour validité)
     string organizerName;

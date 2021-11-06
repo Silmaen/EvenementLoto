@@ -7,1092 +7,1259 @@
    <rect>
        <x>0</x>
        <y>0</y>
-       <width>1456</width>
+       <width>1242</width>
        <height>831</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Événement Loto</string>
   </property>
-  <widget class="QWidget" name="EvenementControl">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <widget class="QFrame" name="frame">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-              <property name="spacing">
-                  <number>0</number>
-              </property>
-              <property name="leftMargin">
-                  <number>0</number>
-              </property>
-              <property name="topMargin">
-                  <number>0</number>
-              </property>
-              <property name="rightMargin">
-                  <number>0</number>
-              </property>
-              <property name="bottomMargin">
-                  <number>0</number>
-              </property>
-              <item>
-                  <widget class="QSplitter" name="splitter_2">
-                      <property name="sizePolicy">
-                          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                              <horstretch>1</horstretch>
-                              <verstretch>1</verstretch>
-                          </sizepolicy>
-                      </property>
-                      <property name="orientation">
-                          <enum>Qt::Horizontal</enum>
-                      </property>
-                      <widget class="QFrame" name="frame_3">
-                          <property name="sizePolicy">
-                              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                  <horstretch>2</horstretch>
-                                  <verstretch>0</verstretch>
-                              </sizepolicy>
-                          </property>
-                          <property name="minimumSize">
-                              <size>
-                                  <width>416</width>
-                                  <height>397</height>
-                              </size>
-                          </property>
-                          <property name="frameShape">
-                              <enum>QFrame::StyledPanel</enum>
-                          </property>
-                          <property name="frameShadow">
-                              <enum>QFrame::Plain</enum>
-                          </property>
-                          <layout class="QVBoxLayout" name="verticalLayout_3">
-                              <item>
-                                  <widget class="QGroupBox" name="GroupPickManual">
-                                      <property name="title">
-                                          <string>Numéros Tirés</string>
-                                      </property>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QGroupBox" name="groupBox_9">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>851</width>
-                                              <height>141</height>
-                                          </size>
-                                      </property>
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>16777215</width>
-                                              <height>141</height>
-                                          </size>
-                                      </property>
-                                      <property name="title">
-                                          <string>Info Evenement</string>
-                                      </property>
-                                      <layout class="QGridLayout" name="gridLayout_14">
-                                          <item row="0" column="0">
-                                              <widget class="QLabel" name="label_14">
-                                                  <property name="text">
-                                                      <string>Date:</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="1">
-                                              <widget class="QLineEdit" name="CurrentDate">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="2">
-                                              <widget class="QLabel" name="label_15">
-                                                  <property name="text">
-                                                      <string>Heure de début</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="3">
-                                              <widget class="QLineEdit" name="StartingHour">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="4">
-                                              <widget class="QLabel" name="label_16">
-                                                  <property name="text">
-                                                      <string>Heure de fin</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="5">
-                                              <widget class="QLineEdit" name="EndingHour">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="6" colspan="3">
-                                              <spacer name="horizontalSpacer_2">
-                                                  <property name="orientation">
-                                                      <enum>Qt::Horizontal</enum>
-                                                  </property>
-                                                  <property name="sizeHint" stdset="0">
-                                                      <size>
-                                                          <width>165</width>
-                                                          <height>20</height>
-                                                      </size>
-                                                  </property>
-                                              </spacer>
-                                          </item>
-                                          <item row="0" column="9" rowspan="2">
-                                              <widget class="QLineEdit" name="CurrentTime">
-                                                  <property name="minimumSize">
-                                                      <size>
-                                                          <width>300</width>
-                                                          <height>70</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>300</width>
-                                                          <height>70</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="font">
-                                                      <font>
-                                                          <pointsize>55</pointsize>
-                                                          <bold>false</bold>
-                                                      </font>
-                                                  </property>
-                                                  <property name="cursor">
-                                                      <cursorShape>ArrowCursor</cursorShape>
-                                                  </property>
-                                                  <property name="text">
-                                                      <string>14:30:22</string>
-                                                  </property>
-                                                  <property name="frame">
-                                                      <bool>false</bool>
-                                                  </property>
-                                                  <property name="alignment">
-                                                      <set>Qt::AlignCenter</set>
-                                                  </property>
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="1" column="0">
-                                              <widget class="QLabel" name="label_17">
-                                                  <property name="text">
-                                                      <string>Durée:</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="1" column="1" rowspan="2">
-                                              <widget class="QLineEdit" name="Duration">
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>200</width>
-                                                          <height>16777215</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="font">
-                                                      <font>
-                                                          <pointsize>25</pointsize>
-                                                      </font>
-                                                  </property>
-                                                  <property name="text">
-                                                      <string/>
-                                                  </property>
-                                                  <property name="alignment">
-                                                      <set>Qt::AlignCenter</set>
-                                                  </property>
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="1" column="2" colspan="7">
-                                              <spacer name="horizontalSpacer_3">
-                                                  <property name="orientation">
-                                                      <enum>Qt::Horizontal</enum>
-                                                  </property>
-                                                  <property name="sizeHint" stdset="0">
-                                                      <size>
-                                                          <width>642</width>
-                                                          <height>20</height>
-                                                      </size>
-                                                  </property>
-                                              </spacer>
-                                          </item>
-                                          <item row="2" column="2" colspan="5">
-                                              <spacer name="horizontalSpacer">
-                                                  <property name="orientation">
-                                                      <enum>Qt::Horizontal</enum>
-                                                  </property>
-                                                  <property name="sizeHint" stdset="0">
-                                                      <size>
-                                                          <width>521</width>
-                                                          <height>20</height>
-                                                      </size>
-                                                  </property>
-                                              </spacer>
-                                          </item>
-                                          <item row="2" column="7">
-                                              <widget class="QLabel" name="label_3">
-                                                  <property name="text">
-                                                      <string>Progression</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="2" column="8" colspan="2">
-                                              <widget class="QProgressBar" name="Progression">
-                                                  <property name="value">
-                                                      <number>24</number>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                      </layout>
-                                  </widget>
-                              </item>
-                          </layout>
-                      </widget>
-                      <widget class="QFrame" name="frame_4">
-                          <property name="sizePolicy">
-                              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-                                  <horstretch>0</horstretch>
-                                  <verstretch>0</verstretch>
-                              </sizepolicy>
-                          </property>
-                          <property name="minimumSize">
-                              <size>
-                                  <width>200</width>
-                                  <height>563</height>
-                              </size>
-                          </property>
-                          <property name="frameShape">
-                              <enum>QFrame::StyledPanel</enum>
-                          </property>
-                          <property name="frameShadow">
-                              <enum>QFrame::Plain</enum>
-                          </property>
-                          <layout class="QVBoxLayout" name="verticalLayout">
-                              <item>
-                                  <widget class="QGroupBox" name="groupBox_10">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>160</height>
-                                          </size>
-                                      </property>
-                                      <property name="title">
-                                          <string>Information partie</string>
-                                      </property>
-                                      <layout class="QGridLayout" name="gridLayout_11">
-                                          <item row="0" column="0">
-                                              <widget class="QLabel" name="label_4">
-                                                  <property name="text">
-                                                      <string>Début</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="1">
-                                              <widget class="QLineEdit" name="RoundStartTime">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="1" column="0">
-                                              <widget class="QLabel" name="label_5">
-                                                  <property name="text">
-                                                      <string>Durée</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="1" column="1">
-                                              <widget class="QLineEdit" name="RoundDuration">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="2" column="0">
-                                              <widget class="QLabel" name="label_6">
-                                                  <property name="text">
-                                                      <string>Tirages:</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="2" column="1">
-                                              <widget class="QLineEdit" name="RoundDraws">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="3" column="0">
-                                              <widget class="QLabel" name="label">
-                                                  <property name="text">
-                                                      <string>Partie:</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="3" column="1">
-                                              <widget class="QLineEdit" name="RoundName">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="4" column="0">
-                                              <widget class="QLabel" name="label_2">
-                                                  <property name="text">
-                                                      <string>Phase:</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="4" column="1">
-                                              <widget class="QLineEdit" name="RoundPhase">
-                                                  <property name="readOnly">
-                                                      <bool>true</bool>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                      </layout>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QGroupBox" name="groupBox_11">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>171</height>
-                                          </size>
-                                      </property>
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>184</height>
-                                          </size>
-                                      </property>
-                                      <property name="title">
-                                          <string>Numéro tiré</string>
-                                      </property>
-                                      <layout class="QGridLayout" name="gridLayout_12">
-                                          <item row="0" column="0">
-                                              <widget class="QLCDNumber" name="CurrentDraw">
-                                                  <property name="minimumSize">
-                                                      <size>
-                                                          <width>160</width>
-                                                          <height>120</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>160</width>
-                                                          <height>144</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="digitCount">
-                                                      <number>2</number>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                      </layout>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QGroupBox" name="groupBox_12">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>71</height>
-                                          </size>
-                                      </property>
-                                      <property name="maximumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>71</height>
-                                          </size>
-                                      </property>
-                                      <property name="title">
-                                          <string>Derniers numéros</string>
-                                      </property>
-                                      <layout class="QGridLayout" name="gridLayout_13">
-                                          <item row="0" column="0">
-                                              <widget class="QLCDNumber" name="LastNumber1">
-                                                  <property name="minimumSize">
-                                                      <size>
-                                                          <width>49</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>49</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="digitCount">
-                                                      <number>2</number>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="1">
-                                              <widget class="QLCDNumber" name="LastNumber2">
-                                                  <property name="minimumSize">
-                                                      <size>
-                                                          <width>50</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>50</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="digitCount">
-                                                      <number>2</number>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item row="0" column="2">
-                                              <widget class="QLCDNumber" name="LastNumber3">
-                                                  <property name="minimumSize">
-                                                      <size>
-                                                          <width>49</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="maximumSize">
-                                                      <size>
-                                                          <width>49</width>
-                                                          <height>35</height>
-                                                      </size>
-                                                  </property>
-                                                  <property name="digitCount">
-                                                      <number>2</number>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                      </layout>
-                                  </widget>
-                              </item>
-                              <item>
-                                  <widget class="QGroupBox" name="groupBox_13">
-                                      <property name="minimumSize">
-                                          <size>
-                                              <width>180</width>
-                                              <height>130</height>
-                                          </size>
-                                      </property>
-                                      <property name="title">
-                                          <string>Commandes</string>
-                                      </property>
-                                      <layout class="QVBoxLayout" name="verticalLayout_2">
-                                          <item>
-                                              <widget class="QPushButton" name="StartEndGameRound">
-                                                  <property name="text">
-                                                      <string>Debut/fin partie</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item>
-                                              <widget class="QPushButton" name="PauseResumeGame">
-                                                  <property name="text">
-                                                      <string>Pause/reprise partie</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item>
-                                              <widget class="QPushButton" name="RandomPick">
-                                                  <property name="text">
-                                                      <string>Tirage Aléatoire</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                          <item>
-                                              <widget class="QPushButton" name="CancelLastPick">
-                                                  <property name="text">
-                                                      <string>Annuler dernier tirage</string>
-                                                  </property>
-                                              </widget>
-                                          </item>
-                                      </layout>
-                                  </widget>
-                              </item>
-                          </layout>
-                      </widget>
-                  </widget>
-              </item>
-          </layout>
-      </widget>
-      <widget class="QFrame" name="frame_2">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>200</height>
+     <widget class="QWidget" name="EventControl">
+         <layout class="QGridLayout" name="gridLayout">
+             <item row="0" column="0">
+                 <widget class="QSplitter" name="splitter">
+                     <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                         </sizepolicy>
+                     </property>
+                     <property name="orientation">
+                         <enum>Qt::Vertical</enum>
+                     </property>
+                     <widget class="QFrame" name="topFrame">
+                         <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>4</verstretch>
+                             </sizepolicy>
+                         </property>
+                         <property name="frameShape">
+                             <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="frameShadow">
+                             <enum>QFrame::Raised</enum>
+                         </property>
+                         <layout class="QHBoxLayout" name="horizontalLayout">
+                             <property name="spacing">
+                                 <number>0</number>
+                             </property>
+                             <property name="leftMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="topMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="rightMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="bottomMargin">
+                                 <number>0</number>
+                             </property>
+                             <item>
+                                 <widget class="QSplitter" name="splitter_2">
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                                             <horstretch>1</horstretch>
+                                             <verstretch>1</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                     <property name="orientation">
+                                         <enum>Qt::Horizontal</enum>
+                                     </property>
+                                     <widget class="QFrame" name="frame_3">
+                                         <property name="sizePolicy">
+                                             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                                                 <horstretch>2</horstretch>
+                                                 <verstretch>0</verstretch>
+                                             </sizepolicy>
+                                         </property>
+                                         <property name="minimumSize">
+                                             <size>
+                                                 <width>416</width>
+                                                 <height>397</height>
+                                             </size>
+                                         </property>
+                                         <property name="frameShape">
+                                             <enum>QFrame::NoFrame</enum>
+                                         </property>
+                                         <property name="frameShadow">
+                                             <enum>QFrame::Plain</enum>
+                                         </property>
+                                         <layout class="QVBoxLayout" name="verticalLayout_3">
+                                             <property name="leftMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="topMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="rightMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="bottomMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <item>
+                                                 <widget class="QGroupBox" name="GroupPickManual">
+                                                     <property name="title">
+                                                         <string>Numéros Tirés</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <widget class="QFrame" name="frame_5">
+                                                     <property name="minimumSize">
+                                                         <size>
+                                                             <width>0</width>
+                                                             <height>100</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="maximumSize">
+                                                         <size>
+                                                             <width>16777215</width>
+                                                             <height>100</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="frameShape">
+                                                         <enum>QFrame::NoFrame</enum>
+                                                     </property>
+                                                     <property name="frameShadow">
+                                                         <enum>QFrame::Raised</enum>
+                                                     </property>
+                                                     <layout class="QHBoxLayout" name="horizontalLayout_4">
+                                                         <property name="spacing">
+                                                             <number>2</number>
+                                                         </property>
+                                                         <property name="leftMargin">
+                                                             <number>2</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>2</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>2</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>2</number>
+                                                         </property>
+                                                         <item>
+                                                             <widget class="QGroupBox" name="EventInfos">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>600</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="title">
+                                                                     <string>Info Evenement</string>
+                                                                 </property>
+                                                                 <layout class="QGridLayout" name="gridLayout_14">
+                                                                     <item row="0" column="1">
+                                                                         <widget class="QLineEdit" name="CurrentDate">
+                                                                             <property name="readOnly">
+                                                                                 <bool>true</bool>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="4">
+                                                                         <widget class="QLabel" name="label_16">
+                                                                             <property name="text">
+                                                                                 <string>Heure de fin</string>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="2">
+                                                                         <widget class="QLabel" name="label_15">
+                                                                             <property name="text">
+                                                                                 <string>Heure de début</string>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="3">
+                                                                         <widget class="QLineEdit" name="StartingHour">
+                                                                             <property name="readOnly">
+                                                                                 <bool>true</bool>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="0">
+                                                                         <widget class="QLabel" name="label_14">
+                                                                             <property name="text">
+                                                                                 <string>Date:</string>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="5">
+                                                                         <widget class="QLineEdit" name="EndingHour">
+                                                                             <property name="readOnly">
+                                                                                 <bool>true</bool>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="6" colspan="2">
+                                                                         <spacer name="horizontalSpacer_2">
+                                                                             <property name="orientation">
+                                                                                 <enum>Qt::Horizontal</enum>
+                                                                             </property>
+                                                                             <property name="sizeHint" stdset="0">
+                                                                                 <size>
+                                                                                     <width>165</width>
+                                                                                     <height>20</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                         </spacer>
+                                                                     </item>
+                                                                     <item row="2" column="1">
+                                                                         <widget class="QLineEdit" name="Duration">
+                                                                             <property name="sizePolicy">
+                                                                                 <sizepolicy hsizetype="Preferred"
+                                                                                             vsizetype="Preferred">
+                                                                                     <horstretch>0</horstretch>
+                                                                                     <verstretch>0</verstretch>
+                                                                                 </sizepolicy>
+                                                                             </property>
+                                                                             <property name="maximumSize">
+                                                                                 <size>
+                                                                                     <width>16777215</width>
+                                                                                     <height>16777215</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="font">
+                                                                                 <font>
+                                                                                     <pointsize>25</pointsize>
+                                                                                 </font>
+                                                                             </property>
+                                                                             <property name="text">
+                                                                                 <string/>
+                                                                             </property>
+                                                                             <property name="alignment">
+                                                                                 <set>Qt::AlignCenter</set>
+                                                                             </property>
+                                                                             <property name="readOnly">
+                                                                                 <bool>true</bool>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="2" column="0">
+                                                                         <widget class="QLabel" name="label_17">
+                                                                             <property name="text">
+                                                                                 <string>Durée:</string>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="2" column="2">
+                                                                         <widget class="QLabel" name="label_3">
+                                                                             <property name="text">
+                                                                                 <string>Progression</string>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="2" column="3" colspan="5">
+                                                                         <widget class="QProgressBar"
+                                                                                 name="Progression">
+                                                                             <property name="sizePolicy">
+                                                                                 <sizepolicy hsizetype="Preferred"
+                                                                                             vsizetype="Preferred">
+                                                                                     <horstretch>0</horstretch>
+                                                                                     <verstretch>0</verstretch>
+                                                                                 </sizepolicy>
+                                                                             </property>
+                                                                             <property name="value">
+                                                                                 <number>24</number>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                 </layout>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QLineEdit" name="CurrentTime">
+                                                                 <property name="sizePolicy">
+                                                                     <sizepolicy hsizetype="Preferred"
+                                                                                 vsizetype="Preferred">
+                                                                         <horstretch>0</horstretch>
+                                                                         <verstretch>0</verstretch>
+                                                                     </sizepolicy>
+                                                                 </property>
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>300</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="maximumSize">
+                                                                     <size>
+                                                                         <width>300</width>
+                                                                         <height>16777215</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="font">
+                                                                     <font>
+                                                                         <pointsize>55</pointsize>
+                                                                         <bold>false</bold>
+                                                                     </font>
+                                                                 </property>
+                                                                 <property name="cursor">
+                                                                     <cursorShape>ArrowCursor</cursorShape>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>14:30:22</string>
+                                                                 </property>
+                                                                 <property name="frame">
+                                                                     <bool>false</bool>
+                                                                 </property>
+                                                                 <property name="alignment">
+                                                                     <set>Qt::AlignCenter</set>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                     <widget class="QFrame" name="rightFrame">
+                                         <property name="sizePolicy">
+                                             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                                                 <horstretch>0</horstretch>
+                                                 <verstretch>4</verstretch>
+                                             </sizepolicy>
+                                         </property>
+                                         <property name="minimumSize">
+                                             <size>
+                                                 <width>200</width>
+                                                 <height>563</height>
+                                             </size>
+                                         </property>
+                                         <property name="frameShape">
+                                             <enum>QFrame::NoFrame</enum>
+                                         </property>
+                                         <property name="frameShadow">
+                                             <enum>QFrame::Plain</enum>
+                                         </property>
+                                         <layout class="QVBoxLayout" name="verticalLayout">
+                                             <property name="spacing">
+                                                 <number>3</number>
+                                             </property>
+                                             <property name="leftMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="topMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="rightMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="bottomMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <item>
+                                                 <widget class="QGroupBox" name="roundInfos">
+                                                     <property name="sizePolicy">
+                                                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                             <horstretch>0</horstretch>
+                                                             <verstretch>1</verstretch>
+                                                         </sizepolicy>
+                                                     </property>
+                                                     <property name="minimumSize">
+                                                         <size>
+                                                             <width>180</width>
+                                                             <height>160</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="title">
+                                                         <string>Information partie</string>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_11">
+                                                         <item row="0" column="0">
+                                                             <widget class="QLabel" name="label_4">
+                                                                 <property name="text">
+                                                                     <string>Début</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="0" column="1">
+                                                             <widget class="QLineEdit" name="RoundStartTime">
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="1" column="0">
+                                                             <widget class="QLabel" name="label_5">
+                                                                 <property name="text">
+                                                                     <string>Durée</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="1" column="1">
+                                                             <widget class="QLineEdit" name="RoundDuration">
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="2" column="0">
+                                                             <widget class="QLabel" name="label_6">
+                                                                 <property name="text">
+                                                                     <string>Tirages:</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="2" column="1">
+                                                             <widget class="QLineEdit" name="RoundDraws">
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="3" column="0">
+                                                             <widget class="QLabel" name="label">
+                                                                 <property name="text">
+                                                                     <string>Partie:</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="3" column="1">
+                                                             <widget class="QLineEdit" name="RoundName">
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="4" column="0">
+                                                             <widget class="QLabel" name="label_2">
+                                                                 <property name="text">
+                                                                     <string>Phase:</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item row="4" column="1">
+                                                             <widget class="QLineEdit" name="RoundPhase">
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <widget class="QFrame" name="lastNumbersDisplay">
+                                                     <property name="sizePolicy">
+                                                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                             <horstretch>0</horstretch>
+                                                             <verstretch>1</verstretch>
+                                                         </sizepolicy>
+                                                     </property>
+                                                     <property name="frameShape">
+                                                         <enum>QFrame::NoFrame</enum>
+                                                     </property>
+                                                     <property name="frameShadow">
+                                                         <enum>QFrame::Raised</enum>
+                                                     </property>
+                                                     <layout class="QVBoxLayout" name="verticalLayout_4">
+                                                         <property name="spacing">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="leftMargin">
+                                                             <number>1</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>1</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>1</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>1</number>
+                                                         </property>
+                                                         <item>
+                                                             <widget class="QGroupBox" name="groupBox_11">
+                                                                 <property name="sizePolicy">
+                                                                     <sizepolicy hsizetype="Preferred"
+                                                                                 vsizetype="Preferred">
+                                                                         <horstretch>0</horstretch>
+                                                                         <verstretch>3</verstretch>
+                                                                     </sizepolicy>
+                                                                 </property>
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="maximumSize">
+                                                                     <size>
+                                                                         <width>16777215</width>
+                                                                         <height>16777215</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="title">
+                                                                     <string>Numéro tiré</string>
+                                                                 </property>
+                                                                 <layout class="QGridLayout" name="gridLayout_12">
+                                                                     <item row="0" column="0">
+                                                                         <widget class="QLCDNumber" name="CurrentDraw">
+                                                                             <property name="minimumSize">
+                                                                                 <size>
+                                                                                     <width>0</width>
+                                                                                     <height>0</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="maximumSize">
+                                                                                 <size>
+                                                                                     <width>16777215</width>
+                                                                                     <height>16777215</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="digitCount">
+                                                                                 <number>2</number>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                 </layout>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QGroupBox" name="groupBox_12">
+                                                                 <property name="sizePolicy">
+                                                                     <sizepolicy hsizetype="Preferred"
+                                                                                 vsizetype="Preferred">
+                                                                         <horstretch>0</horstretch>
+                                                                         <verstretch>1</verstretch>
+                                                                     </sizepolicy>
+                                                                 </property>
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="maximumSize">
+                                                                     <size>
+                                                                         <width>16777215</width>
+                                                                         <height>16777215</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="title">
+                                                                     <string>Derniers numéros</string>
+                                                                 </property>
+                                                                 <layout class="QGridLayout" name="gridLayout_13">
+                                                                     <item row="0" column="0">
+                                                                         <widget class="QLCDNumber" name="LastNumber1">
+                                                                             <property name="minimumSize">
+                                                                                 <size>
+                                                                                     <width>0</width>
+                                                                                     <height>0</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="maximumSize">
+                                                                                 <size>
+                                                                                     <width>16777215</width>
+                                                                                     <height>16777215</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="digitCount">
+                                                                                 <number>2</number>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="1">
+                                                                         <widget class="QLCDNumber" name="LastNumber2">
+                                                                             <property name="minimumSize">
+                                                                                 <size>
+                                                                                     <width>0</width>
+                                                                                     <height>0</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="maximumSize">
+                                                                                 <size>
+                                                                                     <width>16777215</width>
+                                                                                     <height>16777215</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="digitCount">
+                                                                                 <number>2</number>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                     <item row="0" column="2">
+                                                                         <widget class="QLCDNumber" name="LastNumber3">
+                                                                             <property name="minimumSize">
+                                                                                 <size>
+                                                                                     <width>0</width>
+                                                                                     <height>0</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="maximumSize">
+                                                                                 <size>
+                                                                                     <width>16777215</width>
+                                                                                     <height>16777215</height>
+                                                                                 </size>
+                                                                             </property>
+                                                                             <property name="digitCount">
+                                                                                 <number>2</number>
+                                                                             </property>
+                                                                         </widget>
+                                                                     </item>
+                                                                 </layout>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <spacer name="verticalSpacer">
+                                                     <property name="orientation">
+                                                         <enum>Qt::Vertical</enum>
+                                                     </property>
+                                                     <property name="sizeHint" stdset="0">
+                                                         <size>
+                                                             <width>20</width>
+                                                             <height>40</height>
+                                                         </size>
+                                                     </property>
+                                                 </spacer>
+                                             </item>
+                                             <item>
+                                                 <widget class="QGroupBox" name="CommandsBox">
+                                                     <property name="sizePolicy">
+                                                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                             <horstretch>0</horstretch>
+                                                             <verstretch>1</verstretch>
+                                                         </sizepolicy>
+                                                     </property>
+                                                     <property name="minimumSize">
+                                                         <size>
+                                                             <width>180</width>
+                                                             <height>150</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="title">
+                                                         <string>Commandes</string>
+                                                     </property>
+                                                     <layout class="QVBoxLayout" name="verticalLayout_2">
+                                                         <item>
+                                                             <widget class="QPushButton" name="StartEndGameRound">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>20</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>Debut/fin partie</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QPushButton" name="PauseResumeGame">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>20</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>Pause/reprise partie</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QPushButton" name="DisplayRules">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>20</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>Affichage règlement</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QPushButton" name="RandomPick">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>20</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>Tirage Aléatoire</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QPushButton" name="CancelLastPick">
+                                                                 <property name="sizePolicy">
+                                                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                                                                         <horstretch>0</horstretch>
+                                                                         <verstretch>0</verstretch>
+                                                                     </sizepolicy>
+                                                                 </property>
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>0</width>
+                                                                         <height>20</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="text">
+                                                                     <string>Annuler dernier tirage</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                 </widget>
+                             </item>
+                         </layout>
+                     </widget>
+                     <widget class="QFrame" name="bottomFrame">
+                         <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                 <horstretch>0</horstretch>
+                                 <verstretch>1</verstretch>
+                             </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                             <size>
+                                 <width>0</width>
+                                 <height>200</height>
         </size>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+           <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-           <property name="topMargin">
-               <number>0</number>
-           </property>
-           <property name="rightMargin">
-               <number>0</number>
-           </property>
-           <property name="bottomMargin">
-               <number>0</number>
-           </property>
-           <item row="0" column="0">
-               <widget class="QTabWidget" name="tabWidget">
-                   <property name="minimumSize">
-                       <size>
-                           <width>0</width>
-                           <height>200</height>
-                       </size>
-                   </property>
-                   <property name="tabPosition">
-                       <enum>QTabWidget::South</enum>
-                   </property>
-                   <property name="currentIndex">
-                       <number>2</number>
-                   </property>
-                   <widget class="QWidget" name="tabPartieNormale">
-                       <attribute name="title">
-                           <string>Résultat Normaux</string>
-                       </attribute>
-                       <layout class="QGridLayout" name="gridLayout_10">
-                           <item row="0" column="0" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_3">
-                                   <property name="title">
-                                       <string>Presque une ligne</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_3">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="AlmostOneLine">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="1" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_4">
-                                   <property name="title">
-                                       <string>Une ligne</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_4">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="OneLine">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="2" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_5">
-                                   <property name="title">
-                                       <string>Presque 2 lignes</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_5">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="AlmostTwoLines">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="3" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_6">
-                                   <property name="title">
-                                       <string>2 Lignes</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_6">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="TwoLines">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="4" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_7">
-                                   <property name="title">
-                                       <string>Presque carton</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_7">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="AlostCard">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="5" rowspan="7">
-                               <widget class="QGroupBox" name="groupBox_8">
-                                   <property name="title">
-                                       <string>Carton plein</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_8">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="FullCard">
-                                               <property name="minimumSize">
-                                                   <size>
-                                                       <width>100</width>
-                                                       <height>0</height>
-                                                   </size>
-                                               </property>
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item row="0" column="6">
-                               <widget class="QLabel" name="label_7">
-                                   <property name="text">
-                                       <string>Nombre de cartons en jeu</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="0" column="7">
-                               <widget class="QLineEdit" name="NumberCardInGame">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="1" column="6">
-                               <widget class="QLabel" name="label_8">
-                                   <property name="text">
-                                       <string>Lots une Ligne</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="1" column="7">
-                               <widget class="QLineEdit" name="PriceOneLine">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="2" column="6">
-                               <widget class="QLabel" name="label_9">
-                                   <property name="text">
-                                       <string>Gagnant une Ligne</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="2" column="7">
-                               <widget class="QLineEdit" name="WinnerOneLine">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="3" column="6">
-                               <widget class="QLabel" name="label_10">
-                                   <property name="text">
-                                       <string>Lot 2 lignes</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="3" column="7">
-                               <widget class="QLineEdit" name="PriceTwoLines">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="4" column="6">
-                               <widget class="QLabel" name="label_11">
-                                   <property name="text">
-                                       <string>Gagnant 2 lignes</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="4" column="7">
-                               <widget class="QLineEdit" name="WinnerTwoLines">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="5" column="6">
-                               <widget class="QLabel" name="label_12">
-                                   <property name="text">
-                                       <string>Lot carton plein</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="5" column="7">
-                               <widget class="QLineEdit" name="PriceFullCard">
-                                   <property name="minimumSize">
-                                       <size>
-                                           <width>300</width>
-                                           <height>0</height>
-                                       </size>
-                                   </property>
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="6" column="6">
-                               <widget class="QLabel" name="label_13">
-                                   <property name="text">
-                                       <string>Gangant carton plein</string>
-                                   </property>
-                               </widget>
-                           </item>
-                           <item row="6" column="7">
-                               <widget class="QLineEdit" name="WinnerFullCard">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                       </layout>
-                   </widget>
-                   <widget class="QWidget" name="PartieInverse">
-                       <attribute name="title">
-                           <string>Résultats Inversés</string>
-                       </attribute>
-                       <layout class="QHBoxLayout" name="horizontalLayout_2">
-                           <item>
-                               <widget class="QGroupBox" name="groupBox_14">
-                                   <property name="title">
-                                       <string>Cartons vides</string>
-                                   </property>
-                                   <property name="flat">
-                                       <bool>false</bool>
-                                   </property>
-                                   <property name="checkable">
-                                       <bool>false</bool>
-                                   </property>
-                                   <layout class="QGridLayout" name="gridLayout_9">
-                                       <property name="leftMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="topMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="rightMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <property name="bottomMargin">
-                                           <number>3</number>
-                                       </property>
-                                       <item row="0" column="0">
-                                           <widget class="QTextEdit" name="InvertedGrids">
-                                               <property name="horizontalScrollBarPolicy">
-                                                   <enum>Qt::ScrollBarAlwaysOff</enum>
-                                               </property>
-                                               <property name="readOnly">
-                                                   <bool>true</bool>
-                                               </property>
-                                           </widget>
-                                       </item>
-                                   </layout>
-                               </widget>
-                           </item>
-                           <item>
-                               <spacer name="horizontalSpacer_4">
-                                   <property name="orientation">
-                                       <enum>Qt::Horizontal</enum>
-                                   </property>
-                                   <property name="sizeHint" stdset="0">
-                                       <size>
-                                           <width>1048</width>
-                                           <height>20</height>
-                                       </size>
-                                   </property>
-                               </spacer>
-                           </item>
-                       </layout>
-                   </widget>
-                   <widget class="QWidget" name="tabConfig">
-                       <attribute name="title">
-                           <string>Configuration</string>
-                       </attribute>
-                       <layout class="QHBoxLayout" name="horizontalLayout_3">
-                           <item>
-                               <widget class="QGroupBox" name="groupBox">
-                                   <property name="minimumSize">
-                                       <size>
-                                           <width>150</width>
-                                           <height>0</height>
-                                       </size>
-                                   </property>
-                                   <property name="title">
-                                       <string>Tirage Aléatoire</string>
-                                   </property>
-                                   <widget class="QRadioButton" name="radioBtnPureRandom">
-                                       <property name="geometry">
-                                           <rect>
-                                               <x>10</x>
-                                               <y>20</y>
-                                               <width>131</width>
-                                               <height>20</height>
-                                           </rect>
-                                       </property>
-                                       <property name="text">
-                                           <string>Tirage aléatoire seul</string>
-                                       </property>
-                                   </widget>
-                                   <widget class="QRadioButton" name="radioBtnPureManual">
-                                       <property name="geometry">
-                                           <rect>
-                                               <x>10</x>
-                                               <y>40</y>
-                                               <width>121</width>
-                                               <height>20</height>
-                                           </rect>
-                                       </property>
-                                       <property name="text">
-                                           <string>Tirage manuel seul</string>
-                                       </property>
-                                   </widget>
-                                   <widget class="QRadioButton" name="radioBtnBoth">
-                                       <property name="geometry">
-                                           <rect>
-                                               <x>10</x>
-                                               <y>60</y>
-                                               <width>86</width>
-                                               <height>20</height>
-                                           </rect>
-                                       </property>
-                                       <property name="text">
-                                           <string>Les Deux</string>
-                                       </property>
-                                   </widget>
-                               </widget>
-                           </item>
-                           <item>
-                               <spacer name="horizontalSpacer_5">
-                                   <property name="orientation">
-                                       <enum>Qt::Horizontal</enum>
-                                   </property>
-                                   <property name="sizeHint" stdset="0">
-                                       <size>
-                                           <width>1253</width>
-                                           <height>20</height>
-                                       </size>
-                                   </property>
-                               </spacer>
-                           </item>
-                       </layout>
-                   </widget>
-               </widget>
-           </item>
-       </layout>
+                         <layout class="QGridLayout" name="gridLayout_2">
+                             <property name="leftMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="topMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="rightMargin">
+                                 <number>0</number>
+                             </property>
+                             <property name="bottomMargin">
+                                 <number>0</number>
+                             </property>
+                             <item row="0" column="0">
+                                 <widget class="QTabWidget" name="tabWidget">
+                                     <property name="sizePolicy">
+                                         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                                             <horstretch>0</horstretch>
+                                             <verstretch>1</verstretch>
+                                         </sizepolicy>
+                                     </property>
+                                     <property name="minimumSize">
+                                         <size>
+                                             <width>0</width>
+                                             <height>200</height>
+                                         </size>
+                                     </property>
+                                     <property name="tabPosition">
+                                         <enum>QTabWidget::South</enum>
+                                     </property>
+                                     <property name="currentIndex">
+                                         <number>2</number>
+                                     </property>
+                                     <widget class="QWidget" name="tabStdResult">
+                                         <attribute name="title">
+                                             <string>Résultat Normaux</string>
+                                         </attribute>
+                                         <layout class="QGridLayout" name="gridLayout_10">
+                                             <item row="0" column="0" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_3">
+                                                     <property name="title">
+                                                         <string>Presque une ligne</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_3">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="AlmostOneLine">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="1" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_4">
+                                                     <property name="title">
+                                                         <string>Une ligne</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_4">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="OneLine">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="2" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_5">
+                                                     <property name="title">
+                                                         <string>Presque 2 lignes</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_5">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="AlmostTwoLines">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="3" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_6">
+                                                     <property name="title">
+                                                         <string>2 Lignes</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_6">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="TwoLines">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="4" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_7">
+                                                     <property name="title">
+                                                         <string>Presque carton</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_7">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="AlostCard">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="5" rowspan="7">
+                                                 <widget class="QGroupBox" name="groupBox_8">
+                                                     <property name="title">
+                                                         <string>Carton plein</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_8">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="FullCard">
+                                                                 <property name="minimumSize">
+                                                                     <size>
+                                                                         <width>100</width>
+                                                                         <height>0</height>
+                                                                     </size>
+                                                                 </property>
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="6">
+                                                 <widget class="QLabel" name="label_7">
+                                                     <property name="text">
+                                                         <string>Nombre de cartons en jeu</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="0" column="7">
+                                                 <widget class="QLineEdit" name="NumberCardInGame">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="1" column="6">
+                                                 <widget class="QLabel" name="label_8">
+                                                     <property name="text">
+                                                         <string>Lots une Ligne</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="1" column="7">
+                                                 <widget class="QLineEdit" name="PriceOneLine">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="2" column="6">
+                                                 <widget class="QLabel" name="label_9">
+                                                     <property name="text">
+                                                         <string>Gagnant une Ligne</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="2" column="7">
+                                                 <widget class="QLineEdit" name="WinnerOneLine">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="3" column="6">
+                                                 <widget class="QLabel" name="label_10">
+                                                     <property name="text">
+                                                         <string>Lot 2 lignes</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="3" column="7">
+                                                 <widget class="QLineEdit" name="PriceTwoLines">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="4" column="6">
+                                                 <widget class="QLabel" name="label_11">
+                                                     <property name="text">
+                                                         <string>Gagnant 2 lignes</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="4" column="7">
+                                                 <widget class="QLineEdit" name="WinnerTwoLines">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="5" column="6">
+                                                 <widget class="QLabel" name="label_12">
+                                                     <property name="text">
+                                                         <string>Lot carton plein</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="5" column="7">
+                                                 <widget class="QLineEdit" name="PriceFullCard">
+                                                     <property name="minimumSize">
+                                                         <size>
+                                                             <width>300</width>
+                                                             <height>0</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="6" column="6">
+                                                 <widget class="QLabel" name="label_13">
+                                                     <property name="text">
+                                                         <string>Gangant carton plein</string>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                             <item row="6" column="7">
+                                                 <widget class="QLineEdit" name="WinnerFullCard">
+                                                     <property name="readOnly">
+                                                         <bool>true</bool>
+                                                     </property>
+                                                 </widget>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                     <widget class="QWidget" name="tabInverseResult">
+                                         <attribute name="title">
+                                             <string>Résultats Inversés</string>
+                                         </attribute>
+                                         <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                             <item>
+                                                 <widget class="QGroupBox" name="groupBox_14">
+                                                     <property name="title">
+                                                         <string>Cartons vides</string>
+                                                     </property>
+                                                     <property name="flat">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <property name="checkable">
+                                                         <bool>false</bool>
+                                                     </property>
+                                                     <layout class="QGridLayout" name="gridLayout_9">
+                                                         <property name="leftMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="topMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="rightMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <property name="bottomMargin">
+                                                             <number>3</number>
+                                                         </property>
+                                                         <item row="0" column="0">
+                                                             <widget class="QTextEdit" name="InvertedGrids">
+                                                                 <property name="horizontalScrollBarPolicy">
+                                                                     <enum>Qt::ScrollBarAlwaysOff</enum>
+                                                                 </property>
+                                                                 <property name="readOnly">
+                                                                     <bool>true</bool>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <spacer name="horizontalSpacer_4">
+                                                     <property name="orientation">
+                                                         <enum>Qt::Horizontal</enum>
+                                                     </property>
+                                                     <property name="sizeHint" stdset="0">
+                                                         <size>
+                                                             <width>1048</width>
+                                                             <height>20</height>
+                                                         </size>
+                                                     </property>
+                                                 </spacer>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                     <widget class="QWidget" name="tabConfig">
+                                         <attribute name="title">
+                                             <string>Configuration</string>
+                                         </attribute>
+                                         <layout class="QHBoxLayout" name="horizontalLayout_3">
+                                             <item>
+                                                 <widget class="QGroupBox" name="selectTypeDraw">
+                                                     <property name="minimumSize">
+                                                         <size>
+                                                             <width>150</width>
+                                                             <height>0</height>
+                                                         </size>
+                                                     </property>
+                                                     <property name="title">
+                                                         <string>Tirage Aléatoire</string>
+                                                     </property>
+                                                     <layout class="QVBoxLayout" name="verticalLayout_5">
+                                                         <item>
+                                                             <widget class="QRadioButton" name="radioBtnPureRandom">
+                                                                 <property name="text">
+                                                                     <string>Tirage aléatoire seul</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QRadioButton" name="radioBtnPureManual">
+                                                                 <property name="text">
+                                                                     <string>Tirage manuel seul</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                         <item>
+                                                             <widget class="QRadioButton" name="radioBtnBoth">
+                                                                 <property name="text">
+                                                                     <string>Les Deux</string>
+                                                                 </property>
+                                                             </widget>
+                                                         </item>
+                                                     </layout>
+                                                 </widget>
+                                             </item>
+                                             <item>
+                                                 <spacer name="horizontalSpacer_5">
+                                                     <property name="orientation">
+                                                         <enum>Qt::Horizontal</enum>
+                                                     </property>
+                                                     <property name="sizeHint" stdset="0">
+                                                         <size>
+                                                             <width>1253</width>
+                                                             <height>20</height>
+                                                         </size>
+                                                     </property>
+                                                 </spacer>
+                                             </item>
+                                         </layout>
+                                     </widget>
+                                 </widget>
+                             </item>
+                         </layout>
       </widget>
      </widget>
     </item>
@@ -1103,26 +1270,26 @@
     <rect>
      <x>0</x>
      <y>0</y>
-        <width>1456</width>
+        <width>1242</width>
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFichiers">
-    <property name="title">
-     <string>Fichiers</string>
-    </property>
-    <addaction name="actionNouvel_Evenement"/>
-    <addaction name="separator"/>
-    <addaction name="actionCharger_Evenement"/>
-    <addaction name="actionSauver_Evenement"/>
-    <addaction name="actionSauver_Evenement_sous"/>
-    <addaction name="separator"/>
-    <addaction name="actionCommencer_Evenement"/>
-    <addaction name="actionTerminer_Evenement"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuitter"/>
-   </widget>
-      <widget class="QMenu" name="menuParam_tres">
+      <widget class="QMenu" name="menuFile">
+          <property name="title">
+              <string>Fichiers</string>
+          </property>
+          <addaction name="actionNewEvent"/>
+          <addaction name="separator"/>
+          <addaction name="actionLoadEvent"/>
+          <addaction name="actionSaveEvent"/>
+          <addaction name="actionSauveEventAs"/>
+          <addaction name="separator"/>
+          <addaction name="actionStartEvent"/>
+          <addaction name="actionEndEvent"/>
+          <addaction name="separator"/>
+          <addaction name="actionQuit"/>
+      </widget>
+      <widget class="QMenu" name="menuParameters">
           <property name="title">
               <string>Paramètres</string>
           </property>
@@ -1133,38 +1300,38 @@
           <addaction name="actionConfigCard"/>
           <addaction name="actionConfigRounds"/>
       </widget>
-   <widget class="QMenu" name="menuAide">
-    <property name="title">
-     <string>Aide</string>
-    </property>
-    <addaction name="action_propos"/>
-    <addaction name="separator"/>
-    <addaction name="actionAide"/>
-   </widget>
-   <addaction name="menuFichiers"/>
-   <addaction name="menuParam_tres"/>
-   <addaction name="menuAide"/>
+      <widget class="QMenu" name="menuHelp">
+          <property name="title">
+              <string>Aide</string>
+          </property>
+          <addaction name="actionAbout"/>
+          <addaction name="separator"/>
+          <addaction name="actionHelp"/>
+      </widget>
+      <addaction name="menuFile"/>
+      <addaction name="menuParameters"/>
+      <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_propos">
-   <property name="text">
-    <string>À propos</string>
-   </property>
-   <property name="shortcut">
-    <string>F1</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::AboutRole</enum>
-   </property>
-  </action>
-  <action name="actionAide">
-   <property name="text">
-    <string>Aide</string>
-   </property>
-  </action>
+     <action name="actionAbout">
+         <property name="text">
+             <string>À propos</string>
+         </property>
+         <property name="shortcut">
+             <string>F1</string>
+         </property>
+         <property name="menuRole">
+             <enum>QAction::AboutRole</enum>
+         </property>
+     </action>
+     <action name="actionHelp">
+         <property name="text">
+             <string>Aide</string>
+         </property>
+     </action>
      <action name="actionGlobalParam">
          <property name="text">
-             <string>Paramètres généraux</string>
+             <string>Général</string>
          </property>
      </action>
      <action name="actionConfigCard">
@@ -1172,7 +1339,7 @@
              <bool>true</bool>
          </property>
          <property name="text">
-             <string>Configuration des cartons</string>
+             <string>Cartons</string>
          </property>
      </action>
      <action name="actionConfigRounds">
@@ -1180,71 +1347,71 @@
              <bool>false</bool>
          </property>
          <property name="text">
-             <string>Configuration des parties</string>
+             <string>Parties</string>
          </property>
      </action>
      <action name="actionConfigEvent">
          <property name="text">
-             <string>Configuration de l'événement</string>
+             <string>Événement</string>
          </property>
      </action>
-  <action name="actionNouvel_Evenement">
-   <property name="text">
-    <string>Nouvel événement</string>
-   </property>
-  </action>
-  <action name="actionCharger_Evenement">
-   <property name="text">
-    <string>Charger événement</string>
-   </property>
-  </action>
-  <action name="actionSauver_Evenement">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Sauver événement</string>
-   </property>
-  </action>
-  <action name="actionCommencer_Evenement">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Commencer événement</string>
-   </property>
-  </action>
-  <action name="actionQuitter">
-   <property name="text">
-    <string>Quitter</string>
-   </property>
-   <property name="menuRole">
-    <enum>QAction::QuitRole</enum>
-   </property>
-  </action>
-  <action name="actionTerminer_Evenement">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Terminer événement</string>
-   </property>
-  </action>
-  <action name="actionSauver_Evenement_sous">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Sauver événement sous...</string>
-   </property>
-  </action>
+     <action name="actionNewEvent">
+         <property name="text">
+             <string>Nouveau</string>
+         </property>
+     </action>
+     <action name="actionLoadEvent">
+         <property name="text">
+             <string>Charger</string>
+         </property>
+     </action>
+     <action name="actionSaveEvent">
+         <property name="enabled">
+             <bool>false</bool>
+         </property>
+         <property name="text">
+             <string>Sauver</string>
+         </property>
+     </action>
+     <action name="actionStartEvent">
+         <property name="enabled">
+             <bool>false</bool>
+         </property>
+         <property name="text">
+             <string>Commencer</string>
+         </property>
+     </action>
+     <action name="actionQuit">
+         <property name="text">
+             <string>Quitter</string>
+         </property>
+         <property name="menuRole">
+             <enum>QAction::QuitRole</enum>
+         </property>
+     </action>
+     <action name="actionEndEvent">
+         <property name="enabled">
+             <bool>false</bool>
+         </property>
+         <property name="text">
+             <string>Terminer</string>
+         </property>
+     </action>
+     <action name="actionSauveEventAs">
+         <property name="enabled">
+             <bool>false</bool>
+         </property>
+         <property name="text">
+             <string>Sauver sous...</string>
+         </property>
+     </action>
  </widget>
  <resources>
      <include location="../../../resources/EvenementLoto.qrc"/>
  </resources>
  <connections>
   <connection>
-   <sender>action_propos</sender>
+      <sender>actionAbout</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowAbout()</slot>
@@ -1260,7 +1427,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionAide</sender>
+      <sender>actionHelp</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowHelp()</slot>
@@ -1276,7 +1443,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionCharger_Evenement</sender>
+      <sender>actionLoadEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actLoadFile()</slot>
@@ -1292,7 +1459,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionCommencer_Evenement</sender>
+      <sender>actionStartEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actStartEvent()</slot>
@@ -1356,7 +1523,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionNouvel_Evenement</sender>
+      <sender>actionNewEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actNewFile()</slot>
@@ -1388,7 +1555,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionQuitter</sender>
+      <sender>actionQuit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actQuit()</slot>
@@ -1404,7 +1571,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionSauver_Evenement</sender>
+      <sender>actionSaveEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actSaveFile()</slot>
@@ -1420,23 +1587,23 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionSauver_Evenement_sous</sender>
+      <sender>actionSauveEventAs</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actSaveAsFile()</slot>
-   <hints>
-       <hint type="sourcelabel">
-           <x>-1</x>
-           <y>-1</y>
-       </hint>
-       <hint type="destinationlabel">
-           <x>418</x>
-           <y>352</y>
-       </hint>
-   </hints>
+      <hints>
+          <hint type="sourcelabel">
+              <x>-1</x>
+              <y>-1</y>
+          </hint>
+          <hint type="destinationlabel">
+              <x>418</x>
+              <y>352</y>
+          </hint>
+      </hints>
   </connection>
      <connection>
-         <sender>actionTerminer_Evenement</sender>
+         <sender>actionEndEvent</sender>
          <signal>triggered()</signal>
          <receiver>MainWindow</receiver>
          <slot>actEndEvent()</slot>
@@ -1458,11 +1625,11 @@
          <slot>actStartStopRound()</slot>
          <hints>
              <hint type="sourcelabel">
-                 <x>1346</x>
-                 <y>494</y>
+                 <x>1211</x>
+                 <y>480</y>
              </hint>
              <hint type="destinationlabel">
-                 <x>1454</x>
+                 <x>1241</x>
                  <y>443</y>
              </hint>
          </hints>
@@ -1474,11 +1641,11 @@
          <slot>actPauseResumeRound()</slot>
          <hints>
              <hint type="sourcelabel">
-                 <x>1298</x>
-                 <y>513</y>
+                 <x>1211</x>
+                 <y>504</y>
              </hint>
              <hint type="destinationlabel">
-                 <x>1453</x>
+                 <x>1241</x>
                  <y>515</y>
              </hint>
          </hints>
@@ -1490,11 +1657,11 @@
          <slot>actRandomPick()</slot>
          <hints>
              <hint type="sourcelabel">
-                 <x>1300</x>
-                 <y>538</y>
+                 <x>1211</x>
+                 <y>552</y>
              </hint>
              <hint type="destinationlabel">
-                 <x>1457</x>
+                 <x>1241</x>
                  <y>547</y>
              </hint>
          </hints>
@@ -1506,11 +1673,11 @@
          <slot>actCancelPick()</slot>
          <hints>
              <hint type="sourcelabel">
-                 <x>1305</x>
-                 <y>560</y>
+                 <x>1211</x>
+                 <y>576</y>
              </hint>
              <hint type="destinationlabel">
-                 <x>1457</x>
+                 <x>1241</x>
                  <y>583</y>
              </hint>
          </hints>
@@ -1558,8 +1725,24 @@
                  <y>680</y>
              </hint>
              <hint type="destinationlabel">
-                 <x>-2</x>
+                 <x>0</x>
                  <y>691</y>
+             </hint>
+         </hints>
+     </connection>
+     <connection>
+         <sender>DisplayRules</sender>
+         <signal>clicked()</signal>
+         <receiver>MainWindow</receiver>
+         <slot>actDisplayRules()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>1083</x>
+                 <y>515</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>1241</x>
+                 <y>424</y>
              </hint>
          </hints>
      </connection>
@@ -1585,5 +1768,6 @@
         <slot>actRadioPureRandom()</slot>
         <slot>actRadioPureManual()</slot>
         <slot>actRadioBoth()</slot>
+        <slot>actDisplayRules()</slot>
     </slots>
 </ui>

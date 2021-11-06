@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget* parent):
     // connecte le timer à la fonction de mise à jour de l’affichage en jeu.
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateClocks));
     timer->setInterval(500);
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 MainWindow::~MainWindow() {
@@ -139,7 +139,6 @@ void MainWindow::actStartEvent() {
         return;
     currentEvent.startEvent();
     updateDisplay();
-    updateInGameDisplay();
     timer->start();
     displayWindow= new DisplayWindow(&currentEvent, this);
     displayWindow->show();
@@ -158,7 +157,6 @@ void MainWindow::actEndEvent() {
     displayWindow->hide();
     delete displayWindow;
     displayWindow= nullptr;
-    updateInGameDisplay();
     updateDisplay();
 }
 
@@ -179,7 +177,7 @@ void MainWindow::actStartStopRound() {
         numberGrid->resetPushed();
         rng.resetPick();
     }
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 void MainWindow::actPauseResumeRound() {
@@ -187,10 +185,10 @@ void MainWindow::actPauseResumeRound() {
     //showNotImplemented("actPauseResumeRound");
     if(currentEvent.getStatus() == core::Event::Status::GameFinished || currentEvent.getStatus() == core::Event::Status::GameRunning) {
         currentEvent.pauseEvent();
-    } else if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
+    } else if(currentEvent.getStatus() == core::Event::Status::Paused) {
         currentEvent.resumeEvent();
     }
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 void MainWindow::actRandomPick() {
@@ -206,67 +204,34 @@ void MainWindow::actCancelPick() {
         return;
     numberGrid->resetPushed(*cur->beginReverseDraws());
     cur->removeLastPick();
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 void MainWindow::actRadioPureRandom() {
     currentDrawMode= DrawMode::PickOnly;
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 void MainWindow::actRadioPureManual() {
     currentDrawMode= DrawMode::ManualOnly;
-    updateInGameDisplay();
+    updateDisplay();
 }
 
 void MainWindow::actRadioBoth() {
     currentDrawMode= DrawMode::Both;
-    updateInGameDisplay();
+    updateDisplay();
+}
+
+void MainWindow::actDisplayRules() {
+    if(currentEvent.getStatus() == core::Event::Status::DisplayRules)
+        currentEvent.resumeEvent();
+    else
+        currentEvent.displayRules();
+    updateDisplay();
 }
 
 void MainWindow::syncSettings() {
     settings.sync();
-}
-
-void MainWindow::updateDisplay() {
-    ui->actionSauver_Evenement->setEnabled(false);
-    ui->actionSauver_Evenement_sous->setEnabled(false);
-    ui->actionCommencer_Evenement->setEnabled(false);
-    ui->actionTerminer_Evenement->setEnabled(false);
-    ui->actionConfigRounds->setEnabled(false);
-    ui->EvenementControl->setEnabled(false);
-    ui->actionConfigRounds->setText("Configuration des parties");
-    ui->actionConfigEvent->setText("Configuration de l’événement");
-    ui->actionConfigCard->setText("Configuration des cartons");
-
-    switch(currentEvent.getStatus()) {
-    case core::Event::Status::Invalid:
-        break;
-    case core::Event::Status::Ready:
-        ui->actionCommencer_Evenement->setEnabled(true);
-        [[fallthrough]];
-    case core::Event::Status::MissingParties:
-        ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionConfigRounds->setEnabled(true);
-        break;
-    case core::Event::Status::EventStarted:
-    case core::Event::Status::Paused:
-    case core::Event::Status::GamePaused:
-    case core::Event::Status::GameStart:
-    case core::Event::Status::GameRunning:
-    case core::Event::Status::GameFinished:
-        ui->actionTerminer_Evenement->setEnabled(true);
-        ui->EvenementControl->setEnabled(true);
-        [[fallthrough]];
-    case core::Event::Status::Finished:
-        ui->actionSauver_Evenement->setEnabled(true);
-        ui->actionConfigRounds->setEnabled(true);
-        ui->actionConfigRounds->setText("Visualisation des parties");
-        ui->actionConfigEvent->setText("Configuration de l’événement");
-        ui->actionConfigCard->setText("Visualisation des cartons");
-        break;
-    }
-    updateInGameDisplay();
 }
 
 void MainWindow::updateClocks() {
@@ -306,87 +271,137 @@ void MainWindow::updateClocks() {
     }
 }
 
-void MainWindow::updateInGameDisplay() {
+void MainWindow::updateDisplay() {
+    // Mise à jour des menus
+    updateMenus();
+    // TODO: Mise à jour de la barre de statut
+    // Mise à jour Zone du bas
+    updateBottomFrame();
+    // Mise à jour info événement
+    updateInfoEvent();
+    // Mise à jour info partie
+    updateInfoRound();
+    // Mise à jour des numéros tirés
+    updateDraws();
+    // Mise à jour des commandes
+    updateCommands();
+    // timer
+    if(!timer->isActive())
+        timer->start();
+}
 
-    // les radios boutons
-    {
-        switch(currentDrawMode) {
-        case DrawMode::Both:
-            ui->radioBtnPureManual->setChecked(false);
-            ui->radioBtnPureRandom->setChecked(false);
-            ui->radioBtnBoth->setChecked(true);
-            ui->RandomPick->setEnabled(true);
-            ui->GroupPickManual->setEnabled(true);
-            break;
-        case DrawMode::PickOnly:
-            ui->radioBtnPureManual->setChecked(false);
-            ui->radioBtnPureRandom->setChecked(true);
-            ui->radioBtnBoth->setChecked(false);
-            ui->RandomPick->setEnabled(true);
-            ui->GroupPickManual->setEnabled(false);
-            break;
-        case DrawMode::ManualOnly:
-            ui->radioBtnPureManual->setChecked(true);
-            ui->radioBtnPureRandom->setChecked(false);
-            ui->radioBtnBoth->setChecked(false);
-            ui->RandomPick->setEnabled(false);
-            ui->GroupPickManual->setEnabled(true);
-            break;
-        }
-        ui->CancelLastPick->setEnabled(true);
-        if(currentEvent.getStatus() != core::Event::Status::GameRunning) {
-            ui->RandomPick->setEnabled(false);
-            ui->GroupPickManual->setEnabled(false);
-            ui->CancelLastPick->setEnabled(false);
-        }
+void MainWindow::updateMenus() {
+    // ui->menuFile             <- toujours actif, change jamais de texte
+    //   ui->actionNewEvent     <- toujours actif, change jamais de texte
+    //   ui->actionLoadEvent    <- toujours actif, change jamais de texte
+    //   ui->actionSaveEvent
+    if(currentEvent.getStatus() == core::Event::Status::Invalid ||
+       currentEvent.getStatus() == core::Event::Status::MissingParties)
+        ui->actionStartEvent->setEnabled(false);
+    else
+        ui->actionStartEvent->setEnabled(true);
+    //   ui->actionSaveEventAs  <- jamais actif, change jamais de texte
+    //   ui->actionStartEvent
+    if(currentEvent.getStatus() == core::Event::Status::Ready)
+        ui->actionStartEvent->setEnabled(true);
+    else
+        ui->actionStartEvent->setEnabled(false);
+    //   ui->actionEndEvent
+    if(currentEvent.getStatus() == core::Event::Status::Finished)
+        ui->actionEndEvent->setEnabled(true);
+    else
+        ui->actionEndEvent->setEnabled(false);
+    //   ui->actionQuit         <- toujours actif, change jamais de texte
+    // ui->menuParameters       <- toujours actif, change jamais de texte
+    //   ui->actionGlobalParam  <- toujours actif, change jamais de texte
+    //   ui->actionConfigEvent  <- toujours actif, change jamais de texte
+    //   ui->actionConfigCard   <- jamais actif, caché
+    ui->actionConfigCard->setVisible(false);
+    //   ui->actionConfigRounds
+    if(currentEvent.getStatus() == core::Event::Status::Invalid)
+        ui->actionConfigRounds->setEnabled(false);
+    else
+        ui->actionConfigRounds->setEnabled(true);
+    // ui->menuHelp             <- toujours actif, change jamais de texte
+    //   ui->actionAbout        <- toujours actif, change jamais de texte
+    //   ui->actionHelp         <- toujours actif, change jamais de texte
+}
+
+void MainWindow::updateBottomFrame() {
+    ui->tabStdResult->setVisible(false);
+    ui->tabStdResult->setEnabled(false);
+    ui->tabInverseResult->setVisible(false);
+    ui->tabInverseResult->setEnabled(false);
+    updateRadioButtons();
+}
+
+void MainWindow::updateInfoEvent() {
+    if(currentEvent.isEditable()) {
+        ui->EventInfos->setEnabled(false);
+        return;
     }
-    // le bouton de pause
-    {
-        ui->PauseResumeGame->setEnabled(false);
-        if(currentEvent.getStatus() == core::Event::Status::GameRunning || currentEvent.getStatus() == core::Event::Status::GameFinished) {
-            ui->PauseResumeGame->setEnabled(true);
-            ui->PauseResumeGame->setText("Pause partie");
-            if(currentEvent.getStatus() == core::Event::Status::GameFinished)
-                ui->PauseResumeGame->setText("Pause événement");
-        }
-        if(currentEvent.getStatus() == core::Event::Status::Paused || currentEvent.getStatus() == core::Event::Status::GamePaused) {
-            ui->PauseResumeGame->setEnabled(true);
-            ui->PauseResumeGame->setText("Reprise partie");
-            if(currentEvent.getStatus() == core::Event::Status::Paused)
-                ui->PauseResumeGame->setText("Reprise événement");
-        }
-    }
-    // le bouton de debut/fin de round
-    {
-        ui->StartEndGameRound->setEnabled(false);
-        if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
-            ui->StartEndGameRound->setEnabled(true);
-            ui->StartEndGameRound->setText("Afficher première partie");
-        }
-        if(currentEvent.getStatus() == core::Event::Status::GameStart) {
-            ui->StartEndGameRound->setEnabled(true);
-            ui->StartEndGameRound->setText("Démarrer la partie");
-        }
-        if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-            ui->StartEndGameRound->setEnabled(true);
-            auto round= currentEvent.getGameRound(currentEvent.getCurrentIndex());
-            if(round->isCurrentSubRoundLast())
-                ui->StartEndGameRound->setText("Terminer la partie");
-            else
-                ui->StartEndGameRound->setText("Terminer la sous-partie");
-        }
-        if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
-            ui->StartEndGameRound->setEnabled(true);
-            ui->StartEndGameRound->setText("Passer à la partie suivante");
-        }
-    }
-    // informations parties
+    ui->EventInfos->setEnabled(true);
+    core::timePoint start= currentEvent.getStarting();
+    core::timePoint end  = currentEvent.getEnding();
+    ui->CurrentDate->setText("");
+    ui->StartingHour->setText("");
+    ui->EndingHour->setText("");
+    ui->Duration->setText("");
     ui->Progression->setRange(0, currentEvent.sizeRounds());
-    ui->Progression->setValue(currentEvent.getCurrentIndex());
+    ui->Progression->setValue(currentEvent.getCurrentIndex() + 1);
+    if(start == core::epoch)
+        return;
+    ui->CurrentDate->setText(QString::fromUtf8(core::formatCalendar(start)));
+    ui->StartingHour->setText(QString::fromUtf8(core::formatClockNoSecond(start)));
+    if(end == core::epoch)
+        return;
+    ui->EndingHour->setText(QString::fromUtf8(core::formatClockNoSecond(end)));
+    ui->Duration->setText(QString::fromUtf8(core::formatDuration(end - start)));
+}
+
+void MainWindow::updateRadioButtons() {
+    switch(currentDrawMode) {
+    case DrawMode::Both:
+        ui->radioBtnPureManual->setChecked(false);
+        ui->radioBtnPureRandom->setChecked(false);
+        ui->radioBtnBoth->setChecked(true);
+        ui->RandomPick->setEnabled(true);
+        ui->GroupPickManual->setEnabled(true);
+        break;
+    case DrawMode::PickOnly:
+        ui->radioBtnPureManual->setChecked(false);
+        ui->radioBtnPureRandom->setChecked(true);
+        ui->radioBtnBoth->setChecked(false);
+        ui->RandomPick->setEnabled(true);
+        ui->GroupPickManual->setEnabled(false);
+        break;
+    case DrawMode::ManualOnly:
+        ui->radioBtnPureManual->setChecked(true);
+        ui->radioBtnPureRandom->setChecked(false);
+        ui->radioBtnBoth->setChecked(false);
+        ui->RandomPick->setEnabled(false);
+        ui->GroupPickManual->setEnabled(true);
+        break;
+    }
+    ui->CancelLastPick->setEnabled(true);
+    if(currentEvent.getStatus() != core::Event::Status::GameRunning) {
+        ui->RandomPick->setEnabled(false);
+        ui->GroupPickManual->setEnabled(false);
+        ui->CancelLastPick->setEnabled(false);
+    }
+}
+
+void MainWindow::updateInfoRound() {
+    // reset all infos
+    ui->RoundStartTime->setText("");
+    ui->RoundDuration->setText("");
+    ui->RoundDraws->setText("");
+    ui->RoundName->setText("");
+    ui->RoundPhase->setText("");
     if(currentEvent.getStatus() == core::Event::Status::GameStart ||
        currentEvent.getStatus() == core::Event::Status::GameRunning ||
        currentEvent.getStatus() == core::Event::Status::GameFinished ||
-       currentEvent.getStatus() == core::Event::Status::GamePaused) {
+       currentEvent.getStatus() == core::Event::Status::Paused) {
         auto cur= currentEvent.findFirstNotFinished();
         ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
         ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
@@ -397,52 +412,109 @@ void MainWindow::updateInGameDisplay() {
         }
         if(cur->sizeDraws() > 0) {
             ui->CancelLastPick->setEnabled(true);
-            auto it= cur->beginReverseDraws();
-            ui->CurrentDraw->display(*it);
+        }
+    }
+}
+
+void MainWindow::updateDraws() {
+    ui->CurrentDraw->display(0);
+    ui->LastNumber1->display(0);
+    ui->LastNumber2->display(0);
+    ui->LastNumber3->display(0);
+    auto cur= currentEvent.findFirstNotFinished();
+    if(cur == currentEvent.endRounds())
+        return;
+    if(cur->sizeDraws() > 0) {
+        auto it= cur->beginReverseDraws();
+        ui->CurrentDraw->display(*it);
+        ++it;
+        if(it != cur->endReverseDraws()) {
+            ui->LastNumber1->display(*it);
             ++it;
             if(it != cur->endReverseDraws()) {
-                ui->LastNumber1->display(*it);
+                ui->LastNumber2->display(*it);
                 ++it;
                 if(it != cur->endReverseDraws()) {
-                    ui->LastNumber2->display(*it);
-                    ++it;
-                    if(it != cur->endReverseDraws()) {
-                        ui->LastNumber3->display(*it);
-                    } else {
-                        ui->LastNumber3->display(0);
-                    }
+                    ui->LastNumber3->display(*it);
                 } else {
-                    ui->LastNumber2->display(0);
+                    ui->LastNumber3->display(0);
                 }
             } else {
-                ui->LastNumber1->display(0);
+                ui->LastNumber2->display(0);
             }
         } else {
-            ui->CancelLastPick->setEnabled(false);
-            ui->RoundStartTime->setText("");
-            ui->RoundDuration->setText("");
-            ui->RoundDraws->setText("");
-            ui->RoundName->setText("");
-            ui->RoundPhase->setText("");
-            ui->CurrentDraw->display(0);
             ui->LastNumber1->display(0);
-            ui->LastNumber2->display(0);
-            ui->LastNumber3->display(0);
         }
-    } else {
-        ui->CancelLastPick->setEnabled(false);
-        ui->RoundStartTime->setText("");
-        ui->RoundDuration->setText("");
-        ui->RoundDraws->setText("");
-        ui->RoundName->setText("");
-        ui->RoundPhase->setText("");
-        ui->CurrentDraw->display(0);
-        ui->LastNumber1->display(0);
-        ui->LastNumber2->display(0);
-        ui->LastNumber3->display(0);
     }
-    if(!timer->isActive())
-        timer->start();
+}
+
+void MainWindow::updateCommands() {
+    updateStartStopButton();
+    updatePauseButtons();
+    ui->DisplayRules->setEnabled(false);
+    ui->CancelLastPick->setEnabled(false);
+    if(currentEvent.isEditable())
+        return;
+    ui->DisplayRules->setEnabled(true);
+    if(currentEvent.getStatus() == core::Event::Status::DisplayRules) {
+        ui->DisplayRules->setText("Retour");
+        ui->CancelLastPick->setEnabled(false);
+        ui->CancelLastPick->setEnabled(false);
+        ui->CancelLastPick->setEnabled(false);
+    } else {
+        ui->DisplayRules->setText("Affichage règlement");
+    }
+    // update cancel last pick
+    auto cur= currentEvent.findFirstNotFinished();
+    if(cur == currentEvent.endRounds())
+        return;
+    if(cur->sizeDraws() > 0) {
+        ui->CancelLastPick->setEnabled(true);
+    }
+}
+
+void MainWindow::updatePauseButtons() {
+    ui->PauseResumeGame->setEnabled(false);
+    if(currentEvent.getStatus() == core::Event::Status::DisplayRules)
+        return;
+    if(currentEvent.getStatus() == core::Event::Status::GameRunning || currentEvent.getStatus() == core::Event::Status::GameFinished) {
+        ui->PauseResumeGame->setEnabled(true);
+        ui->PauseResumeGame->setText("Pause partie");
+        if(currentEvent.getStatus() == core::Event::Status::GameFinished)
+            ui->PauseResumeGame->setText("Pause événement");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::Paused) {
+        ui->PauseResumeGame->setEnabled(true);
+        ui->PauseResumeGame->setText("Reprise partie");
+        if(currentEvent.getStatus() == core::Event::Status::Paused)
+            ui->PauseResumeGame->setText("Reprise événement");
+    }
+}
+
+void MainWindow::updateStartStopButton() {
+    ui->StartEndGameRound->setEnabled(false);
+    if(currentEvent.getStatus() == core::Event::Status::DisplayRules)
+        return;
+    if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Afficher première partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameStart) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Démarrer la partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
+        ui->StartEndGameRound->setEnabled(true);
+        auto round= currentEvent.getGameRound(currentEvent.getCurrentIndex());
+        if(round->isCurrentSubRoundLast())
+            ui->StartEndGameRound->setText("Terminer la partie");
+        else
+            ui->StartEndGameRound->setText("Terminer la sous-partie");
+    }
+    if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
+        ui->StartEndGameRound->setEnabled(true);
+        ui->StartEndGameRound->setText("Passer à la partie suivante");
+    }
 }
 
 void MainWindow::actGridPushed(int value) {
