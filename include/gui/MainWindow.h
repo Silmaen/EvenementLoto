@@ -159,6 +159,11 @@ private slots:
     void actRadioBoth();
 
     /**
+     * @brief Action de passage en doe d'affichage des règles.
+     */
+    void actDisplayRules();
+
+    /**
      * @brief
      * @param value
      */
@@ -166,17 +171,59 @@ private slots:
 
 private:
     /**
+    * @brief Mise à jour de l’affichage des horloges
+    */
+    void updateClocks();
+
+    /**
      * @brief Met à jour l’affichage en fonction du contenu de l’événement courant
      */
     void updateDisplay();
+
     /**
-     * @brief Mise à jour de l’affichage, spéciale in game.
-     */
-    void updateInGameDisplay();
-    /**
-    * @brief Mise à jour de l’affichage, spéciale in game.
+    * @brief Mise à jour de l’affichage de menus.
     */
-    void updateClocks();
+    void updateMenus();
+
+    /**
+     * @brief Mise à jour du board du bas.
+     */
+    void updateBottomFrame();
+
+    /**
+     * @brief Mise à jour de l’affichage des radios boutons
+     */
+    void updateRadioButtons();
+
+    /**
+     * @brief Mise à jour de l’affichage du bouton de pause
+     */
+    void updatePauseButtons();
+
+    /**
+     * @brief Mise à jour de l’affichage du bouton de start/stop
+     */
+    void updateStartStopButton();
+
+    /**
+     * @brief Mise à jour de l’affichage des informations de l’événement
+     */
+    void updateInfoEvent();
+
+    /**
+     * @brief Mise à jour de l’affichage des informations de partie
+     */
+    void updateInfoRound();
+
+    /**
+     * @brief Mise à jour des numéros tirés
+     */
+    void updateDraws();
+
+    /**
+     * @brief Mise à jour des commandes
+     */
+    void updateCommands();
 
     /// Lien vers la page UI.
     Ui::MainWindow* ui;

@@ -71,14 +71,17 @@ void Event::write(std::ostream& os) const {
 
 void Event::checkValidConfig() {
     if(organizerName.empty() || name.empty()) {
-        status= Status::Invalid;
+        status        = Status::Invalid;
+        previousStatus= status;
         return;
     }
     if(gameRounds.empty()) {
-        status= Status::MissingParties;
+        status        = Status::MissingParties;
+        previousStatus= status;
         return;
     }
-    status= Status::Ready;
+    status        = Status::Ready;
+    previousStatus= status;
 }
 
 bool Event::isEditable() const {
@@ -164,7 +167,7 @@ void Event::startCurrentRound() {
     auto it= findFirstNotFinished();
     it->startGameRound();
     if(it->getStatus() == GameRound::Status::Started) {
-        status= Status::GameRunning;
+        changeStatus(Status::GameRunning);
     }
 }
 
@@ -174,7 +177,7 @@ void Event::addWinnerToCurrentRound(const uint32_t w) {
     auto it= findFirstNotFinished();
     it->addWinner(w);
     if(it->getStatus() == GameRound::Status::DisplayResult) {
-        status= Status::GameFinished;
+        changeStatus(Status::GameFinished);
     }
 }
 
@@ -184,11 +187,11 @@ void Event::closeCurrentRound() {
     auto it= findFirstNotFinished();
     it->closeGameRound();
     if(it->getStatus() == GameRound::Status::Finished) {
-        status= Status::GameStart;
+        changeStatus(Status::GameStart);
         ++it;
         if(it == endRounds()) {
-            status= Status::Finished;
-            end   = clock::now();
+            changeStatus(Status::Finished);
+            end= clock::now();
         }
     }
 }
@@ -197,28 +200,39 @@ void Event::closeCurrentRound() {
 void Event::startEvent() {
     if(status != Status::Ready)
         return;
-    start = clock::now();
-    status= Status::EventStarted;
+    start= clock::now();
+    changeStatus(Status::EventStarted);
 }
 
 void Event::ActiveFirstRound() {
     if(status != Status::EventStarted)
         return;
-    status= Status::GameStart;
+    changeStatus(Status::GameStart);
 }
 
 void Event::pauseEvent() {
-    if(status == Status::GameFinished)
-        status= Status::Paused;
-    if(status == Status::GameRunning)
-        status= Status::GamePaused;
+    if(status == Status::GameFinished || status == Status::GameRunning)
+        changeStatus(Status::Paused);
+}
+
+void Event::displayRules() {
+    if(isEditable())
+        return;
+    changeStatus(Status::DisplayRules);
 }
 
 void Event::resumeEvent() {
-    if(status == Status::Paused)
-        status= Status::GameFinished;
-    if(status == Status::GamePaused)
-        status= Status::GameRunning;
+    if(status == Status::Paused || status == Status::DisplayRules)
+        restoreStatus();
+}
+
+void Event::changeStatus(const Status& newStatus) {
+    previousStatus= status;
+    status        = newStatus;
+}
+
+void Event::restoreStatus() {
+    status= previousStatus;
 }
 
 }// namespace evl::core

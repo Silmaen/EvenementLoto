@@ -52,6 +52,8 @@ void DisplayWindow::initializeDisplay() {
         ui->EP_Logo->setVisible(false);
         ui->EE_LogoA->setVisible(false);
         ui->EE_LogoB->setVisible(false);
+        ui->ER_LogoA->setVisible(false);
+        ui->ER_LogoB->setVisible(false);
     } else {
         if(!exists(event->getOrganizerLogo())) {
             ui->ET_OrganizerLogo->setVisible(false);
@@ -61,6 +63,8 @@ void DisplayWindow::initializeDisplay() {
             ui->EP_Logo->setVisible(false);
             ui->EE_LogoA->setVisible(false);
             ui->EE_LogoB->setVisible(false);
+            ui->ER_LogoA->setVisible(false);
+            ui->ER_LogoB->setVisible(false);
         } else {
             QString imgName(QString::fromUtf8(event->getOrganizerLogo().string()));
             QImage img;
@@ -72,6 +76,8 @@ void DisplayWindow::initializeDisplay() {
             setPixMap(ui->EP_Logo, imgName, img);
             setPixMap(ui->EE_LogoA, imgName, img);
             setPixMap(ui->EE_LogoB, imgName, img);
+            setPixMap(ui->ER_LogoA, imgName, img);
+            setPixMap(ui->ER_LogoB, imgName, img);
         }
     }
     if(event->getLogo().empty()) {
@@ -100,10 +106,7 @@ void DisplayWindow::updateDisplay() {
         updateEventTitlePage();
         break;
     case core::Event::Status::Paused:
-        ui->PageManager->setCurrentIndex(5);
-        break;
-    case core::Event::Status::GamePaused:
-        ui->PageManager->setCurrentIndex(3);
+        ui->PageManager->setCurrentIndex(4);
         break;
     case core::Event::Status::GameStart:
         ui->PageManager->setCurrentIndex(1);
@@ -114,9 +117,12 @@ void DisplayWindow::updateDisplay() {
         updateRoundRunning();
         break;
     case core::Event::Status::GameFinished:
-        ui->PageManager->setCurrentIndex(4);
+        ui->PageManager->setCurrentIndex(3);
         break;
     case core::Event::Status::Finished:
+        ui->PageManager->setCurrentIndex(5);
+        break;
+    case core::Event::Status::DisplayRules:
         ui->PageManager->setCurrentIndex(6);
         break;
     }

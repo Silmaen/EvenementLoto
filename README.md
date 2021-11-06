@@ -34,10 +34,11 @@ Le programme a été correctement compilé avec :
 
 * Affichage:
   * [X] Affichage logo organisateur dans les vues intermédiaires
-  * [ ] Affichage du règlement
-    * [ ] Bouton permettant le ré-affichage à n’importe quel moment
+  * [X] Affichage du règlement
+    * [X] Bouton permettant le ré-affichage à n’importe quel moment
   * [ ] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
   * [ ] Permettre Affichage en plein écran sur le second écran
+  * [ ] Affichage Pause round
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
     * [ ] Ajout d’icones sur les boutons et actions
