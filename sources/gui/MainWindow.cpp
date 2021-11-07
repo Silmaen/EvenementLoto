@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget* parent):
     connect(numberGrid, &WidgetNumberGrid::buttonPushed, this, &MainWindow::actGridPushed);
     // connecte le timer à la fonction de mise à jour de l’affichage en jeu.
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&MainWindow::updateClocks));
-    timer->setInterval(500);
+    timer->setInterval(100);
     updateDisplay();
 }
 
@@ -235,40 +235,20 @@ void MainWindow::syncSettings() {
 }
 
 void MainWindow::updateClocks() {
+    //
+    // Cette fonction est exécutée très régulièrement et doit être super rapide.
+    //
+    // Horloge principale
     ui->CurrentTime->setText(QString::fromStdString(core::formatClock(core::clock::now())));
-    if(currentEvent.getStarting() == core::epoch) {
-        ui->CurrentDate->setText("");
-    } else {
-        ui->CurrentDate->setText(QString::fromStdString(core::formatCalendar(currentEvent.getStarting())));
-    }
-
-    if(currentEvent.getStarting() == core::epoch) {
-        ui->Duration->setText("");
-    } else {
-        ui->StartingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getStarting())));
-        auto length= core::clock::now() - currentEvent.getStarting();
-        if(currentEvent.getEnding() != core::epoch)
-            length= currentEvent.getEnding() - currentEvent.getStarting();
-        ui->Duration->setText(QString::fromStdString(core::formatDuration(length)));
-    }
-    if(currentEvent.getEnding() == core::epoch) {
-        ui->EndingHour->setText("");
-    } else {
-        ui->EndingHour->setText(QString::fromStdString(core::formatClock(currentEvent.getEnding())));
-    }
+    // horloge partie en cours
     auto cur= currentEvent.findFirstNotFinished();
-    if(cur == currentEvent.endRounds())
+    if(cur == currentEvent.endRounds())// pas de round en cours
         return;
-    if(cur->getStarting() == core::epoch) {
-        ui->RoundStartTime->setText("");
-        ui->RoundDuration->setText("");
-    } else {
-        ui->RoundStartTime->setText(QString::fromStdString(core::formatClock(cur->getStarting())));
-        auto length= core::clock::now() - cur->getStarting();
-        if(cur->getEnding() != core::epoch)
-            length= cur->getEnding() - cur->getStarting();
-        ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(length)));
-    }
+    if(cur->getEnding() != core::epoch)// round déjà fini, pas de mise à jour
+        return;
+    if(cur->getStarting() == core::epoch)// round pas commencé, pas de mise à jour
+        return;
+    ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(core::clock::now() - cur->getStarting())));
 }
 
 void MainWindow::updateDisplay() {
@@ -394,26 +374,32 @@ void MainWindow::updateRadioButtons() {
 void MainWindow::updateInfoRound() {
     // reset all infos
     ui->RoundStartTime->setText("");
-    ui->RoundDuration->setText("");
+    //ui->RoundDuration->setText(""); // fait côé horloge
     ui->RoundDraws->setText("");
     ui->RoundName->setText("");
     ui->RoundPhase->setText("");
-    if(currentEvent.getStatus() == core::Event::Status::GameStart ||
-       currentEvent.getStatus() == core::Event::Status::GameRunning ||
-       currentEvent.getStatus() == core::Event::Status::GameFinished ||
-       currentEvent.getStatus() == core::Event::Status::Paused) {
-        auto cur= currentEvent.findFirstNotFinished();
-        ui->RoundPhase->setText(QString::fromStdString(cur->getStatusStr()));
-        ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
-        if(cur->getStarting() == core::epoch) {
-            ui->RoundDraws->setText("0");
-        } else {
-            ui->RoundDraws->setText(QString::number(cur->sizeDraws()));
-        }
-        if(cur->sizeDraws() > 0) {
-            ui->CancelLastPick->setEnabled(true);
+    auto cur= currentEvent.findFirstNotFinished();
+    if(cur == currentEvent.endRounds())
+        return;
+    if(cur->getStarting() == core::epoch)
+        return;
+    ui->RoundStartTime->setText(QString::fromUtf8(core::formatClock(cur->getStarting())));
+    if(cur->getStarting() == core::epoch) {
+        ui->RoundDraws->setText("0");
+    } else {
+        ui->RoundDraws->setText(QString::number(cur->sizeDraws()));
+    }
+    ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
+    QString phase= QString::fromStdString(cur->getStatusStr());
+
+    if(cur->getStatus() == core::GameRound::Status::Started) {
+        auto sub= cur->getCurrentCSubRound();
+        if(sub != cur->endSubRound()) {
+            phase+= " - " + QString::fromUtf8(sub->getTypeStr());
         }
     }
+
+    ui->RoundPhase->setText(phase);
 }
 
 void MainWindow::updateDraws() {

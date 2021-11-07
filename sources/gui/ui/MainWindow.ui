@@ -4,16 +4,16 @@
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
-   <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>1242</width>
-       <height>831</height>
-   </rect>
+      <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>1242</width>
+          <height>831</height>
+      </rect>
   </property>
-  <property name="windowTitle">
-   <string>Événement Loto</string>
-  </property>
+     <property name="windowTitle">
+         <string>Événement Loto</string>
+     </property>
      <widget class="QWidget" name="EventControl">
          <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0">
@@ -156,6 +156,13 @@
                                                                  <layout class="QGridLayout" name="gridLayout_14">
                                                                      <item row="0" column="1">
                                                                          <widget class="QLineEdit" name="CurrentDate">
+                                                                             <property name="sizePolicy">
+                                                                                 <sizepolicy hsizetype="Expanding"
+                                                                                             vsizetype="Preferred">
+                                                                                     <horstretch>0</horstretch>
+                                                                                     <verstretch>0</verstretch>
+                                                                                 </sizepolicy>
+                                                                             </property>
                                                                              <property name="readOnly">
                                                                                  <bool>true</bool>
                                                                              </property>
@@ -177,6 +184,13 @@
                                                                      </item>
                                                                      <item row="0" column="3">
                                                                          <widget class="QLineEdit" name="StartingHour">
+                                                                             <property name="sizePolicy">
+                                                                                 <sizepolicy hsizetype="Expanding"
+                                                                                             vsizetype="Preferred">
+                                                                                     <horstretch>0</horstretch>
+                                                                                     <verstretch>0</verstretch>
+                                                                                 </sizepolicy>
+                                                                             </property>
                                                                              <property name="readOnly">
                                                                                  <bool>true</bool>
                                                                              </property>
@@ -191,6 +205,13 @@
                                                                      </item>
                                                                      <item row="0" column="5">
                                                                          <widget class="QLineEdit" name="EndingHour">
+                                                                             <property name="sizePolicy">
+                                                                                 <sizepolicy hsizetype="Expanding"
+                                                                                             vsizetype="Preferred">
+                                                                                     <horstretch>0</horstretch>
+                                                                                     <verstretch>0</verstretch>
+                                                                                 </sizepolicy>
+                                                                             </property>
                                                                              <property name="readOnly">
                                                                                  <bool>true</bool>
                                                                              </property>
@@ -211,13 +232,6 @@
                                                                      </item>
                                                                      <item row="2" column="1">
                                                                          <widget class="QLineEdit" name="Duration">
-                                                                             <property name="sizePolicy">
-                                                                                 <sizepolicy hsizetype="Preferred"
-                                                                                             vsizetype="Preferred">
-                                                                                     <horstretch>0</horstretch>
-                                                                                     <verstretch>0</verstretch>
-                                                                                 </sizepolicy>
-                                                                             </property>
                                                                              <property name="maximumSize">
                                                                                  <size>
                                                                                      <width>16777215</width>
@@ -258,8 +272,8 @@
                                                                          <widget class="QProgressBar"
                                                                                  name="Progression">
                                                                              <property name="sizePolicy">
-                                                                                 <sizepolicy hsizetype="Preferred"
-                                                                                             vsizetype="Preferred">
+                                                                                 <sizepolicy hsizetype="Expanding"
+                                                                                             vsizetype="Expanding">
                                                                                      <horstretch>0</horstretch>
                                                                                      <verstretch>0</verstretch>
                                                                                  </sizepolicy>
@@ -283,13 +297,13 @@
                                                                  </property>
                                                                  <property name="minimumSize">
                                                                      <size>
-                                                                         <width>300</width>
+                                                                         <width>0</width>
                                                                          <height>0</height>
                                                                      </size>
                                                                  </property>
                                                                  <property name="maximumSize">
                                                                      <size>
-                                                                         <width>300</width>
+                                                                         <width>16777215</width>
                                                                          <height>16777215</height>
                                                                      </size>
                                                                  </property>
@@ -734,14 +748,14 @@
                              <size>
                                  <width>0</width>
                                  <height>200</height>
-        </size>
-       </property>
-       <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
+                             </size>
+                         </property>
+                         <property name="frameShape">
+                             <enum>QFrame::NoFrame</enum>
+                         </property>
+                         <property name="frameShadow">
+                             <enum>QFrame::Plain</enum>
+                         </property>
                          <layout class="QGridLayout" name="gridLayout_2">
                              <property name="leftMargin">
                                  <number>0</number>
@@ -772,14 +786,32 @@
                                      <property name="tabPosition">
                                          <enum>QTabWidget::South</enum>
                                      </property>
+                                     <property name="tabShape">
+                                         <enum>QTabWidget::Rounded</enum>
+                                     </property>
                                      <property name="currentIndex">
-                                         <number>2</number>
+                                         <number>1</number>
+                                     </property>
+                                     <property name="usesScrollButtons">
+                                         <bool>false</bool>
                                      </property>
                                      <widget class="QWidget" name="tabStdResult">
                                          <attribute name="title">
                                              <string>Résultat Normaux</string>
                                          </attribute>
                                          <layout class="QGridLayout" name="gridLayout_10">
+                                             <property name="leftMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="topMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="rightMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="bottomMargin">
+                                                 <number>2</number>
+                                             </property>
                                              <item row="0" column="0" rowspan="7">
                                                  <widget class="QGroupBox" name="groupBox_3">
                                                      <property name="title">
@@ -1149,6 +1181,18 @@
                                              <string>Résultats Inversés</string>
                                          </attribute>
                                          <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                             <property name="leftMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="topMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="rightMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="bottomMargin">
+                                                 <number>2</number>
+                                             </property>
                                              <item>
                                                  <widget class="QGroupBox" name="groupBox_14">
                                                      <property name="title">
@@ -1206,6 +1250,18 @@
                                              <string>Configuration</string>
                                          </attribute>
                                          <layout class="QHBoxLayout" name="horizontalLayout_3">
+                                             <property name="leftMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="topMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="rightMargin">
+                                                 <number>2</number>
+                                             </property>
+                                             <property name="bottomMargin">
+                                                 <number>2</number>
+                                             </property>
                                              <item>
                                                  <widget class="QGroupBox" name="selectTypeDraw">
                                                      <property name="minimumSize">
@@ -1260,59 +1316,59 @@
                                  </widget>
                              </item>
                          </layout>
-      </widget>
+                     </widget>
      </widget>
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-        <width>1242</width>
-     <height>22</height>
-    </rect>
-   </property>
-      <widget class="QMenu" name="menuFile">
-          <property name="title">
-              <string>Fichiers</string>
-          </property>
-          <addaction name="actionNewEvent"/>
-          <addaction name="separator"/>
-          <addaction name="actionLoadEvent"/>
-          <addaction name="actionSaveEvent"/>
-          <addaction name="actionSauveEventAs"/>
-          <addaction name="separator"/>
-          <addaction name="actionStartEvent"/>
-          <addaction name="actionEndEvent"/>
-          <addaction name="separator"/>
-          <addaction name="actionQuit"/>
-      </widget>
-      <widget class="QMenu" name="menuParameters">
-          <property name="title">
-              <string>Paramètres</string>
-          </property>
-          <addaction name="actionGlobalParam"/>
-          <addaction name="separator"/>
-          <addaction name="actionConfigEvent"/>
-          <addaction name="separator"/>
-          <addaction name="actionConfigCard"/>
-          <addaction name="actionConfigRounds"/>
-      </widget>
-      <widget class="QMenu" name="menuHelp">
-          <property name="title">
-              <string>Aide</string>
-          </property>
-          <addaction name="actionAbout"/>
-          <addaction name="separator"/>
-          <addaction name="actionHelp"/>
-      </widget>
-      <addaction name="menuFile"/>
-      <addaction name="menuParameters"/>
-      <addaction name="menuHelp"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+     <widget class="QMenuBar" name="menubar">
+         <property name="geometry">
+             <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>1242</width>
+                 <height>22</height>
+             </rect>
+         </property>
+         <widget class="QMenu" name="menuFile">
+             <property name="title">
+                 <string>Fichiers</string>
+             </property>
+             <addaction name="actionNewEvent"/>
+             <addaction name="separator"/>
+             <addaction name="actionLoadEvent"/>
+             <addaction name="actionSaveEvent"/>
+             <addaction name="actionSauveEventAs"/>
+             <addaction name="separator"/>
+             <addaction name="actionStartEvent"/>
+             <addaction name="actionEndEvent"/>
+             <addaction name="separator"/>
+             <addaction name="actionQuit"/>
+         </widget>
+         <widget class="QMenu" name="menuParameters">
+             <property name="title">
+                 <string>Paramètres</string>
+             </property>
+             <addaction name="actionGlobalParam"/>
+             <addaction name="separator"/>
+             <addaction name="actionConfigEvent"/>
+             <addaction name="separator"/>
+             <addaction name="actionConfigCard"/>
+             <addaction name="actionConfigRounds"/>
+         </widget>
+         <widget class="QMenu" name="menuHelp">
+             <property name="title">
+                 <string>Aide</string>
+             </property>
+             <addaction name="actionAbout"/>
+             <addaction name="separator"/>
+             <addaction name="actionHelp"/>
+         </widget>
+         <addaction name="menuFile"/>
+         <addaction name="menuParameters"/>
+         <addaction name="menuHelp"/>
+     </widget>
+     <widget class="QStatusBar" name="statusbar"/>
      <action name="actionAbout">
          <property name="text">
              <string>À propos</string>
@@ -1586,22 +1642,22 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-      <sender>actionSauveEventAs</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actSaveAsFile()</slot>
-      <hints>
-          <hint type="sourcelabel">
-              <x>-1</x>
-              <y>-1</y>
-          </hint>
-          <hint type="destinationlabel">
-              <x>418</x>
-              <y>352</y>
-          </hint>
-      </hints>
-  </connection>
+     <connection>
+         <sender>actionSauveEventAs</sender>
+         <signal>triggered()</signal>
+         <receiver>MainWindow</receiver>
+         <slot>actSaveAsFile()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>-1</x>
+                 <y>-1</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>418</x>
+                 <y>352</y>
+             </hint>
+         </hints>
+     </connection>
      <connection>
          <sender>actionEndEvent</sender>
          <signal>triggered()</signal>
