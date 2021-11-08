@@ -26,8 +26,9 @@ set(CMAKE_PREFIX_PATH ${BASE_QT_DIR})
 set(${PRJPREFIX}_QT_COMPONENTS_LIST Core Gui Widgets)
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTORCC_OPTIONS "--compress;9")
 #
 #  QT Package
 #
@@ -51,7 +52,11 @@ target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${CMAKE_CURRENT_BINAR
 #
 #  Main Executable
 #
-add_executable(${CMAKE_PROJECT_NAME} main.cpp)
+file(GLOB_RECURSE
+        SRCS_RESOURCE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../resources/*.qrc
+        )
+add_executable(${CMAKE_PROJECT_NAME} main.cpp ${SRCS_RESOURCE})
 target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_PROJECT_NAME}_lib
         ${CMAKE_PROJECT_NAME}_ui

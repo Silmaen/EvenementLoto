@@ -10,7 +10,7 @@ Ce projet utilise CMake (version 3.15 ou supérieure) pour se configurer.
 
 * `BASE_QT_DIR` (requise) chemin vers Qt (voir les dépendances ci-après).
 * `EVL_COVERAGE` active ou non le calcul de la couverture de code.
-  (nécéssite `gcovr` voir dépendances)
+  (nécessite `gcovr` voir dépendances)
 
 ### Dépendance
 
@@ -36,15 +36,15 @@ Le programme a été correctement compilé avec :
   * [X] Affichage logo organisateur dans les vues intermédiaires
   * [X] Affichage du règlement
     * [X] Bouton permettant le ré-affichage à n’importe quel moment
-  * [ ] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
+  * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
   * [ ] Permettre Affichage en plein écran sur le second écran
   * [X] Affichage Pause round
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
-    * [ ] Ajout d’icones sur les boutons et actions
-    * [ ] Choix du thème graphique
-        * [ ] Sélection des couleurs
-        * [ ] Possibilité de couleur différente en fonction du sous-niveau
+  * [X] Ajout d’icônes sur les boutons et actions
+  * [ ] Choix du thème graphique
+    * [ ] Sélection des couleurs
+    * [ ] Possibilité de couleur différente en fonction du sous-niveau
 * Interaction
     * [ ] Saisi du numéro du carton gagnant.
     * [ ] Statistiques cartons

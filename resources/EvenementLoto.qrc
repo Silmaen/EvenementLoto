@@ -1,1 +1,46 @@
-<RCC/>
+<RCC>
+  <qresource prefix="icons">
+    <file>icons/sort-down.png</file>
+    <file>icons/sort-up.png</file>
+    <file>icons/dice.png</file>
+    <file>icons/adjust.png</file>
+    <file>icons/alarm-add.png</file>
+    <file>icons/alarm-off.png</file>
+    <file>icons/alarm-on.png</file>
+    <file>icons/cancel.png</file>
+    <file>icons/clear-symbol.png</file>
+    <file>icons/clock.png</file>
+    <file>icons/comment_question.png</file>
+    <file>icons/comment_text.png</file>
+    <file>icons/countdown.png</file>
+    <file>icons/date-from.png</file>
+    <file>icons/date-span.png</file>
+    <file>icons/date-to.png</file>
+    <file>icons/details.png</file>
+    <file>icons/euro-money.png</file>
+    <file>icons/file.png</file>
+    <file>icons/folder_open.png</file>
+    <file>icons/help.png</file>
+    <file>icons/hourglass.png</file>
+    <file>icons/info.png</file>
+    <file>icons/menu.png</file>
+    <file>icons/new-file.png</file>
+    <file>icons/online-support.png</file>
+    <file>icons/puzzle.png</file>
+    <file>icons/restart.png</file>
+    <file>icons/save.png</file>
+    <file>icons/save-as.png</file>
+    <file>icons/services.png</file>
+    <file>icons/settings.png</file>
+    <file>icons/show-non-hidden-views.png</file>
+    <file>icons/shutdown.png</file>
+    <file>icons/square-clock.png</file>
+    <file>icons/stopwatch.png</file>
+    <file>icons/submit-for-approval.png</file>
+    <file>icons/support.png</file>
+    <file>icons/terms-and-conditions.png</file>
+    <file>icons/toggle-off.png</file>
+    <file>icons/toggle-on.png</file>
+    <file>icons/windows-10-personalization.png</file>
+  </qresource>
+</RCC>
