@@ -3,14 +3,14 @@
  <author>Damien Lachouette</author>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-      <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>1242</width>
-          <height>831</height>
-      </rect>
-  </property>
+     <property name="geometry">
+         <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>1242</width>
+             <height>831</height>
+         </rect>
+     </property>
      <property name="windowTitle">
          <string>Événement Loto</string>
      </property>
@@ -668,6 +668,17 @@
                                                                  <property name="text">
                                                                      <string>Debut/fin partie</string>
                                                                  </property>
+                                                                 <property name="icon">
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                         <normaloff>
+                                                                             :/icons/icons/submit-for-approval.png</normaloff>
+                                                                         :/icons/icons/submit-for-approval.png
+                                                                     </iconset>
+                                                                 </property>
+                                                                 <property name="flat">
+                                                                     <bool>false</bool>
+                                                                 </property>
                                                              </widget>
                                                          </item>
                                                          <item>
@@ -680,6 +691,14 @@
                                                                  </property>
                                                                  <property name="text">
                                                                      <string>Pause/reprise partie</string>
+                                                                 </property>
+                                                                 <property name="icon">
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                         <normaloff>
+                                                                             :/icons/icons/hourglass.png</normaloff>
+                                                                         :/icons/icons/hourglass.png
+                                                                     </iconset>
                                                                  </property>
                                                              </widget>
                                                          </item>
@@ -694,6 +713,14 @@
                                                                  <property name="text">
                                                                      <string>Affichage règlement</string>
                                                                  </property>
+                                                                 <property name="icon">
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                         <normaloff>
+                                                                             :/icons/icons/terms-and-conditions.png</normaloff>
+                                                                         :/icons/icons/terms-and-conditions.png
+                                                                     </iconset>
+                                                                 </property>
                                                              </widget>
                                                          </item>
                                                          <item>
@@ -706,6 +733,13 @@
                                                                  </property>
                                                                  <property name="text">
                                                                      <string>Tirage Aléatoire</string>
+                                                                 </property>
+                                                                 <property name="icon">
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                         <normaloff>:/icons/icons/dice.png</normaloff>
+                                                                         :/icons/icons/dice.png
+                                                                     </iconset>
                                                                  </property>
                                                              </widget>
                                                          </item>
@@ -725,6 +759,14 @@
                                                                  </property>
                                                                  <property name="text">
                                                                      <string>Annuler dernier tirage</string>
+                                                                 </property>
+                                                                 <property name="icon">
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                         <normaloff>
+                                                                             :/icons/icons/countdown.png</normaloff>
+                                                                         :/icons/icons/countdown.png
+                                                                     </iconset>
                                                                  </property>
                                                              </widget>
                                                          </item>
@@ -1317,10 +1359,10 @@
                              </item>
                          </layout>
                      </widget>
+                 </widget>
+             </item>
+         </layout>
      </widget>
-    </item>
-   </layout>
-  </widget>
      <widget class="QMenuBar" name="menubar">
          <property name="geometry">
              <rect>
@@ -1330,9 +1372,26 @@
                  <height>22</height>
              </rect>
          </property>
+         <property name="defaultUp">
+             <bool>false</bool>
+         </property>
+         <property name="nativeMenuBar">
+             <bool>true</bool>
+         </property>
          <widget class="QMenu" name="menuFile">
              <property name="title">
                  <string>Fichiers</string>
+             </property>
+             <property name="icon">
+                 <iconset resource="../../../resources/EvenementLoto.qrc">
+                     <normaloff>:/icons/icons/menu.png</normaloff>:/icons/icons/menu.png
+                 </iconset>
+             </property>
+             <property name="separatorsCollapsible">
+                 <bool>true</bool>
+             </property>
+             <property name="toolTipsVisible">
+                 <bool>true</bool>
              </property>
              <addaction name="actionNewEvent"/>
              <addaction name="separator"/>
@@ -1346,8 +1405,20 @@
              <addaction name="actionQuit"/>
          </widget>
          <widget class="QMenu" name="menuParameters">
+             <property name="tearOffEnabled">
+                 <bool>true</bool>
+             </property>
              <property name="title">
                  <string>Paramètres</string>
+             </property>
+             <property name="icon">
+                 <iconset resource="../../../resources/EvenementLoto.qrc">
+                     <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>
+                     :/icons/icons/windows-10-personalization.png
+                 </iconset>
+             </property>
+             <property name="toolTipsVisible">
+                 <bool>true</bool>
              </property>
              <addaction name="actionGlobalParam"/>
              <addaction name="separator"/>
@@ -1360,6 +1431,11 @@
              <property name="title">
                  <string>Aide</string>
              </property>
+             <property name="icon">
+                 <iconset resource="../../../resources/EvenementLoto.qrc">
+                     <normaloff>:/icons/icons/online-support.png</normaloff>:/icons/icons/online-support.png
+                 </iconset>
+             </property>
              <addaction name="actionAbout"/>
              <addaction name="separator"/>
              <addaction name="actionHelp"/>
@@ -1370,6 +1446,11 @@
      </widget>
      <widget class="QStatusBar" name="statusbar"/>
      <action name="actionAbout">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/info.png</normaloff>:/icons/icons/info.png
+             </iconset>
+         </property>
          <property name="text">
              <string>À propos</string>
          </property>
@@ -1381,11 +1462,21 @@
          </property>
      </action>
      <action name="actionHelp">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/help.png</normaloff>:/icons/icons/help.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Aide</string>
          </property>
      </action>
      <action name="actionGlobalParam">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/adjust.png</normaloff>:/icons/icons/adjust.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Général</string>
          </property>
@@ -1393,6 +1484,11 @@
      <action name="actionConfigCard">
          <property name="enabled">
              <bool>true</bool>
+         </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/puzzle.png</normaloff>:/icons/icons/puzzle.png
+             </iconset>
          </property>
          <property name="text">
              <string>Cartons</string>
@@ -1402,21 +1498,41 @@
          <property name="enabled">
              <bool>false</bool>
          </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/services.png</normaloff>:/icons/icons/services.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Parties</string>
          </property>
      </action>
      <action name="actionConfigEvent">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/details.png</normaloff>:/icons/icons/details.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Événement</string>
          </property>
      </action>
      <action name="actionNewEvent">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/new-file.png</normaloff>:/icons/icons/new-file.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Nouveau</string>
          </property>
      </action>
      <action name="actionLoadEvent">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/folder_open.png</normaloff>:/icons/icons/folder_open.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Charger</string>
          </property>
@@ -1424,6 +1540,11 @@
      <action name="actionSaveEvent">
          <property name="enabled">
              <bool>false</bool>
+         </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/save.png</normaloff>:/icons/icons/save.png
+             </iconset>
          </property>
          <property name="text">
              <string>Sauver</string>
@@ -1433,11 +1554,21 @@
          <property name="enabled">
              <bool>false</bool>
          </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/toggle-on.png</normaloff>:/icons/icons/toggle-on.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Commencer</string>
          </property>
      </action>
      <action name="actionQuit">
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/shutdown.png</normaloff>:/icons/icons/shutdown.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Quitter</string>
          </property>
@@ -1449,6 +1580,11 @@
          <property name="enabled">
              <bool>false</bool>
          </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/toggle-off.png</normaloff>:/icons/icons/toggle-off.png
+             </iconset>
+         </property>
          <property name="text">
              <string>Terminer</string>
          </property>
@@ -1456,6 +1592,11 @@
      <action name="actionSauveEventAs">
          <property name="enabled">
              <bool>false</bool>
+         </property>
+         <property name="icon">
+             <iconset resource="../../../resources/EvenementLoto.qrc">
+                 <normaloff>:/icons/icons/save-as.png</normaloff>:/icons/icons/save-as.png
+             </iconset>
          </property>
          <property name="text">
              <string>Sauver sous...</string>
@@ -1632,14 +1773,14 @@
    <receiver>MainWindow</receiver>
    <slot>actSaveFile()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>418</x>
-     <y>352</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>-1</x>
+           <y>-1</y>
+       </hint>
+       <hint type="destinationlabel">
+           <x>418</x>
+           <y>352</y>
+       </hint>
    </hints>
   </connection>
      <connection>
