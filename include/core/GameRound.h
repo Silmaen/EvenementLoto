@@ -26,9 +26,13 @@ public:
      * @brief Liste des types de parties connus.
      */
     enum struct Type {
-        Normal,///< Une partie standard en remplissant une ligne, puis deux, puis le carton.
-        Enfant,///< Une partie pour les enfants
-        Inverse///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
+        OneQuine,           ///< Une partie standard en remplissant une ligne seulemnt avant reset.
+        TwoQuines,          ///< Une partie standard en remplissant deux lignes seulement.
+        FullCard,           ///< Une partie standard en remplissant le carton seulement.
+        OneQuineFullCard,   ///< Une partie standard en remplissant une ligne, puis le carton.
+        OneTwoQuineFullCard,///< Une partie standard en remplissant une ligne, puis deux, puis le carton.
+        Enfant,             ///< Une partie pour les enfants, similaire à OneQuine.
+        Inverse,            ///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
     };
 
     /**
@@ -46,7 +50,7 @@ public:
      * @brief Constructeur
      * @param t Le type de partie
      */
-    GameRound(Type t= Type::Normal);
+    GameRound(Type t= Type::OneTwoQuineFullCard);
 
     // ---- manipulation du type de partie ----
     /**
@@ -93,7 +97,7 @@ public:
      */
     void restoreStatus() {
         status= Status::Ready;
-        type  = Type::Normal;
+        type  = Type::OneTwoQuineFullCard;
     }
 #endif
 
@@ -221,7 +225,7 @@ private:
     [[nodiscard]] bool isEditable() const;
 
     /// Le type de partie.
-    Type type= Type::Normal;
+    Type type= Type::OneTwoQuineFullCard;
 
     /// Le type actuel de la partie.
     Status status= Status::Ready;

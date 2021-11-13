@@ -42,13 +42,19 @@ Le programme a été correctement compilé avec :
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
   * [X] Ajout d’icônes sur les boutons et actions
+    * [ ] Ajout des icônes manquantes
   * [ ] Choix du thème graphique
     * [ ] Sélection des couleurs
     * [ ] Possibilité de couleur différente en fonction du sous-niveau
 * Interaction
-    * [ ] Saisi du numéro du carton gagnant.
-    * [ ] Statistiques cartons
-    * [x] Désactivation boutons modification partie lors de l’affichage
+  * [X] Ajout d’autres types de parties
+  * [x] Désactivation boutons modification partie lors de l’affichage
+* Sauvegarde et restauration
+  * [ ] import fiches de lot en json
+  * [ ] Version des sauvegardes binaire
+    * [ ] Permettre l’ouverture de vielles versions
+  * [ ] Chemin relatif au lieu de stockage du fichier binaire pour les images
+    * [ ] Copie des images dans le dossier contenant le fichier de sauvegarde
 * Compilation
   * [x] Test compilation OpenBSD
   * [ ] Test compilation msvc (et clang-cl et clang natif)

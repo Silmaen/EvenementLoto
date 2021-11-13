@@ -17,12 +17,20 @@ GameRound::GameRound(GameRound::Type t) {
 // ---- manipulation du type de partie ----
 string GameRound::getTypeStr() const {
     switch(type) {
-    case Type::Normal:
-        return "Normal";
+    case Type::OneQuine:
+        return "un quine";
+    case Type::TwoQuines:
+        return "deux quines";
+    case Type::FullCard:
+        return "carton";
+    case Type::OneQuineFullCard:
+        return "un quine et carton";
+    case Type::OneTwoQuineFullCard:
+        return "complète";
     case Type::Enfant:
-        return "Enfant";
+        return "enfant";
     case Type::Inverse:
-        return "Inverse";
+        return "inverse";
     }
     return "inconnu";
 }
@@ -33,7 +41,20 @@ void GameRound::setType(const Type& t) {
     type= t;
     subGames.clear();
     switch(type) {
-    case Type::Normal:
+    case Type::OneQuine:
+        subGames.emplace_back(SubGameRound::Type::OneQuine);
+        break;
+    case Type::TwoQuines:
+        subGames.emplace_back(SubGameRound::Type::TwoQuines);
+        break;
+    case Type::FullCard:
+        subGames.emplace_back(SubGameRound::Type::FullCard);
+        break;
+    case Type::OneQuineFullCard:
+        subGames.emplace_back(SubGameRound::Type::OneQuine);
+        subGames.emplace_back(SubGameRound::Type::FullCard);
+        break;
+    case Type::OneTwoQuineFullCard:
         subGames.emplace_back(SubGameRound::Type::OneQuine);
         subGames.emplace_back(SubGameRound::Type::TwoQuines);
         subGames.emplace_back(SubGameRound::Type::FullCard);

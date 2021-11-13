@@ -277,9 +277,9 @@ void MainWindow::updateMenus() {
     //   ui->actionSaveEvent
     if(currentEvent.getStatus() == core::Event::Status::Invalid ||
        currentEvent.getStatus() == core::Event::Status::MissingParties)
-        ui->actionStartEvent->setEnabled(false);
+        ui->actionSaveEvent->setEnabled(false);
     else
-        ui->actionStartEvent->setEnabled(true);
+        ui->actionSaveEvent->setEnabled(true);
     //   ui->actionSaveEventAs  <- jamais actif, change jamais de texte
     //   ui->actionStartEvent
     if(currentEvent.getStatus() == core::Event::Status::Ready)

@@ -11,7 +11,7 @@
             </rect>
         </property>
         <property name="windowTitle">
-            <string>Dialog</string>
+            <string>Configuration Parties</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
             <item row="0" column="0">
@@ -194,19 +194,6 @@
                                                 </size>
                                             </property>
                                         </widget>
-                                    </item>
-                                    <item row="1" column="5">
-                                        <spacer name="horizontalSpacer_7">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
-                                                <size>
-                                                    <width>150</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
                                     </item>
                                     <item row="2" column="0">
                                         <widget class="QPushButton" name="btnAddSubRound">

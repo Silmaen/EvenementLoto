@@ -154,24 +154,29 @@ void DisplayWindow::updateEventTitlePage() {
 
 void DisplayWindow::updateRoundTitlePage() {
     auto round= event->getGameRound(event->getCurrentIndex());
-    if(round->getType() == core::GameRound::Type::Normal) {
-        ui->RT_RoundTitle->setText("Partie " + QString::number(event->getCurrentIndex() + 1));
+    ui->RT_RoundTitle->setText("Partie " + QString::number(event->getCurrentIndex() + 1) + " " + QString::fromUtf8(round->getTypeStr()));
+    ui->RT_SubRound_2->setVisible(false);
+    ui->RT_SubRound_3->setVisible(false);
+    switch(round->getType()) {
+    case core::GameRound::Type::OneQuine:
+    case core::GameRound::Type::TwoQuines:
+    case core::GameRound::Type::FullCard:
+    case core::GameRound::Type::Enfant:
+    case core::GameRound::Type::Inverse:
+        ui->RT_SubRound_1->setText("Gain partie: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        break;
+    case core::GameRound::Type::OneQuineFullCard:
+        ui->RT_SubRound_2->setVisible(true);
+        ui->RT_SubRound_1->setText("Gain une ligne: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        ui->RT_SubRound_3->setText("Gain carton plein: \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        break;
+    case core::GameRound::Type::OneTwoQuineFullCard:
         ui->RT_SubRound_2->setVisible(true);
         ui->RT_SubRound_3->setVisible(true);
         ui->RT_SubRound_1->setText("Gain une ligne: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
         ui->RT_SubRound_2->setText("Gain deux Lignes: \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
         ui->RT_SubRound_3->setText("Gain carton plein: \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
-    } else {
-        ui->RT_SubRound_2->setVisible(false);
-        ui->RT_SubRound_3->setVisible(false);
-        if(round->getType() == core::GameRound::Type::Enfant) {
-            ui->RT_RoundTitle->setText("Partie " + QString::number(event->getCurrentIndex() + 1) + " Enfants");
-            ui->RT_SubRound_1->setText("Gains: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        if(round->getType() == core::GameRound::Type::Inverse) {
-            ui->RT_RoundTitle->setText("Partie " + QString::number(event->getCurrentIndex() + 1) + " Inversée");
-            ui->RT_SubRound_1->setText("Gain dernier sans numéro: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
+        break;
     }
 }
 
