@@ -16,7 +16,7 @@ TEST(GameRound, Invalid) {
     EXPECT_EQ(gr.getStarting(), epoch);
     EXPECT_EQ(gr.getEnding(), epoch);
     EXPECT_STREQ(gr.getStatusStr().c_str(), "prête");
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "Inverse");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "inverse");
 #ifdef EVL_DEBUG
     gr.invalidStatus();
     EXPECT_STREQ(gr.getStatusStr().c_str(), "Statut inconnu");
@@ -30,8 +30,8 @@ TEST(GameRound, Type) {
     gr.closeGameRound();
     gr.addWinner(586);
     gr.startGameRound();
-    gr.setType(GameRound::Type::Normal);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "Enfant");
+    gr.setType(GameRound::Type::OneTwoQuineFullCard);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "enfant");
     gr.addWinner(1586);
     EXPECT_EQ(gr.getStatus(), GameRound::Status::DisplayResult);
     EXPECT_EQ(gr.getCurrentCSubRound(), gr.endSubRound());
@@ -39,8 +39,26 @@ TEST(GameRound, Type) {
     EXPECT_EQ(gr.beginSubRound()->getWinner(), 1586);
 }
 
+TEST(GameRound, Types) {
+    GameRound gr{GameRound::Type::OneQuine};
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "un quine");
+    EXPECT_EQ(gr.sizeSubRound(), 1);
+    gr.setType(GameRound::Type::TwoQuines);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "deux quines");
+    EXPECT_EQ(gr.sizeSubRound(), 1);
+    gr.setType(GameRound::Type::FullCard);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "carton");
+    EXPECT_EQ(gr.sizeSubRound(), 1);
+    gr.setType(GameRound::Type::OneQuineFullCard);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "un quine et carton");
+    EXPECT_EQ(gr.sizeSubRound(), 2);
+    gr.setType(GameRound::Type::OneTwoQuineFullCard);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "complète");
+    EXPECT_EQ(gr.sizeSubRound(), 3);
+    gr.setType(GameRound::Type{-1});
+}
 TEST(GameRound, startStop) {
-    GameRound gr{GameRound::Type::Normal};
+    GameRound gr{GameRound::Type::OneTwoQuineFullCard};
     gr.removeLastPick();
     gr.addPickedNumber(55);
     gr.startGameRound();
@@ -63,7 +81,7 @@ TEST(GameRound, startStop) {
 }
 
 TEST(GameRound, draws) {
-    GameRound gr{GameRound::Type::Normal};
+    GameRound gr{GameRound::Type::OneTwoQuineFullCard};
     gr.startGameRound();
     gr.addPickedNumber(60);
     gr.addPickedNumber(30);
@@ -99,7 +117,7 @@ TEST(GameRound, serialize) {
 }
 
 TEST(GameRound, TypeNormal) {
-    GameRound gr{GameRound::Type::Normal};
+    GameRound gr{GameRound::Type::OneTwoQuineFullCard};
     EXPECT_EQ(gr.sizeSubRound(), 3);
     EXPECT_FALSE(gr.isCurrentSubRoundLast());
     auto it= gr.beginSubRound();

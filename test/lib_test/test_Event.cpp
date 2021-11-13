@@ -75,7 +75,7 @@ TEST(Event, RoundManipulation) {
     evt.pushGameRound(GameRound(GameRound::Type::Inverse));
     evt.deleteRoundByIndex(1);
     evt.pushGameRound(GameRound(GameRound::Type::Enfant));
-    evt.pushGameRound(GameRound(GameRound::Type::Normal));
+    evt.pushGameRound(GameRound(GameRound::Type::OneTwoQuineFullCard));
     evt.swapRoundByIndex(2, 3);
     EXPECT_EQ(evt.getGameRound(3)->getType(), GameRound::Type::Enfant);
 }
@@ -116,7 +116,7 @@ TEST(Event, WorkflowPauseRound) {
     evt.ActiveFirstRound();
     evt.startCurrentRound();
     evt.pauseEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::GamePaused);
+    EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
     evt.resumeEvent();
     evt.addWinnerToCurrentRound(153);
     evt.pauseEvent();

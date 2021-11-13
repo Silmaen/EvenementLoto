@@ -96,7 +96,6 @@ void ConfigGameRounds::actEndEditingPrice() {
     if(scur < 0)
         return;
     auto subround= round->getSubRound(scur);
-    std::cout << ui->TextPrices->toPlainText().toStdString() << std::endl;
     subround->define(subround->getType(), ui->TextPrices->toPlainText().toStdString());
     updateDisplay();
 }
@@ -282,13 +281,21 @@ void ConfigGameRounds::updateDisplayResults() {
 }
 
 QStringList ConfigGameRounds::getRoundTypes() {
-    return {"Normal", "Enfants", "Inverse"};
+    return {"Un quine", "Deux quines", "Carton plein", "Un quine et carton plein", "Normale", "Enfants", "Inverse"};
 }
 
 QStringList ConfigGameRounds::getVictoryType(const core::GameRound::Type& t) {
     switch(t) {
-    case core::GameRound::Type::Normal:
-        return {"Une quine", "deux quines", "carton plein"};
+    case core::GameRound::Type::OneQuine:
+        return {"un quine"};
+    case core::GameRound::Type::TwoQuines:
+        return {"deux quines"};
+    case core::GameRound::Type::FullCard:
+        return {"carton plein"};
+    case core::GameRound::Type::OneQuineFullCard:
+        return {"un quine", "carton plein"};
+    case core::GameRound::Type::OneTwoQuineFullCard:
+        return {"un quine", "deux quines", "carton plein"};
     case core::GameRound::Type::Enfant:
         return {"une ligne"};
     case core::GameRound::Type::Inverse:
@@ -299,8 +306,19 @@ QStringList ConfigGameRounds::getVictoryType(const core::GameRound::Type& t) {
 
 int ConfigGameRounds::getVictoryIndex(const core::GameRound::Type& t, const core::SubGameRound::Type& st) {
     switch(t) {
-
-    case core::GameRound::Type::Normal:
+    case core::GameRound::Type::OneQuineFullCard:
+        switch(st) {
+        case core::SubGameRound::Type::OneQuine:
+            return 0;
+        case core::SubGameRound::Type::TwoQuines:
+            return -1;
+        case core::SubGameRound::Type::FullCard:
+            return 1;
+        case core::SubGameRound::Type::Inverse:
+            return -1;
+        }
+        return -1;
+    case core::GameRound::Type::OneTwoQuineFullCard:
         switch(st) {
         case core::SubGameRound::Type::OneQuine:
             return 0;
@@ -312,8 +330,10 @@ int ConfigGameRounds::getVictoryIndex(const core::GameRound::Type& t, const core
             return -1;
         }
         return -1;
+    case core::GameRound::Type::OneQuine:
+    case core::GameRound::Type::TwoQuines:
+    case core::GameRound::Type::FullCard:
     case core::GameRound::Type::Enfant:
-        return 0;
     case core::GameRound::Type::Inverse:
         return 0;
     }
