@@ -42,7 +42,7 @@ Le programme a été correctement compilé avec :
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
   * [X] Ajout d’icônes sur les boutons et actions
-    * [ ] Ajout des icônes manquantes
+    * [X] Ajout des icônes manquantes
   * [ ] Choix du thème graphique
     * [ ] Sélection des couleurs
     * [ ] Possibilité de couleur différente en fonction du sous-niveau

@@ -693,10 +693,10 @@
                                                                      <string>Pause/reprise partie</string>
                                                                  </property>
                                                                  <property name="icon">
-                                                                     <iconset>
+                                                                     <iconset
+                                                                             resource="../../../resources/EvenementLoto.qrc">
                                                                          <normaloff>
-                                                                             :/icons/icons/hourglass.png
-                                                                         </normaloff>
+                                                                             :/icons/icons/hourglass.png</normaloff>
                                                                          :/icons/icons/hourglass.png
                                                                      </iconset>
                                                                  </property>
@@ -1767,22 +1767,22 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-      <sender>actionSaveEvent</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actSaveFile()</slot>
-      <hints>
-          <hint type="sourcelabel">
-              <x>-1</x>
-              <y>-1</y>
-          </hint>
-          <hint type="destinationlabel">
-              <x>418</x>
-              <y>352</y>
-          </hint>
-      </hints>
-  </connection>
+     <connection>
+         <sender>actionSaveEvent</sender>
+         <signal>triggered()</signal>
+         <receiver>MainWindow</receiver>
+         <slot>actSaveFile()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>-1</x>
+                 <y>-1</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>418</x>
+                 <y>352</y>
+             </hint>
+         </hints>
+     </connection>
      <connection>
          <sender>actionSaveEventAs</sender>
          <signal>triggered()</signal>
