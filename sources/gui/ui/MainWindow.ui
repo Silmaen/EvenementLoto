@@ -7,8 +7,8 @@
          <rect>
              <x>0</x>
              <y>0</y>
-             <width>1242</width>
-             <height>831</height>
+             <width>1160</width>
+             <height>829</height>
          </rect>
      </property>
      <property name="windowTitle">
@@ -1368,7 +1368,7 @@
              <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>1242</width>
+                 <width>1160</width>
                  <height>22</height>
              </rect>
          </property>
@@ -1757,14 +1757,14 @@
    <receiver>MainWindow</receiver>
    <slot>actQuit()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>418</x>
-     <y>352</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>-1</x>
+           <y>-1</y>
+       </hint>
+       <hint type="destinationlabel">
+           <x>418</x>
+           <y>352</y>
+       </hint>
    </hints>
   </connection>
      <connection>
