@@ -1,0 +1,18 @@
+Entrée libre, en cas de manque de places assises, la priorité sera donnée aux joueurs
+
+Les parties se jouent à quine puis deux quines puis carton plein.
+Lors de la première phase à quine, le gagnant sera le joueur qui aura le premier marqué les cinq numéros sur une même rangée horizontale.
+Lors de la seconde phase à deux quines le gagnant sera le premier à avoir marqué les 10 numéros de deux rangées d’un même carton.
+Lors de la dernière phase à carton plein le gagnant sera le joueur ayant le premier marqué les 15 numéros d’un même carton.
+À l’énoncé du numéro lui permettant de remplir une ligne ou un carton, le gagnant doit se lever et crier respectivement QUINE, DEUX QUINE ou CARTON PLEIN.
+
+Tous les cartons doivent être démarqués en début de partie
+
+Obligatoirement, un joueur doit avoir dans sa quine ou carton le dernier numéro annoncé.
+Le carton d’un joueur qui a fait une fausse annonce est annulé pour la partie en cours et participe pas à la fin du tirage.
+
+Chaque joueur sera déclaré gagnant après le contrôle des numéros et de la validité du carton dit gagnant.
+Les lots gagnés seront remis à une  personne majeure après avoir renseigné ses coordonnées.
+
+Si dans une partie, plusieurs joueurs annoncent en même temps un carton gagnant, leurs cartons seront contrôlés normalement et ils seront départagés en tirant un jeton numéroté dans un sac.
+Le gagnant sera celui qui tire le plus grand numéro.

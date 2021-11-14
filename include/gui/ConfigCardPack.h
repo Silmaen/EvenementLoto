@@ -58,7 +58,6 @@ public slots:
 
     /**
      * @brief Surcharge de la commande d’exécution.
-     * @return Code de retour.
      */
     void preExec();
 

@@ -124,6 +124,7 @@ void DisplayWindow::updateDisplay() {
         break;
     case core::Event::Status::DisplayRules:
         ui->PageManager->setCurrentIndex(6);
+        updateDisplayRules();
         break;
     }
     // action de redimensionnement
@@ -235,6 +236,12 @@ void DisplayWindow::updateRoundRunning() {
     ui->RR_SubRoundPrice->setText("Gain:\n" + QString::fromUtf8(round->getCurrentCSubRound()->getPrices()));
 }
 
+void DisplayWindow::updateDisplayRules() {
+    if(event->getRules().empty())
+        return;
+    ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
+}
+
 void DisplayWindow::initializeNumberGrid() {
     ui->RR_NumberGrid->setColumnCount(10);
     ui->RR_NumberGrid->setRowCount(9);
@@ -291,10 +298,12 @@ void DisplayWindow::resize() {
     ui->EP_Message->setFont(baseFont);
     ui->EE_EndMessage->setFont(baseFont);
     // taille des lignes et colonnes de la grille
-    for(int col= 0; col < 10; ++col)
+    ui->RR_NumberGrid->horizontalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->width() / 10);
+    ui->RR_NumberGrid->verticalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->height() / 9);
+    /*for(int col= 0; col < 10; ++col)
         ui->RR_NumberGrid->setColumnWidth(col, ui->RR_NumberGrid->width() / 10);
     for(int row= 0; row < 9; ++row)
-        ui->RR_NumberGrid->setRowHeight(row, ui->RR_NumberGrid->height() / 9);
+        ui->RR_NumberGrid->setRowHeight(row, ui->RR_NumberGrid->height() / 9);*/
     currentSize= size();
     // taille de police dans la grille
     float gridRatio= baseRatio * .85;

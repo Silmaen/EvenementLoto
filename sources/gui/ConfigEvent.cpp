@@ -6,10 +6,12 @@
  * All modification must get authorization from the author.
  */
 #include "gui/ConfigEvent.h"
+#include "gui/BaseDialog.h"
 #include "gui/MainWindow.h"
 #include "gui/baseDefinitions.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <fstream>
 
 // Les trucs de QT
 #include "gui/moc_ConfigEvent.cpp"
@@ -33,6 +35,7 @@ void ConfigEvent::SaveFile() {
     gameEvent.setLocation(ui->EventLocation->text().toStdString());
     gameEvent.setLogo(ui->EventLogo->text().toStdString());
     gameEvent.setOrganizerLogo(ui->OrgaLogo->text().toStdString());
+    gameEvent.setRules(ui->textRules->toPlainText().toStdString());
 }
 
 void ConfigEvent::actOk() {
@@ -80,12 +83,12 @@ void ConfigEvent::setEvent(const core::Event& e) {
 }
 
 void ConfigEvent::updateDisplay() {
-    ui->EventName->setText(QString::fromStdString(gameEvent.getName()));
-    ui->EventLocation->setText(QString::fromStdString(gameEvent.getLocation()));
-    ui->EventLogo->setText(QString::fromStdString(gameEvent.getLogo().string()));
-    ui->OrgaName->setText(QString::fromStdString(gameEvent.getOrganizerName()));
-    ui->OrgaLogo->setText(QString::fromStdString(gameEvent.getOrganizerLogo().string()));
-
+    ui->EventName->setText(QString::fromUtf8(gameEvent.getName()));
+    ui->EventLocation->setText(QString::fromUtf8(gameEvent.getLocation()));
+    ui->EventLogo->setText(QString::fromUtf8(gameEvent.getLogo().string()));
+    ui->OrgaName->setText(QString::fromUtf8(gameEvent.getOrganizerName()));
+    ui->OrgaLogo->setText(QString::fromUtf8(gameEvent.getOrganizerLogo().string()));
+    ui->textRules->setText(QString::fromUtf8(gameEvent.getRules()));
     if(!gameEvent.isEditable()) {
         ui->EventName->setEnabled(false);
         ui->EventLocation->setEnabled(false);
@@ -95,7 +98,41 @@ void ConfigEvent::updateDisplay() {
         ui->OrgaLogo->setEnabled(false);
         ui->SearchOrgaLogo->setEnabled(false);
         ui->ButtonApply->setEnabled(false);
+        ui->textRules->setEnabled(false);
+        ui->buttonImportRules->setEnabled(false);
+    } else {
+        ui->EventName->setEnabled(true);
+        ui->EventLocation->setEnabled(true);
+        ui->EventLogo->setEnabled(true);
+        ui->SearchLogo->setEnabled(true);
+        ui->OrgaName->setEnabled(true);
+        ui->OrgaLogo->setEnabled(true);
+        ui->SearchOrgaLogo->setEnabled(true);
+        ui->ButtonApply->setEnabled(true);
+        ui->textRules->setEnabled(true);
+        ui->buttonImportRules->setEnabled(true);
     }
+}
+
+void ConfigEvent::actImportRules() {
+    auto path= dialog::openFile(dialog::FileTypes::Text, true);
+    if(path.empty())
+        return;
+    std::ifstream file;
+    file.open(path, std::ios::in);
+    gameEvent.setRules(string{(std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>())});
+    file.close();
+    updateDisplay();
+}
+
+void ConfigEvent::actExportRules() {
+    auto path= dialog::openFile(dialog::FileTypes::Text, false);
+    if(path.empty())
+        return;
+    std::ofstream file;
+    file.open(path, std::ios::out);
+    file << gameEvent.getRules();
+    file.close();
 }
 
 }// namespace evl::gui

@@ -125,7 +125,6 @@ public:
 
     /**
      * @brief Lecture depuis un json
-     * @param j Le json à lire
      */
     void from_json(const json&) override {}
 

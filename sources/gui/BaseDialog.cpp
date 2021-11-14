@@ -1,5 +1,5 @@
 /**
-* @file baseDialog.cpp
+* @file BaseDialog.cpp
 * @author Silmaen
 * @date 14/11/2021
 * Copyright © 2021 All rights reserved.
@@ -26,6 +26,9 @@ path openFile(const FileTypes& type, bool exist) {
         dia.setNameFilter("fichier événement (*.lev)");
     else if(type == FileTypes::JSON)
         dia.setNameFilter("fichier json de partie (*.json)");
+    else if(type == FileTypes::Text)
+        dia.setNameFilters({"fichier texte brut (*.txt)",
+                            "fichier markdown (*.md)"});
     else if(type == FileTypes::Images)
         dia.setNameFilters(imageFilter);
     if(dia.exec()) {

@@ -69,6 +69,10 @@ private:
      * @brief Mise à jour de l’affichage de la page de partie.
      */
     void updateRoundRunning();
+    /**
+     * @brief Mise à jour de l’affichage de la page des règles de l’événement.
+     */
+    void updateDisplayRules();
 
     /**
      * @brief Initialisation des numéros dans la grille.

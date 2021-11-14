@@ -160,6 +160,18 @@ public:
      */
     void setLogo(const path& logo);
 
+    /**
+     * @brief Accès aux règles de l’événement
+     * @return Les règles.
+     */
+    const string& getRules() const { return rules; }
+
+    /**
+     * @brief Définit les règles de l’événement.
+     * @param newRules Les règles.
+     */
+    void setRules(const string& newRules);
+
     // ----- Manipulation des rounds ----
     /**
      * @brief Renvoie l’itérateur constant de début de parties.
@@ -323,6 +335,9 @@ private:
     path logo;
     /// Lieu de l’événement.
     string location;
+
+    /// Les règles de l'événement
+    string rules;
 
     /// Liste des parties de l’événement.
     roundsType gameRounds;

@@ -1,5 +1,5 @@
 /**
-* @file baseDialog.h
+* @file BaseDialog.h
 * @author Silmaen
 * @date 14/11/2021
 * Copyright © 2021 All rights reserved.
@@ -21,6 +21,7 @@ enum struct FileTypes {
     EventSave,/// La sauvegarde d’un événement
     Images,   /// La liste des images supportées
     JSON,     /// Un fichier JSON
+    Text,     /// Fichiers textes ou markdown
     Folder,   /// Un dossier
 };
 
