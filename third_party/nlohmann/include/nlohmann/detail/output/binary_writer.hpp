@@ -1276,13 +1276,13 @@ public:
     // such a conversion is required to allow values greater than 128.
     // See <https://github.com/nlohmann/json/issues/1286> for a discussion.
     template<typename C                                                           = CharType,
-             enable_if_t<std::is_signed<C>::value && std::is_signed<char>::value>*= nullptr>
+             enable_if_t<std::is_signed<C>::value && std::is_signed<char>::value>* = nullptr>
     static constexpr CharType to_char_type(std::uint8_t x) noexcept {
         return *reinterpret_cast<char*>(&x);
     }
 
     template<typename C                                                             = CharType,
-             enable_if_t<std::is_signed<C>::value && std::is_unsigned<char>::value>*= nullptr>
+             enable_if_t<std::is_signed<C>::value && std::is_unsigned<char>::value>* = nullptr>
     static CharType to_char_type(std::uint8_t x) noexcept {
         static_assert(sizeof(std::uint8_t) == sizeof(CharType), "size of CharType must be equal to std::uint8_t");
         static_assert(std::is_trivial<CharType>::value, "CharType must be trivial");
@@ -1292,7 +1292,7 @@ public:
     }
 
     template<typename C                              = CharType,
-             enable_if_t<std::is_unsigned<C>::value>*= nullptr>
+             enable_if_t<std::is_unsigned<C>::value>* = nullptr>
     static constexpr CharType to_char_type(std::uint8_t x) noexcept {
         return x;
     }
@@ -1301,7 +1301,7 @@ public:
              enable_if_t<
                      std::is_signed<C>::value &&
                      std::is_signed<char>::value &&
-                     std::is_same<char, typename std::remove_cv<InputCharType>::type>::value>*= nullptr>
+                     std::is_same<char, typename std::remove_cv<InputCharType>::type>::value>* = nullptr>
     static constexpr CharType to_char_type(InputCharType x) noexcept {
         return x;
     }
