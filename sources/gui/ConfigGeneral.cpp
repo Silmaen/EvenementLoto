@@ -6,10 +6,10 @@
  * All modification must get authorization from the author.
  */
 #include "gui/ConfigGeneral.h"
+#include "gui/BaseDialog.h"
 #include "gui/MainWindow.h"
 #include "gui/baseDefinitions.h"
-#include <QFileDialog>
-#include <QMessageBox>
+#include <fstream>
 #include <iostream>
 
 // Les trucs de QT
@@ -17,6 +17,8 @@
 #include "ui/ui_ConfigGeneral.h"
 
 namespace evl::gui {
+
+using json= nlohmann::json;
 
 ConfigGeneral::ConfigGeneral(MainWindow* parent):
     QDialog(parent),
@@ -30,7 +32,12 @@ ConfigGeneral::~ConfigGeneral() {
 
 void ConfigGeneral::SaveFile() {
     if(mwd != nullptr) {
-        mwd->getSettings().setValue(dataPathKey, ui->DataLocation->text());
+        mwd->getSettings().setValue(settings::dataPathKey, ui->DataLocation->text());
+        mwd->getSettings().setValue(settings::themeNameKey, ui->editThemeName->text());
+        mwd->getSettings().setValue(settings::globalScaleKey, ui->spinMainScale->value());
+        mwd->getSettings().setValue(settings::titleScaleKey, ui->spinTitleScale->value());
+        mwd->getSettings().setValue(settings::shortTextScaleKey, ui->spinShortTextScale->value());
+        mwd->getSettings().setValue(settings::gridTextScaleKey, ui->spinGridTextScale->value());
         mwd->syncSettings();
     }
 }
@@ -49,17 +56,47 @@ void ConfigGeneral::actCancel() {
 }
 
 void ConfigGeneral::actSearchFolder() {
-    QFileDialog dia;
-    dia.setAcceptMode(QFileDialog::AcceptOpen);
-    dia.setFileMode(QFileDialog::FileMode::Directory);
-    if(dia.exec()) {
-        ui->DataLocation->setText(dia.selectedFiles()[0]);
-    }
+    auto path= dialog::openFile(dialog::FileTypes::Folder, true);
+    if(path.empty())
+        return;
+    ui->DataLocation->setText(QString::fromUtf8(path.string()));
+}
+void ConfigGeneral::actResetTheme() {
+    preExec();
+}
+
+void ConfigGeneral::actImportTheme() {
+    auto path= dialog::openFile(dialog::FileTypes::ThemeFile, true);
+    if(path.empty())
+        return;
+}
+
+void ConfigGeneral::actExportTheme() {
+    auto path= dialog::openFile(dialog::FileTypes::ThemeFile, false);
+    if(path.empty())
+        return;
+    std::ofstream file(path, std::ios::out);
+    file << std::setw(4)
+         << json{
+                    {"name", mwd->getSettings().value(settings::themeNameKey, settings::themeNameDefault).toString().toStdString()},
+                    {"globalScale", mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat()},
+                    {"titleScale", mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat()},
+                    {"shortTextScale", mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat()},
+                    {"longTextScale", mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat()},
+                    {"gridTextScale", mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat()},
+            };
+    file.close();
 }
 
 void ConfigGeneral::preExec() {
     if(mwd != nullptr) {
-        ui->DataLocation->setText(mwd->getSettings().value(dataPathKey, "").toString());
+        ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
+        ui->editThemeName->setText(mwd->getSettings().value(settings::themeNameKey, settings::themeNameDefault).toString());
+        ui->spinMainScale->setValue(mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat());
+        ui->spinTitleScale->setValue(mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat());
+        ui->spinShortTextScale->setValue(mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat());
+        ui->spinShortTextScale->setValue(mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat());
+        ui->spinGridTextScale->setValue(mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat());
     }
 }
 

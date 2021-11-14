@@ -29,8 +29,16 @@ path openFile(const FileTypes& type, bool exist) {
     else if(type == FileTypes::Text)
         dia.setNameFilters({"fichier texte brut (*.txt)",
                             "fichier markdown (*.md)"});
+    else if(type == FileTypes::ThemeFile)
+        dia.setNameFilters({"fichier theme (*.lth)",
+                            "fichier json (*.json)"});
     else if(type == FileTypes::Images)
-        dia.setNameFilters(imageFilter);
+        dia.setNameFilters({
+                "Toutes les images supportées (*.png *.jpg *.jpeg *.bmp)",
+                "Fichiers png (*.png)",
+                "Fichiers jpg (*.jpg, *.jpeg)",
+                "Fichiers bmp (*.bmp)",
+        });
     if(dia.exec()) {
         return path{dia.selectedFiles()[0].toStdString()};
     }

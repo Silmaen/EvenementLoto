@@ -7,18 +7,20 @@
 */
 #include "gui/DisplayWindow.h"
 #include "core/timeFunctions.h"
+#include "gui/MainWindow.h"
 
 // Les trucs de QT
+#include <gui/baseDefinitions.h>
 #include <gui/moc_DisplayWindow.cpp>
 #include <ui/ui_DisplayWindow.h>
 
 namespace evl::gui {
 
-DisplayWindow::DisplayWindow(core::Event* evt, QWidget* parent):
+DisplayWindow::DisplayWindow(core::Event* evt, MainWindow* parent):
     QMainWindow(parent),
     ui(new Ui::DisplayWindow),
     timer(new QTimer(this)),
-    event(evt) {
+    event(evt), mwd(parent) {
     ui->setupUi(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&DisplayWindow::updateDisplay));
     if(event != nullptr) {
@@ -274,12 +276,14 @@ void DisplayWindow::resetGrid() {
 
 void DisplayWindow::resize() {
     // taille de la font par défaut
-    auto baseFont  = font();
-    float baseRatio= std::min(width() * 1.0, height() * 1.4) * 0.02;
+    auto baseFont      = font();
+    float setting_ratio= mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat();
+    float baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
     baseFont.setPointSizeF(baseRatio);
     setFont(baseFont);
     // taille font des titres
-    float titleRatio= baseRatio * 2.0;
+    setting_ratio   = mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat();
+    float titleRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(titleRatio);
     ui->ET_EventTitle->setFont(baseFont);
     ui->RT_RoundTitle->setFont(baseFont);
@@ -289,24 +293,23 @@ void DisplayWindow::resize() {
     ui->EE_Title->setFont(baseFont);
     ui->ER_Title->setFont(baseFont);
     // taille de textes longs
-    float longTextRatio= baseRatio * 0.6;
+    setting_ratio      = mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat();
+    float longTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(longTextRatio);
     ui->ER_Rules->setFont(baseFont);
     // Taille textes courts
-    float shortTextRatio= baseRatio * 1.4;
+    setting_ratio       = mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat();
+    float shortTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(shortTextRatio);
     ui->EP_Message->setFont(baseFont);
     ui->EE_EndMessage->setFont(baseFont);
     // taille des lignes et colonnes de la grille
     ui->RR_NumberGrid->horizontalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->width() / 10);
     ui->RR_NumberGrid->verticalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->height() / 9);
-    /*for(int col= 0; col < 10; ++col)
-        ui->RR_NumberGrid->setColumnWidth(col, ui->RR_NumberGrid->width() / 10);
-    for(int row= 0; row < 9; ++row)
-        ui->RR_NumberGrid->setRowHeight(row, ui->RR_NumberGrid->height() / 9);*/
     currentSize= size();
     // taille de police dans la grille
-    float gridRatio= baseRatio * .85;
+    setting_ratio  = mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat();
+    float gridRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(gridRatio);
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {

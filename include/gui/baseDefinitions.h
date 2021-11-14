@@ -24,16 +24,6 @@ static path baseExecPath;
 /// Nom du fichier de configuration générale de base.
 inline path iniFile= "config.ini";
 
-/// Clé vers le dataPath.
-inline QString dataPathKey= "path/data_path";
-
-/// Listes des formats d’image supportés
-inline QStringList imageFilter= {
-        "Toutes les images supportées (*.png *.jpg *.jpeg *.bmp)",
-        "Fichiers png (*.png)",
-        "Fichiers jpg (*.jpg, *.jpeg)",
-        "Fichiers bmp (*.bmp)",
-};
 
 /**
  * @brief Construit le chemin vers le fichier de configuration initiale
@@ -53,7 +43,7 @@ class About;
  * @brief Affiche une boite de dialogue disant que c’est en travaux.
  * @param from Une chaine permettant de savoir d’où vient la demande.
  */
-inline void showNotImplemented(const QString& from){
+inline void showNotImplemented(const QString& from) {
     QMessageBox message;
     message.setIcon(QMessageBox::Warning);
     message.setWindowTitle(from);
@@ -61,5 +51,26 @@ inline void showNotImplemented(const QString& from){
     message.setInformativeText("La fonction '" + from + "' N’a pas encore été implémentée.");
     message.exec();
 }
+
+/// Namespace regroupant les clées des paramètres.
+namespace settings {
+
+/// Clé vers le dataPath.
+inline QString dataPathKey        = "path/data_path";
+inline QString dataPathDefault    = "";
+inline QString themeNameKey       = "theme/name";
+inline QString themeNameDefault   = "default";
+inline QString globalScaleKey     = "theme/global_scale";
+inline float globalScaleDefault   = 0.02;
+inline QString titleScaleKey      = "theme/title_scale";
+inline float titleScaleDefault    = 2.0;
+inline QString shortTextScaleKey  = "theme/short_text_scale";
+inline float shortTextScaleDefault= 1.4;
+inline QString longTextScaleKey   = "theme/long_text_scale";
+inline float longTextScaleDefault = 0.6;
+inline QString gridTextScaleKey   = "theme/grid_text_scale";
+inline float gridTextScaleDefault = 0.85;
+
+}// namespace settings
 
 }// namespace evl::gui

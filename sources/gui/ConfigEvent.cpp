@@ -9,7 +9,6 @@
 #include "gui/BaseDialog.h"
 #include "gui/MainWindow.h"
 #include "gui/baseDefinitions.h"
-#include <QFileDialog>
 #include <QMessageBox>
 #include <fstream>
 
@@ -54,27 +53,17 @@ void ConfigEvent::actCancel() {
 }
 
 void ConfigEvent::actSearchOrgaLogo() {
-    QFileDialog dia;
-    dia.setAcceptMode(QFileDialog::AcceptOpen);
-    dia.setFileMode(QFileDialog::FileMode::ExistingFile);
-    dia.setNameFilters(imageFilter);
-    if(mwd != nullptr)
-        dia.setDirectory(mwd->getSettings().value(dataPathKey).toString());
-    if(dia.exec()) {
-        ui->OrgaLogo->setText(dia.selectedFiles()[0]);
-    }
+    auto path= dialog::openFile(dialog::FileTypes::Images, true);
+    if(path.empty())
+        return;
+    ui->OrgaLogo->setText(QString::fromUtf8(path.string()));
 }
 
 void ConfigEvent::actSearchLogo() {
-    QFileDialog dia;
-    dia.setAcceptMode(QFileDialog::AcceptOpen);
-    dia.setFileMode(QFileDialog::FileMode::ExistingFile);
-    dia.setNameFilters(imageFilter);
-    if(mwd != nullptr)
-        dia.setDirectory(mwd->getSettings().value(dataPathKey).toString());
-    if(dia.exec()) {
-        ui->EventLogo->setText(dia.selectedFiles()[0]);
-    }
+    auto path= dialog::openFile(dialog::FileTypes::Images, true);
+    if(path.empty())
+        return;
+    ui->EventLogo->setText(QString::fromUtf8(path.string()));
 }
 
 void ConfigEvent::setEvent(const core::Event& e) {
