@@ -331,10 +331,6 @@ void MainWindow::updateMenus() {
 }
 
 void MainWindow::updateBottomFrame() {
-    ui->tabStdResult->setVisible(false);
-    ui->tabStdResult->setEnabled(false);
-    ui->tabInverseResult->setVisible(false);
-    ui->tabInverseResult->setEnabled(false);
     updateRadioButtons();
 }
 

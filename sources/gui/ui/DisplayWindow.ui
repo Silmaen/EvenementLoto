@@ -27,7 +27,7 @@
                 <item row="2" column="0">
                     <widget class="QStackedWidget" name="PageManager">
                         <property name="currentIndex">
-                            <number>4</number>
+                            <number>2</number>
                         </property>
                         <widget class="QWidget" name="pageEventTitle">
                             <layout class="QGridLayout" name="gridLayout_2">
@@ -507,31 +507,31 @@
                                                                     <bool>false</bool>
                                                                 </attribute>
                                                                 <attribute name="horizontalHeaderMinimumSectionSize">
-                                                                    <number>40</number>
+                                                                    <number>0</number>
                                                                 </attribute>
                                                                 <attribute name="horizontalHeaderDefaultSectionSize">
-                                                                    <number>40</number>
+                                                                    <number>58</number>
                                                                 </attribute>
                                                                 <attribute name="horizontalHeaderHighlightSections">
                                                                     <bool>false</bool>
                                                                 </attribute>
                                                                 <attribute name="horizontalHeaderStretchLastSection">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </attribute>
                                                                 <attribute name="verticalHeaderVisible">
                                                                     <bool>false</bool>
                                                                 </attribute>
                                                                 <attribute name="verticalHeaderMinimumSectionSize">
-                                                                    <number>40</number>
+                                                                    <number>0</number>
                                                                 </attribute>
                                                                 <attribute name="verticalHeaderDefaultSectionSize">
-                                                                    <number>40</number>
+                                                                    <number>38</number>
                                                                 </attribute>
                                                                 <attribute name="verticalHeaderHighlightSections">
                                                                     <bool>false</bool>
                                                                 </attribute>
                                                                 <attribute name="verticalHeaderStretchLastSection">
-                                                                    <bool>false</bool>
+                                                                    <bool>true</bool>
                                                                 </attribute>
                                                                 <row/>
                                                                 <row/>

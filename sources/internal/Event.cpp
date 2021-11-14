@@ -10,8 +10,13 @@
 
 namespace evl::core {
 
+constexpr uint16_t currentSaveVersion= 2;
+
 // ---- Serialisation ----
 void Event::read(std::istream& is) {
+    uint16_t saveVersion;
+    is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
+    std::cout << "version read: " << saveVersion << std::endl;
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     sizeType l, i;
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
@@ -32,6 +37,13 @@ void Event::read(std::istream& is) {
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
     location.resize(l);
     for(i= 0; i < l; ++i) is.read(&(location[i]), charSize);
+    // version 2
+    if(saveVersion > 1) {
+        is.read(reinterpret_cast<char*>(&l), sizeof(l));
+        rules.resize(l);
+        for(i= 0; i < l; ++i) is.read(&(rules[i]), charSize);
+    }
+    // version 1
     roundsType::size_type lv, iv;
     is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
     gameRounds.resize(lv);
@@ -41,6 +53,7 @@ void Event::read(std::istream& is) {
 }
 
 void Event::write(std::ostream& os) const {
+    os.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     sizeType l, i;
     l= organizerName.size();
@@ -58,7 +71,11 @@ void Event::write(std::ostream& os) const {
     l= location.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
     for(i= 0; i < l; ++i) os.write(&(location[i]), charSize);
-
+    // version >= 2
+    l= rules.size();
+    os.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) os.write(&(rules[i]), charSize);
+    // version >= 1
     roundsType::size_type lv, iv;
     lv= gameRounds.size();
     os.write(reinterpret_cast<char*>(&lv), sizeof(lv));
@@ -177,6 +194,13 @@ void Event::setBasePath(const path& p) {
         organizerLogo= tOrgLogo;
     else
         organizerLogo= relative(tOrgLogo, basePath);
+}
+
+void Event::setRules(const string& newRules) {
+    if(!isEditable())
+        return;
+    rules= newRules;
+    checkValidConfig();
 }
 
 // ----- Manipulation des rounds ----
