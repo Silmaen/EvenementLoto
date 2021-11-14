@@ -266,26 +266,47 @@ void DisplayWindow::resetGrid() {
 }
 
 void DisplayWindow::resize() {
-    // taille de police dans la grille
-    auto font= ui->RR_NumberGrid->font();
-    int px   = std::min(ui->RR_NumberGrid->width() / 10, ui->RR_NumberGrid->height() / 9) / 3;
-    font.setPointSize(px);
-    ui->RR_NumberGrid->setFont(font);
-    ui->RR_SubRoundVictoryCondition->setFont(font);
-    ui->RR_SubRoundPrice->setFont(font);
-    for(int row= 0; row < 9; ++row) {
-        for(int col= 0; col < 10; ++col) {
-            QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col);
-            if(pCell) {
-                pCell->setFont(font);
-            }
-        }
-    }
+    // taille de la font par défaut
+    auto baseFont  = font();
+    float baseRatio= std::min(width() * 1.0, height() * 1.4) * 0.02;
+    baseFont.setPointSizeF(baseRatio);
+    setFont(baseFont);
+    // taille font des titres
+    float titleRatio= baseRatio * 2.0;
+    baseFont.setPointSizeF(titleRatio);
+    ui->ET_EventTitle->setFont(baseFont);
+    ui->RT_RoundTitle->setFont(baseFont);
+    ui->RR_Title->setFont(baseFont);
+    ui->RE_RoundEndTitle->setFont(baseFont);
+    ui->EP_Title->setFont(baseFont);
+    ui->EE_Title->setFont(baseFont);
+    ui->ER_Title->setFont(baseFont);
+    // taille de textes longs
+    float longTextRatio= baseRatio * 0.6;
+    baseFont.setPointSizeF(longTextRatio);
+    ui->ER_Rules->setFont(baseFont);
+    // Taille textes courts
+    float shortTextRatio= baseRatio * 1.4;
+    baseFont.setPointSizeF(shortTextRatio);
+    ui->EP_Message->setFont(baseFont);
+    ui->EE_EndMessage->setFont(baseFont);
+    // taille des lignes et colonnes de la grille
     for(int col= 0; col < 10; ++col)
         ui->RR_NumberGrid->setColumnWidth(col, ui->RR_NumberGrid->width() / 10);
     for(int row= 0; row < 9; ++row)
         ui->RR_NumberGrid->setRowHeight(row, ui->RR_NumberGrid->height() / 9);
     currentSize= size();
+    // taille de police dans la grille
+    float gridRatio= baseRatio * .85;
+    baseFont.setPointSizeF(gridRatio);
+    for(int row= 0; row < 9; ++row) {
+        for(int col= 0; col < 10; ++col) {
+            QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col);
+            if(pCell) {
+                pCell->setFont(baseFont);
+            }
+        }
+    }
     initializeDisplay();
 }
 

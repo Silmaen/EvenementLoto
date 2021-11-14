@@ -104,6 +104,7 @@ void MainWindow::actLoadFile() {
     if(!file.empty()) {
         std::ifstream f;
         f.open(file, std::ios::in | std::ios::binary);
+        currentEvent.setBasePath(file);
         currentEvent.read(f);
         f.close();
         currentFile= file;
