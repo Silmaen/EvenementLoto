@@ -24,6 +24,7 @@ public:
         FullCard, ///< Le joueur gagne dès qu’il complète son carton.
         Inverse   ///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
     };
+    static const std::unordered_map<Type, string> TypeConvert;
 
     /**
      * @brief Constructeur Avec données
@@ -89,6 +90,18 @@ public:
      * @param bs Le stream où écrire.
      */
     void write(std::ostream& bs) const override;
+
+    /**
+     * @brief Écriture dans un json.
+     * @return Le json à remplir
+     */
+    json to_json() const override;
+
+    /**
+     * @brief Lecture depuis un json
+     * @param j Le json à lire
+     */
+    void from_json(const json& j) override;
 
 private:
     /// La liste des prix pour ce

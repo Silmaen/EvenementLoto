@@ -9,7 +9,6 @@
 #include "CardPack.h"
 #include "GameRound.h"
 #include "Serializable.h"
-#include <filesystem>
 
 namespace evl::core {
 
@@ -33,7 +32,7 @@ public:
         GameStart,     ///< Est en début de partie
         GameRunning,   ///< Est en cours de partie
         GameFinished,  ///< Est en fin de partie
-        DisplayRules,  ///< En affichage des règles de l'événement
+        DisplayRules,  ///< En affichage des règles de l’événement
         Finished       ///< Est fini
     };
 
@@ -49,6 +48,30 @@ public:
      * @param bs Le stream où écrire.
      */
     void write(std::ostream& bs) const override;
+
+    /**
+     * @brief Écriture dans un json.
+     * @return Le json à remplir
+     */
+    json to_json() const override;
+
+    /**
+     * @brief Lecture depuis un json
+     * @param j Le json à lire
+     */
+    void from_json(const json& j) override;
+
+    /**
+     * @brief Export des parties au format JSON
+     * @param file Le fichier où exporter
+     */
+    void exportJSON(const path& file) const;
+
+    /**
+     * @brief Import des parties au format JSON
+     * @param file le fichier à importer
+     */
+    void importJSON(const path& file);
 
     // ---- manipulation du statut ----
     /**
@@ -98,25 +121,25 @@ public:
      * @brief Accès au logo de l’organisateur
      * @return Le logo de l’organisateur
      */
-    const std::filesystem::path& getOrganizerLogo() const { return organizerLogo; }
+    const path& getOrganizerLogo() const { return organizerLogo; }
 
     /**
      * @brief Definition du logo de l’organisateur.
      * @param logo Le logo de l’organisateur.
      */
-    void setOrganizerLogo(const std::filesystem::path& logo);
+    void setOrganizerLogo(const path& logo);
 
     /**
      * @brief Accès au logo de l’événement
      * @return Le logo de l’événement
      */
-    const std::filesystem::path& getLogo() const { return logo; }
+    const path& getLogo() const { return logo; }
 
     /**
      * @brief Definition du logo de l’événement.
      * @param logo Le logo de l’événement.
      */
-    void setLogo(const std::filesystem::path& logo);
+    void setLogo(const path& logo);
 
     // ----- Manipulation des rounds ----
     /**
@@ -181,7 +204,7 @@ public:
 
     /**
      * @brief Termine la partie en cours.
-     * @param w le numéro de la grille à ajouter
+     * @param w Le numéro de la grille à ajouter
      */
     void addWinnerToCurrentRound(const uint32_t w);
 
@@ -207,7 +230,7 @@ public:
     void pauseEvent();
 
     /**
-     * @brief Passe l'événement en mode d'affichage des règles.
+     * @brief Passe l’événement en mode d’affichage des règles.
      * resumeEvent() permet de retourner au statut précédent.
      */
     void displayRules();
@@ -244,7 +267,7 @@ private:
 
     /**
      * @brief Bascule à un nouveau statut et sauvegarde le précédent statut
-     * @param newStatus le nouveau statut à adopter
+     * @param newStatus Le nouveau statut à adopter
      */
     void changeStatus(const Status& newStatus);
 
@@ -260,11 +283,11 @@ private:
     /// Le nom de l’organisateur (requit pour validité)
     string organizerName;
     /// Logo de l’organisateur.
-    std::filesystem::path organizerLogo;
+    path organizerLogo;
     /// Nom de l’événement. (requit pour validité)
     string name;
     /// Logo de l’événement.
-    std::filesystem::path logo;
+    path logo;
     /// Lieu de l’événement.
     string location;
 

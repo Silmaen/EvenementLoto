@@ -50,7 +50,7 @@ Le programme a été correctement compilé avec :
   * [X] Ajout d’autres types de parties
   * [x] Désactivation boutons modification partie lors de l’affichage
 * Sauvegarde et restauration
-  * [ ] import fiches de lot en json
+  * [X] import fiches de lot en json
   * [ ] Version des sauvegardes binaire
     * [ ] Permettre l’ouverture de vielles versions
   * [ ] Chemin relatif au lieu de stockage du fichier binaire pour les images

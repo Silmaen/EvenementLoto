@@ -7,11 +7,11 @@
  */
 
 #pragma once
+#include "baseDefine.h"
 #include <chrono>
 #include <iomanip>
 #include <locale>
 #include <sstream>
-#include <string>
 
 namespace evl::core {
 /// Le type d'horloge
@@ -24,28 +24,28 @@ using duration= std::chrono::duration<double>;
 /// Point de référence dans le temps.
 constexpr timePoint epoch{};
 
-inline std::string formatCalendar(const timePoint& t) {
+inline string formatCalendar(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
     oss << std::put_time(std::localtime(&tt), "%d %B %Y");
     return oss.str();
 }
 
-inline std::string formatClock(const timePoint& t) {
+inline string formatClock(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
     oss << std::put_time(std::localtime(&tt), "%H:%M:%S");
     return oss.str();
 }
 
-inline std::string formatClockNoSecond(const timePoint& t) {
+inline string formatClockNoSecond(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
     oss << std::put_time(std::localtime(&tt), "%H:%M");
     return oss.str();
 }
 
-inline std::string formatDuration(const duration& d) {
+inline string formatDuration(const duration& d) {
     std::stringstream oss;
     auto h= std::chrono::duration_cast<std::chrono::hours>(d).count();
     if(h != 0) {

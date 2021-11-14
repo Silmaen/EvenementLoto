@@ -9,6 +9,16 @@
 
 namespace evl::core {
 
+const std::unordered_map<GameRound::Type, string> GameRound::TypeConvert= {
+        {Type::OneQuine, "une quine"},
+        {Type::TwoQuines, "deux quines"},
+        {Type::FullCard, "carton"},
+        {Type::OneQuineFullCard, "une quine et carton"},
+        {Type::OneTwoQuineFullCard, "normale"},
+        {Type::Enfant, "enfant"},
+        {Type::Inverse, "inverse"},
+};
+
 // --- constructeurs ----
 GameRound::GameRound(GameRound::Type t) {
     setType(t);
@@ -16,21 +26,8 @@ GameRound::GameRound(GameRound::Type t) {
 
 // ---- manipulation du type de partie ----
 string GameRound::getTypeStr() const {
-    switch(type) {
-    case Type::OneQuine:
-        return "un quine";
-    case Type::TwoQuines:
-        return "deux quines";
-    case Type::FullCard:
-        return "carton";
-    case Type::OneQuineFullCard:
-        return "un quine et carton";
-    case Type::OneTwoQuineFullCard:
-        return "complète";
-    case Type::Enfant:
-        return "enfant";
-    case Type::Inverse:
-        return "inverse";
+    if(TypeConvert.contains(type)) {
+        return TypeConvert.at(type);
     }
     return "inconnu";
 }
@@ -155,6 +152,29 @@ void GameRound::write(std::ostream& os) const {
     os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
     for(subRoundsType::size_type i= 0; i < l2; ++i)
         subGames[i].write(os);
+}
+
+json GameRound::to_json() const {
+    nlohmann::json sub;
+    for(auto& game: subGames) {
+        sub.push_back(game.to_json());
+    }
+    return json{{"type", getTypeStr()}, {"subGames", sub}};
+}
+
+void GameRound::from_json(const json& j) {
+    string srType;
+    j.at("type").get_to(srType);
+    for(auto& s: TypeConvert) {
+        if(s.second == srType) {
+            type= s.first;
+            break;
+        }
+    }
+    subGames.clear();
+    for(auto& jj: j.at("subGames")) {
+        subGames.emplace_back().from_json(jj);
+    }
 }
 
 bool GameRound::isEditable() const {

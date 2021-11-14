@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "core/Event.h"
+#include <fstream>
 
 namespace evl::core {
 
@@ -69,6 +70,37 @@ void Event::write(std::ostream& os) const {
     // TODO: gérer les cartons
 }
 
+json Event::to_json() const {
+    nlohmann::json sub;
+    for(auto& game: gameRounds) {
+        sub.push_back(game.to_json());
+    }
+    return json{{"rounds", sub}};
+}
+
+void Event::from_json(const json& j) {
+    gameRounds.clear();
+    for(auto& jj: j.at("rounds")) {
+        gameRounds.emplace_back().from_json(jj);
+    }
+}
+
+void Event::exportJSON(const path& file) const {
+    std::ofstream fileSave;
+    fileSave.open(file, std::ios::out | std::ios::binary);
+    fileSave << std::setw(4) << to_json();
+    fileSave.close();
+}
+
+void Event::importJSON(const path& file) {
+    std::ifstream fileRead;
+    fileRead.open(file, std::ios::in | std::ios::binary);
+    json j;
+    fileRead >> j;
+    from_json(j);
+    fileRead.close();
+}
+
 void Event::checkValidConfig() {
     if(organizerName.empty() || name.empty()) {
         status        = Status::Invalid;
@@ -110,14 +142,14 @@ void Event::setLocation(const std::string& _location) {
     checkValidConfig();
 }
 
-void Event::setLogo(const std::filesystem::path& _logo) {
+void Event::setLogo(const path& _logo) {
     if(!isEditable())
         return;
     logo= _logo;
     checkValidConfig();
 }
 
-void Event::setOrganizerLogo(const std::filesystem::path& _logo) {
+void Event::setOrganizerLogo(const path& _logo) {
     if(!isEditable())
         return;
     organizerLogo= _logo;
@@ -145,7 +177,7 @@ void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
 }
 
 Event::roundsType::iterator Event::findFirstNotFinished() {
-    return std::find_if(gameRounds.begin(), gameRounds.end(), [](GameRound gr) { return gr.getStatus() != GameRound::Status::Finished; });
+    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Finished; });
 }
 
 Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {

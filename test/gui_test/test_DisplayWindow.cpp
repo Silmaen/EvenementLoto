@@ -50,14 +50,14 @@ TEST(gui_DisplayWindow, updateDisplay_eventTitle_falselogo) {
 
 TEST(gui_DisplayWindow, updateDisplay_eventTitle_logo) {
     test::initialize();
-    evl::core::Event evl;
-    DisplayWindow a{&evl};
-    evl.setName("toto");
-    evl.setOrganizerName("titi");
-    evl.setLocation("ici");
-    std::filesystem::path dataPath= std::filesystem::current_path().parent_path().parent_path() / "data";
-    evl.setLogo(dataPath / "poule.png");
-    evl.setOrganizerLogo(dataPath / "poule.png");
+    evl::core::Event event;
+    DisplayWindow a{&event};
+    event.setName("toto");
+    event.setOrganizerName("titi");
+    event.setLocation("ici");
+    evl::path dataPath= std::filesystem::current_path().parent_path().parent_path() / "data";
+    event.setLogo(dataPath / "poule.png");
+    event.setOrganizerLogo(dataPath / "poule.png");
     a.updateDisplay();
     EXPECT_FALSE(a.getUi()->ET_EventLogo->pixmap().isNull());
     EXPECT_FALSE(a.getUi()->ET_OrganizerLogo->pixmap().isNull());

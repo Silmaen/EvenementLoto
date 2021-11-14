@@ -35,6 +35,18 @@ public:
     void read(std::istream& bs) override;
 
     /**
+     * @brief Écriture dans un json.
+     * @return Le json à remplir
+     */
+    json to_json() const override { return json{}; }
+
+    /**
+     * @brief Lecture depuis un json
+     * @param j Le json à lire
+     */
+    void from_json(const json&) override {}
+
+    /**
      * @brief Remet la classe à zéro.
      */
     void fullReset() {

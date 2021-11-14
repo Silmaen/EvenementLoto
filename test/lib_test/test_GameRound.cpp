@@ -41,7 +41,7 @@ TEST(GameRound, Type) {
 
 TEST(GameRound, Types) {
     GameRound gr{GameRound::Type::OneQuine};
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "un quine");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "une quine");
     EXPECT_EQ(gr.sizeSubRound(), 1);
     gr.setType(GameRound::Type::TwoQuines);
     EXPECT_STREQ(gr.getTypeStr().c_str(), "deux quines");
@@ -50,10 +50,10 @@ TEST(GameRound, Types) {
     EXPECT_STREQ(gr.getTypeStr().c_str(), "carton");
     EXPECT_EQ(gr.sizeSubRound(), 1);
     gr.setType(GameRound::Type::OneQuineFullCard);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "un quine et carton");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "une quine et carton");
     EXPECT_EQ(gr.sizeSubRound(), 2);
     gr.setType(GameRound::Type::OneTwoQuineFullCard);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "complète");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "normale");
     EXPECT_EQ(gr.sizeSubRound(), 3);
     gr.setType(GameRound::Type{-1});
 }

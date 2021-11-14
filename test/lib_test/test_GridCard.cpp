@@ -11,6 +11,7 @@ using namespace evl::core;
 
 TEST(GridCard, activation) {
     GridCard carton1;
+    carton1.from_json(carton1.to_json());
     EXPECT_TRUE(carton1.isActive());
     EXPECT_EQ(carton1.getStatus(), GridCard::Status::InGame);
     carton1.deactivate();

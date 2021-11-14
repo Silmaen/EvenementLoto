@@ -18,6 +18,7 @@ TEST(CardPack, generation) {
     CardPack p;
     p.getName()= "Mon  Loto";
 
+    p.from_json(p.to_json());
     RandomNumberGenerator rng;
 
     p.generate(200, &rng);
