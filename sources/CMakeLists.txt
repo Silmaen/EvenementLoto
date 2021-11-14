@@ -8,6 +8,8 @@ file(GLOB_RECURSE
         )
 add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
 target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
+# JSON
+target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_DIR}/third_party/nlohmann/include)
 #
 #  Base Library
 #

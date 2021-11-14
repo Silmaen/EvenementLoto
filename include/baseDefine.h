@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <filesystem>
 #include <string>
 
 /**
@@ -19,6 +20,9 @@ namespace evl {
 constexpr uint8_t nb_ligne= 3;
 /// Nombre de colonnes sur un carton
 constexpr uint8_t nb_colones= 5;
+
+/// Définition d’un chemin vers un fichier ou répertoire
+using path= std::filesystem::path;
 
 /// Définition des chaines de caractères
 using string= std::string;

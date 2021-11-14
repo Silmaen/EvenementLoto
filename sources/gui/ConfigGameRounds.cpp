@@ -6,7 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "gui/ConfigGameRounds.h"
-#include "core/timeFunctions.h"
+#include "gui/BaseDialog.h"
 
 // Les trucs de QT
 #include "gui/moc_ConfigGameRounds.cpp"
@@ -33,6 +33,20 @@ void ConfigGameRounds::actOk() {
 }
 
 void ConfigGameRounds::actApply() {
+}
+
+void ConfigGameRounds::actImportRounds() {
+    path file= dialog::openFile(dialog::FileTypes::JSON, true);
+    if(file.empty())
+        return;
+    gameEvent.importJSON(file);
+}
+
+void ConfigGameRounds::actExportRounds() {
+    path file= dialog::openFile(dialog::FileTypes::JSON, false);
+    if(file.empty())
+        return;
+    gameEvent.exportJSON(file);
 }
 
 void ConfigGameRounds::actCancel() {

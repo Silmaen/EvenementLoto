@@ -156,3 +156,36 @@ TEST(Event, Serialize) {
     EXPECT_EQ(evt2.getName(), evt.getName());
     fs::remove_all(tmp);
 }
+
+TEST(Event, JSONSerialize) {
+    Event evt;
+    evt.setName("toto");
+    evt.pushGameRound(GameRound(GameRound::Type::OneTwoQuineFullCard));
+    evt.pushGameRound(GameRound(GameRound::Type::OneTwoQuineFullCard));
+    auto round= evt.getGameRound(0);
+    auto sub  = round->getSubRound(0);
+    sub->define(sub->getType(), "Un canard en plastique\ndes chaussettes sales");
+    sub= round->getSubRound(1);
+    sub->define(sub->getType(), "un pistolet à eau\nun saucisson");
+    sub= round->getSubRound(2);
+    sub->define(sub->getType(), "un vibromasseur\ndes piles");
+    round= evt.getGameRound(1);
+    sub  = round->getSubRound(0);
+    sub->define(sub->getType(), "Un bob ricard\nun verre à ballon");
+    sub= round->getSubRound(1);
+    sub->define(sub->getType(), "un bon pour un tour à l’urinoir\nun colonel");
+    sub= round->getSubRound(2);
+    sub->define(sub->getType(), "un massage vibrant\nune queue de pie");
+
+    fs::path tmp= fs::temp_directory_path() / "test";
+    fs::create_directories(tmp);
+    fs::path file= tmp / "testGameRound.sdeg";
+
+    evt.exportJSON(file);
+
+    Event evt2;
+    evt2.importJSON(file);
+
+    EXPECT_STREQ(evt2.getGameRound(1)->getSubRound(1)->getPrices().c_str(), "un bon pour un tour à l’urinoir\nun colonel");
+    fs::remove_all(tmp);
+}

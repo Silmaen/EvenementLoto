@@ -75,6 +75,16 @@ public slots:
     void actOk();
 
     /**
+     * @brief Action lors du click sur le bouton d’import de partie.
+     */
+    void actImportRounds();
+
+    /**
+     * @brief Action lors du click sur le bouton d’export de partie.
+     */
+    void actExportRounds();
+
+    /**
      * @brief Action lors du click sur le bouton de création de partie.
      */
     void actCreateGameRound();

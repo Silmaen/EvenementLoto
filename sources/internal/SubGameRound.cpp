@@ -10,16 +10,16 @@
 
 namespace evl::core {
 
+const std::unordered_map<SubGameRound::Type, string> SubGameRound::TypeConvert= {
+        {SubGameRound::Type::OneQuine, "une quine"},
+        {SubGameRound::Type::TwoQuines, "deux quines"},
+        {SubGameRound::Type::FullCard, "carton plein"},
+        {SubGameRound::Type::Inverse, "inverse"},
+};
+
 const string SubGameRound::getTypeStr() const {
-    switch(type) {
-    case Type::OneQuine:
-        return "une quine";
-    case Type::TwoQuines:
-        return "deux quines";
-    case Type::FullCard:
-        return "carton plein";
-    case Type::Inverse:
-        return "inverse";
+    if(TypeConvert.contains(type)) {
+        return TypeConvert.at(type);
     }
     return evl::string("Type Inconnu");
 }
@@ -41,6 +41,22 @@ void SubGameRound::write(std::ostream& bs) const {
     bs.write((char*)&l, sizeof(sizeType));
     for(sizeType i= 0; i < l; i++)
         bs.write((char*)&prices[i], charSize);
+}
+
+json SubGameRound::to_json() const {
+    return json{{"type", getTypeStr()}, {"prices", prices}};
+}
+
+void SubGameRound::from_json(const json& j) {
+    string srType;
+    j.at("type").get_to(srType);
+    for(auto& s: TypeConvert) {
+        if(s.second == srType) {
+            type= s.first;
+            break;
+        }
+    }
+    j.at("prices").get_to(prices);
 }
 
 }// namespace evl::core

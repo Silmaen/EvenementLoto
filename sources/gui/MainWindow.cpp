@@ -116,7 +116,7 @@ void MainWindow::actLoadFile() {
 void MainWindow::actSaveFile() {
     if(currentEvent.getStatus() == core::Event::Status::Invalid)
         return;
-    std::filesystem::path base= settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString().toStdString();
+    path base= settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString().toStdString();
     base/= currentEvent.getName() + ".lev";
     std::ofstream f;
     f.open(base, std::ios::out | std::ios::binary);

@@ -593,6 +593,52 @@
                             </widget>
                         </item>
                         <item>
+                            <spacer name="horizontalSpacer_7">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonImport">
+                                <property name="text">
+                                    <string>Importer</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_9">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonExport">
+                                <property name="text">
+                                    <string>Exporter</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
                             <spacer name="horizontalSpacer_4">
                                 <property name="orientation">
                                     <enum>Qt::Horizontal</enum>
@@ -621,8 +667,8 @@
             <slot>actOk()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>397</x>
-                    <y>610</y>
+                    <x>315</x>
+                    <y>620</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>392</x>
@@ -637,8 +683,8 @@
             <slot>actApply()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>493</x>
-                    <y>611</y>
+                    <x>422</x>
+                    <y>620</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>491</x>
@@ -653,8 +699,8 @@
             <slot>actCancel()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>592</x>
-                    <y>605</y>
+                    <x>529</x>
+                    <y>620</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>589</x>
@@ -781,8 +827,8 @@
             <slot>actCreateSubGameRound()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>325</x>
-                    <y>105</y>
+                    <x>370</x>
+                    <y>118</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>217</x>
@@ -797,8 +843,8 @@
             <slot>actDeleteSubGameRound()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>356</x>
-                    <y>109</y>
+                    <x>400</x>
+                    <y>118</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>240</x>
@@ -813,8 +859,8 @@
             <slot>actMoveSubGameRoundBefore()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>391</x>
-                    <y>110</y>
+                    <x>430</x>
+                    <y>118</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>383</x>
@@ -829,8 +875,8 @@
             <slot>actMoveSubGameRoundBefore()</slot>
             <hints>
                 <hint type="sourcelabel">
-                    <x>417</x>
-                    <y>106</y>
+                    <x>460</x>
+                    <y>118</y>
                 </hint>
                 <hint type="destinationlabel">
                     <x>420</x>
@@ -870,6 +916,38 @@
                 </hint>
             </hints>
         </connection>
+        <connection>
+            <sender>ButtonImport</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actExportRounds()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>617</x>
+                    <y>612</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>663</x>
+                    <y>646</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonExport</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGameRounds</receiver>
+            <slot>actExportRounds()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>703</x>
+                    <y>614</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>659</x>
+                    <y>642</y>
+                </hint>
+            </hints>
+        </connection>
     </connections>
     <slots>
         <slot>actOk()</slot>
@@ -888,5 +966,7 @@
         <slot>actMoveSubGameRoundAfter()</slot>
         <slot>actChangeSelectedGameRound()</slot>
         <slot>actChangeSelectedSubGameRound()</slot>
+        <slot>actImportRounds()</slot>
+        <slot>actExportRounds()</slot>
     </slots>
 </ui>

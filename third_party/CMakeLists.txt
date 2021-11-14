@@ -1,5 +1,5 @@
 #
-# the thrid parties for project EvenementLoto
+# the third parties for project EvenementLoto
 #
 
 #
