@@ -69,7 +69,7 @@ public:
 
     /**
      * @brief Import des parties au format JSON
-     * @param file le fichier à importer
+     * @param file Le fichier à importer
      */
     void importJSON(const path& file);
 
@@ -124,6 +124,15 @@ public:
     const path& getOrganizerLogo() const { return organizerLogo; }
 
     /**
+     * @brief Accès au chemin complet vers le log de l’organisateur
+     * @return Chemin complet vers le log de l’organisateur
+     */
+    path getOrganizerLogoFull() const {
+        if(organizerLogo.empty())
+            return organizerLogo;
+        return getBasePath() / getOrganizerLogo();
+    }
+    /**
      * @brief Definition du logo de l’organisateur.
      * @param logo Le logo de l’organisateur.
      */
@@ -134,6 +143,16 @@ public:
      * @return Le logo de l’événement
      */
     const path& getLogo() const { return logo; }
+
+    /**
+     * @brief Accès au chemin complet vers le logo de l’événement
+     * @return Chemin complet vers le logo de l’événement
+     */
+    path getLogoFull() const {
+        if(logo.empty())
+            return logo;
+        return getBasePath() / getLogo();
+    }
 
     /**
      * @brief Definition du logo de l’événement.
@@ -259,6 +278,20 @@ public:
      */
     const timePoint& getEnding() const { return end; }
 
+    // ---- accès au chemin ----
+
+    /**
+     * @brief Récupération du chemin de base vers l’événement
+     * @return Le chemin de base de l’événement
+     */
+    const path& getBasePath() const { return basePath; }
+
+    /**
+     * @brief Definition du chemin de base vers l’événement
+     * @param p Le chemin vers l’événement
+     */
+    void setBasePath(const path& p);
+
 private:
     /**
      * @brief Si l’événement est en phase d’édition, met à jour son statuT.
@@ -299,6 +332,9 @@ private:
 
     /// La date et heure de début de l’événement
     timePoint end{};
+
+    /// Le chemin de base de l’événement
+    path basePath;
 
     /// Lien vers la liste des cartons
     //[[maybe_unused]] CardPack* cartons= nullptr;

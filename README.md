@@ -49,12 +49,16 @@ Le programme a été correctement compilé avec :
 * Interaction
   * [X] Ajout d’autres types de parties
   * [x] Désactivation boutons modification partie lors de l’affichage
+  * [ ] Edition du règlement dans la fenêtre de configuration de l’événement.
 * Sauvegarde et restauration
   * [X] import fiches de lot en json
   * [ ] Version des sauvegardes binaire
     * [ ] Permettre l’ouverture de vielles versions
-  * [ ] Chemin relatif au lieu de stockage du fichier binaire pour les images
-    * [ ] Copie des images dans le dossier contenant le fichier de sauvegarde
+  * [X] Chemin relatif au lieu de stockage du fichier binaire pour les images
+    * [X] Copie des images dans le dossier contenant le fichier de sauvegarde
+  * [ ] Gestion du règlement
+    * [ ] Import/Export via un fichier markdown
+    * [ ] Sauvegarde dans l’événement
 * Compilation
   * [x] Test compilation OpenBSD
   * [ ] Test compilation msvc (et clang-cl et clang natif)

@@ -124,12 +124,12 @@ private slots:
     void actQuit();
 
     /**
-     * @brief Fonction démarrage et fin d'une partie
+     * @brief Fonction démarrage et fin d’une partie
      */
     void actStartStopRound();
 
     /**
-     * @brief Fonction pause et reprise d'une partie
+     * @brief Fonction pause et reprise d’une partie
      */
     void actPauseResumeRound();
 
@@ -144,22 +144,22 @@ private slots:
     void actCancelPick();
 
     /**
-     * @brief action de changement du radio bouton de type de tirage.
+     * @brief Action de changement du radio bouton de type de tirage.
      */
     void actRadioPureRandom();
 
     /**
-     * @brief action de changement du radio bouton de type de tirage.
+     * @brief Action de changement du radio bouton de type de tirage.
      */
     void actRadioPureManual();
 
     /**
-     * @brief action de changement du radio bouton de type de tirage.
+     * @brief Action de changement du radio bouton de type de tirage.
      */
     void actRadioBoth();
 
     /**
-     * @brief Action de passage en doe d'affichage des règles.
+     * @brief Action de passage en doe d’affichage des règles.
      */
     void actDisplayRules();
 
@@ -245,6 +245,9 @@ private:
 
     /// Le générateur de nombre aléatoire
     core::RandomNumberGenerator rng;
+
+    /// Le fichier courant
+    path currentFile= path{};
 
     enum struct DrawMode {
         Both,

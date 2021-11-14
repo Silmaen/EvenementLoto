@@ -32,4 +32,6 @@ enum struct FileTypes {
  */
 path openFile(const FileTypes& type= FileTypes::EventSave, bool exist= false);
 
+bool question(const QString& title, const QString& question, const QString& add= "");
+
 }// namespace evl::gui::dialog

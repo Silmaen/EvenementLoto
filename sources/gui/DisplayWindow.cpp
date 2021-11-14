@@ -44,7 +44,7 @@ void setPixMap(QLabel* where, const QString& name, const QImage& img) {
 
 void DisplayWindow::initializeDisplay() {
     //  les images
-    if(event->getOrganizerLogo().string().empty()) {
+    if(event->getOrganizerLogoFull().empty()) {
         ui->ET_OrganizerLogo->setVisible(false);
         ui->RR_Logo->setVisible(false);
         ui->RT_Logo->setVisible(false);
@@ -55,7 +55,7 @@ void DisplayWindow::initializeDisplay() {
         ui->ER_LogoA->setVisible(false);
         ui->ER_LogoB->setVisible(false);
     } else {
-        if(!exists(event->getOrganizerLogo())) {
+        if(!exists(event->getOrganizerLogoFull())) {
             ui->ET_OrganizerLogo->setVisible(false);
             ui->RR_Logo->setVisible(false);
             ui->RT_Logo->setVisible(false);
@@ -66,7 +66,7 @@ void DisplayWindow::initializeDisplay() {
             ui->ER_LogoA->setVisible(false);
             ui->ER_LogoB->setVisible(false);
         } else {
-            QString imgName(QString::fromUtf8(event->getOrganizerLogo().string()));
+            QString imgName(QString::fromUtf8(event->getOrganizerLogoFull().string()));
             QImage img;
             img.load(imgName);
             setPixMap(ui->ET_OrganizerLogo, imgName, img);
@@ -80,13 +80,13 @@ void DisplayWindow::initializeDisplay() {
             setPixMap(ui->ER_LogoB, imgName, img);
         }
     }
-    if(event->getLogo().empty()) {
+    if(event->getLogoFull().empty()) {
         ui->ET_EventLogo->setVisible(false);
     } else {
-        if(!exists(event->getLogo())) {
+        if(!exists(event->getLogoFull())) {
             ui->ET_EventLogo->setVisible(false);
         } else {
-            QString imgName(QString::fromUtf8(event->getLogo().string()));
+            QString imgName(QString::fromUtf8(event->getLogoFull().string()));
             QImage img;
             img.load(imgName);
             setPixMap(ui->ET_EventLogo, imgName, img);
