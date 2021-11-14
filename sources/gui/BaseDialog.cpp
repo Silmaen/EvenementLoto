@@ -34,4 +34,16 @@ path openFile(const FileTypes& type, bool exist) {
     return path{};
 }
 
+bool question(const QString& title, const QString& question, const QString& add) {
+    QMessageBox message;
+    message.setIcon(QMessageBox::Question);
+    message.setWindowTitle(title);
+    message.setText(question);
+    message.setInformativeText(add);
+    message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
+    if(message.exec() == QMessageBox::StandardButton::Yes)
+        return true;
+    return false;
+}
+
 }// namespace evl::gui::dialog

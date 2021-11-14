@@ -6,8 +6,8 @@
  * All modification must get authorization from the author.
  */
 #include "gui/MainWindow.h"
-#include "core/timeFunctions.h"
 #include "gui/About.h"
+#include "gui/BaseDialog.h"
 #include "gui/ConfigCardPack.h"
 #include "gui/ConfigEvent.h"
 #include "gui/ConfigGameRounds.h"
@@ -95,20 +95,18 @@ void MainWindow::actShowEventParameters() {
 
 void MainWindow::actNewFile() {
     currentEvent= core::Event();
+    currentFile = path{};
     updateDisplay();
 }
 
 void MainWindow::actLoadFile() {
-    QFileDialog dia;
-    dia.setAcceptMode(QFileDialog::AcceptOpen);
-    dia.setFileMode(QFileDialog::FileMode::ExistingFile);
-    dia.setDirectory(settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString());
-    dia.setNameFilter("fichier événement (*.lev)");
-    if(dia.exec()) {
+    path file= dialog::openFile(dialog::FileTypes::EventSave, true);
+    if(!file.empty()) {
         std::ifstream f;
-        f.open(dia.selectedFiles()[0].toStdString(), std::ios::in | std::ios::binary);
+        f.open(file, std::ios::in | std::ios::binary);
         currentEvent.read(f);
         f.close();
+        currentFile= file;
     }
     updateDisplay();
 }
@@ -116,26 +114,52 @@ void MainWindow::actLoadFile() {
 void MainWindow::actSaveFile() {
     if(currentEvent.getStatus() == core::Event::Status::Invalid)
         return;
-    path base= settings.value(dataPathKey, QString::fromStdString(baseExecPath.string())).toString().toStdString();
-    base/= currentEvent.getName() + ".lev";
+    if(currentFile.empty()) {
+        actSaveAsFile();
+        return;
+    }
     std::ofstream f;
-    f.open(base, std::ios::out | std::ios::binary);
+    f.open(currentFile, std::ios::out | std::ios::binary);
+    currentEvent.setBasePath(currentFile.parent_path());
+    // copy image file if not in child directory
+    if(!currentEvent.getLogo().empty()) {
+        path ori= currentEvent.getLogoFull();
+        if(ori.parent_path() != currentEvent.getBasePath()) {
+            path dest= currentEvent.getBasePath() / ori.filename();
+            if(exists(dest))
+                remove(dest);
+            copy_file(ori, dest);
+            currentEvent.setLogo(dest);
+        }
+    }
+    if(!currentEvent.getOrganizerLogo().empty()) {
+        path ori= currentEvent.getOrganizerLogoFull();
+        if(ori.parent_path() != currentEvent.getBasePath()) {
+            path dest= currentEvent.getBasePath() / ori.filename();
+            if(exists(dest))
+                remove(dest);
+            copy_file(ori, dest);
+            currentEvent.setOrganizerLogo(dest);
+        }
+    }
     currentEvent.write(f);
     f.close();
 }
 
 void MainWindow::actSaveAsFile() {
-    showNotImplemented("Sauver événement sous...");
+    if(currentEvent.getStatus() == core::Event::Status::Invalid)
+        return;
+    path file= dialog::openFile(dialog::FileTypes::EventSave, false);
+    if(file.empty())
+        return;
+    currentFile= file;
+    actSaveFile();
 }
 
 void MainWindow::actStartEvent() {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Question);
-    message.setWindowTitle("Démarrage de l’événement.");
-    message.setText("Êtes-vous sûr de vouloir démarrer l’événement ?");
-    message.setInformativeText("Une fois démarré, la configuration de l’événement et de ses parties ne pourra plus être modifié.");
-    message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
-    if(message.exec() != QMessageBox::StandardButton::Yes)
+    if(!dialog::question("Démarrage de l’événement.",
+                         "Êtes-vous sûr de vouloir démarrer l’événement ?",
+                         "Une fois démarré, la configuration de l’événement et de ses parties ne pourra plus être modifié."))
         return;
     currentEvent.startEvent();
     updateDisplay();
@@ -145,13 +169,9 @@ void MainWindow::actStartEvent() {
 }
 
 void MainWindow::actEndEvent() {
-    QMessageBox message;
-    message.setIcon(QMessageBox::Question);
-    message.setWindowTitle("Terminer de l’événement.");
-    message.setText("Êtes-vous sûr de vouloir terminer l’événement ?");
-    message.setInformativeText("Une fois terminé, l’événement ne pourra plus être démarré à nouveau.");
-    message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
-    if(message.exec() != QMessageBox::StandardButton::Yes)
+    if(!dialog::question("Terminer de l’événement.",
+                         "Êtes-vous sûr de vouloir terminer l’événement ?",
+                         "Une fois terminé, l’événement ne pourra plus être démarré à nouveau."))
         return;
     timer->stop();
     displayWindow->hide();
@@ -276,11 +296,13 @@ void MainWindow::updateMenus() {
     //   ui->actionLoadEvent    <- toujours actif, change jamais de texte
     //   ui->actionSaveEvent
     if(currentEvent.getStatus() == core::Event::Status::Invalid ||
-       currentEvent.getStatus() == core::Event::Status::MissingParties)
+       currentEvent.getStatus() == core::Event::Status::MissingParties) {
         ui->actionSaveEvent->setEnabled(false);
-    else
+        ui->actionSaveEventAs->setEnabled(false);
+    } else {
         ui->actionSaveEvent->setEnabled(true);
-    //   ui->actionSaveEventAs  <- jamais actif, change jamais de texte
+        ui->actionSaveEventAs->setEnabled(true);
+    }
     //   ui->actionStartEvent
     if(currentEvent.getStatus() == core::Event::Status::Ready)
         ui->actionStartEvent->setEnabled(true);

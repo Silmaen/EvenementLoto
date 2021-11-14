@@ -693,10 +693,10 @@
                                                                      <string>Pause/reprise partie</string>
                                                                  </property>
                                                                  <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
+                                                                     <iconset>
                                                                          <normaloff>
-                                                                             :/icons/icons/hourglass.png</normaloff>
+                                                                             :/icons/icons/hourglass.png
+                                                                         </normaloff>
                                                                          :/icons/icons/hourglass.png
                                                                      </iconset>
                                                                  </property>
@@ -1397,7 +1397,7 @@
              <addaction name="separator"/>
              <addaction name="actionLoadEvent"/>
              <addaction name="actionSaveEvent"/>
-             <addaction name="actionSauveEventAs"/>
+             <addaction name="actionSaveEventAs"/>
              <addaction name="separator"/>
              <addaction name="actionStartEvent"/>
              <addaction name="actionEndEvent"/>
@@ -1589,7 +1589,7 @@
              <string>Terminer</string>
          </property>
      </action>
-     <action name="actionSauveEventAs">
+     <action name="actionSaveEventAs">
          <property name="enabled">
              <bool>false</bool>
          </property>
@@ -1772,19 +1772,19 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actSaveFile()</slot>
-   <hints>
-       <hint type="sourcelabel">
-           <x>-1</x>
-           <y>-1</y>
-       </hint>
-       <hint type="destinationlabel">
-           <x>418</x>
-           <y>352</y>
-       </hint>
-   </hints>
+      <hints>
+          <hint type="sourcelabel">
+              <x>-1</x>
+              <y>-1</y>
+          </hint>
+          <hint type="destinationlabel">
+              <x>418</x>
+              <y>352</y>
+          </hint>
+      </hints>
   </connection>
      <connection>
-         <sender>actionSauveEventAs</sender>
+         <sender>actionSaveEventAs</sender>
          <signal>triggered()</signal>
          <receiver>MainWindow</receiver>
          <slot>actSaveAsFile()</slot>

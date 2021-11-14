@@ -145,15 +145,38 @@ void Event::setLocation(const std::string& _location) {
 void Event::setLogo(const path& _logo) {
     if(!isEditable())
         return;
-    logo= _logo;
+    if(_logo.empty() || _logo.is_relative() || basePath.empty())
+        logo= _logo;
+    else
+        logo= relative(_logo, basePath);
     checkValidConfig();
 }
 
 void Event::setOrganizerLogo(const path& _logo) {
     if(!isEditable())
         return;
-    organizerLogo= _logo;
+    if(_logo.empty() || _logo.is_relative() || basePath.empty())
+        organizerLogo= _logo;
+    else
+        organizerLogo= relative(_logo, basePath);
     checkValidConfig();
+}
+
+void Event::setBasePath(const path& p) {
+    path tLogo   = getLogoFull();
+    path tOrgLogo= getOrganizerLogoFull();
+    if(is_directory(p))
+        basePath= p;
+    else
+        basePath= p.parent_path();
+    if(tLogo.empty() || tLogo.is_relative() || basePath.empty())
+        logo= tLogo;
+    else
+        logo= relative(tLogo, basePath);
+    if(tOrgLogo.empty() || tOrgLogo.is_relative() || basePath.empty())
+        organizerLogo= tOrgLogo;
+    else
+        organizerLogo= relative(tOrgLogo, basePath);
 }
 
 // ----- Manipulation des rounds ----
