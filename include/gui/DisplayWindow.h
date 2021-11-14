@@ -20,6 +20,8 @@ class DisplayWindow;
 
 namespace evl::gui {
 
+class MainWindow;
+
 class DisplayWindow: public QMainWindow {
     Q_OBJECT
 public:
@@ -28,7 +30,7 @@ public:
      * @param evt Pointeur vers l’événement.
      * @param parent Le widget Parent.
      */
-    explicit DisplayWindow(core::Event* evt, QWidget* parent= nullptr);
+    explicit DisplayWindow(core::Event* evt, MainWindow* parent= nullptr);
 
     /**
      * @brief Destructeur.
@@ -94,6 +96,8 @@ private:
     QSize currentSize;
     /// sauvegarde du statut
     core::Event::Status currentStatus;
+    /// Lien vers la MainWindow
+    MainWindow* mwd= nullptr;
 };
 
 }// namespace evl::gui

@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+#include "baseDefine.h"
 #include <QDialog>
 
 namespace Ui {
@@ -64,6 +65,21 @@ public slots:
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
     void actSearchFolder();
+
+    /**
+     * @brief Réagit au clic sur la recherche d’un dossier.
+     */
+    void actResetTheme();
+
+    /**
+     * @brief Réagit au clic sur la recherche d’un dossier.
+     */
+    void actImportTheme();
+
+    /**
+    * @brief Réagit au clic sur la recherche d’un dossier.
+    */
+    void actExportTheme();
 
 private:
     /**

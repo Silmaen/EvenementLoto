@@ -22,6 +22,7 @@ enum struct FileTypes {
     Images,   /// La liste des images supportées
     JSON,     /// Un fichier JSON
     Text,     /// Fichiers textes ou markdown
+    ThemeFile,/// Fichier de thème
     Folder,   /// Un dossier
 };
 
