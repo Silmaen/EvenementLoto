@@ -8,6 +8,7 @@
 #pragma once
 
 #include "DisplayWindow.h"
+#include "VisualTheme.h"
 #include "WidgetNumberGrid.h"
 #include <QMainWindow>
 #include <QSettings>
@@ -169,6 +170,12 @@ private slots:
      */
     void actGridPushed(int value);
 
+    /**
+     * @brief Accès direct au theme visuel
+     * @return Le theme visuel
+     */
+    VisualTheme& getTheme() { return theme; }
+
 private:
     /**
     * @brief Mise à jour de l’affichage des horloges
@@ -245,6 +252,9 @@ private:
 
     /// Le générateur de nombre aléatoire
     core::RandomNumberGenerator rng;
+
+    /// Le theme visuel
+    VisualTheme theme;
 
     /// Le fichier courant
     path currentFile= path{};

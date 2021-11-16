@@ -56,8 +56,8 @@ TEST(gui_DisplayWindow, updateDisplay_eventTitle_logo) {
     event.setOrganizerName("titi");
     event.setLocation("ici");
     evl::path dataPath= std::filesystem::current_path().parent_path().parent_path() / "data";
-    event.setLogo(dataPath / "poule.png");
-    event.setOrganizerLogo(dataPath / "poule.png");
+    event.setLogo(dataPath / "logo_sou.png");
+    event.setOrganizerLogo(dataPath / "logo_sou.png");
     a.updateDisplay();
     EXPECT_FALSE(a.getUi()->ET_EventLogo->pixmap().isNull());
     EXPECT_FALSE(a.getUi()->ET_OrganizerLogo->pixmap().isNull());

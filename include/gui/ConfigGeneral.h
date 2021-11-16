@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #pragma once
-#include "baseDefine.h"
 #include <QDialog>
 
 namespace Ui {
