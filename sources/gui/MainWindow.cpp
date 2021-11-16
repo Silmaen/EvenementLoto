@@ -12,9 +12,7 @@
 #include "gui/ConfigEvent.h"
 #include "gui/ConfigGameRounds.h"
 #include "gui/ConfigGeneral.h"
-#include "gui/baseDefinitions.h"
 #include <QFileDialog>
-#include <QMessageBox>
 #include <fstream>
 #include <iostream>
 
@@ -29,7 +27,8 @@ MainWindow::MainWindow(QWidget* parent):
     ui(new Ui::MainWindow),
     settings{QString(getIniFile().generic_u8string().c_str()), QSettings::IniFormat},
     timer(new QTimer(this)),
-    numberGrid(new WidgetNumberGrid()) {
+    numberGrid(new WidgetNumberGrid()),
+    theme(&settings) {
     // initialise l'ui depuis le fichier ui.
     ui->setupUi(this);
     // initialise la numberGrid

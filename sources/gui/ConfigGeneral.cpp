@@ -5,16 +5,17 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "gui/ConfigGeneral.h"
-#include "gui/BaseDialog.h"
-#include "gui/MainWindow.h"
-#include "gui/baseDefinitions.h"
-#include <fstream>
-#include <iostream>
 
 // Les trucs de QT
 #include "gui/moc_ConfigGeneral.cpp"
 #include "ui/ui_ConfigGeneral.h"
+
+#include "gui/BaseDialog.h"
+#include "gui/ConfigGeneral.h"
+#include "gui/MainWindow.h"
+#include "gui/baseDefinitions.h"
+#include <fstream>
+#include <iostream>
 
 namespace evl::gui {
 

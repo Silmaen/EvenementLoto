@@ -275,7 +275,10 @@ void DisplayWindow::resetGrid() {
 }
 
 void DisplayWindow::resize() {
+    initializeDisplay();
     // taille de la font par défaut
+    if(mwd == nullptr)
+        return;
     auto baseFont      = font();
     float setting_ratio= mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat();
     float baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
@@ -319,7 +322,6 @@ void DisplayWindow::resize() {
             }
         }
     }
-    initializeDisplay();
 }
 
 }// namespace evl::gui
