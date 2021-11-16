@@ -69,3 +69,21 @@ TEST(gui_VisualTheme, ExportJSON) {
     EXPECT_STREQ(resu.c_str(), "{\n    \"theme\": {\n        \"baseRatio\": 0.02,\n        \"gridTextRatio\": 0.85,\n        \"longTextRatio\": 0.6,\n        \"name\": \"default\",\n        \"shortTextRatio\": 1.4,\n        \"titleRatio\": 2.0\n    }\n}");
     fs::remove_all(tmp);
 }
+
+TEST(gui_VisualTheme, ImportJSON) {
+    fs::path tmp= fs::temp_directory_path() / "test";
+    fs::create_directories(tmp);
+    fs::path file= tmp / "test.json";
+
+    json j= {{"theme", {{"baseRatio", 0.04}, {"gridTextRatio", 0.85}, {"longTextRatio", 0.6}, {"name", "titi"}, {"shortTextRatio", 1.4}, {"titleRatio", 2.0}}}};
+    std::ofstream outFile(file, std::ios::out);
+    outFile << j;
+    outFile.close();
+
+    QSettings settings;
+    VisualTheme theme(&settings);
+    theme.importJSON(file);
+    EXPECT_EQ(theme.getParam("baseRatio").toDouble(), 0.04);
+    EXPECT_STREQ(theme.getParam("name").toString().toStdString().c_str(), "titi");
+    fs::remove_all(tmp);
+}

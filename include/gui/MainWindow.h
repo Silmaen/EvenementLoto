@@ -50,6 +50,12 @@ public:
      * @return Les paramètres.
      */
     [[nodiscard]] QSettings& getSettings() { return settings; }
+
+    /**
+     * @brief Accès direct au theme visuel
+     * @return Le theme visuel
+     */
+    VisualTheme& getTheme() { return theme; }
 public slots:
 
     /**
@@ -170,11 +176,6 @@ private slots:
      */
     void actGridPushed(int value);
 
-    /**
-     * @brief Accès direct au theme visuel
-     * @return Le theme visuel
-     */
-    VisualTheme& getTheme() { return theme; }
 
 private:
     /**

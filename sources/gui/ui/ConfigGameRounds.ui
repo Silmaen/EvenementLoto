@@ -1,972 +1,956 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-    <class>ConfigGameRounds</class>
-    <widget class="QDialog" name="ConfigGameRounds">
-        <property name="geometry">
-            <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>985</width>
-                <height>640</height>
-            </rect>
+ <class>ConfigGameRounds</class>
+ <widget class="QDialog" name="ConfigGameRounds">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>903</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Configuration Parties</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QFrame" name="GroupEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>2</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QGroupBox" name="groupGameRound">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="windowTitle">
-            <string>Configuration Parties</string>
+        <property name="title">
+         <string>Liste des Parties</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="0">
-                <widget class="QFrame" name="GroupEdit">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                            <horstretch>0</horstretch>
-                            <verstretch>2</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="frameShape">
-                        <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_2">
-                        <item row="0" column="0">
-                            <widget class="QGroupBox" name="groupGameRound">
-                                <property name="sizePolicy">
-                                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                        <horstretch>1</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="title">
-                                    <string>Liste des Parties</string>
-                                </property>
-                                <layout class="QGridLayout" name="gridLayout_3">
-                                    <item row="0" column="0">
-                                        <widget class="QPushButton" name="btnAddRound">
-                                            <property name="sizePolicy">
-                                                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                                                    <horstretch>0</horstretch>
-                                                    <verstretch>0</verstretch>
-                                                </sizepolicy>
-                                            </property>
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/submit-for-approval.png</normaloff>
-                                                    :/icons/icons/submit-for-approval.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="1">
-                                        <widget class="QPushButton" name="btnDelRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/clear-symbol.png</normaloff>
-                                                    :/icons/icons/clear-symbol.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="2">
-                                        <widget class="QPushButton" name="btnUpRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/sort-up.png</normaloff>
-                                                    :/icons/icons/sort-up.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="3">
-                                        <widget class="QPushButton" name="btnDownRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/sort-down.png</normaloff>
-                                                    :/icons/icons/sort-down.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="4">
-                                        <spacer name="horizontalSpacer_5">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
-                                                <size>
-                                                    <width>139</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
-                                    </item>
-                                    <item row="1" column="0" colspan="5">
-                                        <widget class="QListWidget" name="listGameRound"/>
-                                    </item>
-                                </layout>
-                            </widget>
-                        </item>
-                        <item row="0" column="1">
-                            <widget class="QGroupBox" name="groupSubRound">
-                                <property name="sizePolicy">
-                                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                        <horstretch>1</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="title">
-                                    <string>Phases de la partie</string>
-                                </property>
-                                <layout class="QGridLayout" name="gridLayout_4">
-                                    <item row="0" column="0" colspan="4">
-                                        <widget class="QLabel" name="label">
-                                            <property name="text">
-                                                <string>Type de partie:</string>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="1" column="0" colspan="5">
-                                        <widget class="QComboBox" name="GameRoundTypes">
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>300</width>
-                                                    <height>16777215</height>
-                                                </size>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="2" column="0">
-                                        <widget class="QPushButton" name="btnAddSubRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/submit-for-approval.png</normaloff>
-                                                    :/icons/icons/submit-for-approval.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="2" column="1">
-                                        <widget class="QPushButton" name="btnDelSubRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/clear-symbol.png</normaloff>
-                                                    :/icons/icons/clear-symbol.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="2" column="2">
-                                        <widget class="QPushButton" name="btnUpSubround">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/sort-up.png</normaloff>
-                                                    :/icons/icons/sort-up.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="2" column="3">
-                                        <widget class="QPushButton" name="btnDownSubRound">
-                                            <property name="minimumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="maximumSize">
-                                                <size>
-                                                    <width>24</width>
-                                                    <height>24</height>
-                                                </size>
-                                            </property>
-                                            <property name="text">
-                                                <string/>
-                                            </property>
-                                            <property name="icon">
-                                                <iconset resource="../../../resources/EvenementLoto.qrc">
-                                                    <normaloff>:/icons/icons/sort-down.png</normaloff>
-                                                    :/icons/icons/sort-down.png
-                                                </iconset>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="2" column="4" colspan="2">
-                                        <spacer name="horizontalSpacer_6">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
-                                                <size>
-                                                    <width>156</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
-                                    </item>
-                                    <item row="3" column="0" colspan="6">
-                                        <widget class="QListWidget" name="listSubRound"/>
-                                    </item>
-                                </layout>
-                            </widget>
-                        </item>
-                        <item row="0" column="2">
-                            <widget class="QGroupBox" name="groupPhase">
-                                <property name="sizePolicy">
-                                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                        <horstretch>1</horstretch>
-                                        <verstretch>0</verstretch>
-                                    </sizepolicy>
-                                </property>
-                                <property name="title">
-                                    <string>Configuration de la phase:</string>
-                                </property>
-                                <layout class="QGridLayout" name="gridLayout_5">
-                                    <item row="0" column="2">
-                                        <widget class="QComboBox" name="SubRoundTypes"/>
-                                    </item>
-                                    <item row="2" column="0" colspan="3">
-                                        <widget class="QTextEdit" name="TextPrices">
-                                            <property name="undoRedoEnabled">
-                                                <bool>false</bool>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="1" column="1" colspan="2">
-                                        <spacer name="horizontalSpacer_8">
-                                            <property name="orientation">
-                                                <enum>Qt::Horizontal</enum>
-                                            </property>
-                                            <property name="sizeHint" stdset="0">
-                                                <size>
-                                                    <width>300</width>
-                                                    <height>20</height>
-                                                </size>
-                                            </property>
-                                        </spacer>
-                                    </item>
-                                    <item row="1" column="0">
-                                        <widget class="QLabel" name="label_3">
-                                            <property name="text">
-                                                <string>Lots:</string>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                    <item row="0" column="0" colspan="2">
-                                        <widget class="QLabel" name="label_2">
-                                            <property name="text">
-                                                <string>Condition de victoire:</string>
-                                            </property>
-                                        </widget>
-                                    </item>
-                                </layout>
-                            </widget>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item row="1" column="0">
-                <widget class="QGroupBox" name="groupResult">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                            <horstretch>0</horstretch>
-                            <verstretch>1</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="title">
-                        <string>Résultats de la partie</string>
-                    </property>
-                    <layout class="QGridLayout" name="gridLayout_6">
-                        <item row="5" column="2">
-                            <widget class="QLineEdit" name="NumberDraws">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>240</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="6" column="2">
-                            <spacer name="verticalSpacer">
-                                <property name="orientation">
-                                    <enum>Qt::Vertical</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>20</width>
-                                        <height>40</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item row="0" column="4">
-                            <widget class="QLabel" name="label_9">
-                                <property name="text">
-                                    <string>Grilles gagnantes</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="0" column="3">
-                            <widget class="QLabel" name="label_8">
-                                <property name="text">
-                                    <string>Tirages:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="1" rowspan="2" colspan="2">
-                            <widget class="QLineEdit" name="StartingDate">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>300</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="3" column="1" colspan="2">
-                            <widget class="QLineEdit" name="EndingDate">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>300</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="4" column="1" colspan="2">
-                            <widget class="QLineEdit" name="Duration">
-                                <property name="maximumSize">
-                                    <size>
-                                        <width>300</width>
-                                        <height>16777215</height>
-                                    </size>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="5" column="0" colspan="2">
-                            <widget class="QLabel" name="label_7">
-                                <property name="text">
-                                    <string>Nombre de Tirages</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="3" rowspan="6">
-                            <widget class="QTextEdit" name="TextDraws">
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="0" rowspan="2">
-                            <widget class="QLabel" name="label_4">
-                                <property name="text">
-                                    <string>Début:</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="3" column="0">
-                            <widget class="QLabel" name="label_5">
-                                <property name="text">
-                                    <string>Fin</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="4" column="0">
-                            <widget class="QLabel" name="label_6">
-                                <property name="text">
-                                    <string>Durée</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item row="1" column="4" rowspan="6">
-                            <widget class="QTextEdit" name="ListWinners">
-                                <property name="readOnly">
-                                    <bool>true</bool>
-                                </property>
-                            </widget>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
-            <item row="2" column="0">
-                <widget class="QFrame" name="frame">
-                    <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="frameShape">
-                        <enum>QFrame::StyledPanel</enum>
-                    </property>
-                    <property name="frameShadow">
-                        <enum>QFrame::Raised</enum>
-                    </property>
-                    <layout class="QHBoxLayout" name="horizontalLayout">
-                        <item>
-                            <spacer name="horizontalSpacer">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>130</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="ButtonOk">
-                                <property name="toolTip">
-                                    <string>Sauvegarde Et ferme La fenêtre</string>
-                                </property>
-                                <property name="text">
-                                    <string>Ok</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer_2">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>QSizePolicy::Preferred</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="ButtonApply">
-                                <property name="toolTip">
-                                    <string>Sauvegarde sans fermer la fenêtre</string>
-                                </property>
-                                <property name="text">
-                                    <string>Appliquer</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer_3">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>QSizePolicy::Preferred</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="ButtonCancel">
-                                <property name="toolTip">
-                                    <string>Ferme la fenêtre sans sauvegarder</string>
-                                </property>
-                                <property name="text">
-                                    <string>Annuler</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer_7">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>QSizePolicy::Preferred</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="ButtonImport">
-                                <property name="text">
-                                    <string>Importer</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer_9">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeType">
-                                    <enum>QSizePolicy::Preferred</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>20</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                        <item>
-                            <widget class="QPushButton" name="ButtonExport">
-                                <property name="text">
-                                    <string>Exporter</string>
-                                </property>
-                            </widget>
-                        </item>
-                        <item>
-                            <spacer name="horizontalSpacer_4">
-                                <property name="orientation">
-                                    <enum>Qt::Horizontal</enum>
-                                </property>
-                                <property name="sizeHint" stdset="0">
-                                    <size>
-                                        <width>130</width>
-                                        <height>20</height>
-                                    </size>
-                                </property>
-                            </spacer>
-                        </item>
-                    </layout>
-                </widget>
-            </item>
+        <layout class="QGridLayout" name="gridLayout_3">
+         <item row="0" column="0">
+          <widget class="QPushButton" name="btnAddRound">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="btnDelRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QPushButton" name="btnUpRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QPushButton" name="btnDownRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="4">
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>139</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0" colspan="5">
+          <widget class="QListWidget" name="listGameRound"/>
+         </item>
         </layout>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="groupSubRound">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Phases de la partie</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0" colspan="4">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Type de partie:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="5">
+          <widget class="QComboBox" name="GameRoundTypes">
+           <property name="maximumSize">
+            <size>
+             <width>300</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="btnAddSubRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="btnDelSubRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <widget class="QPushButton" name="btnUpSubround">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="3">
+          <widget class="QPushButton" name="btnDownSubRound">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../resources/EvenementLoto.qrc">
+             <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="4" colspan="2">
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>156</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="0" colspan="6">
+          <widget class="QListWidget" name="listSubRound"/>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QGroupBox" name="groupPhase">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>1</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Configuration de la phase:</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="0" column="2">
+          <widget class="QComboBox" name="SubRoundTypes"/>
+         </item>
+         <item row="2" column="0" colspan="3">
+          <widget class="QTextEdit" name="TextPrices">
+           <property name="undoRedoEnabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1" colspan="2">
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>300</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Lots:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0" colspan="2">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Condition de victoire:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
-    <resources>
-        <include location="../../../resources/EvenementLoto.qrc"/>
-    </resources>
-    <connections>
-        <connection>
-            <sender>ButtonOk</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actOk()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>315</x>
-                    <y>620</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>392</x>
-                    <y>642</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>ButtonApply</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actApply()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>422</x>
-                    <y>620</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>491</x>
-                    <y>646</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>ButtonCancel</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actCancel()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>529</x>
-                    <y>620</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>589</x>
-                    <y>641</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnAddRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actCreateGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>39</x>
-                    <y>56</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>4</x>
-                    <y>54</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnDelRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actDeleteGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>71</x>
-                    <y>66</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>4</x>
-                    <y>89</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnUpRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveGameRoundBefore()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>98</x>
-                    <y>61</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>1</x>
-                    <y>121</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnDownRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveSubGameRoundAfter()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>133</x>
-                    <y>61</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>2</x>
-                    <y>155</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>GameRoundTypes</sender>
-            <signal>currentIndexChanged(int)</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actChangeGameRoundType(int)</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>369</x>
-                    <y>76</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>186</x>
-                    <y>1</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>SubRoundTypes</sender>
-            <signal>activated(int)</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actChangeSubGameRoundType(int)</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>857</x>
-                    <y>58</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>830</x>
-                    <y>3</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>TextPrices</sender>
-            <signal>textChanged()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actEndEditingPrice()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>885</x>
-                    <y>172</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>979</x>
-                    <y>134</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnAddSubRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actCreateSubGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>370</x>
-                    <y>118</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>217</x>
-                    <y>6</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnDelSubRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actDeleteSubGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>400</x>
-                    <y>118</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>240</x>
-                    <y>-6</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnUpSubround</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveSubGameRoundBefore()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>430</x>
-                    <y>118</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>383</x>
-                    <y>-5</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>btnDownSubRound</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actMoveSubGameRoundBefore()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>460</x>
-                    <y>118</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>420</x>
-                    <y>-7</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>listGameRound</sender>
-            <signal>currentRowChanged(int)</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actChangeSelectedGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>71</x>
-                    <y>301</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>1</x>
-                    <y>302</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>listSubRound</sender>
-            <signal>currentRowChanged(int)</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actChangeSelectedSubGameRound()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>485</x>
-                    <y>310</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>1</x>
-                    <y>346</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>ButtonImport</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actExportRounds()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>617</x>
-                    <y>612</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>663</x>
-                    <y>646</y>
-                </hint>
-            </hints>
-        </connection>
-        <connection>
-            <sender>ButtonExport</sender>
-            <signal>clicked()</signal>
-            <receiver>ConfigGameRounds</receiver>
-            <slot>actExportRounds()</slot>
-            <hints>
-                <hint type="sourcelabel">
-                    <x>703</x>
-                    <y>614</y>
-                </hint>
-                <hint type="destinationlabel">
-                    <x>659</x>
-                    <y>642</y>
-                </hint>
-            </hints>
-        </connection>
-    </connections>
-    <slots>
-        <slot>actOk()</slot>
-        <slot>actApply()</slot>
-        <slot>actCancel()</slot>
-        <slot>actCreateGameRound()</slot>
-        <slot>actDeleteGameRound()</slot>
-        <slot>actMoveGameRoundBefore()</slot>
-        <slot>actMoveGameRoundAfter()</slot>
-        <slot>actChangeGameRoundType(int)</slot>
-        <slot>actChangeSubGameRoundType(int)</slot>
-        <slot>actEndEditingPrice()</slot>
-        <slot>actCreateSubGameRound()</slot>
-        <slot>actDeleteSubGameRound()</slot>
-        <slot>actMoveSubGameRoundBefore()</slot>
-        <slot>actMoveSubGameRoundAfter()</slot>
-        <slot>actChangeSelectedGameRound()</slot>
-        <slot>actChangeSelectedSubGameRound()</slot>
-        <slot>actImportRounds()</slot>
-        <slot>actExportRounds()</slot>
-    </slots>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupResult">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Résultats de la partie</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="5" column="2">
+       <widget class="QLineEdit" name="NumberDraws">
+        <property name="maximumSize">
+         <size>
+          <width>240</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Grilles gagnantes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Tirages:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" rowspan="2" colspan="2">
+       <widget class="QLineEdit" name="StartingDate">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QLineEdit" name="EndingDate">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="2">
+       <widget class="QLineEdit" name="Duration">
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Nombre de Tirages</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3" rowspan="6">
+       <widget class="QTextEdit" name="TextDraws">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Début:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Fin</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Durée</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" rowspan="6">
+       <widget class="QTextEdit" name="ListWinners">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QFrame" name="frame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>130</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ButtonOk">
+        <property name="toolTip">
+         <string>Sauvegarde Et ferme La fenêtre</string>
+        </property>
+        <property name="text">
+         <string>Ok</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ButtonApply">
+        <property name="toolTip">
+         <string>Sauvegarde sans fermer la fenêtre</string>
+        </property>
+        <property name="text">
+         <string>Appliquer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ButtonCancel">
+        <property name="toolTip">
+         <string>Ferme la fenêtre sans sauvegarder</string>
+        </property>
+        <property name="text">
+         <string>Annuler</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_7">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ButtonImport">
+        <property name="text">
+         <string>Importer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_9">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Preferred</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="ButtonExport">
+        <property name="text">
+         <string>Exporter</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>130</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../resources/EvenementLoto.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>ButtonOk</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actOk()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>620</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>392</x>
+     <y>642</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonApply</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actApply()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>422</x>
+     <y>620</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>491</x>
+     <y>646</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonCancel</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actCancel()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>529</x>
+     <y>620</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>589</x>
+     <y>641</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actCreateGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>39</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>54</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDelRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actDeleteGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnUpRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actMoveGameRoundBefore()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>98</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>121</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDownRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actMoveSubGameRoundAfter()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>133</x>
+     <y>61</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>2</x>
+     <y>155</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>GameRoundTypes</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actChangeGameRoundType(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>369</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>186</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SubRoundTypes</sender>
+   <signal>activated(int)</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actChangeSubGameRoundType(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>857</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>830</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>TextPrices</sender>
+   <signal>textChanged()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actEndEditingPrice()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>885</x>
+     <y>172</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>979</x>
+     <y>134</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnAddSubRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actCreateSubGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>370</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>217</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDelSubRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actDeleteSubGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>-6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnUpSubround</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actMoveSubGameRoundBefore()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>430</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>383</x>
+     <y>-5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDownSubRound</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actMoveSubGameRoundBefore()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>460</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>420</x>
+     <y>-7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listGameRound</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actChangeSelectedGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>301</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>302</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listSubRound</sender>
+   <signal>currentRowChanged(int)</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actChangeSelectedSubGameRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>485</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>346</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonImport</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actExportRounds()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>617</x>
+     <y>612</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>663</x>
+     <y>646</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ButtonExport</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actExportRounds()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>703</x>
+     <y>614</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>659</x>
+     <y>642</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>actOk()</slot>
+  <slot>actApply()</slot>
+  <slot>actCancel()</slot>
+  <slot>actCreateGameRound()</slot>
+  <slot>actDeleteGameRound()</slot>
+  <slot>actMoveGameRoundBefore()</slot>
+  <slot>actMoveGameRoundAfter()</slot>
+  <slot>actChangeGameRoundType(int)</slot>
+  <slot>actChangeSubGameRoundType(int)</slot>
+  <slot>actEndEditingPrice()</slot>
+  <slot>actCreateSubGameRound()</slot>
+  <slot>actDeleteSubGameRound()</slot>
+  <slot>actMoveSubGameRoundBefore()</slot>
+  <slot>actMoveSubGameRoundAfter()</slot>
+  <slot>actChangeSelectedGameRound()</slot>
+  <slot>actChangeSelectedSubGameRound()</slot>
+  <slot>actImportRounds()</slot>
+  <slot>actExportRounds()</slot>
+ </slots>
 </ui>

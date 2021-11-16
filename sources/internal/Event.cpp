@@ -16,7 +16,6 @@ constexpr uint16_t currentSaveVersion= 2;
 void Event::read(std::istream& is) {
     uint16_t saveVersion;
     is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
-    std::cout << "version read: " << saveVersion << std::endl;
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     sizeType l, i;
     is.read(reinterpret_cast<char*>(&l), sizeof(l));

@@ -3,960 +3,937 @@
  <author>Damien Lachouette</author>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-     <property name="windowTitle">
-         <string>Événement Loto</string>
-     </property>
-     <widget class="QWidget" name="EventControl">
-         <layout class="QGridLayout" name="gridLayout">
-             <property name="leftMargin">
-                 <number>2</number>
-             </property>
-             <property name="topMargin">
-                 <number>2</number>
-             </property>
-             <property name="rightMargin">
-                 <number>2</number>
-             </property>
-             <property name="bottomMargin">
-                 <number>2</number>
-             </property>
-             <property name="spacing">
-                 <number>4</number>
-             </property>
-             <item row="0" column="0">
-                 <widget class="QSplitter" name="splitter">
-                     <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                             <horstretch>0</horstretch>
-                             <verstretch>0</verstretch>
-                         </sizepolicy>
-                     </property>
-                     <property name="orientation">
-                         <enum>Qt::Vertical</enum>
-                     </property>
-                     <widget class="QFrame" name="topFrame">
-                         <property name="sizePolicy">
-                             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-                                 <horstretch>1</horstretch>
-                                 <verstretch>4</verstretch>
-                             </sizepolicy>
-                         </property>
-                         <property name="frameShape">
-                             <enum>QFrame::NoFrame</enum>
-                         </property>
-                         <property name="frameShadow">
-                             <enum>QFrame::Raised</enum>
-                         </property>
-                         <layout class="QHBoxLayout" name="horizontalLayout">
-                             <property name="spacing">
-                                 <number>0</number>
-                             </property>
-                             <property name="leftMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="topMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="rightMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="bottomMargin">
-                                 <number>0</number>
-                             </property>
-                             <item>
-                                 <widget class="QSplitter" name="splitter_2">
-                                     <property name="sizePolicy">
-                                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                                             <horstretch>1</horstretch>
-                                             <verstretch>1</verstretch>
-                                         </sizepolicy>
-                                     </property>
-                                     <property name="orientation">
-                                         <enum>Qt::Horizontal</enum>
-                                     </property>
-                                     <widget class="QFrame" name="frame_3">
-                                         <property name="frameShape">
-                                             <enum>QFrame::NoFrame</enum>
-                                         </property>
-                                         <property name="frameShadow">
-                                             <enum>QFrame::Plain</enum>
-                                         </property>
-                                         <layout class="QVBoxLayout" name="verticalLayout_3">
-                                             <property name="leftMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="topMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="rightMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="bottomMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <item>
-                                                 <widget class="QGroupBox" name="GroupPickManual">
-                                                     <property name="title">
-                                                         <string>Numéros Tirés</string>
-                                                     </property>
-                                                 </widget>
-                                             </item>
-                                             <item>
-                                                 <widget class="QFrame" name="frame_5">
-                                                     <property name="sizePolicy">
-                                                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                                                             <horstretch>1</horstretch>
-                                                             <verstretch>0</verstretch>
-                                                         </sizepolicy>
-                                                     </property>
-                                                     <property name="frameShape">
-                                                         <enum>QFrame::NoFrame</enum>
-                                                     </property>
-                                                     <property name="frameShadow">
-                                                         <enum>QFrame::Raised</enum>
-                                                     </property>
-                                                     <layout class="QHBoxLayout" name="horizontalLayout_4">
-                                                         <property name="spacing">
-                                                             <number>2</number>
-                                                         </property>
-                                                         <property name="leftMargin">
-                                                             <number>2</number>
-                                                         </property>
-                                                         <property name="topMargin">
-                                                             <number>2</number>
-                                                         </property>
-                                                         <property name="rightMargin">
-                                                             <number>2</number>
-                                                         </property>
-                                                         <property name="bottomMargin">
-                                                             <number>2</number>
-                                                         </property>
-                                                         <item>
-                                                             <widget class="QGroupBox" name="EventInfos">
-                                                                 <property name="title">
-                                                                     <string>Info Evenement</string>
-                                                                 </property>
-                                                                 <layout class="QGridLayout" name="gridLayout_14">
-                                                                     <item row="0" column="1">
-                                                                         <widget class="QLineEdit" name="CurrentDate">
-                                                                             <property name="readOnly">
-                                                                                 <bool>true</bool>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="4">
-                                                                         <widget class="QLabel" name="label_16">
-                                                                             <property name="text">
-                                                                                 <string>Heure de fin</string>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="2">
-                                                                         <widget class="QLabel" name="label_15">
-                                                                             <property name="text">
-                                                                                 <string>Heure de début</string>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="3">
-                                                                         <widget class="QLineEdit" name="StartingHour">
-                                                                             <property name="readOnly">
-                                                                                 <bool>true</bool>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="0">
-                                                                         <widget class="QLabel" name="label_14">
-                                                                             <property name="text">
-                                                                                 <string>Date:</string>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="5">
-                                                                         <widget class="QLineEdit" name="EndingHour">
-                                                                             <property name="readOnly">
-                                                                                 <bool>true</bool>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="6" colspan="2">
-                                                                         <spacer name="horizontalSpacer_2">
-                                                                             <property name="orientation">
-                                                                                 <enum>Qt::Horizontal</enum>
-                                                                             </property>
-                                                                             <property name="sizeHint" stdset="0">
-                                                                                 <size>
-                                                                                     <width>165</width>
-                                                                                     <height>20</height>
-                                                                                 </size>
-                                                                             </property>
-                                                                         </spacer>
-                                                                     </item>
-                                                                     <item row="2" column="1">
-                                                                         <widget class="QLineEdit" name="Duration">
-                                                                             <property name="font">
-                                                                                 <font>
-                                                                                     <pointsize>25</pointsize>
-                                                                                 </font>
-                                                                             </property>
-                                                                             <property name="text">
-                                                                                 <string/>
-                                                                             </property>
-                                                                             <property name="alignment">
-                                                                                 <set>Qt::AlignCenter</set>
-                                                                             </property>
-                                                                             <property name="readOnly">
-                                                                                 <bool>true</bool>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="2" column="0">
-                                                                         <widget class="QLabel" name="label_17">
-                                                                             <property name="text">
-                                                                                 <string>Durée:</string>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="2" column="2">
-                                                                         <widget class="QLabel" name="label_3">
-                                                                             <property name="text">
-                                                                                 <string>Progression</string>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="2" column="3" colspan="5">
-                                                                         <widget class="QProgressBar"
-                                                                                 name="Progression">
-                                                                             <property name="value">
-                                                                                 <number>24</number>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                 </layout>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QLineEdit" name="CurrentTime">
-                                                                 <property name="font">
-                                                                     <font>
-                                                                         <pointsize>55</pointsize>
-                                                                         <bold>false</bold>
-                                                                     </font>
-                                                                 </property>
-                                                                 <property name="text">
-                                                                     <string>14:30:22</string>
-                                                                 </property>
-                                                                 <property name="frame">
-                                                                     <bool>false</bool>
-                                                                 </property>
-                                                                 <property name="alignment">
-                                                                     <set>Qt::AlignCenter</set>
-                                                                 </property>
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                     </layout>
-                                                 </widget>
-                                             </item>
-                                         </layout>
-                                     </widget>
-                                     <widget class="QFrame" name="rightFrame">
-                                         <property name="frameShape">
-                                             <enum>QFrame::NoFrame</enum>
-                                         </property>
-                                         <property name="frameShadow">
-                                             <enum>QFrame::Plain</enum>
-                                         </property>
-                                         <layout class="QVBoxLayout" name="verticalLayout">
-                                             <property name="spacing">
-                                                 <number>3</number>
-                                             </property>
-                                             <property name="leftMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="topMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="rightMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="bottomMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <item>
-                                                 <widget class="QGroupBox" name="roundInfos">
-                                                     <property name="sizePolicy">
-                                                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                                                             <horstretch>1</horstretch>
-                                                             <verstretch>0</verstretch>
-                                                         </sizepolicy>
-                                                     </property>
-                                                     <property name="title">
-                                                         <string>Information partie</string>
-                                                     </property>
-                                                     <layout class="QGridLayout" name="gridLayout_11">
-                                                         <item row="0" column="0">
-                                                             <widget class="QLabel" name="label_4">
-                                                                 <property name="text">
-                                                                     <string>Début</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="0" column="1">
-                                                             <widget class="QLineEdit" name="RoundStartTime">
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="1" column="0">
-                                                             <widget class="QLabel" name="label_5">
-                                                                 <property name="text">
-                                                                     <string>Durée</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="1" column="1">
-                                                             <widget class="QLineEdit" name="RoundDuration">
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="2" column="0">
-                                                             <widget class="QLabel" name="label_6">
-                                                                 <property name="text">
-                                                                     <string>Tirages:</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="2" column="1">
-                                                             <widget class="QLineEdit" name="RoundDraws">
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="3" column="0">
-                                                             <widget class="QLabel" name="label">
-                                                                 <property name="text">
-                                                                     <string>Partie:</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="3" column="1">
-                                                             <widget class="QLineEdit" name="RoundName">
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="4" column="0">
-                                                             <widget class="QLabel" name="label_2">
-                                                                 <property name="text">
-                                                                     <string>Phase:</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item row="4" column="1">
-                                                             <widget class="QLineEdit" name="RoundPhase">
-                                                                 <property name="readOnly">
-                                                                     <bool>true</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                     </layout>
-                                                 </widget>
-                                             </item>
-                                             <item>
-                                                 <widget class="QFrame" name="lastNumbersDisplay">
-                                                     <property name="sizePolicy">
-                                                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                                                             <horstretch>0</horstretch>
-                                                             <verstretch>1</verstretch>
-                                                         </sizepolicy>
-                                                     </property>
-                                                     <property name="frameShape">
-                                                         <enum>QFrame::NoFrame</enum>
-                                                     </property>
-                                                     <property name="frameShadow">
-                                                         <enum>QFrame::Raised</enum>
-                                                     </property>
-                                                     <layout class="QVBoxLayout" name="verticalLayout_4">
-                                                         <property name="spacing">
-                                                             <number>3</number>
-                                                         </property>
-                                                         <property name="leftMargin">
-                                                             <number>1</number>
-                                                         </property>
-                                                         <property name="topMargin">
-                                                             <number>1</number>
-                                                         </property>
-                                                         <property name="rightMargin">
-                                                             <number>1</number>
-                                                         </property>
-                                                         <property name="bottomMargin">
-                                                             <number>1</number>
-                                                         </property>
-                                                         <item>
-                                                             <widget class="QGroupBox" name="groupBox_11">
-                                                                 <property name="sizePolicy">
-                                                                     <sizepolicy hsizetype="Preferred"
-                                                                                 vsizetype="Preferred">
-                                                                         <horstretch>1</horstretch>
-                                                                         <verstretch>3</verstretch>
-                                                                     </sizepolicy>
-                                                                 </property>
-                                                                 <property name="title">
-                                                                     <string>Numéro tiré</string>
-                                                                 </property>
-                                                                 <layout class="QGridLayout" name="gridLayout_12">
-                                                                     <item row="0" column="0">
-                                                                         <widget class="QLCDNumber" name="CurrentDraw">
-                                                                             <property name="digitCount">
-                                                                                 <number>2</number>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                 </layout>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QGroupBox" name="groupBox_12">
-                                                                 <property name="sizePolicy">
-                                                                     <sizepolicy hsizetype="Preferred"
-                                                                                 vsizetype="Preferred">
-                                                                         <horstretch>0</horstretch>
-                                                                         <verstretch>1</verstretch>
-                                                                     </sizepolicy>
-                                                                 </property>
-                                                                 <property name="title">
-                                                                     <string>Derniers numéros</string>
-                                                                 </property>
-                                                                 <layout class="QGridLayout" name="gridLayout_13">
-                                                                     <item row="0" column="0">
-                                                                         <widget class="QLCDNumber" name="LastNumber1">
-                                                                             <property name="digitCount">
-                                                                                 <number>2</number>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="1">
-                                                                         <widget class="QLCDNumber" name="LastNumber2">
-                                                                             <property name="digitCount">
-                                                                                 <number>2</number>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                     <item row="0" column="2">
-                                                                         <widget class="QLCDNumber" name="LastNumber3">
-                                                                             <property name="digitCount">
-                                                                                 <number>2</number>
-                                                                             </property>
-                                                                         </widget>
-                                                                     </item>
-                                                                 </layout>
-                                                             </widget>
-                                                         </item>
-                                                     </layout>
-                                                 </widget>
-                                             </item>
-                                             <item>
-                                                 <spacer name="verticalSpacer">
-                                                     <property name="orientation">
-                                                         <enum>Qt::Vertical</enum>
-                                                     </property>
-                                                     <property name="sizeType">
-                                                         <enum>QSizePolicy::Expanding</enum>
-                                                     </property>
-                                                     <property name="sizeHint" stdset="0">
-                                                         <size>
-                                                             <width>20</width>
-                                                             <height>10</height>
-                                                         </size>
-                                                     </property>
-                                                 </spacer>
-                                             </item>
-                                             <item>
-                                                 <widget class="QGroupBox" name="CommandsBox">
-                                                     <property name="sizePolicy">
-                                                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                                                             <horstretch>1</horstretch>
-                                                             <verstretch>0</verstretch>
-                                                         </sizepolicy>
-                                                     </property>
-                                                     <property name="title">
-                                                         <string>Commandes</string>
-                                                     </property>
-                                                     <layout class="QVBoxLayout" name="verticalLayout_2">
-                                                         <item>
-                                                             <widget class="QPushButton" name="StartEndGameRound">
-                                                                 <property name="text">
-                                                                     <string>Debut/fin partie</string>
-                                                                 </property>
-                                                                 <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
-                                                                         <normaloff>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>888</width>
+    <height>685</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Événement Loto</string>
+  </property>
+  <widget class="QWidget" name="EventControl">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QSplitter" name="splitter">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QFrame" name="topFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>1</horstretch>
+         <verstretch>4</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QSplitter" name="splitter_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <widget class="QFrame" name="frame_3">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="GroupPickManual">
+              <property name="title">
+               <string>Numéros Tirés</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="frame_5">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>1</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>2</number>
+               </property>
+               <property name="leftMargin">
+                <number>2</number>
+               </property>
+               <property name="topMargin">
+                <number>2</number>
+               </property>
+               <property name="rightMargin">
+                <number>2</number>
+               </property>
+               <property name="bottomMargin">
+                <number>2</number>
+               </property>
+               <item>
+                <widget class="QGroupBox" name="EventInfos">
+                 <property name="title">
+                  <string>Info Evenement</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_14">
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="CurrentDate">
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="4">
+                   <widget class="QLabel" name="label_16">
+                    <property name="text">
+                     <string>Heure de fin</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLabel" name="label_15">
+                    <property name="text">
+                     <string>Heure de début</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="3">
+                   <widget class="QLineEdit" name="StartingHour">
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_14">
+                    <property name="text">
+                     <string>Date:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QLineEdit" name="EndingHour">
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="6" colspan="2">
+                   <spacer name="horizontalSpacer_2">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>165</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLineEdit" name="Duration">
+                    <property name="font">
+                     <font>
+                      <pointsize>25</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_17">
+                    <property name="text">
+                     <string>Durée:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <widget class="QLabel" name="label_3">
+                    <property name="text">
+                     <string>Progression</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3" colspan="5">
+                   <widget class="QProgressBar" name="Progression">
+                    <property name="value">
+                     <number>24</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="CurrentTime">
+                 <property name="font">
+                  <font>
+                   <pointsize>55</pointsize>
+                   <bold>false</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>14:30:22</string>
+                 </property>
+                 <property name="frame">
+                  <bool>false</bool>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QFrame" name="rightFrame">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>3</number>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="roundInfos">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>1</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Information partie</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_11">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Début</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="RoundStartTime">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Durée</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="RoundDuration">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Tirages:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="RoundDraws">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Partie:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QLineEdit" name="RoundName">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Phase:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="RoundPhase">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="lastNumbersDisplay">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>1</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="frameShadow">
+               <enum>QFrame::Raised</enum>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+               <property name="spacing">
+                <number>3</number>
+               </property>
+               <property name="leftMargin">
+                <number>1</number>
+               </property>
+               <property name="topMargin">
+                <number>1</number>
+               </property>
+               <property name="rightMargin">
+                <number>1</number>
+               </property>
+               <property name="bottomMargin">
+                <number>1</number>
+               </property>
+               <item>
+                <widget class="QGroupBox" name="groupBox_11">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>1</horstretch>
+                   <verstretch>3</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Numéro tiré</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="0" column="0">
+                   <widget class="QLCDNumber" name="CurrentDraw">
+                    <property name="digitCount">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QGroupBox" name="groupBox_12">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>1</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="title">
+                  <string>Derniers numéros</string>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_13">
+                  <item row="0" column="0">
+                   <widget class="QLCDNumber" name="LastNumber1">
+                    <property name="digitCount">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLCDNumber" name="LastNumber2">
+                    <property name="digitCount">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QLCDNumber" name="LastNumber3">
+                    <property name="digitCount">
+                     <number>2</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="CommandsBox">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>1</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Commandes</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QPushButton" name="StartEndGameRound">
+                 <property name="text">
+                  <string>Debut/fin partie</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>
                                                                              :/icons/icons/submit-for-approval.png</normaloff>
-                                                                         :/icons/icons/submit-for-approval.png
-                                                                     </iconset>
-                                                                 </property>
-                                                                 <property name="flat">
-                                                                     <bool>false</bool>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QPushButton" name="PauseResumeGame">
-                                                                 <property name="text">
-                                                                     <string>Pause/reprise partie</string>
-                                                                 </property>
-                                                                 <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
-                                                                         <normaloff>
+                                                                             :/icons/icons/submit-for-approval.png</iconset>
+                 </property>
+                 <property name="flat">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="PauseResumeGame">
+                 <property name="text">
+                  <string>Pause/reprise partie</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>
                                                                              :/icons/icons/hourglass.png</normaloff>
-                                                                         :/icons/icons/hourglass.png
-                                                                     </iconset>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QPushButton" name="DisplayRules">
-                                                                 <property name="text">
-                                                                     <string>Affichage règlement</string>
-                                                                 </property>
-                                                                 <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
-                                                                         <normaloff>
+                                                                             :/icons/icons/hourglass.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="DisplayRules">
+                 <property name="text">
+                  <string>Affichage règlement</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>
                                                                              :/icons/icons/terms-and-conditions.png</normaloff>
-                                                                         :/icons/icons/terms-and-conditions.png
-                                                                     </iconset>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QPushButton" name="RandomPick">
-                                                                 <property name="text">
-                                                                     <string>Tirage Aléatoire</string>
-                                                                 </property>
-                                                                 <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
-                                                                         <normaloff>:/icons/icons/dice.png</normaloff>
-                                                                         :/icons/icons/dice.png
-                                                                     </iconset>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QPushButton" name="CancelLastPick">
-                                                                 <property name="sizePolicy">
-                                                                     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                                                                         <horstretch>0</horstretch>
-                                                                         <verstretch>0</verstretch>
-                                                                     </sizepolicy>
-                                                                 </property>
-                                                                 <property name="text">
-                                                                     <string>Annuler dernier tirage</string>
-                                                                 </property>
-                                                                 <property name="icon">
-                                                                     <iconset
-                                                                             resource="../../../resources/EvenementLoto.qrc">
-                                                                         <normaloff>
+                                                                             :/icons/icons/terms-and-conditions.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="RandomPick">
+                 <property name="text">
+                  <string>Tirage Aléatoire</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/dice.png</normaloff>:/icons/icons/dice.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="CancelLastPick">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string>Annuler dernier tirage</string>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>
                                                                              :/icons/icons/countdown.png</normaloff>
-                                                                         :/icons/icons/countdown.png
-                                                                     </iconset>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                     </layout>
-                                                 </widget>
-                                             </item>
-                                         </layout>
-                                     </widget>
-                                 </widget>
-                             </item>
-                         </layout>
-                     </widget>
-                     <widget class="QFrame" name="bottomFrame">
-                         <property name="sizePolicy">
-                             <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                                 <horstretch>1</horstretch>
-                                 <verstretch>1</verstretch>
-                             </sizepolicy>
-                         </property>
-                         <property name="frameShape">
-                             <enum>QFrame::NoFrame</enum>
-                         </property>
-                         <property name="frameShadow">
-                             <enum>QFrame::Plain</enum>
-                         </property>
-                         <layout class="QGridLayout" name="gridLayout_2">
-                             <property name="leftMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="topMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="rightMargin">
-                                 <number>0</number>
-                             </property>
-                             <property name="bottomMargin">
-                                 <number>0</number>
-                             </property>
-                             <item row="0" column="0">
-                                 <widget class="QTabWidget" name="tabWidget">
-                                     <property name="sizePolicy">
-                                         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                                             <horstretch>0</horstretch>
-                                             <verstretch>1</verstretch>
-                                         </sizepolicy>
-                                     </property>
-                                     <property name="tabPosition">
-                                         <enum>QTabWidget::South</enum>
-                                     </property>
-                                     <property name="tabShape">
-                                         <enum>QTabWidget::Rounded</enum>
-                                     </property>
-                                     <property name="currentIndex">
-                                         <number>0</number>
-                                     </property>
-                                     <property name="usesScrollButtons">
-                                         <bool>false</bool>
-                                     </property>
-                                     <widget class="QWidget" name="tabConfig">
-                                         <attribute name="title">
-                                             <string>Configuration</string>
-                                         </attribute>
-                                         <layout class="QHBoxLayout" name="horizontalLayout_3">
-                                             <property name="sizeConstraint">
-                                                 <enum>QLayout::SetNoConstraint</enum>
-                                             </property>
-                                             <property name="leftMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="topMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="rightMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <property name="bottomMargin">
-                                                 <number>2</number>
-                                             </property>
-                                             <item>
-                                                 <widget class="QGroupBox" name="selectTypeDraw">
-                                                     <property name="sizePolicy">
-                                                         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                                                             <horstretch>0</horstretch>
-                                                             <verstretch>0</verstretch>
-                                                         </sizepolicy>
-                                                     </property>
-                                                     <property name="title">
-                                                         <string>Tirage Aléatoire</string>
-                                                     </property>
-                                                     <layout class="QVBoxLayout" name="verticalLayout_5">
-                                                         <item>
-                                                             <widget class="QRadioButton" name="radioBtnPureRandom">
-                                                                 <property name="text">
-                                                                     <string>Tirage aléatoire seul</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QRadioButton" name="radioBtnPureManual">
-                                                                 <property name="text">
-                                                                     <string>Tirage manuel seul</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                         <item>
-                                                             <widget class="QRadioButton" name="radioBtnBoth">
-                                                                 <property name="text">
-                                                                     <string>Les Deux</string>
-                                                                 </property>
-                                                             </widget>
-                                                         </item>
-                                                     </layout>
-                                                 </widget>
-                                             </item>
-                                             <item>
-                                                 <spacer name="horizontalSpacer_5">
-                                                     <property name="orientation">
-                                                         <enum>Qt::Horizontal</enum>
-                                                     </property>
-                                                     <property name="sizeType">
-                                                         <enum>QSizePolicy::Expanding</enum>
-                                                     </property>
-                                                     <property name="sizeHint" stdset="0">
-                                                         <size>
-                                                             <width>50</width>
-                                                             <height>20</height>
-                                                         </size>
-                                                     </property>
-                                                 </spacer>
-                                             </item>
-                                         </layout>
-                                     </widget>
-                                 </widget>
-                             </item>
-                         </layout>
-                     </widget>
-                 </widget>
-             </item>
-         </layout>
+                                                                             :/icons/icons/countdown.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QFrame" name="bottomFrame">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+         <horstretch>1</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item row="0" column="0">
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>1</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="tabPosition">
+           <enum>QTabWidget::South</enum>
+          </property>
+          <property name="tabShape">
+           <enum>QTabWidget::Rounded</enum>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <property name="usesScrollButtons">
+           <bool>false</bool>
+          </property>
+          <widget class="QWidget" name="tabConfig">
+           <attribute name="title">
+            <string>Configuration</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetNoConstraint</enum>
+            </property>
+            <property name="leftMargin">
+             <number>2</number>
+            </property>
+            <property name="topMargin">
+             <number>2</number>
+            </property>
+            <property name="rightMargin">
+             <number>2</number>
+            </property>
+            <property name="bottomMargin">
+             <number>2</number>
+            </property>
+            <item>
+             <widget class="QGroupBox" name="selectTypeDraw">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Tirage Aléatoire</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5">
+               <item>
+                <widget class="QRadioButton" name="radioBtnPureRandom">
+                 <property name="text">
+                  <string>Tirage aléatoire seul</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioBtnPureManual">
+                 <property name="text">
+                  <string>Tirage manuel seul</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="radioBtnBoth">
+                 <property name="text">
+                  <string>Les Deux</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>50</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
-     <widget class="QMenuBar" name="menubar">
-         <property name="geometry">
-             <rect>
-                 <x>0</x>
-                 <y>0</y>
-                 <width>921</width>
-                 <height>22</height>
-             </rect>
-         </property>
-         <property name="defaultUp">
-             <bool>false</bool>
-         </property>
-         <property name="nativeMenuBar">
-             <bool>true</bool>
-         </property>
-         <widget class="QMenu" name="menuFile">
-             <property name="title">
-                 <string>Fichiers</string>
-             </property>
-             <property name="icon">
-                 <iconset resource="../../../resources/EvenementLoto.qrc">
-                     <normaloff>:/icons/icons/menu.png</normaloff>:/icons/icons/menu.png
-                 </iconset>
-             </property>
-             <property name="separatorsCollapsible">
-                 <bool>true</bool>
-             </property>
-             <property name="toolTipsVisible">
-                 <bool>true</bool>
-             </property>
-             <addaction name="actionNewEvent"/>
-             <addaction name="separator"/>
-             <addaction name="actionLoadEvent"/>
-             <addaction name="actionSaveEvent"/>
-             <addaction name="actionSaveEventAs"/>
-             <addaction name="separator"/>
-             <addaction name="actionStartEvent"/>
-             <addaction name="actionEndEvent"/>
-             <addaction name="separator"/>
-             <addaction name="actionQuit"/>
-         </widget>
-         <widget class="QMenu" name="menuParameters">
-             <property name="tearOffEnabled">
-                 <bool>true</bool>
-             </property>
-             <property name="title">
-                 <string>Paramètres</string>
-             </property>
-             <property name="icon">
-                 <iconset resource="../../../resources/EvenementLoto.qrc">
-                     <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>
-                     :/icons/icons/windows-10-personalization.png
-                 </iconset>
-             </property>
-             <property name="toolTipsVisible">
-                 <bool>true</bool>
-             </property>
-             <addaction name="actionGlobalParam"/>
-             <addaction name="separator"/>
-             <addaction name="actionConfigEvent"/>
-             <addaction name="separator"/>
-             <addaction name="actionConfigCard"/>
-             <addaction name="actionConfigRounds"/>
-         </widget>
-         <widget class="QMenu" name="menuHelp">
-             <property name="title">
-                 <string>Aide</string>
-             </property>
-             <property name="icon">
-                 <iconset resource="../../../resources/EvenementLoto.qrc">
-                     <normaloff>:/icons/icons/online-support.png</normaloff>:/icons/icons/online-support.png
-                 </iconset>
-             </property>
-             <addaction name="actionAbout"/>
-             <addaction name="separator"/>
-             <addaction name="actionHelp"/>
-         </widget>
-         <addaction name="menuFile"/>
-         <addaction name="menuParameters"/>
-         <addaction name="menuHelp"/>
-     </widget>
-     <widget class="QStatusBar" name="statusbar"/>
-     <action name="actionAbout">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/info.png</normaloff>:/icons/icons/info.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>À propos</string>
-         </property>
-         <property name="shortcut">
-             <string>F1</string>
-         </property>
-         <property name="menuRole">
-             <enum>QAction::AboutRole</enum>
-         </property>
-     </action>
-     <action name="actionHelp">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/help.png</normaloff>:/icons/icons/help.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Aide</string>
-         </property>
-     </action>
-     <action name="actionGlobalParam">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/adjust.png</normaloff>:/icons/icons/adjust.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Général</string>
-         </property>
-     </action>
-     <action name="actionConfigCard">
-         <property name="enabled">
-             <bool>true</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/puzzle.png</normaloff>:/icons/icons/puzzle.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Cartons</string>
-         </property>
-     </action>
-     <action name="actionConfigRounds">
-         <property name="enabled">
-             <bool>false</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/services.png</normaloff>:/icons/icons/services.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Parties</string>
-         </property>
-     </action>
-     <action name="actionConfigEvent">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/details.png</normaloff>:/icons/icons/details.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Événement</string>
-         </property>
-     </action>
-     <action name="actionNewEvent">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/new-file.png</normaloff>:/icons/icons/new-file.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Nouveau</string>
-         </property>
-     </action>
-     <action name="actionLoadEvent">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/folder_open.png</normaloff>:/icons/icons/folder_open.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Charger</string>
-         </property>
-     </action>
-     <action name="actionSaveEvent">
-         <property name="enabled">
-             <bool>false</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/save.png</normaloff>:/icons/icons/save.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Sauver</string>
-         </property>
-     </action>
-     <action name="actionStartEvent">
-         <property name="enabled">
-             <bool>false</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/toggle-on.png</normaloff>:/icons/icons/toggle-on.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Commencer</string>
-         </property>
-     </action>
-     <action name="actionQuit">
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/shutdown.png</normaloff>:/icons/icons/shutdown.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Quitter</string>
-         </property>
-         <property name="menuRole">
-             <enum>QAction::QuitRole</enum>
-         </property>
-     </action>
-     <action name="actionEndEvent">
-         <property name="enabled">
-             <bool>false</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/toggle-off.png</normaloff>:/icons/icons/toggle-off.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Terminer</string>
-         </property>
-     </action>
-     <action name="actionSaveEventAs">
-         <property name="enabled">
-             <bool>false</bool>
-         </property>
-         <property name="icon">
-             <iconset resource="../../../resources/EvenementLoto.qrc">
-                 <normaloff>:/icons/icons/save-as.png</normaloff>:/icons/icons/save-as.png
-             </iconset>
-         </property>
-         <property name="text">
-             <string>Sauver sous...</string>
-         </property>
-     </action>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>888</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="defaultUp">
+    <bool>false</bool>
+   </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Fichiers</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../../../resources/EvenementLoto.qrc">
+      <normaloff>:/icons/icons/menu.png</normaloff>:/icons/icons/menu.png</iconset>
+    </property>
+    <property name="separatorsCollapsible">
+     <bool>true</bool>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionNewEvent"/>
+    <addaction name="separator"/>
+    <addaction name="actionLoadEvent"/>
+    <addaction name="actionSaveEvent"/>
+    <addaction name="actionSaveEventAs"/>
+    <addaction name="separator"/>
+    <addaction name="actionStartEvent"/>
+    <addaction name="actionEndEvent"/>
+    <addaction name="separator"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuParameters">
+    <property name="title">
+     <string>Paramètres</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../../../resources/EvenementLoto.qrc">
+      <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>:/icons/icons/windows-10-personalization.png</iconset>
+    </property>
+    <property name="separatorsCollapsible">
+     <bool>true</bool>
+    </property>
+    <property name="toolTipsVisible">
+     <bool>true</bool>
+    </property>
+    <addaction name="actionGlobalParam"/>
+    <addaction name="separator"/>
+    <addaction name="actionConfigEvent"/>
+    <addaction name="separator"/>
+    <addaction name="actionConfigCard"/>
+    <addaction name="actionConfigRounds"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Aide</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../../../resources/EvenementLoto.qrc">
+      <normaloff>:/icons/icons/online-support.png</normaloff>:/icons/icons/online-support.png</iconset>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="separator"/>
+    <addaction name="actionHelp"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuParameters"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/info.png</normaloff>:/icons/icons/info.png</iconset>
+   </property>
+   <property name="text">
+    <string>À propos</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/help.png</normaloff>:/icons/icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>Aide</string>
+   </property>
+  </action>
+  <action name="actionGlobalParam">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/adjust.png</normaloff>:/icons/icons/adjust.png</iconset>
+   </property>
+   <property name="text">
+    <string>Général</string>
+   </property>
+  </action>
+  <action name="actionConfigCard">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/puzzle.png</normaloff>:/icons/icons/puzzle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Cartons</string>
+   </property>
+  </action>
+  <action name="actionConfigRounds">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/services.png</normaloff>:/icons/icons/services.png</iconset>
+   </property>
+   <property name="text">
+    <string>Parties</string>
+   </property>
+  </action>
+  <action name="actionConfigEvent">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/details.png</normaloff>:/icons/icons/details.png</iconset>
+   </property>
+   <property name="text">
+    <string>Événement</string>
+   </property>
+  </action>
+  <action name="actionNewEvent">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/new-file.png</normaloff>:/icons/icons/new-file.png</iconset>
+   </property>
+   <property name="text">
+    <string>Nouveau</string>
+   </property>
+  </action>
+  <action name="actionLoadEvent">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/folder_open.png</normaloff>:/icons/icons/folder_open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Charger</string>
+   </property>
+  </action>
+  <action name="actionSaveEvent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/save.png</normaloff>:/icons/icons/save.png</iconset>
+   </property>
+   <property name="text">
+    <string>Sauver</string>
+   </property>
+  </action>
+  <action name="actionStartEvent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/toggle-on.png</normaloff>:/icons/icons/toggle-on.png</iconset>
+   </property>
+   <property name="text">
+    <string>Commencer</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/shutdown.png</normaloff>:/icons/icons/shutdown.png</iconset>
+   </property>
+   <property name="text">
+    <string>Quitter</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::QuitRole</enum>
+   </property>
+  </action>
+  <action name="actionEndEvent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/toggle-off.png</normaloff>:/icons/icons/toggle-off.png</iconset>
+   </property>
+   <property name="text">
+    <string>Terminer</string>
+   </property>
+  </action>
+  <action name="actionSaveEventAs">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/save-as.png</normaloff>:/icons/icons/save-as.png</iconset>
+   </property>
+   <property name="text">
+    <string>Sauver sous...</string>
+   </property>
+  </action>
  </widget>
  <resources>
-     <include location="../../../resources/EvenementLoto.qrc"/>
+  <include location="../../../resources/EvenementLoto.qrc"/>
  </resources>
  <connections>
   <connection>
-      <sender>actionAbout</sender>
+   <sender>actionAbout</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowAbout()</slot>
@@ -972,7 +949,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionHelp</sender>
+   <sender>actionHelp</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowHelp()</slot>
@@ -988,7 +965,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionLoadEvent</sender>
+   <sender>actionLoadEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actLoadFile()</slot>
@@ -1004,7 +981,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionStartEvent</sender>
+   <sender>actionStartEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actStartEvent()</slot>
@@ -1020,7 +997,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionConfigEvent</sender>
+   <sender>actionConfigEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowEventParameters()</slot>
@@ -1036,7 +1013,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionConfigCard</sender>
+   <sender>actionConfigCard</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowCardPackParameters()</slot>
@@ -1052,7 +1029,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionConfigRounds</sender>
+   <sender>actionConfigRounds</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowGameRoundsParameters()</slot>
@@ -1068,7 +1045,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionNewEvent</sender>
+   <sender>actionNewEvent</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actNewFile()</slot>
@@ -1084,7 +1061,7 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionGlobalParam</sender>
+   <sender>actionGlobalParam</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowGlobalParameters()</slot>
@@ -1100,219 +1077,219 @@
    </hints>
   </connection>
   <connection>
-      <sender>actionQuit</sender>
+   <sender>actionQuit</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actQuit()</slot>
-      <hints>
-          <hint type="sourcelabel">
-              <x>-1</x>
-              <y>-1</y>
-          </hint>
-          <hint type="destinationlabel">
-              <x>418</x>
-              <y>352</y>
-          </hint>
-      </hints>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>352</y>
+    </hint>
+   </hints>
   </connection>
-     <connection>
-         <sender>actionSaveEvent</sender>
-         <signal>triggered()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actSaveFile()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>-1</x>
-                 <y>-1</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>418</x>
-                 <y>352</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>actionSaveEventAs</sender>
-         <signal>triggered()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actSaveAsFile()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>-1</x>
-                 <y>-1</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>418</x>
-                 <y>352</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>actionEndEvent</sender>
-         <signal>triggered()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actEndEvent()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>-1</x>
-                 <y>-1</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>418</x>
-                 <y>352</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>StartEndGameRound</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actStartStopRound()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>1138</x>
-                 <y>469</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>1159</x>
-                 <y>443</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>PauseResumeGame</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actPauseResumeRound()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>1138</x>
-                 <y>497</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>1159</x>
-                 <y>515</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>RandomPick</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actRandomPick()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>1138</x>
-                 <y>553</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>1159</x>
-                 <y>547</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>CancelLastPick</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actCancelPick()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>1138</x>
-                 <y>581</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>1159</x>
-                 <y>583</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>radioBtnPureRandom</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actRadioPureRandom()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>88</x>
-                 <y>663</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>4</x>
-                 <y>614</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>radioBtnPureManual</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actRadioPureManual()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>56</x>
-                 <y>704</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>0</x>
-                 <y>652</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>radioBtnBoth</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actRadioBoth()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>76</x>
-                 <y>745</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>0</x>
-                 <y>691</y>
-             </hint>
-         </hints>
-     </connection>
-     <connection>
-         <sender>DisplayRules</sender>
-         <signal>clicked()</signal>
-         <receiver>MainWindow</receiver>
-         <slot>actDisplayRules()</slot>
-         <hints>
-             <hint type="sourcelabel">
-                 <x>1083</x>
-                 <y>515</y>
-             </hint>
-             <hint type="destinationlabel">
-                 <x>1159</x>
-                 <y>424</y>
-             </hint>
-         </hints>
-     </connection>
+  <connection>
+   <sender>actionSaveEvent</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actSaveFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSaveEventAs</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actSaveAsFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEndEvent</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actEndEvent()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>418</x>
+     <y>352</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>StartEndGameRound</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actStartStopRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1138</x>
+     <y>469</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1159</x>
+     <y>443</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PauseResumeGame</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actPauseResumeRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1138</x>
+     <y>497</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1159</x>
+     <y>515</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>RandomPick</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actRandomPick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1138</x>
+     <y>553</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1159</x>
+     <y>547</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CancelLastPick</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actCancelPick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1138</x>
+     <y>581</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1159</x>
+     <y>583</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioBtnPureRandom</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actRadioPureRandom()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>88</x>
+     <y>663</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>614</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioBtnPureManual</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actRadioPureManual()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>704</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>652</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radioBtnBoth</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actRadioBoth()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>76</x>
+     <y>745</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>691</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DisplayRules</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actDisplayRules()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1083</x>
+     <y>515</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1159</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
-    <slots>
-        <slot>actShowAbout()</slot>
-        <slot>actShowHelp()</slot>
-        <slot>actShowGlobalParameters()</slot>
-        <slot>actShowCardPackParameters()</slot>
-        <slot>actShowGameRoundsParameters()</slot>
-        <slot>actShowEventParameters()</slot>
-        <slot>actNewFile()</slot>
-        <slot>actLoadFile()</slot>
-        <slot>actSaveFile()</slot>
-        <slot>actSaveAsFile()</slot>
-        <slot>actStartEvent()</slot>
-        <slot>actQuit()</slot>
-        <slot>actEndEvent()</slot>
-        <slot>actStartStopRound()</slot>
-        <slot>actPauseResumeRound()</slot>
-        <slot>actRandomPick()</slot>
-        <slot>actCancelPick()</slot>
-        <slot>actRadioPureRandom()</slot>
-        <slot>actRadioPureManual()</slot>
-        <slot>actRadioBoth()</slot>
-        <slot>actDisplayRules()</slot>
-    </slots>
+ <slots>
+  <slot>actShowAbout()</slot>
+  <slot>actShowHelp()</slot>
+  <slot>actShowGlobalParameters()</slot>
+  <slot>actShowCardPackParameters()</slot>
+  <slot>actShowGameRoundsParameters()</slot>
+  <slot>actShowEventParameters()</slot>
+  <slot>actNewFile()</slot>
+  <slot>actLoadFile()</slot>
+  <slot>actSaveFile()</slot>
+  <slot>actSaveAsFile()</slot>
+  <slot>actStartEvent()</slot>
+  <slot>actQuit()</slot>
+  <slot>actEndEvent()</slot>
+  <slot>actStartStopRound()</slot>
+  <slot>actPauseResumeRound()</slot>
+  <slot>actRandomPick()</slot>
+  <slot>actCancelPick()</slot>
+  <slot>actRadioPureRandom()</slot>
+  <slot>actRadioPureManual()</slot>
+  <slot>actRadioBoth()</slot>
+  <slot>actDisplayRules()</slot>
+ </slots>
 </ui>

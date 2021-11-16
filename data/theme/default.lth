@@ -1,8 +1,10 @@
 {
-  "globalScale": 0.02,
-  "gridTextScale": 0.85,
-  "longTextScale": 0.60,
-  "name": "default",
-  "shortTextScale": 0.6,
-  "titleScale": 2.0
+  "theme": {
+    "baseRatio": 0.02,
+    "gridTextRatio": 0.85,
+    "longTextRatio": 0.60,
+    "name": "default",
+    "shortTextRatio": 0.6,
+    "titleRatio": 2.0
+  }
 }

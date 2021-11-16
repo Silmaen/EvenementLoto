@@ -1,8 +1,10 @@
 {
-  "globalScale": 0.08,
-  "gridTextScale": 0.8,
-  "longTextScale": 0.9,
-  "name": "crazy",
-  "shortTextScale": 1.6,
-  "titleScale": 5.0
+  "theme": {
+    "baseRatio": 0.08,
+    "gridTextRatio": 0.8,
+    "longTextRatio": 0.9,
+    "name": "crazy",
+    "shortTextRatio": 1.6,
+    "titleRatio": 5.0
+  }
 }

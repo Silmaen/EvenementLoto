@@ -6,16 +6,16 @@
  * All modification must get authorization from the author.
  */
 
-// Les trucs de QT
-#include "gui/moc_ConfigGeneral.cpp"
-#include "ui/ui_ConfigGeneral.h"
-
-#include "gui/BaseDialog.h"
 #include "gui/ConfigGeneral.h"
+#include "gui/BaseDialog.h"
 #include "gui/MainWindow.h"
 #include "gui/baseDefinitions.h"
 #include <fstream>
 #include <iostream>
+
+// Les trucs de QT
+#include "gui/moc_ConfigGeneral.cpp"
+#include "ui/ui_ConfigGeneral.h"
 
 namespace evl::gui {
 
@@ -34,11 +34,13 @@ ConfigGeneral::~ConfigGeneral() {
 void ConfigGeneral::SaveFile() {
     if(mwd != nullptr) {
         mwd->getSettings().setValue(settings::dataPathKey, ui->DataLocation->text());
-        mwd->getSettings().setValue(settings::themeNameKey, ui->editThemeName->text());
-        mwd->getSettings().setValue(settings::globalScaleKey, ui->spinMainScale->value());
-        mwd->getSettings().setValue(settings::titleScaleKey, ui->spinTitleScale->value());
-        mwd->getSettings().setValue(settings::shortTextScaleKey, ui->spinShortTextScale->value());
-        mwd->getSettings().setValue(settings::gridTextScaleKey, ui->spinGridTextScale->value());
+        mwd->getTheme().setParam("name", ui->editThemeName->text());
+        mwd->getTheme().setParam("baseRatio", ui->spinMainScale->value());
+        mwd->getTheme().setParam("titleRatio", ui->spinTitleScale->value());
+        mwd->getTheme().setParam("gridTextRatio", ui->spinGridTextScale->value());
+        mwd->getTheme().setParam("shortTextRatio", ui->spinShortTextScale->value());
+        mwd->getTheme().setParam("longTextRatio", ui->spinLongTextScale->value());
+        mwd->getTheme().writeInSettings();
         mwd->syncSettings();
     }
 }
@@ -53,6 +55,8 @@ void ConfigGeneral::actApply() {
 }
 
 void ConfigGeneral::actCancel() {
+    if(mwd)
+        mwd->getTheme().setFromSettings();
     reject();
 }
 
@@ -66,38 +70,35 @@ void ConfigGeneral::actResetTheme() {
     preExec();
 }
 
+void ConfigGeneral::actRestoreTheme() {
+    mwd->getTheme().resetFactory();
+    preExec();
+}
+
 void ConfigGeneral::actImportTheme() {
     auto path= dialog::openFile(dialog::FileTypes::ThemeFile, true);
     if(path.empty())
         return;
+    mwd->getTheme().importJSON(path);
+    preExec();
 }
 
 void ConfigGeneral::actExportTheme() {
     auto path= dialog::openFile(dialog::FileTypes::ThemeFile, false);
     if(path.empty())
         return;
-    std::ofstream file(path, std::ios::out);
-    file << std::setw(4)
-         << json{
-                    {"name", mwd->getSettings().value(settings::themeNameKey, settings::themeNameDefault).toString().toStdString()},
-                    {"globalScale", mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat()},
-                    {"titleScale", mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat()},
-                    {"shortTextScale", mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat()},
-                    {"longTextScale", mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat()},
-                    {"gridTextScale", mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat()},
-            };
-    file.close();
+    mwd->getTheme().exportJSON(path);
 }
 
 void ConfigGeneral::preExec() {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
-        ui->editThemeName->setText(mwd->getSettings().value(settings::themeNameKey, settings::themeNameDefault).toString());
-        ui->spinMainScale->setValue(mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat());
-        ui->spinTitleScale->setValue(mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat());
-        ui->spinShortTextScale->setValue(mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat());
-        ui->spinShortTextScale->setValue(mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat());
-        ui->spinGridTextScale->setValue(mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat());
+        ui->editThemeName->setText(mwd->getTheme().getParam("name").toString());
+        ui->spinMainScale->setValue(mwd->getTheme().getParam("baseRatio").toDouble());
+        ui->spinTitleScale->setValue(mwd->getTheme().getParam("titleRatio").toDouble());
+        ui->spinShortTextScale->setValue(mwd->getTheme().getParam("shortTextRatio").toDouble());
+        ui->spinLongTextScale->setValue(mwd->getTheme().getParam("longTextRatio").toDouble());
+        ui->spinGridTextScale->setValue(mwd->getTheme().getParam("gridTextRatio").toDouble());
     }
 }
 

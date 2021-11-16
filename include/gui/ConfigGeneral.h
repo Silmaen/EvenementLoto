@@ -73,6 +73,11 @@ public slots:
     /**
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
+    void actRestoreTheme();
+
+    /**
+     * @brief Réagit au clic sur la recherche d’un dossier.
+     */
     void actImportTheme();
 
     /**
