@@ -6,6 +6,7 @@
 * All modification must get authorization from the author.
 */
 #include "gui/BaseDialog.h"
+#include <QColorDialog>
 #include <QFileDialog>
 
 namespace evl::gui::dialog {
@@ -55,6 +56,14 @@ bool question(const QString& title, const QString& question, const QString& add)
     if(message.exec() == QMessageBox::StandardButton::Yes)
         return true;
     return false;
+}
+
+QColor colorSelection(const QColor& color) {
+    QColorDialog box;
+    box.setCurrentColor(color);
+    if(box.exec() == QColorDialog::Accepted)
+        return box.selectedColor();
+    return color;
 }
 
 }// namespace evl::gui::dialog
