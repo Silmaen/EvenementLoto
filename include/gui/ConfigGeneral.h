@@ -85,6 +85,11 @@ public slots:
     */
     void actExportTheme();
 
+    /**
+     * @brief Réagit au clic de la couleur de fond.
+     */
+    void actBackgroundColorChange();
+
 private:
     /**
      * @brief Charge une configuration depuis un fichier

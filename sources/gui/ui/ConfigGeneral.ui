@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
-    <height>452</height>
+    <width>359</width>
+    <height>461</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,7 +123,7 @@
          <item>
           <widget class="QLineEdit" name="editThemeName">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -134,6 +134,9 @@
           <spacer name="horizontalSpacer_5">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeType">
+            <enum>QSizePolicy::Preferred</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -201,9 +204,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>0</y>
-              <width>532</width>
-              <height>148</height>
+              <y>-12</y>
+              <width>320</width>
+              <height>164</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -223,7 +226,7 @@
               <widget class="QFrame" name="frameLeft">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>1</horstretch>
+                 <horstretch>2</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
@@ -249,7 +252,7 @@
                 <item>
                  <widget class="QLabel" name="label_4">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -262,7 +265,7 @@
                 <item>
                  <widget class="QLabel" name="label_5">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -275,7 +278,7 @@
                 <item>
                  <widget class="QLabel" name="label_6">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -288,7 +291,7 @@
                 <item>
                  <widget class="QLabel" name="label_7">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
@@ -301,13 +304,26 @@
                 <item>
                  <widget class="QLabel" name="label_3">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="text">
                    <string>Facteur d'échelle de la grille</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_8">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Couleur de l'arrière plan</string>
                   </property>
                  </widget>
                 </item>
@@ -318,7 +334,7 @@
               <widget class="QFrame" name="frameRight">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>2</horstretch>
+                 <horstretch>1</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
@@ -343,6 +359,12 @@
                 </property>
                 <item>
                  <widget class="QDoubleSpinBox" name="spinMainScale">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -362,6 +384,12 @@
                 </item>
                 <item>
                  <widget class="QDoubleSpinBox" name="spinTitleScale">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimum">
                    <double>1.000000000000000</double>
                   </property>
@@ -381,6 +409,12 @@
                 </item>
                 <item>
                  <widget class="QDoubleSpinBox" name="spinShortTextScale">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
                   </property>
@@ -400,6 +434,12 @@
                 </item>
                 <item>
                  <widget class="QDoubleSpinBox" name="spinLongTextScale">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
                   </property>
@@ -419,6 +459,12 @@
                 </item>
                 <item>
                  <widget class="QDoubleSpinBox" name="spinGridTextScale">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
                   </property>
@@ -433,6 +479,25 @@
                   </property>
                   <property name="value">
                    <double>0.850000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="buttonBackgroundColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="autoFillBackground">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>#456734</string>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -762,6 +827,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>buttonBackgroundColor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actBackgroundColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>296</x>
+     <y>338</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>561</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>actOk()</slot>
@@ -772,5 +853,6 @@
   <slot>actImportTheme()</slot>
   <slot>actExportTheme()</slot>
   <slot>actRestoreTheme()</slot>
+  <slot>actBackgroundColorChange()</slot>
  </slots>
 </ui>

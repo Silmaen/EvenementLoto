@@ -23,6 +23,7 @@ static const params themeDefaults{
         {"gridTextRatio", 0.85},
         {"shortTextRatio", 1.4},
         {"longTextRatio", 0.6},
+        //{"BackgroundColor", QColor(240,240,240)},
 };
 
 /**

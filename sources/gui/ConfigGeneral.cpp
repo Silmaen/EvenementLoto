@@ -90,6 +90,23 @@ void ConfigGeneral::actExportTheme() {
     mwd->getTheme().exportJSON(path);
 }
 
+void buttonSetColor(QPushButton* btn, const QColor& col) {
+    auto palette= btn->palette();
+    palette.setColor(QPalette::Button, col);
+    if(col.lightness() < 100)
+        palette.setColor(QPalette::ButtonText, QColor(255, 255, 255));
+    else
+        palette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
+    btn->setPalette(palette);
+    btn->setText(col.name());
+}
+
+void ConfigGeneral::actBackgroundColorChange() {
+    QColor base    = ui->buttonBackgroundColor->palette().color(QPalette::Button);
+    QColor newColor= dialog::colorSelection(base);
+    buttonSetColor(ui->buttonBackgroundColor, newColor);
+}
+
 void ConfigGeneral::preExec() {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
@@ -99,6 +116,7 @@ void ConfigGeneral::preExec() {
         ui->spinShortTextScale->setValue(mwd->getTheme().getParam("shortTextRatio").toDouble());
         ui->spinLongTextScale->setValue(mwd->getTheme().getParam("longTextRatio").toDouble());
         ui->spinGridTextScale->setValue(mwd->getTheme().getParam("gridTextRatio").toDouble());
+        //buttonSetColor(ui->buttonBackgroundColor,mwd->getTheme().getParam("gridTextRatio").to);
     }
 }
 
