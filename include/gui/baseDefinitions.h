@@ -24,7 +24,6 @@ static path baseExecPath;
 /// Nom du fichier de configuration générale de base.
 inline path iniFile= "config.ini";
 
-
 /**
  * @brief Construit le chemin vers le fichier de configuration initiale
  * @return Le chemin complet vers le fichier de configuration.
@@ -58,18 +57,6 @@ namespace settings {
 /// Clé vers le dataPath.
 inline QString dataPathKey        = "path/data_path";
 inline QString dataPathDefault    = "";
-inline QString themeNameKey       = "theme/name";
-inline QString themeNameDefault   = "default";
-inline QString globalScaleKey     = "theme/global_scale";
-inline float globalScaleDefault   = 0.02;
-inline QString titleScaleKey      = "theme/title_scale";
-inline float titleScaleDefault    = 2.0;
-inline QString shortTextScaleKey  = "theme/short_text_scale";
-inline float shortTextScaleDefault= 1.4;
-inline QString longTextScaleKey   = "theme/long_text_scale";
-inline float longTextScaleDefault = 0.6;
-inline QString gridTextScaleKey   = "theme/grid_text_scale";
-inline float gridTextScaleDefault = 0.85;
 
 }// namespace settings
 

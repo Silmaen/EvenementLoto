@@ -64,15 +64,25 @@ void VisualTheme::importJSON(const path& file) {
 }
 
 void VisualTheme::setFromSettings() {
+    if(settings == nullptr)
+        return;
     for(auto& element: themeDefaults) {
         // conservation du type
-        if(settings->value("theme/" + element.first, element.second).typeId() != element.second.typeId())
-            return;
-        parameters[element.first]= settings->value("theme/" + element.first, element.second);
+        QVariant v(settings->value("theme/" + element.first, element.second));
+        if(element.second.metaType() == QMetaType(QMetaType::Int))
+            parameters[element.first]= v.toInt();
+        else if(element.second.metaType() == QMetaType(QMetaType::Double))
+            parameters[element.first]= v.toDouble();
+        else if(element.second.metaType() == QMetaType(QMetaType::Bool))
+            parameters[element.first]= v.toBool();
+        else
+            parameters[element.first]= v.toString();
     }
 }
 
 void VisualTheme::writeInSettings() {
+    if(settings == nullptr)
+        return;
     for(auto& parameter: parameters)
         settings->setValue("theme/" + parameter.first, parameter.second);
     settings->sync();

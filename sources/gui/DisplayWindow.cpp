@@ -8,9 +8,9 @@
 #include "gui/DisplayWindow.h"
 #include "core/timeFunctions.h"
 #include "gui/MainWindow.h"
+#include "gui/baseDefinitions.h"
 
 // Les trucs de QT
-#include <gui/baseDefinitions.h>
 #include <gui/moc_DisplayWindow.cpp>
 #include <ui/ui_DisplayWindow.h>
 
@@ -279,13 +279,14 @@ void DisplayWindow::resize() {
     // taille de la font par défaut
     if(mwd == nullptr)
         return;
+    auto theme         = mwd->getTheme();
     auto baseFont      = font();
-    float setting_ratio= mwd->getSettings().value(settings::globalScaleKey, settings::globalScaleDefault).toFloat();
+    float setting_ratio= theme.getParam("baseRatio").toDouble();
     float baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
     baseFont.setPointSizeF(baseRatio);
     setFont(baseFont);
     // taille font des titres
-    setting_ratio   = mwd->getSettings().value(settings::titleScaleKey, settings::titleScaleDefault).toFloat();
+    setting_ratio   = theme.getParam("titleRatio").toDouble();
     float titleRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(titleRatio);
     ui->ET_EventTitle->setFont(baseFont);
@@ -296,12 +297,12 @@ void DisplayWindow::resize() {
     ui->EE_Title->setFont(baseFont);
     ui->ER_Title->setFont(baseFont);
     // taille de textes longs
-    setting_ratio      = mwd->getSettings().value(settings::longTextScaleKey, settings::longTextScaleDefault).toFloat();
+    setting_ratio      = theme.getParam("longTextRatio").toDouble();
     float longTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(longTextRatio);
     ui->ER_Rules->setFont(baseFont);
     // Taille textes courts
-    setting_ratio       = mwd->getSettings().value(settings::shortTextScaleKey, settings::shortTextScaleDefault).toFloat();
+    setting_ratio       = theme.getParam("shortTextRatio").toDouble();
     float shortTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(shortTextRatio);
     ui->EP_Message->setFont(baseFont);
@@ -311,7 +312,7 @@ void DisplayWindow::resize() {
     ui->RR_NumberGrid->verticalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->height() / 9);
     currentSize= size();
     // taille de police dans la grille
-    setting_ratio  = mwd->getSettings().value(settings::gridTextScaleKey, settings::gridTextScaleDefault).toFloat();
+    setting_ratio  = theme.getParam("gridTextRatio").toDouble();
     float gridRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(gridRatio);
     for(int row= 0; row < 9; ++row) {
