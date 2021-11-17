@@ -37,7 +37,8 @@ Le programme a été correctement compilé avec :
   * [X] Affichage du règlement
     * [X] Bouton permettant le ré-affichage à n’importe quel moment
   * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
-  * [ ] Permettre Affichage en plein écran sur le second écran
+  * [X] Permettre Affichage en plein écran sur le second écran
+    * [ ] Permettre le choix/configuration du mode plein écran.
   * [X] Affichage Pause round
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
