@@ -6,7 +6,6 @@
 * All modification must get authorization from the author.
 */
 #include "gui/DisplayWindow.h"
-#include "core/timeFunctions.h"
 #include "gui/MainWindow.h"
 #include "gui/baseDefinitions.h"
 
@@ -130,7 +129,8 @@ void DisplayWindow::updateDisplay() {
         break;
     }
     // action de redimensionnement
-    if(currentSize != size() || currentStatus != event->getStatus()) {
+    if(currentSize != size() || currentStatus != event->getStatus() || mwd->getTheme().isModified()) {
+        updateColors();
         ui->ET_OrganizerLogo->setText("");
         ui->RR_Logo->setText("");
         ui->RT_Logo->setText("");
@@ -140,6 +140,8 @@ void DisplayWindow::updateDisplay() {
         ui->EE_LogoB->setText("");
         resize();
         currentStatus= event->getStatus();
+    } else {
+        updateColors();
     }
 }
 
@@ -195,18 +197,20 @@ void DisplayWindow::updateRoundRunning() {
     // mise à jour de l’affichage de la grille
     resetGrid();
     QBrush br;
-    br.setColor(QColor(255, 112, 0));
     br.setStyle(Qt::BrushStyle::SolidPattern);
-    int i= 0;
+    int i       = 0;
+    QColor color= QColor(mwd->getTheme().getParam("selectedNumberColor").toString());
     for(auto iDraw= round->beginReverseDraws(); iDraw != round->endReverseDraws(); ++iDraw) {
-        if(i == 0) {
-            br.setColor(QColor(255, 112, 0));
-        } else if(i == 1) {
-            br.setColor(QColor(255, 132, 20));
-        } else if(i == 2) {
-            br.setColor(QColor(255, 162, 50));
-        } else
-            br.setColor(QColor(255, 212, 100));
+        br.setColor(color);
+        if(mwd->getTheme().getParam("fadeNumbers").toBool() &&
+           i < mwd->getTheme().getParam("fadeNumbersAmount").toInt()) {
+            int strength= mwd->getTheme().getParam("fadeNumbersStrength").toInt();
+            if(strength < 0) {
+                color= color.darker(100 - strength);
+            } else {
+                color= color.lighter(100 + strength);
+            }
+        }
         ++i;
         int row= (*iDraw - 1) / 10;
         int col= (*iDraw - 1) % 10;
@@ -242,6 +246,19 @@ void DisplayWindow::updateDisplayRules() {
     if(event->getRules().empty())
         return;
     ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
+}
+
+void DisplayWindow::updateColors() {
+    auto curent= palette();
+    auto back  = QColor(mwd->getTheme().getParam("backgroundColor").toString());
+    curent.setColor(QPalette::ColorRole::Window, back);
+    auto text= QColor(mwd->getTheme().getParam("textColor").toString());
+    curent.setColor(QPalette::ColorRole::Text, text);
+    curent.setColor(QPalette::ColorRole::WindowText, text);
+    curent.setColor(QPalette::ColorRole::PlaceholderText, text);
+    auto gridBack= QColor(mwd->getTheme().getParam("gridBackgroundColor").toString());
+    curent.setColor(QPalette::ColorRole::Base, gridBack);
+    setPalette(curent);
 }
 
 void DisplayWindow::initializeNumberGrid() {
@@ -285,6 +302,7 @@ void DisplayWindow::resize() {
     float baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
     baseFont.setPointSizeF(baseRatio);
     setFont(baseFont);
+
     // taille font des titres
     setting_ratio   = theme.getParam("titleRatio").toDouble();
     float titleRatio= baseRatio * setting_ratio;

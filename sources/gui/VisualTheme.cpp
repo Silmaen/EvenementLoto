@@ -24,6 +24,7 @@ VisualTheme::VisualTheme(QSettings* set):
 
 void VisualTheme::resetFactory() {
     parameters= themeDefaults;
+    toUpdate  = true;
 }
 
 void VisualTheme::exportJSON(const path& file) const {
@@ -61,6 +62,7 @@ void VisualTheme::importJSON(const path& file) {
                 parameters[key]= QString::fromUtf8(item.value().get<string>());
         }
     }
+    toUpdate= true;
 }
 
 void VisualTheme::setFromSettings() {
@@ -78,6 +80,7 @@ void VisualTheme::setFromSettings() {
         else
             parameters[element.first]= v.toString();
     }
+    toUpdate= true;
 }
 
 void VisualTheme::writeInSettings() {
@@ -86,10 +89,12 @@ void VisualTheme::writeInSettings() {
     for(auto& parameter: parameters)
         settings->setValue("theme/" + parameter.first, parameter.second);
     settings->sync();
+    toUpdate= true;
 }
 
-const QVariant& VisualTheme::getParam(const QString& key) const {
+const QVariant& VisualTheme::getParam(const QString& key) {
     if(themeDefaults.contains(key)) {
+        toUpdate= false;
         return parameters.at(key);
     }
     return nullVariant;
@@ -101,6 +106,7 @@ void VisualTheme::setParam(const QString& key, const QVariant& value) {
     if(themeDefaults.at(key).typeId() != value.typeId())
         return;
     parameters[key]= value;
+    toUpdate       = true;
 }
 
 }// namespace evl::gui

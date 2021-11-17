@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>359</width>
-    <height>461</height>
+    <width>441</width>
+    <height>729</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -131,22 +131,6 @@
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Preferred</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>208</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
           <widget class="QPushButton" name="buttonImportTheme">
            <property name="text">
             <string>Importer</string>
@@ -204,9 +188,9 @@
             <property name="geometry">
              <rect>
               <x>0</x>
-              <y>-12</y>
-              <width>320</width>
-              <height>164</height>
+              <y>0</y>
+              <width>419</width>
+              <height>468</height>
              </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -257,8 +241,14 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
                   <property name="text">
-                   <string>Facteur d'échelle pricipal</string>
+                   <string>Facteur d'échelle principal</string>
                   </property>
                  </widget>
                 </item>
@@ -269,6 +259,12 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
                   </property>
                   <property name="text">
                    <string>Facteur d'échelle de titre</string>
@@ -283,6 +279,12 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Facteur déchelle texte court</string>
                   </property>
@@ -295,6 +297,12 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
                   </property>
                   <property name="text">
                    <string>Facteur d'échelle texte long</string>
@@ -309,8 +317,27 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Facteur d'échelle de la grille</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </item>
@@ -322,8 +349,141 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>Couleur de l'arrière plan</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_9">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Couleur de l'arrière plan de la grille</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_10">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Couleur du texte</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_3">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_11">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Couleur chiffre sélectionné</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_12">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Activation de la fondu de couleur</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Fondu sur combien de chiffres</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_14">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Force de la fondue</string>
                   </property>
                  </widget>
                 </item>
@@ -365,6 +525,15 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
                   <property name="decimals">
                    <number>3</number>
                   </property>
@@ -389,6 +558,15 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                   <property name="minimum">
                    <double>1.000000000000000</double>
@@ -415,6 +593,15 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
                   </property>
@@ -439,6 +626,15 @@
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
                   </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
@@ -465,6 +661,15 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
                   <property name="minimum">
                    <double>0.200000000000000</double>
                   </property>
@@ -483,6 +688,19 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="Line" name="line_2">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QPushButton" name="buttonBackgroundColor">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -490,14 +708,183 @@
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
                   <property name="autoFillBackground">
                    <bool>true</bool>
                   </property>
                   <property name="text">
-                   <string>#456734</string>
+                   <string>#f0f0f0</string>
                   </property>
                   <property name="flat">
                    <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="buttonGridBackgroundColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="autoFillBackground">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>#f0f0f0</string>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="buttonTextColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="autoFillBackground">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>#000000</string>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_4">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="buttonSelectedNumberColor">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="autoFillBackground">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>#ff7000</string>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkFadeNumbers">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Activé</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinFadeAmount">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="maximum">
+                   <number>10</number>
+                  </property>
+                  <property name="value">
+                   <number>3</number>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinFadeStrength">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="minimum">
+                   <number>-100</number>
+                  </property>
+                  <property name="maximum">
+                   <number>100</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>4</number>
                   </property>
                  </widget>
                 </item>
@@ -573,19 +960,6 @@
       </item>
      </layout>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item>
     <widget class="QFrame" name="frame">
@@ -706,8 +1080,8 @@
    <slot>actOk()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>207</x>
-     <y>433</y>
+     <x>155</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -722,8 +1096,8 @@
    <slot>actApply()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>314</x>
-     <y>433</y>
+     <x>257</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>224</x>
@@ -738,8 +1112,8 @@
    <slot>actCancel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>421</x>
-     <y>433</y>
+     <x>359</x>
+     <y>710</y>
     </hint>
     <hint type="destinationlabel">
      <x>336</x>
@@ -754,7 +1128,7 @@
    <slot>actSearchFolder()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>534</x>
+     <x>421</x>
      <y>58</y>
     </hint>
     <hint type="destinationlabel">
@@ -770,11 +1144,11 @@
    <slot>actResetTheme()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>273</x>
+     <x>217</x>
      <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>562</x>
+     <x>440</x>
      <y>162</y>
     </hint>
    </hints>
@@ -786,11 +1160,11 @@
    <slot>actImportTheme()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>414</x>
-     <y>116</y>
+     <x>340</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
-     <x>563</x>
+     <x>440</x>
      <y>206</y>
     </hint>
    </hints>
@@ -802,11 +1176,11 @@
    <slot>actExportTheme()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>490</x>
-     <y>116</y>
+     <x>421</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
-     <x>557</x>
+     <x>440</x>
      <y>118</y>
     </hint>
    </hints>
@@ -818,11 +1192,11 @@
    <slot>actRestoreTheme()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>310</x>
-     <y>171</y>
+     <x>298</x>
+     <y>186</y>
     </hint>
     <hint type="destinationlabel">
-     <x>558</x>
+     <x>440</x>
      <y>154</y>
     </hint>
    </hints>
@@ -834,12 +1208,76 @@
    <slot>actBackgroundColorChange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>296</x>
-     <y>338</y>
+     <x>423</x>
+     <y>426</y>
     </hint>
     <hint type="destinationlabel">
-     <x>561</x>
+     <x>440</x>
      <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonGridBackgroundColor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actGridBackgroundColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>453</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>445</x>
+     <y>456</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonTextColor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actTextColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>381</x>
+     <y>483</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>445</x>
+     <y>486</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonSelectedNumberColor</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actSelectedNumbersColorChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>387</x>
+     <y>530</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>445</x>
+     <y>538</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkFadeNumbers</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actFadeActivationChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>324</x>
+     <y>574</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>447</x>
+     <y>578</y>
     </hint>
    </hints>
   </connection>
@@ -854,5 +1292,9 @@
   <slot>actExportTheme()</slot>
   <slot>actRestoreTheme()</slot>
   <slot>actBackgroundColorChange()</slot>
+  <slot>actGridBackgroundColorChange()</slot>
+  <slot>actTextColorChange()</slot>
+  <slot>actSelectedNumbersColorChange()</slot>
+  <slot>actFadeActivationChange()</slot>
  </slots>
 </ui>

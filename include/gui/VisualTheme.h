@@ -23,7 +23,13 @@ static const params themeDefaults{
         {"gridTextRatio", 0.85},
         {"shortTextRatio", 1.4},
         {"longTextRatio", 0.6},
-        //{"BackgroundColor", QColor(240,240,240)},
+        {"backgroundColor", "#F0F0F0"},
+        {"gridBackgroundColor", "#F0F0F0"},
+        {"textColor", "#000000"},
+        {"selectedNumberColor", "#ff7000"},
+        {"fadeNumbers", true},
+        {"fadeNumbersAmount", 3},
+        {"fadeNumbersStrength", 10},
 };
 
 /**
@@ -68,7 +74,7 @@ public:
      * @param key Le nom du paramètre.
      * @return Sa valeur si celui-ci existe (un QVariant vide sinon).
      */
-    const QVariant& getParam(const QString& key) const;
+    const QVariant& getParam(const QString& key);
 
     /**
      * @brief Définition d’un paramètre
@@ -78,11 +84,19 @@ public:
      */
     void setParam(const QString& key, const QVariant& value);
 
+    /**
+     * @brief Si le thème a été modifié mais pas encore lu
+     * @return Vrai si le theme n'a encore jamais été lu et a été modifié.
+     */
+    const bool& isModified() { return toUpdate; }
+
 private:
     /// Les settings généraux.
     QSettings* settings;
     /// Les paramètres
     params parameters= themeDefaults;
+    /// Si le thème a été modifié
+    bool toUpdate= true;
 };
 
 }// namespace evl::gui
