@@ -43,13 +43,13 @@ Le programme a été correctement compilé avec :
 * Thème
   * [X] Ajout d’icônes sur les boutons et actions
     * [X] Ajout des icônes manquantes
-  * [ ] Choix du thème graphique
-    * [ ] Sélection des couleurs
-    * [ ] Possibilité de couleur différente en fonction du sous-niveau
+  * [X] Choix du thème graphique
+    * [X] Sélection des couleurs
+    * [X] Possibilité de couleur différente en fonction du sous-niveau
     * [X] réglage de taille des polices
     * [X] sauvegarde du theme dans les settings
     * [X] export du thème en json
-    * [ ] import du thème en json
+    * [X] import du thème en json
 * Interaction
   * [X] Ajout d’autres types de parties
   * [x] Désactivation boutons modification partie lors de l’affichage
