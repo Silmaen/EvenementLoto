@@ -13,6 +13,7 @@
 #include "gui/ConfigGameRounds.h"
 #include "gui/ConfigGeneral.h"
 #include <QFileDialog>
+#include <QScreen>
 #include <fstream>
 #include <iostream>
 
@@ -164,8 +165,20 @@ void MainWindow::actStartEvent() {
     currentEvent.startEvent();
     updateDisplay();
     timer->start();
-    displayWindow= new DisplayWindow(&currentEvent, this);
-    displayWindow->show();
+    displayWindow          = new DisplayWindow(&currentEvent, this);
+    QList<QScreen*> screens= QApplication::screens();
+    if(screens.size() < 2) {
+        displayWindow->show();
+    } else {
+        for(QScreen* s: screens) {
+            if(s == screen())
+                continue;
+            QRect sizes= s->geometry();
+            displayWindow->move(sizes.x(), sizes.y());
+            break;
+        }
+        displayWindow->showFullScreen();
+    }
 }
 
 void MainWindow::actEndEvent() {
