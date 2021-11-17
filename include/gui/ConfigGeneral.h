@@ -90,6 +90,26 @@ public slots:
      */
     void actBackgroundColorChange();
 
+    /**
+     * @brief Réagit au clic de la couleur de fond de la grille.
+     */
+    void actGridBackgroundColorChange();
+
+    /**
+     * @brief Réagit au clic de la couleur du texte.
+     */
+    void actSelectedNumbersColorChange();
+
+    /**
+    * @brief Réagit au clic de la couleur des chiffres sélectionnés.
+    */
+    void actTextColorChange();
+
+    /**
+    * @brief Réagit au clic de la couleur de fond.
+    */
+    void actFadeActivationChange();
+
 private:
     /**
      * @brief Charge une configuration depuis un fichier

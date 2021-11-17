@@ -19,6 +19,28 @@
 
 namespace evl::gui {
 
+// color button utility
+
+QColor getButtonColor(QPushButton* btn) {
+    return btn->palette().color(QPalette::Button);
+}
+QString getButtonColorName(QPushButton* btn) {
+    return btn->palette().color(QPalette::Button).name();
+}
+void setButtonColor(QPushButton* btn, const QColor& col) {
+    auto palette= btn->palette();
+    palette.setColor(QPalette::Button, col);
+    if(col.lightness() < 100)
+        palette.setColor(QPalette::ButtonText, QColor(255, 255, 255));
+    else
+        palette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
+    btn->setPalette(palette);
+    btn->setText(col.name());
+}
+void setButtonColor(QPushButton* btn, const QString& name) {
+    setButtonColor(btn, QColor(name));
+}
+
 using json= nlohmann::json;
 
 ConfigGeneral::ConfigGeneral(MainWindow* parent):
@@ -40,6 +62,13 @@ void ConfigGeneral::SaveFile() {
         mwd->getTheme().setParam("gridTextRatio", ui->spinGridTextScale->value());
         mwd->getTheme().setParam("shortTextRatio", ui->spinShortTextScale->value());
         mwd->getTheme().setParam("longTextRatio", ui->spinLongTextScale->value());
+        mwd->getTheme().setParam("backgroundColor", getButtonColorName(ui->buttonBackgroundColor));
+        mwd->getTheme().setParam("gridBackgroundColor", getButtonColorName(ui->buttonGridBackgroundColor));
+        mwd->getTheme().setParam("textColor", getButtonColorName(ui->buttonTextColor));
+        mwd->getTheme().setParam("selectedNumberColor", getButtonColorName(ui->buttonSelectedNumberColor));
+        mwd->getTheme().setParam("fadeNumbers", ui->checkFadeNumbers->isChecked());
+        mwd->getTheme().setParam("fadeNumbersAmount", ui->spinFadeAmount->value());
+        mwd->getTheme().setParam("fadeNumbersStrength", ui->spinFadeStrength->value());
         mwd->getTheme().writeInSettings();
         mwd->syncSettings();
     }
@@ -90,21 +119,33 @@ void ConfigGeneral::actExportTheme() {
     mwd->getTheme().exportJSON(path);
 }
 
-void buttonSetColor(QPushButton* btn, const QColor& col) {
-    auto palette= btn->palette();
-    palette.setColor(QPalette::Button, col);
-    if(col.lightness() < 100)
-        palette.setColor(QPalette::ButtonText, QColor(255, 255, 255));
-    else
-        palette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
-    btn->setPalette(palette);
-    btn->setText(col.name());
+void ConfigGeneral::actBackgroundColorChange() {
+    QColor base    = getButtonColor(ui->buttonBackgroundColor);
+    QColor newColor= dialog::colorSelection(base);
+    setButtonColor(ui->buttonBackgroundColor, newColor);
 }
 
-void ConfigGeneral::actBackgroundColorChange() {
-    QColor base    = ui->buttonBackgroundColor->palette().color(QPalette::Button);
+void ConfigGeneral::actGridBackgroundColorChange() {
+    QColor base    = getButtonColor(ui->buttonGridBackgroundColor);
     QColor newColor= dialog::colorSelection(base);
-    buttonSetColor(ui->buttonBackgroundColor, newColor);
+    setButtonColor(ui->buttonGridBackgroundColor, newColor);
+}
+
+void ConfigGeneral::actSelectedNumbersColorChange() {
+    QColor base    = getButtonColor(ui->buttonSelectedNumberColor);
+    QColor newColor= dialog::colorSelection(base);
+    setButtonColor(ui->buttonSelectedNumberColor, newColor);
+}
+
+void ConfigGeneral::actTextColorChange() {
+    QColor base    = getButtonColor(ui->buttonTextColor);
+    QColor newColor= dialog::colorSelection(base);
+    setButtonColor(ui->buttonTextColor, newColor);
+}
+
+void ConfigGeneral::actFadeActivationChange() {
+    ui->spinFadeAmount->setEnabled(ui->checkFadeNumbers->isChecked());
+    ui->spinFadeStrength->setEnabled(ui->checkFadeNumbers->isChecked());
 }
 
 void ConfigGeneral::preExec() {
@@ -116,7 +157,14 @@ void ConfigGeneral::preExec() {
         ui->spinShortTextScale->setValue(mwd->getTheme().getParam("shortTextRatio").toDouble());
         ui->spinLongTextScale->setValue(mwd->getTheme().getParam("longTextRatio").toDouble());
         ui->spinGridTextScale->setValue(mwd->getTheme().getParam("gridTextRatio").toDouble());
-        //buttonSetColor(ui->buttonBackgroundColor,mwd->getTheme().getParam("gridTextRatio").to);
+        setButtonColor(ui->buttonBackgroundColor, mwd->getTheme().getParam("backgroundColor").toString());
+        setButtonColor(ui->buttonGridBackgroundColor, mwd->getTheme().getParam("gridBackgroundColor").toString());
+        setButtonColor(ui->buttonTextColor, mwd->getTheme().getParam("textColor").toString());
+        setButtonColor(ui->buttonSelectedNumberColor, mwd->getTheme().getParam("selectedNumberColor").toString());
+        ui->checkFadeNumbers->setChecked(mwd->getTheme().getParam("fadeNumbers").toBool());
+        actFadeActivationChange();
+        ui->spinFadeAmount->setValue(mwd->getTheme().getParam("fadeNumbersAmount").toInt());
+        ui->spinFadeStrength->setValue(mwd->getTheme().getParam("fadeNumbersStrength").toInt());
     }
 }
 

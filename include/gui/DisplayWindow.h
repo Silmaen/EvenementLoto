@@ -63,14 +63,17 @@ private:
      * @brief Mise à jour de l’affichage de la page de titre.
      */
     void updateEventTitlePage();
+
     /**
      * @brief Mise à jour de l’affichage de la page de titre du round.
      */
     void updateRoundTitlePage();
+
     /**
      * @brief Mise à jour de l’affichage de la page de partie.
      */
     void updateRoundRunning();
+
     /**
      * @brief Mise à jour de l’affichage de la page des règles de l’événement.
      */
@@ -82,7 +85,12 @@ private:
     void initializeNumberGrid();
 
     /**
-     * @brief remise à zéro de l'affichage de la grille
+     * @brief Mise à jour les couleurs des fenêtres
+     */
+    void updateColors();
+
+    /**
+     * @brief Remise à zéro de l'affichage de la grille
      */
     void resetGrid();
 
