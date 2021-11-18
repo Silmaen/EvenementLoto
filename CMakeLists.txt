@@ -22,6 +22,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "OpenBSD")
     set(${PRJPREFIX}_GNU_MINIMAL 11.2)
     set(${PRJPREFIX}_Clang_MINIMAL 11.1)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(EXE_EXT ".exe")
+    set(LIB_EXT ".exe")
     set(${PRJPREFIX}_GNU_MINIMAL 11.2)
     set(${PRJPREFIX}_Clang_MINIMAL 13.0)
     set(${PRJPREFIX}_MSVC_MINIMAL 19.65)
@@ -99,7 +101,6 @@ if (${PRJPREFIX}_PROFILING)
     #options for profiling
     if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_compile_options(-pg)
-
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # todo
     else ()
@@ -154,3 +155,32 @@ if (DOXYGEN_FOUND)
 else (DOXYGEN_FOUND)
     message(ERROR no doxygen found)
 endif (DOXYGEN_FOUND)
+#
+# ---=== Packaging ===---
+#
+add_custom_target(Package
+        DEPENDS ${CMAKE_PROJECT_NAME})
+add_custom_command(
+        TARGET Package POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/sources/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PROJECT_BINARY_DIR}/bin/${CMAKE_PROJECT_NAME}${EXE_EXT})
+if (WIN32)
+    if (EXISTS "${PROJECT_BINARY_DIR}/sources/plugins/platforms/qwindows.dll")
+        add_custom_command(TARGET Package POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E make_directory
+                "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
+        add_custom_command(TARGET Package POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${PROJECT_BINARY_DIR}/sources/plugins/platforms/qwindows.dll"
+                "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
+    endif ()
+    foreach (QT_LIB Core Gui Widgets)
+        add_custom_command(TARGET Package POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy
+                "${PROJECT_BINARY_DIR}/sources/Qt6${QT_LIB}.dll"
+                "${PROJECT_BINARY_DIR}/bin")
+    endforeach (QT_LIB)
+endif ()
+add_custom_command(
+        TARGET Package POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data ${PROJECT_BINARY_DIR}/bin/data)
+
