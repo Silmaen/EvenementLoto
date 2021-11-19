@@ -47,8 +47,14 @@ endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(-Wall -Wextra -pedantic -Werror)
+    if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
+        add_link_options(-Wl,-subsystem,windows)
+    endif ()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options(-Wall -Wextra -pedantic -Werror)
+    if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
+        add_link_options(-Wl,-subsystem,windows)
+    endif ()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_compile_options(/W4 /WX)
 else ()
@@ -163,14 +169,14 @@ add_custom_target(Package
 add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/sources/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PROJECT_BINARY_DIR}/bin/${CMAKE_PROJECT_NAME}${EXE_EXT})
-if (WIN32)
-    if (EXISTS "${PROJECT_BINARY_DIR}/sources/plugins/platforms/qwindows.dll")
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    if (EXISTS "${BASE_QT_DIR}/plugins/platforms/qwindows.dll")
         add_custom_command(TARGET Package POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory
                 "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
         add_custom_command(TARGET Package POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "${PROJECT_BINARY_DIR}/sources/plugins/platforms/qwindows.dll"
+                "${BASE_QT_DIR}/plugins/platforms/qwindows.dll"
                 "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
     endif ()
     foreach (QT_LIB Core Gui Widgets)
