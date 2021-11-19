@@ -65,5 +65,5 @@ Le programme a été correctement compilé avec :
     * [X] Import/Export via un fichier markdown
     * [X] Sauvegarde dans l’événement
 * Compilation
-  * [x] Test compilation OpenBSD
+  * [ ] Test compilation OpenBSD
   * [ ] Test compilation msvc (et clang-cl et clang natif)
