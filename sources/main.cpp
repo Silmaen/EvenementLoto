@@ -15,16 +15,16 @@ using namespace evl::gui;
 using namespace std::filesystem;
 
 int main(int argc, char* argv[]) {
-    baseExecPath= absolute(path(argv[0])).parent_path();
     QApplication app(argc, argv);
-    QCoreApplication::setOrganizationName("Damien Lachouette");
-    QCoreApplication::setApplicationName("Evenemlent Loto");
-    QCoreApplication::setApplicationVersion("1.0");
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
     parser.addVersionOption();
     parser.process(app);
+    baseExecPath= absolute(path(argv[0])).parent_path();
+    QCoreApplication::setOrganizationName("Damien Lachouette");
+    QCoreApplication::setApplicationName("Evenemlent Loto");
+    QCoreApplication::setApplicationVersion("1.0");
 
     MainWindow window;
     window.syncSettings();
