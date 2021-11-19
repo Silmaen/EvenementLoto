@@ -1,7 +1,7 @@
 #
 #  CMAKE du projet d'événement loto
 #
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.15)
 
 #
 # ---=== GENERALITIES ===---
@@ -30,7 +30,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(${PRJPREFIX}_GNU_MINIMAL 11.2)
-    set(${PRJPREFIX}_Clang_MINIMAL 13.0)
+    set(${PRJPREFIX}_Clang_MINIMAL 10.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")

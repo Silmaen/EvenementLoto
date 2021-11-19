@@ -57,12 +57,14 @@ target_include_directories(${CMAKE_PROJECT_NAME}_ui PUBLIC ${CMAKE_CURRENT_BINAR
 file(GLOB_RECURSE
         SRCS_RESOURCE
         ${CMAKE_CURRENT_SOURCE_DIR}/../resources/*.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../resources/*.rc
         )
 add_executable(${CMAKE_PROJECT_NAME} main.cpp ${SRCS_RESOURCE})
 target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_PROJECT_NAME}_lib
         ${CMAKE_PROJECT_NAME}_ui
         )
+
 
 # base includes
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
