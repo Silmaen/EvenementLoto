@@ -1,7 +1,7 @@
 #
 #  CMAKE du projet d'événement loto
 #
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
 #
 # ---=== GENERALITIES ===---
@@ -179,6 +179,15 @@ if (WIN32)
                 "${PROJECT_BINARY_DIR}/sources/Qt6${QT_LIB}.dll"
                 "${PROJECT_BINARY_DIR}/bin")
     endforeach (QT_LIB)
+    cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
+    foreach (BASE_LIB winpthread-1 stdc++-6 gcc_s_seh-1)
+        if (EXISTS ${COMPILER_PATH}/lib${BASE_LIB}.dll)
+            add_custom_command(TARGET Package POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy
+                    "${COMPILER_PATH}/lib${BASE_LIB}.dll"
+                    "${PROJECT_BINARY_DIR}/bin")
+        endif ()
+    endforeach ()
 endif ()
 add_custom_command(
         TARGET Package POST_BUILD
