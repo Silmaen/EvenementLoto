@@ -238,8 +238,23 @@ void DisplayWindow::updateRoundRunning() {
         }
     }
     // mise à jour affichage des lots et type de partie
-    ui->RR_SubRoundVictoryCondition->setText("Condition de gain: " + QString::fromUtf8(round->getCurrentCSubRound()->getTypeStr()));
-    ui->RR_SubRoundPrice->setText("Gain:\n" + QString::fromUtf8(round->getCurrentCSubRound()->getPrices()));
+    ui->RR_SubRoundVictoryCondition->setText(QString::fromUtf8(round->getCurrentCSubRound()->getTypeStr()));
+    QString gain= QString::fromUtf8(round->getCurrentCSubRound()->getPrices());
+    if(mwd->getTheme().getParam("truncatePrice").toBool()) {
+        auto gains = gain.split("\n");
+        int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
+        if(gains.size() <= maxLine) {
+            ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+        } else {
+            QString s= gains[0];
+            for(int iLine= 1; iLine < maxLine; ++iLine) {
+                s+= "\n" + gains[iLine];
+            }
+            ui->RR_SubRoundPrice->setText("Gain:\n" + s);
+        }
+    } else {
+        ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+    }
 }
 
 void DisplayWindow::updateDisplayRules() {

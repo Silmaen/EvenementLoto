@@ -101,6 +101,11 @@ public slots:
     void actSelectedNumbersColorChange();
 
     /**
+     * @brief action d'appui sur la troncature de prix
+     */
+    void actTruncatePriceChange();
+
+    /**
     * @brief Réagit au clic de la couleur des chiffres sélectionnés.
     */
     void actTextColorChange();
