@@ -25,6 +25,8 @@ static const params themeDefaults{
         {"longTextRatio", 0.6},
         {"backgroundColor", "#F0F0F0"},
         {"gridBackgroundColor", "#F0F0F0"},
+        {"truncatePrice", true},
+        {"truncatePriceLines", 3},
         {"textColor", "#000000"},
         {"selectedNumberColor", "#ff7000"},
         {"fadeNumbers", true},

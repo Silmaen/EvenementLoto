@@ -64,6 +64,8 @@ void ConfigGeneral::SaveFile() {
         mwd->getTheme().setParam("longTextRatio", ui->spinLongTextScale->value());
         mwd->getTheme().setParam("backgroundColor", getButtonColorName(ui->buttonBackgroundColor));
         mwd->getTheme().setParam("gridBackgroundColor", getButtonColorName(ui->buttonGridBackgroundColor));
+        mwd->getTheme().setParam("truncatePrice", ui->checkTruncatePrice->isChecked());
+        mwd->getTheme().setParam("truncatePriceLines", ui->spinTruncatePriceLines->value());
         mwd->getTheme().setParam("textColor", getButtonColorName(ui->buttonTextColor));
         mwd->getTheme().setParam("selectedNumberColor", getButtonColorName(ui->buttonSelectedNumberColor));
         mwd->getTheme().setParam("fadeNumbers", ui->checkFadeNumbers->isChecked());
@@ -148,6 +150,10 @@ void ConfigGeneral::actFadeActivationChange() {
     ui->spinFadeStrength->setEnabled(ui->checkFadeNumbers->isChecked());
 }
 
+void ConfigGeneral::actTruncatePriceChange() {
+    ui->spinTruncatePriceLines->setEnabled(ui->checkTruncatePrice->isChecked());
+}
+
 void ConfigGeneral::preExec() {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
@@ -156,6 +162,9 @@ void ConfigGeneral::preExec() {
         ui->spinTitleScale->setValue(mwd->getTheme().getParam("titleRatio").toDouble());
         ui->spinShortTextScale->setValue(mwd->getTheme().getParam("shortTextRatio").toDouble());
         ui->spinLongTextScale->setValue(mwd->getTheme().getParam("longTextRatio").toDouble());
+        ui->checkTruncatePrice->setChecked(mwd->getTheme().getParam("truncatePrice").toBool());
+        ui->spinTruncatePriceLines->setValue(mwd->getTheme().getParam("truncatePriceLines").toInt());
+        actTruncatePriceChange();
         ui->spinGridTextScale->setValue(mwd->getTheme().getParam("gridTextRatio").toDouble());
         setButtonColor(ui->buttonBackgroundColor, mwd->getTheme().getParam("backgroundColor").toString());
         setButtonColor(ui->buttonGridBackgroundColor, mwd->getTheme().getParam("gridBackgroundColor").toString());

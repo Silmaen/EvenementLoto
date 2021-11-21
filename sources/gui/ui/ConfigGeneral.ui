@@ -380,6 +380,44 @@
                  </widget>
                 </item>
                 <item>
+                 <widget class="QLabel" name="label_15">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Tronquer lignes de lots</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_16">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Nombre maximum de lignes de lots</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QLabel" name="label_10">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -750,6 +788,38 @@
                   </property>
                   <property name="flat">
                    <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkTruncatePrice">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Activé</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinTruncatePriceLines">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>15</number>
+                  </property>
+                  <property name="value">
+                   <number>3</number>
                   </property>
                  </widget>
                 </item>
@@ -1212,7 +1282,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>423</x>
-     <y>426</y>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
      <x>440</x>
@@ -1227,8 +1297,8 @@
    <slot>actGridBackgroundColorChange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>381</x>
-     <y>453</y>
+     <x>423</x>
+     <y>430</y>
     </hint>
     <hint type="destinationlabel">
      <x>445</x>
@@ -1243,8 +1313,8 @@
    <slot>actTextColorChange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>381</x>
-     <y>483</y>
+     <x>423</x>
+     <y>526</y>
     </hint>
     <hint type="destinationlabel">
      <x>445</x>
@@ -1259,8 +1329,8 @@
    <slot>actSelectedNumbersColorChange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>387</x>
-     <y>530</y>
+     <x>423</x>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
      <x>445</x>
@@ -1275,12 +1345,28 @@
    <slot>actFadeActivationChange()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>324</x>
-     <y>574</y>
+     <x>418</x>
+     <y>601</y>
     </hint>
     <hint type="destinationlabel">
      <x>447</x>
      <y>578</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>checkTruncatePrice</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigGeneral</receiver>
+   <slot>actTruncatePriceChange()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>321</x>
+     <y>450</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>446</x>
+     <y>442</y>
     </hint>
    </hints>
   </connection>
@@ -1299,5 +1385,6 @@
   <slot>actTextColorChange()</slot>
   <slot>actSelectedNumbersColorChange()</slot>
   <slot>actFadeActivationChange()</slot>
+  <slot>actTruncatePriceChange()</slot>
  </slots>
 </ui>
