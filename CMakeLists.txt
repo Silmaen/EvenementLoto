@@ -14,6 +14,14 @@ set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE off)
+
+
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(${PRJPREFIX}_QT_VERSION "5" CACHE PATH "Version of QT Library")
+else ()
+    set(${PRJPREFIX}_QT_VERSION "6" CACHE PATH "Version of QT Library")
+endif ()
+set(${PRJPREFIX}_QT_DIR "/usr/lib/x86_64-linux-gnu/cmake/Qt5" CACHE PATH "Path to QT${${PRJPREFIX}_QT_VERSION} library")
 #
 # ---=== Supported OS ===---
 #
@@ -29,8 +37,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(${PRJPREFIX}_MSVC_MINIMAL 19.65)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(${PRJPREFIX}_GNU_MINIMAL 11.2)
-    set(${PRJPREFIX}_Clang_MINIMAL 10.0)
+    set(${PRJPREFIX}_GNU_MINIMAL 10.0)
+    set(${PRJPREFIX}_Clang_MINIMAL 12.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 else ()
     message(FATAL_ERROR "Unsupported Operating System '${CMAKE_SYSTEM_NAME}'")
@@ -150,8 +158,8 @@ find_package(Doxygen
         REQUIRED dot)
 if (DOXYGEN_FOUND)
     message(STATUS "found doxygen version: ${DOXYGEN_VERSION}")
-    if (${DOXYGEN_VERSION} VERSION_LESS 1.9)
-        message(FATAL_ERROR "Doxygen version 19.0 or higher is required")
+    if (${DOXYGEN_VERSION} VERSION_LESS 1.8.17)
+        message(FATAL_ERROR "Doxygen version 1.8.17 or higher is required")
     endif ()
     add_custom_target(documentation
             COMMAND ${DOXYGEN_EXECUTABLE}
@@ -170,13 +178,20 @@ add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/sources/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PROJECT_BINARY_DIR}/bin/${CMAKE_PROJECT_NAME}${EXE_EXT})
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    if (EXISTS "${BASE_QT_DIR}/plugins/platforms/qwindows.dll")
+    set(QT_INSTALL_PATH ${${PRJPREFIX}_QT_DIR})
+    if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
+        set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
+        if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
+            set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
+        endif ()
+    endif ()
+    if (EXISTS "${QT_INSTALL_PATH}/plugins/platforms/qwindows.dll")
         add_custom_command(TARGET Package POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E make_directory
                 "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
         add_custom_command(TARGET Package POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy
-                "${BASE_QT_DIR}/plugins/platforms/qwindows.dll"
+                "${QT_INSTALL_PATH}/plugins/platforms/qwindows.dll"
                 "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
     endif ()
     foreach (QT_LIB Core Gui Widgets)
