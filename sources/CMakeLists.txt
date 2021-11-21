@@ -20,13 +20,18 @@ target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC ${${PRJPREFIX}_ROOT_
 #
 #  QT Package
 #
-set(BASE_QT_DIR "" CACHE PATH "Path to QT6 library")
-if (NOT EXISTS ${BASE_QT_DIR})
-    message(FATAL_ERROR "Please give an existing Folder To find QT6 by setting BASE_QT_DIR")
+message(STATUS "${PRJPREFIX}_QT_VERSION ${${PRJPREFIX}_QT_VERSION}")
+message(STATUS "${PRJPREFIX}_QT_DIR ${${PRJPREFIX}_QT_DIR}")
+
+if (${${PRJPREFIX}_QT_VERSION} LESS 5)
+    message(FATAL_ERROR "QT version 5 minimum is required version 6 is recommended")
 endif ()
-set(CMAKE_PREFIX_PATH ${BASE_QT_DIR})
+if (NOT EXISTS ${${PRJPREFIX}_QT_DIR})
+    message(FATAL_ERROR "Please give an existing Folder To find QT${${PRJPREFIX}_QT_VERSION} by setting ${PRJPREFIX}_QT_DIR")
+endif ()
+set(CMAKE_PREFIX_PATH ${${PRJPREFIX}_QT_DIR})
 set(${PRJPREFIX}_QT_COMPONENTS_LIST Core Gui Widgets)
-find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${${PRJPREFIX}_QT_VERSION} COMPONENTS Core Gui Widgets REQUIRED)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
@@ -68,7 +73,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
 
 # base includes
 target_include_directories(${CMAKE_PROJECT_NAME} PUBLIC ${${PRJPREFIX}_ROOT_DIR}/include)
-if (WIN32)
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
     if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
         set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
