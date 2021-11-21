@@ -171,11 +171,15 @@ private slots:
     void actDisplayRules();
 
     /**
+     * @brief Action de passage en doe d’affichage des règles.
+     */
+    void actChangeFullScreen();
+
+    /**
      * @brief
      * @param value
      */
     void actGridPushed(int value);
-
 
 private:
     /**

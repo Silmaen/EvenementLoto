@@ -27,7 +27,7 @@
     <item row="2" column="0">
      <widget class="QStackedWidget" name="PageManager">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pageEventTitle">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -35,15 +35,12 @@
          <widget class="QLabel" name="ET_OrganizerLogo">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>2</horstretch>
-            <verstretch>2</verstretch>
+            <horstretch>1</horstretch>
+            <verstretch>1</verstretch>
            </sizepolicy>
           </property>
           <property name="text">
            <string>TextLabel</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -105,9 +102,6 @@
           </property>
           <property name="text">
            <string>TextLabel</string>
-          </property>
-          <property name="scaledContents">
-           <bool>false</bool>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -578,6 +572,9 @@
                    <property name="text">
                     <string>Un vélo en plmastique</string>
                    </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item row="0" column="0">
@@ -619,12 +616,24 @@
            <item>
             <widget class="QFrame" name="frame_3">
              <property name="frameShape">
-              <enum>QFrame::StyledPanel</enum>
+              <enum>QFrame::NoFrame</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Raised</enum>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_2">
+              <property name="leftMargin">
+               <number>4</number>
+              </property>
+              <property name="topMargin">
+               <number>4</number>
+              </property>
+              <property name="rightMargin">
+               <number>4</number>
+              </property>
+              <property name="bottomMargin">
+               <number>4</number>
+              </property>
               <item>
                <widget class="QGroupBox" name="groupBox_11">
                 <property name="sizePolicy">
@@ -824,7 +833,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
-            <height>10</height>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -837,7 +846,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>0</width>
-            <height>10</height>
+            <height>40</height>
            </size>
           </property>
          </spacer>

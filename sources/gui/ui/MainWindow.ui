@@ -512,10 +512,8 @@
                   <string>Debut/fin partie</string>
                  </property>
                  <property name="icon">
-                  <iconset>
-                   <normaloff>
-                                                                             :/icons/icons/submit-for-approval.png</normaloff>
-                                                                             :/icons/icons/submit-for-approval.png</iconset>
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
                  </property>
                  <property name="flat">
                   <bool>false</bool>
@@ -528,10 +526,8 @@
                   <string>Pause/reprise partie</string>
                  </property>
                  <property name="icon">
-                  <iconset>
-                   <normaloff>
-                                                                             :/icons/icons/hourglass.png</normaloff>
-                                                                             :/icons/icons/hourglass.png</iconset>
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -541,10 +537,8 @@
                   <string>Affichage règlement</string>
                  </property>
                  <property name="icon">
-                  <iconset>
-                   <normaloff>
-                                                                             :/icons/icons/terms-and-conditions.png</normaloff>
-                                                                             :/icons/icons/terms-and-conditions.png</iconset>
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/terms-and-conditions.png</normaloff>:/icons/icons/terms-and-conditions.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -571,10 +565,8 @@
                   <string>Annuler dernier tirage</string>
                  </property>
                  <property name="icon">
-                  <iconset>
-                   <normaloff>
-                                                                             :/icons/icons/countdown.png</normaloff>
-                                                                             :/icons/icons/countdown.png</iconset>
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -755,7 +747,7 @@
     </property>
     <property name="icon">
      <iconset resource="../../../resources/EvenementLoto.qrc">
-      <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>:/icons/icons/windows-10-personalization.png</iconset>
+      <normaloff>:/icons/icons/settings.png</normaloff>:/icons/icons/settings.png</iconset>
     </property>
     <property name="separatorsCollapsible">
      <bool>true</bool>
@@ -782,11 +774,39 @@
     <addaction name="separator"/>
     <addaction name="actionHelp"/>
    </widget>
+   <widget class="QMenu" name="menuAffichage">
+    <property name="title">
+     <string>Affichage</string>
+    </property>
+    <property name="icon">
+     <iconset resource="../../../resources/EvenementLoto.qrc">
+      <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>:/icons/icons/windows-10-personalization.png</iconset>
+    </property>
+    <addaction name="actionFullScreen"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuParameters"/>
+   <addaction name="menuAffichage"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="separator"/>
+   <addaction name="actionStartEvent"/>
+   <addaction name="actionEndEvent"/>
+  </widget>
   <action name="actionAbout">
    <property name="icon">
     <iconset resource="../../../resources/EvenementLoto.qrc">
@@ -929,6 +949,17 @@
    </property>
    <property name="text">
     <string>Sauver sous...</string>
+   </property>
+  </action>
+  <action name="actionFullScreen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Plein écran</string>
    </property>
   </action>
  </widget>
@@ -1151,8 +1182,8 @@
    <slot>actStartStopRound()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1138</x>
-     <y>469</y>
+     <x>873</x>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
      <x>1159</x>
@@ -1167,8 +1198,8 @@
    <slot>actPauseResumeRound()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1138</x>
-     <y>497</y>
+     <x>873</x>
+     <y>424</y>
     </hint>
     <hint type="destinationlabel">
      <x>1159</x>
@@ -1183,8 +1214,8 @@
    <slot>actRandomPick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1138</x>
-     <y>553</y>
+     <x>873</x>
+     <y>476</y>
     </hint>
     <hint type="destinationlabel">
      <x>1159</x>
@@ -1199,8 +1230,8 @@
    <slot>actCancelPick()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1138</x>
-     <y>581</y>
+     <x>873</x>
+     <y>502</y>
     </hint>
     <hint type="destinationlabel">
      <x>1159</x>
@@ -1215,8 +1246,8 @@
    <slot>actRadioPureRandom()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>663</y>
+     <x>102</x>
+     <y>570</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1231,8 +1262,8 @@
    <slot>actRadioPureManual()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>56</x>
-     <y>704</y>
+     <x>70</x>
+     <y>596</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1247,8 +1278,8 @@
    <slot>actRadioBoth()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>76</x>
-     <y>745</y>
+     <x>90</x>
+     <y>622</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1263,12 +1294,28 @@
    <slot>actDisplayRules()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1083</x>
-     <y>515</y>
+     <x>873</x>
+     <y>450</y>
     </hint>
     <hint type="destinationlabel">
      <x>1159</x>
      <y>424</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionFullScreen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actChangeFullScreen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>342</y>
     </hint>
    </hints>
   </connection>
@@ -1295,5 +1342,6 @@
   <slot>actRadioPureManual()</slot>
   <slot>actRadioBoth()</slot>
   <slot>actDisplayRules()</slot>
+  <slot>actChangeFullScreen()</slot>
  </slots>
 </ui>
