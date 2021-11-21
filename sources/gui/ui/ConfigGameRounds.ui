@@ -651,8 +651,8 @@
    <slot>actOk()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>315</x>
-     <y>620</y>
+     <x>274</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>392</x>
@@ -667,8 +667,8 @@
    <slot>actApply()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>422</x>
-     <y>620</y>
+     <x>381</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>491</x>
@@ -683,8 +683,8 @@
    <slot>actCancel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>529</x>
-     <y>620</y>
+     <x>488</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>589</x>
@@ -795,8 +795,8 @@
    <slot>actEndEditingPrice()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>885</x>
-     <y>172</y>
+     <x>873</x>
+     <y>271</y>
     </hint>
     <hint type="destinationlabel">
      <x>979</x>
@@ -811,7 +811,7 @@
    <slot>actCreateSubGameRound()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>370</x>
+     <x>342</x>
      <y>118</y>
     </hint>
     <hint type="destinationlabel">
@@ -827,7 +827,7 @@
    <slot>actDeleteSubGameRound()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>400</x>
+     <x>372</x>
      <y>118</y>
     </hint>
     <hint type="destinationlabel">
@@ -843,7 +843,7 @@
    <slot>actMoveSubGameRoundBefore()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>430</x>
+     <x>402</x>
      <y>118</y>
     </hint>
     <hint type="destinationlabel">
@@ -859,7 +859,7 @@
    <slot>actMoveSubGameRoundBefore()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>460</x>
+     <x>432</x>
      <y>118</y>
     </hint>
     <hint type="destinationlabel">
@@ -904,11 +904,11 @@
    <sender>ButtonImport</sender>
    <signal>clicked()</signal>
    <receiver>ConfigGameRounds</receiver>
-   <slot>actExportRounds()</slot>
+   <slot>actImportRounds()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>617</x>
-     <y>612</y>
+     <x>595</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>663</x>
@@ -923,8 +923,8 @@
    <slot>actExportRounds()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>703</x>
-     <y>614</y>
+     <x>702</x>
+     <y>621</y>
     </hint>
     <hint type="destinationlabel">
      <x>659</x>

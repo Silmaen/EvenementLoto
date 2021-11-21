@@ -168,19 +168,19 @@ void DisplayWindow::updateRoundTitlePage() {
     case core::GameRound::Type::FullCard:
     case core::GameRound::Type::Enfant:
     case core::GameRound::Type::Inverse:
-        ui->RT_SubRound_1->setText("Gain partie: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
         break;
     case core::GameRound::Type::OneQuineFullCard:
         ui->RT_SubRound_2->setVisible(true);
-        ui->RT_SubRound_1->setText("Gain une ligne: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        ui->RT_SubRound_3->setText("Gain carton plein: \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
         break;
     case core::GameRound::Type::OneTwoQuineFullCard:
         ui->RT_SubRound_2->setVisible(true);
         ui->RT_SubRound_3->setVisible(true);
-        ui->RT_SubRound_1->setText("Gain une ligne: \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        ui->RT_SubRound_2->setText("Gain deux Lignes: \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
-        ui->RT_SubRound_3->setText("Gain carton plein: \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
+        ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        ui->RT_SubRound_2->setText("Gain double quine \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
         break;
     }
 }
@@ -302,6 +302,15 @@ void DisplayWindow::resize() {
     float baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
     baseFont.setPointSizeF(baseRatio);
     setFont(baseFont);
+
+    ui->RR_SubRoundPrice->setFont(baseFont);
+    QString text= ui->RR_SubRoundPrice->text();
+    int nbLine  = text.split("\n").size();
+    if(nbLine > 4) {
+        float pricesRatio= 4.0 / (float)nbLine * baseRatio;
+        baseFont.setPointSizeF(pricesRatio);
+        ui->RR_SubRoundPrice->setFont(baseFont);
+    }
 
     // taille font des titres
     setting_ratio   = theme.getParam("titleRatio").toDouble();

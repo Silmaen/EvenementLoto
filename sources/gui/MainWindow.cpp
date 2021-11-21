@@ -165,10 +165,16 @@ void MainWindow::actStartEvent() {
     currentEvent.startEvent();
     updateDisplay();
     timer->start();
-    displayWindow          = new DisplayWindow(&currentEvent, this);
+    displayWindow= new DisplayWindow(&currentEvent, this);
+    actChangeFullScreen();
+}
+
+void MainWindow::actChangeFullScreen() {
+    if(displayWindow == nullptr)
+        return;
     QList<QScreen*> screens= QApplication::screens();
-    if(screens.size() < 2) {
-        displayWindow->show();
+    if(screens.size() < 2 || !ui->actionFullScreen->isChecked()) {
+        displayWindow->showNormal();
     } else {
         for(QScreen* s: screens) {
             if(s == screen())
