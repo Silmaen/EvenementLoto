@@ -28,7 +28,7 @@ static const params themeDefaults{
         {"truncatePrice", true},
         {"truncatePriceLines", 3},
         {"textColor", "#000000"},
-        {"selectedNumberColor", "#ff7000"},
+        {"selectedNumberColor", "#FF7000"},
         {"fadeNumbers", true},
         {"fadeNumbersAmount", 3},
         {"fadeNumbersStrength", 10},
@@ -46,7 +46,7 @@ public:
     explicit VisualTheme(QSettings* set);
 
     /**
-     * @brief Remet tous les paramètres aux valeurs d'usine
+     * @brief Remet tous les paramètres aux valeurs d’usine
      */
     void resetFactory();
 
@@ -87,8 +87,8 @@ public:
     void setParam(const QString& key, const QVariant& value);
 
     /**
-     * @brief Si le thème a été modifié mais pas encore lu
-     * @return Vrai si le theme n'a encore jamais été lu et a été modifié.
+     * @brief Si le thème a été modifié, mais pas encore lu
+     * @return Vrai si le theme n’a encore jamais été lu et a été modifié.
      */
     const bool& isModified() { return toUpdate; }
 

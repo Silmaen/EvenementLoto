@@ -20,7 +20,7 @@ void CardPack::write(std::ostream& bs) const {
     for(const GridCard& carton: cartons) carton.write(bs);
 }
 
-void CardPack::read(std::istream& bs) {
+void CardPack::read(std::istream& bs, int file_version) {
     std::string::size_type ss;
     bs.read((char*)&ss, sizeof(ss));
     nom.resize(ss);
@@ -31,7 +31,7 @@ void CardPack::read(std::istream& bs) {
     cartons.clear();
     cartons.resize(sv);
     for(std::string::size_type i= 0; i < sv; ++i)
-        cartons[i].read(bs);
+        cartons[i].read(bs, file_version);
 }
 
 std::vector<GridCard> CardPack::getGridCardsByStatus(const GridCard::Status& st) const {

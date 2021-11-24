@@ -111,6 +111,11 @@ public slots:
 
     /**
      * @brief
+     */
+    void actChangeRoundNumber(int);
+
+    /**
+     * @brief
      * @param newIndex
      */
     void actChangeSubGameRoundType(int newIndex);

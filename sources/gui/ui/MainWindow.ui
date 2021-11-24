@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>888</width>
-    <height>685</height>
+    <height>714</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -543,6 +543,17 @@
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="DisplaySanity">
+                 <property name="text">
+                  <string>Affichage Sanitaire</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                   <normaloff>:/icons/icons/comment_text.png</normaloff>:/icons/icons/comment_text.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="RandomPick">
                  <property name="text">
                   <string>Tirage Aléatoire</string>
@@ -797,6 +808,9 @@
    <property name="movable">
     <bool>false</bool>
    </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
    <attribute name="toolBarArea">
     <enum>TopToolBarArea</enum>
    </attribute>
@@ -804,8 +818,25 @@
     <bool>false</bool>
    </attribute>
    <addaction name="separator"/>
+   <addaction name="actionNewEvent"/>
+   <addaction name="separator"/>
+   <addaction name="actionLoadEvent"/>
+   <addaction name="actionSaveEvent"/>
+   <addaction name="actionSaveEventAs"/>
+   <addaction name="separator"/>
    <addaction name="actionStartEvent"/>
    <addaction name="actionEndEvent"/>
+   <addaction name="separator"/>
+   <addaction name="actionGlobalParam"/>
+   <addaction name="actionConfigEvent"/>
+   <addaction name="actionConfigRounds"/>
+   <addaction name="separator"/>
+   <addaction name="actionStartEndGameRound"/>
+   <addaction name="actionPauseResumeGame"/>
+   <addaction name="actionDisplayRules"/>
+   <addaction name="actionDisplaySanity"/>
+   <addaction name="actionRandomPick"/>
+   <addaction name="actionCancelLastPick"/>
   </widget>
   <action name="actionAbout">
    <property name="icon">
@@ -960,6 +991,60 @@
    </property>
    <property name="text">
     <string>Plein écran</string>
+   </property>
+  </action>
+  <action name="actionStartEndGameRound">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
+   </property>
+   <property name="text">
+    <string>Début/Fin partie</string>
+   </property>
+  </action>
+  <action name="actionPauseResumeGame">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pause/reprise partie</string>
+   </property>
+  </action>
+  <action name="actionDisplayRules">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/terms-and-conditions.png</normaloff>:/icons/icons/terms-and-conditions.png</iconset>
+   </property>
+   <property name="text">
+    <string>Affichage règlement</string>
+   </property>
+  </action>
+  <action name="actionRandomPick">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/dice.png</normaloff>:/icons/icons/dice.png</iconset>
+   </property>
+   <property name="text">
+    <string>Tirage Aléatoire</string>
+   </property>
+  </action>
+  <action name="actionCancelLastPick">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
+   </property>
+   <property name="text">
+    <string>Annuler dernier tirage</string>
+   </property>
+  </action>
+  <action name="actionDisplaySanity">
+   <property name="icon">
+    <iconset resource="../../../resources/EvenementLoto.qrc">
+     <normaloff>:/icons/icons/comment_text.png</normaloff>:/icons/icons/comment_text.png</iconset>
+   </property>
+   <property name="text">
+    <string>Affichage consignes sanitaire</string>
    </property>
   </action>
  </widget>
@@ -1186,7 +1271,7 @@
      <y>398</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1159</x>
+     <x>887</x>
      <y>443</y>
     </hint>
    </hints>
@@ -1202,7 +1287,7 @@
      <y>424</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1159</x>
+     <x>887</x>
      <y>515</y>
     </hint>
    </hints>
@@ -1215,10 +1300,10 @@
    <hints>
     <hint type="sourcelabel">
      <x>873</x>
-     <y>476</y>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1159</x>
+     <x>887</x>
      <y>547</y>
     </hint>
    </hints>
@@ -1231,10 +1316,10 @@
    <hints>
     <hint type="sourcelabel">
      <x>873</x>
-     <y>502</y>
+     <y>527</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1159</x>
+     <x>887</x>
      <y>583</y>
     </hint>
    </hints>
@@ -1247,7 +1332,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>102</x>
-     <y>570</y>
+     <y>599</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1263,7 +1348,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>70</x>
-     <y>596</y>
+     <y>625</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1279,7 +1364,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>90</x>
-     <y>622</y>
+     <y>651</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1298,7 +1383,7 @@
      <y>450</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1159</x>
+     <x>887</x>
      <y>424</y>
     </hint>
    </hints>
@@ -1316,6 +1401,118 @@
     <hint type="destinationlabel">
      <x>443</x>
      <y>342</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionStartEndGameRound</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actStartStopRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionPauseResumeGame</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actPauseResumeRound()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDisplayRules</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actDisplayRules()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionDisplaySanity</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actDisplaySanity()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionRandomPick</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actRandomPick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionCancelLastPick</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actCancelPick()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DisplaySanity</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>actDisplaySanity()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>802</x>
+     <y>472</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>443</x>
+     <y>356</y>
     </hint>
    </hints>
   </connection>
@@ -1343,5 +1540,6 @@
   <slot>actRadioBoth()</slot>
   <slot>actDisplayRules()</slot>
   <slot>actChangeFullScreen()</slot>
+  <slot>actDisplaySanity()</slot>
  </slots>
 </ui>

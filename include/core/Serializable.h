@@ -26,8 +26,9 @@ public:
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
+     * @param file_version La version du fichier à lire
      */
-    virtual void read(std::istream& bs)= 0;
+    virtual void read(std::istream& bs, int file_version)= 0;
 
     /**
      * @brief Écriture dans un stream.

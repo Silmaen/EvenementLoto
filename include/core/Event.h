@@ -33,6 +33,7 @@ public:
         GameRunning,   ///< Est en cours de partie
         GameFinished,  ///< Est en fin de partie
         DisplayRules,  ///< En affichage des règles de l’événement
+        DisplaySanity, ///< En affichage des règles sanitaires
         Finished       ///< Est fini
     };
 
@@ -40,8 +41,9 @@ public:
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
+     * @param file_version La version du fichier à lire
      */
-    void read(std::istream& bs) override;
+    void read(std::istream& bs, int file_version) override;
 
     /**
      * @brief Écriture dans un stream.
@@ -172,6 +174,18 @@ public:
      */
     void setRules(const string& newRules);
 
+    /**
+     * @brief Accès aux règles sanitaires de l’événement
+     * @return Les règles.
+     */
+    const string& getSanityRules() const { return sanityRules; }
+
+    /**
+     * @brief Définit les règles sanitaires de l’événement.
+     * @param newRules Les règles.
+     */
+    void setSanityRules(const string& newRules);
+
     // ----- Manipulation des rounds ----
     /**
      * @brief Renvoie l’itérateur constant de début de parties.
@@ -267,6 +281,12 @@ public:
     void displayRules();
 
     /**
+     * @brief Passe l’événement en mode d’affichage des règles sanitaires.
+     * resumeEvent() permet de retourner au statut précédent.
+     */
+    void displaySanity();
+
+    /**
      * @brief Reprend l’événement.
      */
     void resumeEvent();
@@ -338,6 +358,9 @@ private:
 
     /// Les règles de l'événement
     string rules;
+
+    /// Les règles sanitaires de l'événement
+    string sanityRules;
 
     /// Liste des parties de l’événement.
     roundsType gameRounds;

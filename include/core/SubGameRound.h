@@ -82,8 +82,9 @@ public:
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
+     * @param file_version La version du fichier à lire
      */
-    void read(std::istream& bs) override;
+    void read(std::istream& bs, int file_version) override;
 
     /**
      * @brief Écriture dans un stream.

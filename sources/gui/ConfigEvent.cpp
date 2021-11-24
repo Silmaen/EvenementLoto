@@ -35,6 +35,7 @@ void ConfigEvent::SaveFile() {
     gameEvent.setLogo(ui->EventLogo->text().toStdString());
     gameEvent.setOrganizerLogo(ui->OrgaLogo->text().toStdString());
     gameEvent.setRules(ui->textRules->toPlainText().toStdString());
+    gameEvent.setSanityRules(ui->textSanityRules->toPlainText().toStdString());
 }
 
 void ConfigEvent::actOk() {
@@ -78,6 +79,7 @@ void ConfigEvent::updateDisplay() {
     ui->OrgaName->setText(QString::fromUtf8(gameEvent.getOrganizerName()));
     ui->OrgaLogo->setText(QString::fromUtf8(gameEvent.getOrganizerLogo().string()));
     ui->textRules->setText(QString::fromUtf8(gameEvent.getRules()));
+    ui->textSanityRules->setText(QString::fromUtf8(gameEvent.getSanityRules()));
     if(!gameEvent.isEditable()) {
         ui->EventName->setEnabled(false);
         ui->EventLocation->setEnabled(false);
@@ -88,6 +90,7 @@ void ConfigEvent::updateDisplay() {
         ui->SearchOrgaLogo->setEnabled(false);
         ui->ButtonApply->setEnabled(false);
         ui->textRules->setEnabled(false);
+        ui->textSanityRules->setEnabled(false);
         ui->buttonImportRules->setEnabled(false);
     } else {
         ui->EventName->setEnabled(true);
@@ -99,6 +102,7 @@ void ConfigEvent::updateDisplay() {
         ui->SearchOrgaLogo->setEnabled(true);
         ui->ButtonApply->setEnabled(true);
         ui->textRules->setEnabled(true);
+        ui->textSanityRules->setEnabled(true);
         ui->buttonImportRules->setEnabled(true);
     }
 }
@@ -121,6 +125,27 @@ void ConfigEvent::actExportRules() {
     std::ofstream file;
     file.open(path, std::ios::out);
     file << gameEvent.getRules();
+    file.close();
+}
+
+void ConfigEvent::actImportSanityRules() {
+    auto path= dialog::openFile(dialog::FileTypes::Text, true);
+    if(path.empty())
+        return;
+    std::ifstream file;
+    file.open(path, std::ios::in);
+    gameEvent.setSanityRules(string{(std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>())});
+    file.close();
+    updateDisplay();
+}
+
+void ConfigEvent::actExportSanityRules() {
+    auto path= dialog::openFile(dialog::FileTypes::Text, false);
+    if(path.empty())
+        return;
+    std::ofstream file;
+    file.open(path, std::ios::out);
+    file << gameEvent.getSanityRules();
     file.close();
 }
 

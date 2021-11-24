@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>421</width>
-    <height>526</height>
+    <width>479</width>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -192,6 +192,53 @@
     </spacer>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Règles Sanitaires</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="1" column="2">
+       <widget class="QPushButton" name="buttonExportSanityRules">
+        <property name="text">
+         <string>Export</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/EvenementLoto.qrc">
+          <normaloff>:/icons/icons/date-from.png</normaloff>:/icons/icons/date-from.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="buttonImportSanityRules">
+        <property name="text">
+         <string>Import</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../resources/EvenementLoto.qrc">
+          <normaloff>:/icons/icons/date-to.png</normaloff>:/icons/icons/date-to.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QTextEdit" name="textSanityRules"/>
+      </item>
+      <item row="1" column="1">
+       <spacer name="horizontalSpacer_8">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Règlement</string>
@@ -369,8 +416,8 @@
    <slot>actOk()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>274</x>
-     <y>506</y>
+     <x>189</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>299</x>
@@ -385,8 +432,8 @@
    <slot>actApply()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>381</x>
-     <y>506</y>
+     <x>276</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>427</x>
@@ -401,8 +448,8 @@
    <slot>actCancel()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>488</x>
-     <y>506</y>
+     <x>363</x>
+     <y>603</y>
     </hint>
     <hint type="destinationlabel">
      <x>474</x>
@@ -417,11 +464,11 @@
    <slot>actSearchOrgaLogo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>419</x>
+     <x>314</x>
      <y>208</y>
     </hint>
     <hint type="destinationlabel">
-     <x>613</x>
+     <x>478</x>
      <y>152</y>
     </hint>
    </hints>
@@ -433,11 +480,11 @@
    <slot>actSearchLogo()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>669</x>
+     <x>459</x>
      <y>114</y>
     </hint>
     <hint type="destinationlabel">
-     <x>614</x>
+     <x>478</x>
      <y>109</y>
     </hint>
    </hints>
@@ -449,11 +496,11 @@
    <slot>actImportRules()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>46</x>
-     <y>446</y>
+     <x>65</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
-     <x>-4</x>
+     <x>0</x>
      <y>456</y>
     </hint>
    </hints>
@@ -465,12 +512,44 @@
    <slot>actExportRules()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>639</x>
-     <y>444</y>
+     <x>459</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
-     <x>697</x>
+     <x>478</x>
      <y>445</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonImportSanityRules</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigEvent</receiver>
+   <slot>actImportSanityRules()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>52</x>
+     <y>375</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-5</x>
+     <y>361</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonExportSanityRules</sender>
+   <signal>clicked()</signal>
+   <receiver>ConfigEvent</receiver>
+   <slot>actExportSanityRules()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>426</x>
+     <y>371</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>482</x>
+     <y>355</y>
     </hint>
    </hints>
   </connection>
@@ -483,5 +562,7 @@
   <slot>actSearchLogo()</slot>
   <slot>actImportRules()</slot>
   <slot>actExportRules()</slot>
+  <slot>actImportSanityRules()</slot>
+  <slot>actExportSanityRules()</slot>
  </slots>
 </ui>

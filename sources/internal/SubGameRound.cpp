@@ -11,8 +11,8 @@
 namespace evl::core {
 
 const std::unordered_map<SubGameRound::Type, string> SubGameRound::TypeConvert= {
-        {SubGameRound::Type::OneQuine, "une quine"},
-        {SubGameRound::Type::TwoQuines, "deux quines"},
+        {SubGameRound::Type::OneQuine, "simple quine"},
+        {SubGameRound::Type::TwoQuines, "double quine"},
         {SubGameRound::Type::FullCard, "carton plein"},
         {SubGameRound::Type::Inverse, "inverse"},
 };
@@ -24,7 +24,7 @@ const string SubGameRound::getTypeStr() const {
     return evl::string("Type Inconnu");
 }
 
-void SubGameRound::read(std::istream& bs) {
+void SubGameRound::read(std::istream& bs, int) {
     bs.read((char*)&type, sizeof(Type));
     bs.read((char*)&winner, sizeof(uint32_t));
     sizeType l;
