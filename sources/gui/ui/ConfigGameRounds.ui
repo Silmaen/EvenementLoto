@@ -295,6 +295,16 @@
          <item row="3" column="0" colspan="6">
           <widget class="QListWidget" name="listSubRound"/>
          </item>
+         <item row="1" column="5">
+          <widget class="QSpinBox" name="spinRoundNumber"/>
+         </item>
+         <item row="0" column="5">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Numéro Affichage</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -932,6 +942,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>spinRoundNumber</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>ConfigGameRounds</receiver>
+   <slot>actChangeRoundNumber(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>523</x>
+     <y>78</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>505</x>
+     <y>-10</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>actOk()</slot>
@@ -952,5 +978,6 @@
   <slot>actChangeSelectedSubGameRound()</slot>
   <slot>actImportRounds()</slot>
   <slot>actExportRounds()</slot>
+  <slot>actChangeRoundNumber(int)</slot>
  </slots>
 </ui>

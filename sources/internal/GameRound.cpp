@@ -10,13 +10,13 @@
 namespace evl::core {
 
 const std::unordered_map<GameRound::Type, string> GameRound::TypeConvert= {
-        {Type::OneQuine, "une quine"},
-        {Type::TwoQuines, "deux quines"},
-        {Type::FullCard, "carton"},
+        {Type::OneQuine, "Simple quine"},
+        {Type::TwoQuines, "Double quine"},
+        {Type::FullCard, "Gros lot"},
         {Type::OneQuineFullCard, "une quine et carton"},
         {Type::OneTwoQuineFullCard, "normale"},
-        {Type::Enfant, "enfant"},
-        {Type::Inverse, "inverse"},
+        {Type::Enfant, "Enfant"},
+        {Type::Inverse, "Inverse"},
 };
 
 // --- constructeurs ----
@@ -122,7 +122,11 @@ void GameRound::closeGameRound() {
 }
 
 // ---- Serialisation ----
-void GameRound::read(std::istream& is) {
+void GameRound::read(std::istream& is, int file_version) {
+    if(file_version < 3)
+        Id= 0;
+    else
+        is.read(reinterpret_cast<char*>(&Id), sizeof(Id));
     is.read(reinterpret_cast<char*>(&type), sizeof(type));
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
@@ -136,10 +140,11 @@ void GameRound::read(std::istream& is) {
     is.read(reinterpret_cast<char*>(&l2), sizeof(subRoundsType::size_type));
     subGames.resize(l2);
     for(subRoundsType::size_type i= 0; i < l2; ++i)
-        subGames[i].read(is);
+        subGames[i].read(is, file_version);
 }
 
 void GameRound::write(std::ostream& os) const {
+    os.write(reinterpret_cast<const char*>(&Id), sizeof(Id));
     os.write(reinterpret_cast<const char*>(&type), sizeof(type));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
@@ -159,7 +164,7 @@ json GameRound::to_json() const {
     for(auto& game: subGames) {
         sub.push_back(game.to_json());
     }
-    return json{{"type", getTypeStr()}, {"subGames", sub}};
+    return json{{"type", getTypeStr()}, {"Id", Id}, {"subGames", sub}};
 }
 
 void GameRound::from_json(const json& j) {
@@ -171,6 +176,7 @@ void GameRound::from_json(const json& j) {
             break;
         }
     }
+    j.at("\"Id\"").get_to(Id);
     subGames.clear();
     for(auto& jj: j.at("subGames")) {
         subGames.emplace_back().from_json(jj);
@@ -195,8 +201,19 @@ std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
 std::vector<SubGameRound>::const_iterator GameRound::getCurrentCSubRound() const {
     return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner() == 0; });
 }
+
 std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {
     return std::next(subGames.begin(), index);
+}
+
+string GameRound::getName() const {
+    std::stringstream res;
+    res << "Partie";
+    if(Id > 0)
+        res << " " << Id;
+    if(type != Type::OneTwoQuineFullCard)
+        res << " " << TypeConvert.at(type);
+    return res.str();
 }
 
 }// namespace evl::core

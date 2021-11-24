@@ -55,6 +55,8 @@ void DisplayWindow::initializeDisplay() {
         ui->EE_LogoB->setVisible(false);
         ui->ER_LogoA->setVisible(false);
         ui->ER_LogoB->setVisible(false);
+        ui->SR_LogoA->setVisible(false);
+        ui->SR_LogoB->setVisible(false);
     } else {
         if(!exists(event->getOrganizerLogoFull())) {
             ui->ET_OrganizerLogo->setVisible(false);
@@ -66,6 +68,8 @@ void DisplayWindow::initializeDisplay() {
             ui->EE_LogoB->setVisible(false);
             ui->ER_LogoA->setVisible(false);
             ui->ER_LogoB->setVisible(false);
+            ui->SR_LogoA->setVisible(false);
+            ui->SR_LogoB->setVisible(false);
         } else {
             QString imgName(QString::fromUtf8(event->getOrganizerLogoFull().string()));
             QImage img;
@@ -79,6 +83,8 @@ void DisplayWindow::initializeDisplay() {
             setPixMap(ui->EE_LogoB, imgName, img);
             setPixMap(ui->ER_LogoA, imgName, img);
             setPixMap(ui->ER_LogoB, imgName, img);
+            setPixMap(ui->SR_LogoA, imgName, img);
+            setPixMap(ui->SR_LogoB, imgName, img);
         }
     }
     if(event->getLogoFull().empty()) {
@@ -127,6 +133,10 @@ void DisplayWindow::updateDisplay() {
         ui->PageManager->setCurrentIndex(6);
         updateDisplayRules();
         break;
+    case core::Event::Status::DisplaySanity:
+        ui->PageManager->setCurrentIndex(7);
+        updateDisplaySanityRules();
+        break;
     }
     // action de redimensionnement
     if(currentSize != size() || currentStatus != event->getStatus() || mwd->getTheme().isModified()) {
@@ -138,6 +148,10 @@ void DisplayWindow::updateDisplay() {
         ui->EP_Logo->setText("");
         ui->EE_LogoA->setText("");
         ui->EE_LogoB->setText("");
+        ui->ER_LogoA->setText("");
+        ui->ER_LogoB->setText("");
+        ui->SR_LogoA->setText("");
+        ui->SR_LogoB->setText("");
         resize();
         currentStatus= event->getStatus();
     } else {
@@ -159,7 +173,7 @@ void DisplayWindow::updateEventTitlePage() {
 
 void DisplayWindow::updateRoundTitlePage() {
     auto round= event->getGameRound(event->getCurrentIndex());
-    ui->RT_RoundTitle->setText("Partie " + QString::number(event->getCurrentIndex() + 1) + " " + QString::fromUtf8(round->getTypeStr()));
+    ui->RT_RoundTitle->setText(QString::fromUtf8(round->getName()));
     ui->RT_SubRound_2->setVisible(false);
     ui->RT_SubRound_3->setVisible(false);
     switch(round->getType()) {
@@ -187,8 +201,8 @@ void DisplayWindow::updateRoundTitlePage() {
 
 void DisplayWindow::updateRoundRunning() {
     resize();
-    ui->RR_Title->setText("Partie " + QString::number(event->getCurrentIndex() + 1));
     auto round= event->getGameRound(event->getCurrentIndex());
+    ui->RR_Title->setText(QString::fromUtf8(round->getName()));
     // mise à jour de l’heure et durée
     auto now= core::clock::now();
     ui->RR_Clock->setText(QString::fromStdString(core::formatClockNoSecond(now)));
@@ -261,6 +275,12 @@ void DisplayWindow::updateDisplayRules() {
     if(event->getRules().empty())
         return;
     ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
+}
+
+void DisplayWindow::updateDisplaySanityRules() {
+    if(event->getSanityRules().empty())
+        return;
+    ui->SR_Rules->setText(QString::fromUtf8(event->getSanityRules()));
 }
 
 void DisplayWindow::updateColors() {

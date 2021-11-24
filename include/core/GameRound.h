@@ -26,7 +26,7 @@ public:
      * @brief Liste des types de parties connus.
      */
     enum struct Type {
-        OneQuine,           ///< Une partie standard en remplissant une ligne seulemnt avant reset.
+        OneQuine,           ///< Une partie standard en remplissant une ligne seulement avant reset.
         TwoQuines,          ///< Une partie standard en remplissant deux lignes seulement.
         FullCard,           ///< Une partie standard en remplissant le carton seulement.
         OneQuineFullCard,   ///< Une partie standard en remplissant une ligne, puis le carton.
@@ -158,8 +158,9 @@ public:
     /**
      * @brief Lecture depuis un stream
      * @param bs Le stream d’entrée.
+     * @param file_version La version du fichier à lire
      */
-    void read(std::istream& bs) override;
+    void read(std::istream& bs, int file_version) override;
 
     /**
      * @brief Écriture dans un stream.
@@ -224,6 +225,24 @@ public:
      */
     subRoundsType::size_type sizeSubRound() const { return subGames.size(); }
 
+    /**
+     * @brief Défini le numéro de partie
+     * @param id Le numéro de partie
+     */
+    void setID(const int id) { Id= id; }
+
+    /**
+     * @brief Renvoie le numéro d'affichage de la partie
+     * @return le numéro d'affichage
+     */
+    const int& getID() const { return Id; }
+
+    /**
+     * @brief affichage de nom spécial
+     * @return
+     */
+    string getName() const;
+
 private:
     /**
      * @brief Accès à la sous-partie courante
@@ -254,6 +273,9 @@ private:
 
     /// La liste des
     subRoundsType subGames;
+
+    /// Le numéro de la partie (à ne pas afficher si négatif)
+    int Id= 0;
 };
 
 }// namespace evl::core

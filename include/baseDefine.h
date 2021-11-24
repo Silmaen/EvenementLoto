@@ -21,6 +21,9 @@ constexpr uint8_t nb_ligne= 3;
 /// Nombre de colonnes sur un carton
 constexpr uint8_t nb_colones= 5;
 
+/// Version des sauvegardes
+constexpr uint16_t currentSaveVersion= 3;
+
 /// Définition d’un chemin vers un fichier ou répertoire
 using path= std::filesystem::path;
 

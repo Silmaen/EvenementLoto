@@ -10,10 +10,8 @@
 
 namespace evl::core {
 
-constexpr uint16_t currentSaveVersion= 2;
-
 // ---- Serialisation ----
-void Event::read(std::istream& is) {
+void Event::read(std::istream& is, int) {
     uint16_t saveVersion;
     is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
@@ -42,11 +40,17 @@ void Event::read(std::istream& is) {
         rules.resize(l);
         for(i= 0; i < l; ++i) is.read(&(rules[i]), charSize);
     }
+    // version 3
+    if(saveVersion > 2) {
+        is.read(reinterpret_cast<char*>(&l), sizeof(l));
+        sanityRules.resize(l);
+        for(i= 0; i < l; ++i) is.read(&(sanityRules[i]), charSize);
+    }
     // version 1
     roundsType::size_type lv, iv;
     is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
     gameRounds.resize(lv);
-    for(iv= 0; iv < lv; ++iv) gameRounds[iv].read(is);
+    for(iv= 0; iv < lv; ++iv) gameRounds[iv].read(is, saveVersion);
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
 }
@@ -74,6 +78,10 @@ void Event::write(std::ostream& os) const {
     l= rules.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
     for(i= 0; i < l; ++i) os.write(&(rules[i]), charSize);
+    // version >= 3
+    l= sanityRules.size();
+    os.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) os.write(&(sanityRules[i]), charSize);
     // version >= 1
     roundsType::size_type lv, iv;
     lv= gameRounds.size();
@@ -202,6 +210,13 @@ void Event::setRules(const string& newRules) {
     checkValidConfig();
 }
 
+void Event::setSanityRules(const string& newRules) {
+    if(!isEditable())
+        return;
+    sanityRules= newRules;
+    checkValidConfig();
+}
+
 // ----- Manipulation des rounds ----
 void Event::pushGameRound(const GameRound& round) {
     if(!isEditable())
@@ -299,8 +314,14 @@ void Event::displayRules() {
     changeStatus(Status::DisplayRules);
 }
 
+void Event::displaySanity() {
+    if(isEditable())
+        return;
+    changeStatus(Status::DisplaySanity);
+}
+
 void Event::resumeEvent() {
-    if(status == Status::Paused || status == Status::DisplayRules)
+    if(status == Status::Paused || status == Status::DisplayRules || status == Status::DisplaySanity)
         restoreStatus();
 }
 

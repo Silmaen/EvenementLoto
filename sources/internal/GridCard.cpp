@@ -148,7 +148,7 @@ void GridCard::generate(const uint32_t& num, RandomNumberGenerator* rng) {
         delete rng;
 }
 
-void GridCard::read(std::istream& is) {
+void GridCard::read(std::istream& is, int) {
     is.read((char*)&IdNumber, 4);
     is.read((char*)&res, sizeof(Status));
     for(const std::array<GCase, nb_colones>& line: lines) {

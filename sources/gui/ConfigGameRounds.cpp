@@ -99,6 +99,16 @@ void ConfigGameRounds::actChangeGameRoundType(int newIndex) {
     updateDisplay();
 }
 
+void ConfigGameRounds::actChangeRoundNumber(int) {
+    if(in_update_loop)
+        return;
+    int cur= ui->listGameRound->currentRow();
+    if(cur < 0)
+        return;
+    gameEvent.getGameRound(cur)->setID(ui->spinRoundNumber->value());
+    updateDisplay();
+}
+
 void ConfigGameRounds::actEndEditingPrice() {
     if(in_update_loop)
         return;
@@ -181,7 +191,9 @@ void ConfigGameRounds::updateDisplayRoundList() {
     ui->listGameRound->clear();
     int idx= 1;
     for(auto it= gameEvent.beginRounds(); it != gameEvent.endRounds(); ++it, ++idx) {
-        ui->listGameRound->addItem("Partie " + QString::number(idx) + " : " + QString::fromUtf8(it->getTypeStr()));
+        ui->listGameRound->addItem("Partie " + QString::number(idx) + " : " +
+                                   QString::fromUtf8(it->getTypeStr()) +
+                                   " - " + QString::fromUtf8(it->getName()));
     }
     if(cur >= ui->listGameRound->count()) {
         ui->listGameRound->setCurrentRow(ui->listGameRound->count());
@@ -203,6 +215,7 @@ void ConfigGameRounds::updateDisplayEdits() {
         ui->GameRoundTypes->addItems(getRoundTypes());
         auto round= gameEvent.getGameRound(cur);
         ui->GameRoundTypes->setCurrentIndex((int)round->getType());
+        ui->spinRoundNumber->setValue(round->getID());
         int scur= ui->listSubRound->currentRow();
         ui->listSubRound->clear();
         int idx= 1;

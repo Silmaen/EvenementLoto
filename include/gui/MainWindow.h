@@ -173,6 +173,11 @@ private slots:
     /**
      * @brief Action de passage en doe d’affichage des règles.
      */
+    void actDisplaySanity();
+
+    /**
+     * @brief Action de passage en doe d’affichage des règles.
+     */
     void actChangeFullScreen();
 
     /**
