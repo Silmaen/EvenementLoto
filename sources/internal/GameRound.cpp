@@ -176,7 +176,7 @@ void GameRound::from_json(const json& j) {
             break;
         }
     }
-    j.at("\"Id\"").get_to(Id);
+    j.at("Id").get_to(Id);
     subGames.clear();
     for(auto& jj: j.at("subGames")) {
         subGames.emplace_back().from_json(jj);
