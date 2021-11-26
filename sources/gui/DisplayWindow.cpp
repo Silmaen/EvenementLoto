@@ -174,27 +174,67 @@ void DisplayWindow::updateEventTitlePage() {
 void DisplayWindow::updateRoundTitlePage() {
     auto round= event->getGameRound(event->getCurrentIndex());
     ui->RT_RoundTitle->setText(QString::fromUtf8(round->getName()));
+    ui->RT_SubRound_1->setVisible(false);
     ui->RT_SubRound_2->setVisible(false);
     ui->RT_SubRound_3->setVisible(false);
     switch(round->getType()) {
     case core::GameRound::Type::OneQuine:
     case core::GameRound::Type::TwoQuines:
     case core::GameRound::Type::FullCard:
+        if(!round->getSubRound(0)->getPrices().empty()) {
+            ui->RT_SubRound_1->setVisible(true);
+            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        }
+        break;
     case core::GameRound::Type::Enfant:
+        ui->RT_SubRound_1->setVisible(true);
+        if(round->getSubRound(0)->getPrices().empty()) {
+            ui->RT_SubRound_1->setText("partie enfant");
+        } else {
+            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        }
+        break;
     case core::GameRound::Type::Inverse:
-        ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        ui->RT_SubRound_1->setVisible(true);
+        if(round->getSubRound(0)->getPrices().empty()) {
+            ui->RT_SubRound_1->setText("partie Assis-debout");
+        } else {
+            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        }
         break;
     case core::GameRound::Type::OneQuineFullCard:
-        ui->RT_SubRound_2->setVisible(true);
-        ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        ui->RT_SubRound_1->setVisible(true);
+        ui->RT_SubRound_3->setVisible(true);
+        if(round->getSubRound(0)->getPrices().empty()) {
+            ui->RT_SubRound_1->setText("simple quine");
+        } else {
+            ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        }
+        if(round->getSubRound(1)->getPrices().empty()) {
+            ui->RT_SubRound_3->setText("carton plein");
+        } else {
+            ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        }
         break;
     case core::GameRound::Type::OneTwoQuineFullCard:
+        ui->RT_SubRound_1->setVisible(true);
         ui->RT_SubRound_2->setVisible(true);
         ui->RT_SubRound_3->setVisible(true);
-        ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        ui->RT_SubRound_2->setText("Gain double quine \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
-        ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
+        if(round->getSubRound(0)->getPrices().empty()) {
+            ui->RT_SubRound_1->setText("simple quine");
+        } else {
+            ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
+        }
+        if(round->getSubRound(1)->getPrices().empty()) {
+            ui->RT_SubRound_2->setText("double quine");
+        } else {
+            ui->RT_SubRound_2->setText("Gain double quine \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
+        }
+        if(round->getSubRound(2)->getPrices().empty()) {
+            ui->RT_SubRound_3->setText("carton plein");
+        } else {
+            ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
+        }
         break;
     }
 }
@@ -254,20 +294,25 @@ void DisplayWindow::updateRoundRunning() {
     // mise à jour affichage des lots et type de partie
     ui->RR_SubRoundVictoryCondition->setText(QString::fromUtf8(round->getCurrentCSubRound()->getTypeStr()));
     QString gain= QString::fromUtf8(round->getCurrentCSubRound()->getPrices());
-    if(mwd->getTheme().getParam("truncatePrice").toBool()) {
-        auto gains = gain.split("\n");
-        int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
-        if(gains.size() <= maxLine) {
-            ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
-        } else {
-            QString s= gains[0];
-            for(int iLine= 1; iLine < maxLine; ++iLine) {
-                s+= "\n" + gains[iLine];
-            }
-            ui->RR_SubRoundPrice->setText("Gain:\n" + s);
-        }
+    if(gain.isEmpty()) {
+        ui->RR_SubRoundPrice->setVisible(false);
     } else {
-        ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+        ui->RR_SubRoundPrice->setVisible(true);
+        if(mwd->getTheme().getParam("truncatePrice").toBool()) {
+            auto gains = gain.split("\n");
+            int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
+            if(gains.size() <= maxLine) {
+                ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+            } else {
+                QString s= gains[0];
+                for(int iLine= 1; iLine < maxLine; ++iLine) {
+                    s+= "\n" + gains[iLine];
+                }
+                ui->RR_SubRoundPrice->setText("Gain:\n" + s);
+            }
+        } else {
+            ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+        }
     }
 }
 
