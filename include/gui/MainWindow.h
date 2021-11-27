@@ -242,6 +242,17 @@ private:
      */
     void updateCommands();
 
+    /**
+     * @brief Vérifie que la fenêtre d'affichage est visible et active le bouton si elle doit l'être
+     */
+    void checkDisplayWindow();
+
+    /**
+     * @brief save in a file
+     * @param where
+     */
+    void saveFile(const path& where);
+
     /// Lien vers la page UI.
     Ui::MainWindow* ui;
 
@@ -268,6 +279,9 @@ private:
 
     /// Le fichier courant
     path currentFile= path{};
+
+    /// Simple compteur pour ralentir l'autosave
+    int autoSaveCounter;
 
     enum struct DrawMode {
         Both,

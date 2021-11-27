@@ -119,8 +119,12 @@ void MainWindow::actSaveFile() {
         actSaveAsFile();
         return;
     }
+    saveFile(currentFile);
+}
+
+void MainWindow::saveFile(const path& where) {
     std::ofstream f;
-    f.open(currentFile, std::ios::out | std::ios::binary);
+    f.open(where, std::ios::out | std::ios::binary);
     currentEvent.setBasePath(currentFile.parent_path());
     // copy image file if not in child directory
     if(!currentEvent.getLogo().empty()) {
@@ -289,6 +293,8 @@ void MainWindow::updateClocks() {
     ui->CurrentTime->setText(QString::fromStdString(core::formatClock(core::clock::now())));
     // horloge partie en cours
     auto cur= currentEvent.findFirstNotFinished();
+    // check si la fenêtre d'affichage est ouverte ou fermée
+    checkDisplayWindow();
     if(cur == currentEvent.endRounds())// pas de round en cours
         return;
     if(cur->getEnding() != core::epoch)// round déjà fini, pas de mise à jour
@@ -296,6 +302,28 @@ void MainWindow::updateClocks() {
     if(cur->getStarting() == core::epoch)// round pas commencé, pas de mise à jour
         return;
     ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(core::clock::now() - cur->getStarting())));
+}
+
+void MainWindow::checkDisplayWindow() {
+    // pas d'action à prendre
+    if(currentEvent.getStatus() == core::Event::Status::Finished ||
+       currentEvent.getStatus() == core::Event::Status::Invalid)
+        return;
+    if(displayWindow == nullptr || !displayWindow->isVisible()) {
+        ui->actionStartEvent->setEnabled(true);
+    }
+    ++autoSaveCounter;
+    if(autoSaveCounter < 15)
+        return;
+    autoSaveCounter= 0;
+    QVariant p     = settings.value("path/data_path", "");
+    if(p.toString() == "")
+        return;
+    path pt(p.toString().toStdString());
+    if(!exists(pt))
+        return;
+    pt= pt / "rescue.lev";
+    saveFile(pt);
 }
 
 void MainWindow::updateDisplay() {
