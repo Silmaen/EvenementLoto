@@ -483,6 +483,11 @@ void MainWindow::updateDraws() {
             ui->LastNumber1->display(0);
         }
     }
+    QString draws;
+    for(auto draw= cur->beginDraws(); draw != cur->endDraws(); ++draw) {
+        draws+= QString::number(*draw) + " ";
+    }
+    ui->textLastDraw->setText(draws);
 }
 
 void MainWindow::updateCommands() {
