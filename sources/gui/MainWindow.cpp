@@ -327,6 +327,7 @@ void MainWindow::checkDisplayWindow() {
 }
 
 void MainWindow::updateDisplay() {
+    onUpdate= true;
     // Mise à jour des menus
     updateMenus();
     // TODO: Mise à jour de la barre de statut
@@ -343,6 +344,7 @@ void MainWindow::updateDisplay() {
     // timer
     if(!timer->isActive())
         timer->start();
+    onUpdate= false;
 }
 
 void MainWindow::updateMenus() {
@@ -512,8 +514,10 @@ void MainWindow::updateDraws() {
         }
     }
     QString draws;
+    numberGrid->resetPushed();
     for(auto draw= cur->beginDraws(); draw != cur->endDraws(); ++draw) {
         draws+= QString::number(*draw) + " ";
+        numberGrid->setPushed(*draw);
     }
     ui->textLastDraw->setText(draws);
 }
@@ -638,6 +642,8 @@ void MainWindow::updateStartStopButton() {
 }
 
 void MainWindow::actGridPushed(int value) {
+    if(onUpdate)
+        return;
     currentEvent.findFirstNotFinished()->addPickedNumber(value);
     rng.addPick(value);
     updateDisplay();

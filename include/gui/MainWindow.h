@@ -283,6 +283,8 @@ private:
     /// Simple compteur pour ralentir l'autosave
     int autoSaveCounter;
 
+    bool onUpdate= false;
+
     enum struct DrawMode {
         Both,
         PickOnly,
