@@ -27,10 +27,37 @@ Ce projet utilise CMake (version 3.15 ou supérieure) pour se configurer.
 Le programme a été correctement compilé avec :
 
 * windows
-    * gcc 11.2 ou supérieur (mingw)
-    * clang 13 (mingw)
+  * gcc 11.2 ou supérieur (mingw)
+  * clang 13 (mingw)
 
 ## TODOs
+
+### version 1.1
+
+* Affichage
+  * [ ] affichage des lots
+    * [ ] sous forme liste
+    * [ ] à chaque changement de quine
+    * [ ] affichage de la valeur
+  * [ ] affichage de la phase dans le titre de la partie
+  * [ ] améliorer la lisibilité les derniers numéros tirés
+  * [ ] Police par défaut en gras pour les numéros de la grille
+* Contrôle et paramètre
+  * [ ] choix de l'écran de plein écran
+  * [ ] permettre le choix de la police de caractère
+* moteur de jeu
+  * [ ] Données
+    * [ ] ajout de la valeur de lot
+    * [ ] édition de lots sous forme de liste d’articles
+    * [ ] correction du mouvement de curseur lors de la rédaction des lots
+  * [ ] ajout de stats
+    * [ ] de sorties des numéros
+    * [ ] de temps de parties
+* Compilation
+  * [ ] Test compilation OpenBSD
+  * [ ] Test compilation msvc (et clang-cl et clang natif)
+
+### version 1.0
 
 * Affichage:
   * [X] Affichage logo organisateur dans les vues intermédiaires
@@ -38,7 +65,7 @@ Le programme a été correctement compilé avec :
     * [X] Bouton permettant le ré-affichage à n’importe quel moment
   * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
   * [X] Permettre Affichage en plein écran sur le second écran
-    * [ ] Permettre le choix/configuration du mode plein écran.
+    * [X] Permettre le choix/configuration du mode plein écran.
   * [X] Affichage Pause round
   * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
@@ -64,6 +91,3 @@ Le programme a été correctement compilé avec :
   * [X] Gestion du règlement
     * [X] Import/Export via un fichier markdown
     * [X] Sauvegarde dans l’événement
-* Compilation
-  * [ ] Test compilation OpenBSD
-  * [ ] Test compilation msvc (et clang-cl et clang natif)
