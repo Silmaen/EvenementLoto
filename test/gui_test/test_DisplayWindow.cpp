@@ -17,7 +17,7 @@ using namespace evl::gui;
 TEST(gui_DisplayWindow, base) {
     test::initialize();
     evl::core::Event evl;
-    DisplayWindow a{nullptr};
+    DisplayWindow a{&evl};
     a.updateDisplay();
     EXPECT_EQ(a.getUi()->PageManager->currentIndex(), 0);
     test::finalize();

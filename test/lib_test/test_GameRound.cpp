@@ -16,7 +16,7 @@ TEST(GameRound, Invalid) {
     EXPECT_EQ(gr.getStarting(), epoch);
     EXPECT_EQ(gr.getEnding(), epoch);
     EXPECT_STREQ(gr.getStatusStr().c_str(), "prête");
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "inverse");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Inverse");
 #ifdef EVL_DEBUG
     gr.invalidStatus();
     EXPECT_STREQ(gr.getStatusStr().c_str(), "Statut inconnu");
@@ -31,7 +31,7 @@ TEST(GameRound, Type) {
     gr.addWinner(586);
     gr.startGameRound();
     gr.setType(GameRound::Type::OneTwoQuineFullCard);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "enfant");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Enfant");
     gr.addWinner(1586);
     EXPECT_EQ(gr.getStatus(), GameRound::Status::DisplayResult);
     EXPECT_EQ(gr.getCurrentCSubRound(), gr.endSubRound());
@@ -41,13 +41,13 @@ TEST(GameRound, Type) {
 
 TEST(GameRound, Types) {
     GameRound gr{GameRound::Type::OneQuine};
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "une quine");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Simple quine");
     EXPECT_EQ(gr.sizeSubRound(), 1);
     gr.setType(GameRound::Type::TwoQuines);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "deux quines");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Double quine");
     EXPECT_EQ(gr.sizeSubRound(), 1);
     gr.setType(GameRound::Type::FullCard);
-    EXPECT_STREQ(gr.getTypeStr().c_str(), "carton");
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Gros lot");
     EXPECT_EQ(gr.sizeSubRound(), 1);
     gr.setType(GameRound::Type::OneQuineFullCard);
     EXPECT_STREQ(gr.getTypeStr().c_str(), "une quine et carton");
@@ -109,7 +109,7 @@ TEST(GameRound, serialize) {
     GameRound gr2;
     std::ifstream fileRead;
     fileRead.open(file, std::ios::in | std::ios::binary);
-    gr2.read(fileRead);
+    gr2.read(fileRead, evl::currentSaveVersion);
     fileRead.close();
 
     EXPECT_EQ(gr2.getType(), GameRound::Type::Enfant);

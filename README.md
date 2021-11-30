@@ -63,6 +63,7 @@ Le programme a été correctement compilé avec :
   * [X] Affichage logo organisateur dans les vues intermédiaires
   * [X] Affichage du règlement
     * [X] Bouton permettant le ré-affichage à n’importe quel moment
+  * [X] Affichage consignes sanitaire
   * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
   * [X] Permettre Affichage en plein écran sur le second écran
     * [X] Permettre le choix/configuration du mode plein écran.

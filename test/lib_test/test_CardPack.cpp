@@ -35,7 +35,7 @@ TEST(CardPack, generation) {
     CardPack p2;
     std::ifstream fileRead;
     fileRead.open(file, std::ios::in | std::ios::binary);
-    p2.read(fileRead);
+    p2.read(fileRead, currentSaveVersion);
     fileRead.close();
 
     EXPECT_STREQ(p.getName().c_str(), p2.getName().c_str());
@@ -60,7 +60,7 @@ TEST(CardPack, internalGeneration) {
     CardPack p2;
     std::ifstream fileRead;
     fileRead.open(file, std::ios::in | std::ios::binary);
-    p2.read(fileRead);
+    p2.read(fileRead, currentSaveVersion);
     fileRead.close();
 
     EXPECT_STREQ(p.getName().c_str(), p2.getName().c_str());

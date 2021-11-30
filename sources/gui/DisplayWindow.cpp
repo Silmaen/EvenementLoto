@@ -329,6 +329,8 @@ void DisplayWindow::updateDisplaySanityRules() {
 }
 
 void DisplayWindow::updateColors() {
+    if(mwd == nullptr)
+        return;
     auto curent= palette();
     auto back  = QColor(mwd->getTheme().getParam("backgroundColor").toString());
     curent.setColor(QPalette::ColorRole::Window, back);

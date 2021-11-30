@@ -14,7 +14,8 @@ using namespace evl::gui;
 
 TEST(gui_MainWindow, base) {
     test::initialize();
-    MainWindow main;
-    EXPECT_STREQ(main.getSettings().applicationName().toStdString().c_str(), "");
+    MainWindow* main= new MainWindow;
+    EXPECT_STREQ(main->getSettings().applicationName().toStdString().c_str(), "");
+    delete main;
     test::finalize();
 }
