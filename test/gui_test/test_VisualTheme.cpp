@@ -32,6 +32,7 @@ TEST(gui_VisualTheme, base) {
     settings.sync();
     VisualTheme theme(&settings);
 
+    EXPECT_TRUE(theme.isModified());
     EXPECT_EQ(theme.getParam("param de merde"), QVariant());
     EXPECT_STREQ(theme.getParam("name").value<QString>().toStdString().c_str(), "153");
     EXPECT_EQ(theme.getParam("gridTextRatio").value<double>(), -666.66);

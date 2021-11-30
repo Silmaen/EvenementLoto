@@ -80,6 +80,27 @@ TEST(Event, RoundManipulation) {
     EXPECT_EQ(evt.getGameRound(3)->getType(), GameRound::Type::Enfant);
 }
 
+TEST(Event, displayScreens) {
+    Event evt;
+    evt.setName("toto");
+    evt.setOrganizerName("toto tata");
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
+    evt.displayRules();
+    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
+    evt.displaySanity();
+    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
+    evt.startEvent();
+    evt.displayRules();
+    EXPECT_EQ(evt.getStatus(), Event::Status::DisplayRules);
+    evt.resumeEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
+    evt.displaySanity();
+    EXPECT_EQ(evt.getStatus(), Event::Status::DisplaySanity);
+    evt.resumeEvent();
+    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
+}
+
 TEST(Event, Workflow) {
     Event evt;
     evt.setName("toto");
@@ -188,4 +209,15 @@ TEST(Event, JSONSerialize) {
 
     EXPECT_STREQ(evt2.getGameRound(1)->getSubRound(1)->getPrices().c_str(), "un bon pour un tour à l’urinoir\nun colonel");
     fs::remove_all(tmp);
+}
+
+TEST(Event, basePath) {
+    Event evt;
+    evt.setName("toto");
+    evt.pushGameRound(GameRound(GameRound::Type::OneTwoQuineFullCard));
+    evt.pushGameRound(GameRound(GameRound::Type::OneTwoQuineFullCard));
+    evt.setBasePath("");
+    evt.setLogo("");
+    evt.setOrganizerLogo("");
+    EXPECT_STREQ(evt.getLogo().string().c_str(), "");
 }

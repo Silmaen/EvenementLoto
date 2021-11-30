@@ -25,6 +25,21 @@ TEST(GameRound, Invalid) {
 #endif
 }
 
+TEST(GameRound, Id) {
+    GameRound gr{GameRound::Type::Enfant};
+    EXPECT_EQ(gr.getID(), 0);
+    gr.setID(665);
+    EXPECT_EQ(gr.getID(), 665);
+}
+
+TEST(GameRound, Name) {
+    GameRound gr;
+    EXPECT_STREQ(gr.getName().c_str(), "Partie");
+    gr.setID(665);
+    gr.setType(GameRound::Type::Inverse);
+    EXPECT_STREQ(gr.getName().c_str(), "Partie 665 Inverse");
+}
+
 TEST(GameRound, Type) {
     GameRound gr{GameRound::Type::Enfant};
     gr.closeGameRound();
