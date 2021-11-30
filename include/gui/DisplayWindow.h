@@ -22,6 +22,9 @@ namespace evl::gui {
 
 class MainWindow;
 
+/**
+ * @brief Fenêtre d’affichage vue par les joueurs
+ */
 class DisplayWindow: public QMainWindow {
     Q_OBJECT
 public:

@@ -56,6 +56,7 @@ namespace settings {
 
 /// Clé vers le dataPath.
 inline QString dataPathKey        = "path/data_path";
+/// Valeur par défaut du dataPath.
 inline QString dataPathDefault    = "";
 
 }// namespace settings

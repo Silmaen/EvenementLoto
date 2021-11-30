@@ -32,7 +32,7 @@ Le programme a été correctement compilé avec :
 
 ## TODOs
 
-### version 1.1
+### version x.y.z
 
 * Affichage
   * [ ] affichage des lots
@@ -43,8 +43,11 @@ Le programme a été correctement compilé avec :
   * [ ] améliorer la lisibilité les derniers numéros tirés
   * [ ] Police par défaut en gras pour les numéros de la grille
 * Contrôle et paramètre
-  * [ ] choix de l'écran de plein écran
+  * [ ] choix de l’écran de plein écran
   * [ ] permettre le choix de la police de caractère
+  * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
+    * [ ] ajouter le réglage de cette valeur
+    * [ ] permettre de régler cette valeur dans les onglets du bas
 * moteur de jeu
   * [ ] Données
     * [ ] ajout de la valeur de lot
@@ -57,7 +60,7 @@ Le programme a été correctement compilé avec :
   * [ ] Test compilation OpenBSD
   * [ ] Test compilation msvc (et clang-cl et clang natif)
 
-### version 1.0
+### version 0.2
 
 * Affichage:
   * [X] Affichage logo organisateur dans les vues intermédiaires

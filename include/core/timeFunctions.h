@@ -24,6 +24,11 @@ using duration= std::chrono::duration<double>;
 /// Point de référence dans le temps.
 constexpr timePoint epoch{};
 
+/**
+ * @brief Formatage d’un point dans le temps comme date du calendrier
+ * @param t Le point dans le temps
+ * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
+ */
 inline string formatCalendar(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
@@ -31,6 +36,11 @@ inline string formatCalendar(const timePoint& t) {
     return oss.str();
 }
 
+/**
+ * @brief Formatage d’un point dans le temps comme heure d’horloge
+ * @param t Le point dans le temps
+ * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
+ */
 inline string formatClock(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
@@ -38,6 +48,11 @@ inline string formatClock(const timePoint& t) {
     return oss.str();
 }
 
+/**
+ * @brief Formatage d’un point dans le temps comme heure d’horloge sans les secondes
+ * @param t Le point dans le temps
+ * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
+ */
 inline string formatClockNoSecond(const timePoint& t) {
     std::stringstream oss;
     auto tt= clock::to_time_t(t);
@@ -45,6 +60,11 @@ inline string formatClockNoSecond(const timePoint& t) {
     return oss.str();
 }
 
+/**
+ * @brief Formatage d’une durée
+ * @param d La durée à formater.
+ * @return Une chaine de caractères formatant la durée
+ */
 inline string formatDuration(const duration& d) {
     std::stringstream oss;
     auto h= std::chrono::duration_cast<std::chrono::hours>(d).count();

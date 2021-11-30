@@ -60,7 +60,7 @@ public:
 
     /**
      * @brief Renvoie le nom du type de sous-partie
-     * @return le nom du type de sous-partie
+     * @return Le nom du type de sous-partie
      */
     const string getTypeStr() const;
 

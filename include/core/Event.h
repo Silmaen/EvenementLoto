@@ -343,6 +343,7 @@ private:
 
     /// Le statut de l’événement
     Status status        = Status::Invalid;
+    /// Le précédent statut (pour pouvoir annuler)
     Status previousStatus= Status::Invalid;
 
     /// Le nom de l’organisateur (requit pour validité)
@@ -356,10 +357,10 @@ private:
     /// Lieu de l’événement.
     string location;
 
-    /// Les règles de l'événement
+    /// Les règles de l’événement
     string rules;
 
-    /// Les règles sanitaires de l'événement
+    /// Les règles sanitaires de l’événement
     string sanityRules;
 
     /// Liste des parties de l’événement.

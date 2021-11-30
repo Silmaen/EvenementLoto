@@ -80,12 +80,12 @@ public slots:
     void actSearchLogo();
 
     /**
-     * @brief Action d'import des règles
+     * @brief Action d’import des règles
      */
     void actImportRules();
 
     /**
-     * @brief Action d'export des règles'
+     * @brief Action d’export des règles
      */
     void actExportRules();
 

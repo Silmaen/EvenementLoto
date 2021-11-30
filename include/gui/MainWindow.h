@@ -280,15 +280,19 @@ private:
     /// Le fichier courant
     path currentFile= path{};
 
-    /// Simple compteur pour ralentir l'autosave
+    /// Simple compteur pour ralentir la sauvegarde automatique
     int autoSaveCounter;
 
+    /// Variable mise à vraie au début de la procédure de mise à jour de l'affichage pour éviter les récursions infinies
     bool onUpdate= false;
 
+    /**
+     * @brief Mode de tirage des numéros
+     */
     enum struct DrawMode {
-        Both,
-        PickOnly,
-        ManualOnly
+        Both,     ///< À la fois manuel et tirage aléatoire par la machine
+        PickOnly, ///< Seulement le tirage machine
+        ManualOnly///< Seulement le tirage manuel (machine à boule)
     } currentDrawMode= DrawMode::Both;
 };
 
