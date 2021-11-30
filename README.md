@@ -4,19 +4,19 @@ Logiciel de gestion d’événement de type loto associatif.
 
 ## Construction
 
-Ce projet utilise CMake (version 3.15 ou supérieure) pour se configurer.
+Ce projet utilise CMake (version 3.20 ou supérieure) pour se configurer.
 
 ### Variables de construction
 
-* `BASE_QT_DIR` (requise) chemin vers Qt (voir les dépendances ci-après).
+* `EVL_QT_DIR` (requise) chemin vers Qt (voir les dépendances ci-après).
 * `EVL_COVERAGE` active ou non le calcul de la couverture de code.
   (nécessite `gcovr` voir dépendances)
 
 ### Dépendance
 
 * Ce projet dépend de la librairie Qt6 le chemin vers l’installation de Qt6 est passé à CMake par la
-  variable `BASE_QT_DIR`. Cette variable est d’ailleurs requise.
-* Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
+  variable `EVL_QT_DIR`. Cette variable est d’ailleurs requise.
+* Ce projet nécessite l’installation d’une version de doxygen (version 1.9.2 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
 * Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code. (gcovr peut être installé grâce à
@@ -32,7 +32,7 @@ Le programme a été correctement compilé avec :
 
 ## TODOs
 
-### version x.y.z
+### version 0.3
 
 * Affichage
   * [ ] affichage des lots
@@ -42,7 +42,7 @@ Le programme a été correctement compilé avec :
   * [ ] affichage de la phase dans le titre de la partie
   * [ ] améliorer la lisibilité les derniers numéros tirés
   * [ ] Police par défaut en gras pour les numéros de la grille
-* Contrôle et paramètre
+* Contrôle et paramètres
   * [ ] choix de l’écran de plein écran
   * [ ] permettre le choix de la police de caractère
   * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
@@ -56,9 +56,17 @@ Le programme a été correctement compilé avec :
   * [ ] ajout de stats
     * [ ] de sorties des numéros
     * [ ] de temps de parties
+  * [ ] Gestion des gagnants multiple
+    * [ ] permettre de départager les gagnants multiples (tirage au sort ou saisi)
+    * [ ] garder trace des consolés
+  * [ ] Résultat
+    * [ ] Saisi du nom du gagnant
+    * [ ] Génération du rapport de fin d'événement
 * Compilation
   * [ ] Test compilation OpenBSD
   * [ ] Test compilation msvc (et clang-cl et clang natif)
+* Documentation
+  * [ ] Écrire les pages d’aide
 
 ### version 0.2
 

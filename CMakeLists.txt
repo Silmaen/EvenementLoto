@@ -1,12 +1,12 @@
 #
 #  CMAKE du projet d'événement loto
 #
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.20)
 
 #
 # ---=== GENERALITIES ===---
 #
-project(EvenementLoto VERSION 0.0.1 LANGUAGES CXX)
+project(EvenementLoto VERSION 0.3.0 LANGUAGES CXX)
 set(PRJPREFIX EVL)
 set(PRJPREFIX_LOWER evl)
 set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
@@ -158,8 +158,8 @@ find_package(Doxygen
         REQUIRED dot)
 if (DOXYGEN_FOUND)
     message(STATUS "found doxygen version: ${DOXYGEN_VERSION}")
-    if (${DOXYGEN_VERSION} VERSION_LESS 1.8.17)
-        message(FATAL_ERROR "Doxygen version 1.8.17 or higher is required")
+    if (${DOXYGEN_VERSION} VERSION_LESS 1.9.2)
+        message(FATAL_ERROR "Doxygen version 1.9.2 or higher is required")
     endif ()
     add_custom_target(documentation
             COMMAND ${DOXYGEN_EXECUTABLE}
