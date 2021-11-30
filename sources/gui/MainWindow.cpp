@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget* parent):
     timer(new QTimer(this)),
     numberGrid(new WidgetNumberGrid()),
     theme(&settings) {
-    // initialise l'ui depuis le fichier ui.
+    // initialise l’ui depuis le fichier ui.
     ui->setupUi(this);
     // initialise la numberGrid
     auto layout= new QGridLayout(ui->GroupPickManual);
@@ -51,6 +51,7 @@ MainWindow::~MainWindow() {
     if(displayWindow != nullptr)
         delete displayWindow;
 }
+
 void MainWindow::actShowAbout() {
     evl::gui::About AboutWindow(this);
     AboutWindow.setModal(true);

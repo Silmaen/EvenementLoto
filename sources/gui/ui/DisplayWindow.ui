@@ -27,7 +27,7 @@
     <item row="2" column="0">
      <widget class="QStackedWidget" name="PageManager">
       <property name="currentIndex">
-       <number>7</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="pageEventTitle">
        <layout class="QGridLayout" name="gridLayout_2">

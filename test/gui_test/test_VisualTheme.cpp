@@ -33,7 +33,7 @@ TEST(gui_VisualTheme, base) {
     VisualTheme theme(&settings);
 
     EXPECT_EQ(theme.getParam("param de merde"), QVariant());
-    EXPECT_STREQ(theme.getParam("name").value<QString>().toStdString().c_str(), "default");
+    EXPECT_STREQ(theme.getParam("name").value<QString>().toStdString().c_str(), "153");
     EXPECT_EQ(theme.getParam("gridTextRatio").value<double>(), -666.66);
     fs::remove_all(tmp);
 }
@@ -66,7 +66,7 @@ TEST(gui_VisualTheme, ExportJSON) {
     std::ifstream inFile(file, std::ios::in);
     std::string resu{(std::istreambuf_iterator<char>(inFile)), (std::istreambuf_iterator<char>())};
     inFile.close();
-    EXPECT_STREQ(resu.c_str(), "{\n    \"theme\": {\n        \"baseRatio\": 0.02,\n        \"gridTextRatio\": 0.85,\n        \"longTextRatio\": 0.6,\n        \"name\": \"default\",\n        \"shortTextRatio\": 1.4,\n        \"titleRatio\": 2.0\n    }\n}");
+    EXPECT_STREQ(resu.c_str(), "{\n    \"theme\": {\n        \"backgroundColor\": \"#F0F0F0\",\n        \"baseRatio\": 0.02,\n        \"fadeNumbers\": true,\n        \"fadeNumbersAmount\": 3,\n        \"fadeNumbersStrength\": 10,\n        \"gridBackgroundColor\": \"#F0F0F0\",\n        \"gridTextRatio\": 0.85,\n        \"longTextRatio\": 0.6,\n        \"name\": \"default\",\n        \"selectedNumberColor\": \"#FF7000\",\n        \"shortTextRatio\": 1.4,\n        \"textColor\": \"#000000\",\n        \"titleRatio\": 2.0,\n        \"truncatePrice\": true,\n        \"truncatePriceLines\": 3\n    }\n}");
     fs::remove_all(tmp);
 }
 
@@ -75,7 +75,7 @@ TEST(gui_VisualTheme, ImportJSON) {
     fs::create_directories(tmp);
     fs::path file= tmp / "test.json";
 
-    json j= {{"theme", {{"baseRatio", 0.04}, {"gridTextRatio", 0.85}, {"longTextRatio", 0.6}, {"name", "titi"}, {"shortTextRatio", 1.4}, {"titleRatio", 2.0}}}};
+    json j= {{"theme", {{"backgroundColor", "#F0F0F0"}, {"fadeNumbers", true}, {"fadeNumbersAmount", 3}, {"baseRatio", 0.04}, {"gridTextRatio", 0.85}, {"longTextRatio", 0.6}, {"name", "titi"}, {"shortTextRatio", 1.4}, {"titleRatio", 2.0}}}};
     std::ofstream outFile(file, std::ios::out);
     outFile << j;
     outFile.close();

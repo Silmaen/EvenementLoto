@@ -13,7 +13,7 @@ using namespace evl::core;
 
 TEST(SubGameRound, types) {
     SubGameRound partie(SubGameRound::Type::OneQuine, "");
-    EXPECT_STREQ(partie.getTypeStr().c_str(), "une quine");
+    EXPECT_STREQ(partie.getTypeStr().c_str(), "simple quine");
     SubGameRound partie2(SubGameRound::Type::FullCard, "");
     EXPECT_STREQ(partie2.getTypeStr().c_str(), "carton plein");
     SubGameRound partie3(SubGameRound::Type::Inverse, "");
@@ -37,11 +37,11 @@ TEST(SubGameRound, serialize) {
     SubGameRound partie2;
     std::ifstream fileRead;
     fileRead.open(file, std::ios::in | std::ios::binary);
-    partie2.read(fileRead);
+    partie2.read(fileRead, evl::currentSaveVersion);
     fileRead.close();
 
     EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);
-    EXPECT_STREQ(partie2.getTypeStr().c_str(), "deux quines");
+    EXPECT_STREQ(partie2.getTypeStr().c_str(), "double quine");
     EXPECT_EQ(partie2.getWinner(), 666);
     EXPECT_STREQ(partie2.getPrices().c_str(), "une moto");
 
