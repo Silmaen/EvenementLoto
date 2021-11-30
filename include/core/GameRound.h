@@ -196,7 +196,7 @@ public:
     // ---- accès aux sub rounds (lecture seule) ----
     /**
      * @brief Renvoie si la sous-partie actuelle est la dernière de la liste
-     * @return true si on est à la dernière sous-partie.
+     * @return True si on est à la dernière sous-partie.
      */
     bool isCurrentSubRoundLast() const;
     /**

@@ -50,6 +50,10 @@ public:
      */
     void setEvent(const core::Event& e);
 
+    /**
+     * @brief Accès extérieur aux éléments d’interface.
+     * @return Pointeur vers la classe interne d’interface.
+     */
     const Ui::ConfigGameRounds* getUi() const { return ui; }
 public slots:
 
@@ -104,34 +108,35 @@ public slots:
     void actMoveGameRoundBefore();
 
     /**
-     * @brief
-     * @param newIndex
+     * @brief Changement de type de partie
+     * @param newIndex Index du nouveau type de partie
      */
     void actChangeGameRoundType(int newIndex);
 
     /**
-     * @brief
+     * @brief Changement du numéro de la partie
+     * @param index Nouveau numéro de partie
      */
-    void actChangeRoundNumber(int);
+    void actChangeRoundNumber(int index);
 
     /**
-     * @brief
-     * @param newIndex
+     * @brief Changement du type de sous-partie
+     * @param newIndex Nouvel index de type de sous-partie
      */
     void actChangeSubGameRoundType(int newIndex);
 
     /**
-     * @brief
+     * @brief Action à la fin de l’édition des lots.
      */
     void actEndEditingPrice();
 
     /**
-     * @brief
+     * @brief Création d’une nouvelle sous-partie
      */
     void actCreateSubGameRound();
 
     /**
-     * @brief
+     * @brief Suppression d’une sous-partie
      */
     void actDeleteSubGameRound();
     /**
@@ -145,14 +150,12 @@ public slots:
     void actMoveSubGameRoundBefore();
 
     /**
-     * @brief
-     * @param newIndex
+     * @brief Action lors du changement de partie
      */
     void actChangeSelectedGameRound();
 
     /**
-     * @brief
-     * @param newIndex
+     * @brief Action lors du changement de sous-partie
      */
     void actChangeSelectedSubGameRound();
 
@@ -203,6 +206,7 @@ private:
     /// L’événement en cours d’édition
     core::Event gameEvent;
 
+    /// Variable mise à vrai lors de la mise à jour de l’affichage pour éviter les récursions infinies.
     bool onUpdate= false;
 };
 
