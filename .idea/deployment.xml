@@ -2,26 +2,31 @@
 <project version="4">
   <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="docker cg alpine (351d2448-a1d5-4c48-8cca-227f9e9c19f3)">
+      <paths name="arch-clang (0e9ecc22-1e4d-438a-9077-04d51a83be31)">
         <serverdata>
           <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="satellite (8ced286d-fc3d-425f-a2e0-6440ea9b6ec7)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/argawaen/sources/EvenementLoto" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/_buildagent/dev/EvenementLoto" local="$PROJECT_DIR$" />
           </mappings>
           <excludedPaths>
-            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-satellite" />
-            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-clang-obsd" />
-            <excludedPath local="true" path="cmake-*" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-arch-gcc" />
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-arch-clang" />
             <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-clang" />
-            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-gcc-coverage" />
-            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-gcc-obsd" />
+          </excludedPaths>
+        </serverdata>
+      </paths>
+      <paths name="arch-gcc (48dd8de7-f735-4a11-8eac-a34eccaa4b2a)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/_buildagent/dev/EvenementLoto" local="$PROJECT_DIR$" />
+          </mappings>
+          <excludedPaths>
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-arch-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-gcc" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-debug-arch-clang" />
+            <excludedPath local="true" path="$PROJECT_DIR$/cmake-build-release-clang" />
           </excludedPaths>
         </serverdata>
       </paths>
