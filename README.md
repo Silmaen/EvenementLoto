@@ -4,18 +4,17 @@ Logiciel de gestion d’événement de type loto associatif.
 
 ## Construction
 
-Ce projet utilise CMake (version 3.20 ou supérieure) pour se configurer.
+Ce projet utilise CMake (version 3.23 ou supérieure) pour se configurer.
 
 ### Variables de construction
 
-* `EVL_QT_DIR` (requise) chemin vers Qt (voir les dépendances ci-après).
 * `EVL_COVERAGE` active ou non le calcul de la couverture de code.
   (nécessite `gcovr` voir dépendances)
 
 ### Dépendance
 
-* Ce projet dépend de la librairie Qt6 le chemin vers l’installation de Qt6 est passé à CMake par la
-  variable `EVL_QT_DIR`. Cette variable est d’ailleurs requise.
+* Ce projet dépend de la librairie Qt6
+* Ce projet dépend de la librairie nlohmann json
 * Ce projet nécessite l’installation d’une version de doxygen (version 1.9.2 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
@@ -27,8 +26,12 @@ Ce projet utilise CMake (version 3.20 ou supérieure) pour se configurer.
 Le programme a été correctement compilé avec :
 
 * windows
-  * gcc 11.2 ou supérieur (mingw)
-  * clang 13 (mingw)
+  * gcc 12 (mingw)
+  * clang 14 (mingw)
+
+* linux
+  * gcc 12
+  * clang 14
 
 ## TODOs
 
