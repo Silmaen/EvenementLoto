@@ -30,12 +30,12 @@ TEST(GridCard, string) {
 TEST(GridCard, play) {
     GridCard carton1;
     carton1.fromString("002;;1;26;43;75;80;;4;23;36;47;60;;12;24;31;78;85;;");
-    for(uint8_t i: {43, 75, 12, 56, 34, 60, 78, 25, 45, 80, 26, 75})
+    for(uint8_t i: std::vector<uint8_t>{43U, 75U, 12U, 56U, 34U, 60U, 78U, 25U, 45U, 80U, 26U, 75U})
         carton1.playNumber(i);
     EXPECT_EQ(carton1.getStatus(), GridCard::Status::AlmostOneLine);
     carton1.playNumber(1);
     EXPECT_EQ(carton1.getStatus(), GridCard::Status::OneLine);
-    for(uint8_t i: {4, 23, 12, 85, 47, 69, 78})
+    for(uint8_t i: std::vector<uint8_t>{4U, 23U, 12U, 85U, 47U, 69U, 78U})
         carton1.playNumber(i);
     EXPECT_EQ(carton1.getStatus(), GridCard::Status::AlmostTwoLines);
     carton1.playNumber(36);
