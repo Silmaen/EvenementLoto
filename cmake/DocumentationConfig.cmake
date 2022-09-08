@@ -5,8 +5,8 @@ find_package(Doxygen
         REQUIRED dot)
 if (DOXYGEN_FOUND)
     message(STATUS "found doxygen version: ${DOXYGEN_VERSION}")
-    if (${DOXYGEN_VERSION} VERSION_LESS 1.9.3)
-        message(FATAL_ERROR "Doxygen version 1.9.3 or higher is required")
+    if (${DOXYGEN_VERSION} VERSION_LESS 1.9.1)
+        message(FATAL_ERROR "Doxygen version 1.9.1 or higher is required")
     endif ()
     add_custom_target(documentation)
     add_custom_command(
