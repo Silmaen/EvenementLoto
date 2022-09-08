@@ -12,8 +12,13 @@ target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC .)
 
 # ----==== third party ====----
 # json
-find_package(nlohmann_json 3.11.1 REQUIRED)
+find_package(nlohmann_json 3.10 REQUIRED)
 message(STATUS "Found nlohmann")
+
+#fmt
+find_package(fmt 8 REQUIRED)
+message(STATUS "Found fmt")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt)
 
 #
 # ----====  UI Library ====----
