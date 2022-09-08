@@ -27,7 +27,7 @@
     <item row="2" column="0">
      <widget class="QStackedWidget" name="PageManager">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="pageEventTitle">
        <layout class="QGridLayout" name="gridLayout_2">
@@ -426,32 +426,44 @@
            </property>
            <item>
             <widget class="QFrame" name="frame_7">
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
+                <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                        <horstretch>10</horstretch>
+                        <verstretch>0</verstretch>
+                    </sizepolicy>
+                </property>
+                <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="frameShadow">
+                    <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <property name="leftMargin">
+                        <number>0</number>
+                    </property>
+                    <property name="topMargin">
+                        <number>0</number>
+                    </property>
+                    <property name="rightMargin">
+                        <number>0</number>
+                    </property>
+                    <property name="bottomMargin">
+                        <number>0</number>
+                    </property>
+                    <item>
                <widget class="QTableWidget" name="RR_NumberGrid">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>1</horstretch>
                   <verstretch>3</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="font">
+                 <font>
+                     <weight>75</weight>
+                  <bold>true</bold>
+                 </font>
                 </property>
                 <property name="frameShape">
                  <enum>QFrame::Box</enum>
@@ -561,49 +573,19 @@
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QGridLayout" name="gridLayout_4">
-                 <item row="1" column="0">
-                  <widget class="QLabel" name="RR_SubRoundPrice">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>3</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Un vélo en plmastique</string>
-                   </property>
+                    <item row="0" column="0">
+                        <widget class="QLabel" name="RR_SubRoundPrice">
+                            <property name="sizePolicy">
+                                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                    <horstretch>0</horstretch>
+                                    <verstretch>3</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>Un vélo en plmastique</string>
+                            </property>
                    <property name="scaledContents">
                     <bool>true</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="RR_SubRoundVictoryCondition">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>3</horstretch>
-                     <verstretch>1</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Condition de gain: Une Ligne
-                                                                                </string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1" rowspan="2">
-                  <widget class="QLabel" name="RR_Logo">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                     <horstretch>1</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>&lt;logo&gt;</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -613,28 +595,34 @@
              </layout>
             </widget>
            </item>
-           <item>
-            <widget class="QFrame" name="frame_3">
-             <property name="frameShape">
-              <enum>QFrame::NoFrame</enum>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <property name="leftMargin">
-               <number>4</number>
-              </property>
-              <property name="topMargin">
-               <number>4</number>
-              </property>
-              <property name="rightMargin">
-               <number>4</number>
-              </property>
-              <property name="bottomMargin">
-               <number>4</number>
-              </property>
               <item>
+                  <widget class="QFrame" name="frame_3">
+                      <property name="sizePolicy">
+                          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                          </sizepolicy>
+                      </property>
+                      <property name="frameShape">
+                          <enum>QFrame::NoFrame</enum>
+                      </property>
+                      <property name="frameShadow">
+                          <enum>QFrame::Raised</enum>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_2">
+                          <property name="leftMargin">
+                              <number>4</number>
+                          </property>
+                          <property name="topMargin">
+                              <number>4</number>
+                          </property>
+                          <property name="rightMargin">
+                              <number>4</number>
+                          </property>
+                          <property name="bottomMargin">
+                              <number>4</number>
+                          </property>
+                          <item>
                <widget class="QGroupBox" name="groupBox_11">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -656,42 +644,22 @@
                 </layout>
                </widget>
               </item>
-              <item>
-               <widget class="QGroupBox" name="groupBox_12">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>1</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="title">
-                 <string>Derniers numéros</string>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_13">
-                 <item row="0" column="0">
-                  <widget class="QLCDNumber" name="RR_LastNumber1">
-                   <property name="digitCount">
-                    <number>2</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLCDNumber" name="RR_LastNumber2">
-                   <property name="digitCount">
-                    <number>2</number>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QLCDNumber" name="RR_LastNumber3">
-                   <property name="digitCount">
-                    <number>2</number>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
+                          <item>
+                              <widget class="QLabel" name="RR_Logo">
+                                  <property name="sizePolicy">
+                                      <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                                          <horstretch>1</horstretch>
+                                          <verstretch>1</verstretch>
+                                      </sizepolicy>
+                                  </property>
+                                  <property name="text">
+                                      <string>&lt;logo&gt;</string>
+                                  </property>
+                                  <property name="alignment">
+                                      <set>Qt::AlignCenter</set>
+                                  </property>
+                              </widget>
+                          </item>
               <item>
                <spacer name="verticalSpacer">
                 <property name="orientation">

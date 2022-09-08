@@ -48,6 +48,10 @@ else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
 
+if (CMAKE_BUILD_TYPE MATCHES "Debug")
+    add_compile_definitions(${PRJPREFIX}_DEBUG)
+endif ()
+
 if (${PRJPREFIX}_COVERAGE)
     include(cmake/CoverageConfig.cmake)
 else ()

@@ -2,6 +2,10 @@
 
 Logiciel de gestion d’événement de type loto associatif.
 
+## Utilisation
+
+[Utilisation](document/Utilisation.md)
+
 ## Construction
 
 Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
@@ -41,10 +45,10 @@ Le programme a été correctement compilé avec :
   * [ ] affichage des lots
     * [ ] sous forme liste
     * [ ] à chaque changement de quine
-    * [ ] affichage de la valeur
-  * [ ] affichage de la phase dans le titre de la partie
-  * [ ] améliorer la lisibilité les derniers numéros tirés
-  * [ ] Police par défaut en gras pour les numéros de la grille
+    * [X] affichage de la valeur
+  * [X] affichage de la phase dans le titre de la partie
+  * [X] améliorer la lisibilité les derniers numéros tirés
+  * [X] Police par défaut en gras pour les numéros de la grille
 * Contrôle et paramètres
   * [ ] choix de l’écran de plein écran
   * [ ] permettre le choix de la police de caractère
@@ -53,7 +57,7 @@ Le programme a été correctement compilé avec :
     * [ ] permettre de régler cette valeur dans les onglets du bas
 * moteur de jeu
   * [ ] Données
-    * [ ] ajout de la valeur de lot
+    * [X] ajout de la valeur de lot
     * [ ] édition de lots sous forme de liste d’articles
     * [ ] correction du mouvement de curseur lors de la rédaction des lots
   * [ ] ajout de stats
@@ -63,7 +67,7 @@ Le programme a été correctement compilé avec :
     * [ ] permettre de départager les gagnants multiples (tirage au sort ou saisi)
     * [ ] garder trace des consolés
   * [ ] Résultat
-    * [ ] Saisi du nom du gagnant
+    * [X] Saisi du nom du gagnant
     * [ ] Génération du rapport de fin d'événement
 * Compilation
   * [X] Test compilation Linux

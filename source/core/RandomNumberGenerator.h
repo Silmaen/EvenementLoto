@@ -54,14 +54,6 @@ public:
      */
     void popNum();
 
-    /**
-     * @brief Génère une ligne de grille de loto.
-     *
-     * Les chiffres tirés sont ajouté à la liste d’exclusion pour l’éventuel tirage de la ligne suivante.
-     * @return Liste des numéros tirés.
-     */
-    std::vector<uint8_t> generateLine();
-
 private:
     /// Liste des numéros déjà tirer.
     std::vector<uint8_t> alreadyPicked;

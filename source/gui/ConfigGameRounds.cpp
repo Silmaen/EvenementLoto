@@ -120,8 +120,12 @@ void ConfigGameRounds::actEndEditingPrice() {
     if(scur < 0)
         return;
     auto subround= round->getSubRound(static_cast<uint32_t>(scur));
-    subround->define(subround->getType(), ui->TextPrices->toPlainText().toStdString());
+    subround->define(subround->getType(), ui->TextPrices->toPlainText().toStdString(), ui->PricesValue->value());
     updateDisplay();
+}
+
+void ConfigGameRounds::actChangePriceValue() {
+    actEndEditingPrice();
 }
 
 // -----------------
@@ -239,10 +243,12 @@ void ConfigGameRounds::updateDisplayEdits() {
             ui->TextPrices->clear();
             ui->TextPrices->setText(QString::fromUtf8(subRound->getPrices()));
             ui->TextPrices->setTextCursor(p);
+            ui->PricesValue->setValue(subRound->getValue());
         } else {
             ui->groupPhase->setEnabled(false);
             ui->SubRoundTypes->clear();
             ui->TextPrices->clear();
+            ui->PricesValue->setValue(0);
         }
     } else {
         ui->listSubRound->clear();
@@ -279,15 +285,8 @@ void ConfigGameRounds::updateDisplayResults() {
     if(round->getStatus() == core::GameRound::Status::Ready)
         return;
     ui->StartingDate->setText(QString::fromUtf8(core::formatClock(round->getStarting())));
-    int tirages= static_cast<int>(round->sizeDraws());
-    ui->NumberDraws->setText(QString::number(tirages));
-    if(tirages > 0) {
-        QString listDraws= "";
-        for(auto i= round->beginDraws(); i != round->endDraws(); ++i) {
-            listDraws+= QString::number(*i) + " ";
-        }
-        ui->TextDraws->setText(listDraws);
-    }
+    ui->NumberDraws->setText(QString::number(round->drawsCount()));
+    ui->TextDraws->setText(QString::fromStdString(round->getDrawStr()));
     if(round->getStatus() == core::GameRound::Status::Started) {
         ui->EndingDate->setEnabled(false);
         ui->Duration->setEnabled(false);
@@ -301,14 +300,14 @@ void ConfigGameRounds::updateDisplayResults() {
     int i= 1;
     for(auto ii= round->beginSubRound(); ii != round->endSubRound(); ++ii) {
         resultats+= "Sous-partie " + QString::number(i) + ": " + QString::fromUtf8(ii->getTypeStr()) + "\n";
-        resultats+= "  grille " + QString::number(ii->getWinner()) + " gagne: " + QString::fromUtf8(ii->getPrices()) + "\n";
+        resultats+= "  grille " + QString::fromStdString(ii->getWinner()) + " gagne: " + QString::fromUtf8(ii->getPrices()) + "\n";
         ++i;
     }
     ui->ListWinners->setText(resultats);
 }
 
 QStringList ConfigGameRounds::getRoundTypes() {
-    return {"Un quine", "Deux quines", "Carton plein", "Un quine et carton plein", "Normale", "Enfants", "Inverse"};
+    return {"Un quine", "Deux quines", "Carton plein", "Un quine et carton plein", "Normale", "Enfants", "Inverse", "Pause"};
 }
 
 QStringList ConfigGameRounds::getVictoryType(const core::GameRound::Type& t) {
@@ -327,6 +326,8 @@ QStringList ConfigGameRounds::getVictoryType(const core::GameRound::Type& t) {
         return {"une ligne"};
     case core::GameRound::Type::Inverse:
         return {"inverse"};
+    case core::GameRound::Type::Pause:
+        return {"none"};
     }
     return {};
 }
@@ -362,6 +363,7 @@ int ConfigGameRounds::getVictoryIndex(const core::GameRound::Type& t, const core
     case core::GameRound::Type::FullCard:
     case core::GameRound::Type::Enfant:
     case core::GameRound::Type::Inverse:
+    case core::GameRound::Type::Pause:
         return 0;
     }
     return -1;
