@@ -15,8 +15,8 @@ else ()
     list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
 
     message(STATUS "Found gcovr version ${GCOVR_VERSION} at location: ${GCOVR} ")
-    if (${GCOVR_VERSION} VERSION_LESS 5.1)
-        message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.1")
+    if (${GCOVR_VERSION} VERSION_LESS 5.0)
+        message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 5.0")
     endif ()
 endif ()
 # options for coverage

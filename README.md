@@ -4,7 +4,7 @@ Logiciel de gestion d’événement de type loto associatif.
 
 ## Construction
 
-Ce projet utilise CMake (version 3.23 ou supérieure) pour se configurer.
+Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 
 ### Variables de construction
 
@@ -15,11 +15,11 @@ Ce projet utilise CMake (version 3.23 ou supérieure) pour se configurer.
 
 * Ce projet dépend de la librairie Qt6
 * Ce projet dépend de la librairie nlohmann json
-* Ce projet nécessite l’installation d’une version de doxygen (version 1.9.2 ou supérieure) pour générer la
+* Ce projet dépend de la librairie fmt
+* Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
-* Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code. (gcovr peut être installé grâce à
-  pip, et pui, du coup nécessite python.)
+* Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code.
 
 ### Compilateur
 
@@ -33,9 +33,9 @@ Le programme a été correctement compilé avec :
   * gcc 12
   * clang 14
 
-## TODOs
+## Roadmap
 
-### version 0.3
+### Version 0.3 (In development)
 
 * Affichage
   * [ ] affichage des lots
@@ -66,12 +66,14 @@ Le programme a été correctement compilé avec :
     * [ ] Saisi du nom du gagnant
     * [ ] Génération du rapport de fin d'événement
 * Compilation
-  * [ ] Test compilation OpenBSD
-  * [ ] Test compilation msvc (et clang-cl et clang natif)
+  * [X] Test compilation Linux
+    * [X] Ubuntu 22.04
+    * [X] Archlinux
+  * [X] Mise en place test CI
 * Documentation
   * [ ] Écrire les pages d’aide
 
-### version 0.2
+### Version 0.2 (Released 30 november 2021)
 
 * Affichage:
   * [X] Affichage logo organisateur dans les vues intermédiaires
