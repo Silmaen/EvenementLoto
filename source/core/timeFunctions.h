@@ -9,9 +9,9 @@
 #pragma once
 #include "../baseDefine.h"
 #include <chrono>
+#include <fmt/chrono.h>
 #include <iomanip>
 #include <locale>
-#include <sstream>
 
 namespace evl::core {
 /// Le type d'horloge
@@ -30,10 +30,7 @@ constexpr timePoint epoch{};
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
  */
 inline string formatCalendar(const timePoint& t) {
-    std::stringstream oss;
-    auto tt= clock::to_time_t(t);
-    oss << std::put_time(std::localtime(&tt), "%d %B %Y");
-    return oss.str();
+    return fmt::format("{:%d %B %Y}", t);
 }
 
 /**
@@ -42,10 +39,7 @@ inline string formatCalendar(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
 inline string formatClock(const timePoint& t) {
-    std::stringstream oss;
-    auto tt= clock::to_time_t(t);
-    oss << std::put_time(std::localtime(&tt), "%H:%M:%S");
-    return oss.str();
+    return fmt::format("{:%T}", t);
 }
 
 /**
@@ -54,10 +48,7 @@ inline string formatClock(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
  */
 inline string formatClockNoSecond(const timePoint& t) {
-    std::stringstream oss;
-    auto tt= clock::to_time_t(t);
-    oss << std::put_time(std::localtime(&tt), "%H:%M");
-    return oss.str();
+    return fmt::format("{:%R}", t);
 }
 
 /**
@@ -66,21 +57,12 @@ inline string formatClockNoSecond(const timePoint& t) {
  * @return Une chaine de caractères formatant la durée
  */
 inline string formatDuration(const duration& d) {
-    std::stringstream oss;
-    auto h= std::chrono::duration_cast<std::chrono::hours>(d).count();
-    if(h != 0) {
-        if(h < 10) oss << "0";
-        oss << h << ":";
-    }
-    auto m= std::chrono::duration_cast<std::chrono::minutes>(d).count() % 60;
-    if(m != 0) {
-        if(m < 10) oss << "0";
-        oss << m << ":";
-    }
-    auto s= std::chrono::duration_cast<std::chrono::seconds>(d).count() % 60;
-    if(s < 10) oss << "0";
-    oss << s;
-    return oss.str();
+    auto s= std::chrono::duration_cast<std::chrono::seconds>(d).count();
+    if(s < 60)
+        return fmt::format("{}", d);
+    if(s < 3600)
+        return fmt::format("{:%M:%S}", d);
+    return fmt::format("{:%T}", d);
 }
 
 }// namespace evl::core
