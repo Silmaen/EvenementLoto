@@ -23,8 +23,10 @@ TEST(SubGameRound, types) {
 }
 
 TEST(SubGameRound, serialize) {
-    SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto");
-    partie.setWinner(666);
+    SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto", 152.12);
+    EXPECT_FALSE(partie.isFinished());
+    partie.setWinner("mr X");
+    EXPECT_TRUE(partie.isFinished());
     fs::path tmp= fs::temp_directory_path() / "test";
     fs::create_directories(tmp);
     fs::path file= tmp / "testSubGameRound.sdeg";
@@ -42,8 +44,8 @@ TEST(SubGameRound, serialize) {
 
     EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);
     EXPECT_STREQ(partie2.getTypeStr().c_str(), "double quine");
-    EXPECT_EQ(partie2.getWinner(), 666);
+    EXPECT_STREQ(partie2.getWinner().c_str(), "mr X");
     EXPECT_STREQ(partie2.getPrices().c_str(), "une moto");
-
+    EXPECT_NEAR(partie2.getValue(), 152.12, 0.001);
     fs::remove_all(tmp);
 }

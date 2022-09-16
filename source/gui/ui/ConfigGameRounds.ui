@@ -2,37 +2,42 @@
 <ui version="4.0">
  <class>ConfigGameRounds</class>
  <widget class="QDialog" name="ConfigGameRounds">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>903</width>
-    <height>640</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Configuration Parties</string>
-  </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QFrame" name="GroupEdit">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>2</verstretch>
-      </sizepolicy>
+     <property name="geometry">
+         <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>903</width>
+             <height>640</height>
+         </rect>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+     <property name="windowTitle">
+         <string>Configuration Parties</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="windowIcon">
+         <iconset resource="../../resources/EvenementLoto.qrc">
+             <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png
+         </iconset>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QGroupBox" name="groupGameRound">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+             <widget class="QFrame" name="GroupEdit">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>2</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                     <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                     <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_2">
+                     <item row="0" column="0">
+                         <widget class="QGroupBox" name="groupGameRound">
+                             <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -64,10 +69,11 @@
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
-           </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="0" column="1">
@@ -78,19 +84,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="0" column="2">
@@ -101,19 +108,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="0" column="3">
@@ -124,19 +132,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="0" column="4">
@@ -195,19 +204,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="2" column="1">
@@ -218,19 +228,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="2" column="2">
@@ -241,19 +252,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/sort-up.png</normaloff>:/icons/icons/sort-up.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="2" column="3">
@@ -264,19 +276,20 @@
              <height>24</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png</iconset>
-           </property>
+              <property name="maximumSize">
+                  <size>
+                      <width>24</width>
+                      <height>24</height>
+                  </size>
+              </property>
+              <property name="text">
+                  <string/>
+              </property>
+              <property name="icon">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
+                      <normaloff>:/icons/icons/sort-down.png</normaloff>:/icons/icons/sort-down.png
+                  </iconset>
+              </property>
           </widget>
          </item>
          <item row="2" column="4" colspan="2">
@@ -308,204 +321,247 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QGroupBox" name="groupPhase">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>1</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Configuration de la phase:</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_5">
-         <item row="0" column="2">
-          <widget class="QComboBox" name="SubRoundTypes"/>
-         </item>
-         <item row="2" column="0" colspan="3">
-          <widget class="QTextEdit" name="TextPrices">
-           <property name="undoRedoEnabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1" colspan="2">
-          <spacer name="horizontalSpacer_8">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>300</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+                     <item row="0" column="2">
+                         <widget class="QGroupBox" name="groupPhase">
+                             <property name="sizePolicy">
+                                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                     <horstretch>1</horstretch>
+                                     <verstretch>0</verstretch>
+                                 </sizepolicy>
+                             </property>
+                             <property name="title">
+                                 <string>Configuration de la phase:</string>
+                             </property>
+                             <layout class="QGridLayout" name="gridLayout_5">
+                                 <item row="2" column="0">
+                                     <widget class="QLabel" name="label_3">
+                                         <property name="text">
+                                             <string>Liste des lots:</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="1" column="0">
+                                     <widget class="QLabel" name="label_11">
+                                         <property name="text">
+                                             <string>Valeur Totale</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="3" column="0" colspan="3">
+                                     <widget class="QTextEdit" name="TextPrices">
+                                         <property name="undoRedoEnabled">
+                                             <bool>false</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="2" column="1" colspan="2">
+                                     <spacer name="horizontalSpacer_8">
+                                         <property name="orientation">
+                                             <enum>Qt::Horizontal</enum>
+                                         </property>
+                                         <property name="sizeHint" stdset="0">
+                                             <size>
+                                                 <width>300</width>
+                                                 <height>20</height>
+                                             </size>
+                                         </property>
+                                     </spacer>
+                                 </item>
+                                 <item row="0" column="2">
+                                     <widget class="QComboBox" name="SubRoundTypes"/>
+                                 </item>
+                                 <item row="0" column="0" colspan="2">
+                                     <widget class="QLabel" name="label_2">
+                                         <property name="text">
+                                             <string>Condition de victoire:</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="1" column="2">
+                                     <widget class="QDoubleSpinBox" name="PricesValue">
+                                         <property name="maximum">
+                                             <double>99999.990000000005239</double>
+                                         </property>
+                                         <property name="stepType">
+                                             <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                                         </property>
+                                     </widget>
+                                 </item>
+                             </layout>
+                         </widget>
+                     </item>
+                 </layout>
+             </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Lots:</string>
-           </property>
-          </widget>
+             <widget class="QGroupBox" name="groupResult">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>1</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="title">
+                     <string>Résultats de la partie</string>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_2">
+                     <item>
+                         <widget class="QFrame" name="frame_2">
+                             <property name="frameShape">
+                                 <enum>QFrame::StyledPanel</enum>
+                             </property>
+                             <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QGridLayout" name="gridLayout_6">
+                                 <item row="0" column="0">
+                                     <widget class="QLabel" name="label_4">
+                                         <property name="text">
+                                             <string>Début:</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="0" column="1">
+                                     <widget class="QLineEdit" name="StartingDate">
+                                         <property name="maximumSize">
+                                             <size>
+                                                 <width>300</width>
+                                                 <height>16777215</height>
+                                             </size>
+                                         </property>
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="1" column="0">
+                                     <widget class="QLabel" name="label_5">
+                                         <property name="text">
+                                             <string>Fin</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="1" column="1">
+                                     <widget class="QLineEdit" name="EndingDate">
+                                         <property name="maximumSize">
+                                             <size>
+                                                 <width>300</width>
+                                                 <height>16777215</height>
+                                             </size>
+                                         </property>
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="2" column="0">
+                                     <widget class="QLabel" name="label_6">
+                                         <property name="text">
+                                             <string>Durée</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="2" column="1">
+                                     <widget class="QLineEdit" name="Duration">
+                                         <property name="maximumSize">
+                                             <size>
+                                                 <width>300</width>
+                                                 <height>16777215</height>
+                                             </size>
+                                         </property>
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="3" column="0">
+                                     <widget class="QLabel" name="label_7">
+                                         <property name="text">
+                                             <string>Nombre de Tirages</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item row="3" column="1">
+                                     <widget class="QLineEdit" name="NumberDraws">
+                                         <property name="maximumSize">
+                                             <size>
+                                                 <width>240</width>
+                                                 <height>16777215</height>
+                                             </size>
+                                         </property>
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                             </layout>
+                         </widget>
+                     </item>
+                     <item>
+                         <widget class="QFrame" name="frame_3">
+                             <property name="frameShape">
+                                 <enum>QFrame::StyledPanel</enum>
+                             </property>
+                             <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout">
+                                 <item>
+                                     <widget class="QLabel" name="label_8">
+                                         <property name="text">
+                                             <string>Tirages:</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item>
+                                     <widget class="QTextEdit" name="TextDraws">
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                             </layout>
+                         </widget>
+                     </item>
+                     <item>
+                         <widget class="QFrame" name="frame_4">
+                             <property name="frameShape">
+                                 <enum>QFrame::StyledPanel</enum>
+                             </property>
+                             <property name="frameShadow">
+                                 <enum>QFrame::Raised</enum>
+                             </property>
+                             <layout class="QVBoxLayout" name="verticalLayout_2">
+                                 <item>
+                                     <widget class="QLabel" name="label_9">
+                                         <property name="text">
+                                             <string>Noms des gagnants</string>
+                                         </property>
+                                     </widget>
+                                 </item>
+                                 <item>
+                                     <widget class="QTextEdit" name="ListWinners">
+                                         <property name="readOnly">
+                                             <bool>true</bool>
+                                         </property>
+                                     </widget>
+                                 </item>
+                             </layout>
+                         </widget>
+                     </item>
+                 </layout>
+             </widget>
          </item>
-         <item row="0" column="0" colspan="2">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Condition de victoire:</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupResult">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>1</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Résultats de la partie</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_6">
-      <item row="5" column="2">
-       <widget class="QLineEdit" name="NumberDraws">
-        <property name="maximumSize">
-         <size>
-          <width>240</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="2">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>Grilles gagnantes</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Tirages:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" rowspan="2" colspan="2">
-       <widget class="QLineEdit" name="StartingDate">
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="1" colspan="2">
-       <widget class="QLineEdit" name="EndingDate">
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1" colspan="2">
-       <widget class="QLineEdit" name="Duration">
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0" colspan="2">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Nombre de Tirages</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="3" rowspan="6">
-       <widget class="QTextEdit" name="TextDraws">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0" rowspan="2">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Début:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Fin</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Durée</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4" rowspan="6">
-       <widget class="QTextEdit" name="ListWinners">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
+         <item row="2" column="0">
+             <widget class="QFrame" name="frame">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
+                 <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
@@ -651,7 +707,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="../../../resources/EvenementLoto.qrc"/>
+     <include location="../../resources/EvenementLoto.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -660,10 +716,10 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actOk()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>274</x>
-     <y>621</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>248</x>
+           <y>617</y>
+       </hint>
     <hint type="destinationlabel">
      <x>392</x>
      <y>642</y>
@@ -676,10 +732,10 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actApply()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>381</x>
-     <y>621</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>373</x>
+           <y>617</y>
+       </hint>
     <hint type="destinationlabel">
      <x>491</x>
      <y>646</y>
@@ -694,7 +750,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>488</x>
-     <y>621</y>
+        <y>617</y>
     </hint>
     <hint type="destinationlabel">
      <x>589</x>
@@ -804,10 +860,10 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actEndEditingPrice()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>271</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>867</x>
+           <y>355</y>
+       </hint>
     <hint type="destinationlabel">
      <x>979</x>
      <y>134</y>
@@ -916,10 +972,10 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actImportRounds()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>595</x>
-     <y>621</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>597</x>
+           <y>617</y>
+       </hint>
     <hint type="destinationlabel">
      <x>663</x>
      <y>646</y>
@@ -932,10 +988,10 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actExportRounds()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>702</x>
-     <y>621</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>706</x>
+           <y>617</y>
+       </hint>
     <hint type="destinationlabel">
      <x>659</x>
      <y>642</y>
@@ -948,16 +1004,32 @@
    <receiver>ConfigGameRounds</receiver>
    <slot>actChangeRoundNumber(int)</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>523</x>
-     <y>78</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>505</x>
-     <y>-10</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>523</x>
+           <y>78</y>
+       </hint>
+       <hint type="destinationlabel">
+           <x>505</x>
+           <y>-10</y>
+       </hint>
    </hints>
   </connection>
+     <connection>
+         <sender>PricesValue</sender>
+         <signal>valueChanged(double)</signal>
+         <receiver>ConfigGameRounds</receiver>
+         <slot>actChangePriceValue()</slot>
+         <hints>
+             <hint type="sourcelabel">
+                 <x>796</x>
+                 <y>85</y>
+             </hint>
+             <hint type="destinationlabel">
+                 <x>903</x>
+                 <y>119</y>
+             </hint>
+         </hints>
+     </connection>
  </connections>
  <slots>
   <slot>actOk()</slot>
@@ -979,5 +1051,6 @@
   <slot>actImportRounds()</slot>
   <slot>actExportRounds()</slot>
   <slot>actChangeRoundNumber(int)</slot>
+     <slot>actChangePriceValue()</slot>
  </slots>
 </ui>

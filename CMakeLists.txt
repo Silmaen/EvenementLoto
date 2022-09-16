@@ -39,42 +39,50 @@ add_subdirectory(test)
 #
 add_custom_target(Package
         DEPENDS ${CMAKE_PROJECT_NAME})
+set(PACKAGE_BINARY ${PROJECT_BINARY_DIR}/source)
+
+set(PACKAGE_LOCATION ${PROJECT_BINARY_DIR}/bin)
+# copy main executable
 add_custom_command(
         TARGET Package POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_BINARY_DIR}/sources/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PROJECT_BINARY_DIR}/bin/${CMAKE_PROJECT_NAME}${EXE_EXT})
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PACKAGE_BINARY}/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PACKAGE_LOCATION}/${CMAKE_PROJECT_NAME}${EXE_EXT})
+
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(QT_INSTALL_PATH ${${PRJPREFIX}_QT_DIR})
-    if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-        set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-        if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
-            set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
-        endif ()
-    endif ()
-    if (EXISTS "${QT_INSTALL_PATH}/plugins/platforms/qwindows.dll")
-        add_custom_command(TARGET Package POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E make_directory
-                "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
-        add_custom_command(TARGET Package POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${QT_INSTALL_PATH}/plugins/platforms/qwindows.dll"
-                "${PROJECT_BINARY_DIR}/bin/plugins/platforms/")
-    endif ()
+    # copy along dlls
     foreach (QT_LIB Core Gui Widgets)
-        add_custom_command(TARGET Package POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy
-                "${PROJECT_BINARY_DIR}/sources/Qt6${QT_LIB}.dll"
-                "${PROJECT_BINARY_DIR}/bin")
-    endforeach (QT_LIB)
+        add_custom_command(
+                TARGET Package POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy ${PACKAGE_BINARY}/Qt6${QT_LIB}.dll
+                ${PACKAGE_LOCATION}/Qt6${QT_LIB}.dll)
+    endforeach()
+    add_custom_command(TARGET Package POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+            "${PACKAGE_LOCATION}/platforms/")
+    add_custom_command(TARGET Package POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PACKAGE_BINARY}/platforms/qwindows.dll"
+            "${PACKAGE_LOCATION}/platforms/")
+
     cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
-    foreach (BASE_LIB winpthread-1 stdc++-6 gcc_s_seh-1)
+    foreach (BASE_LIB winpthread-1 stdc++-6 gcc_s_seh-1
+            fmt
+            winpthread-1 freetype-6 harfbuzz-0 md4c png16-16 zlib1 bz2-1 brotlidec brotlicommon glib-2.0-0 intl-8 graphite2
+            b2-1 double-conversion icuin69 icuuc69 pcre2-16-0 icudt69 iconv-2 pcre-1
+            )
         if (EXISTS ${COMPILER_PATH}/lib${BASE_LIB}.dll)
             add_custom_command(TARGET Package POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${COMPILER_PATH}/lib${BASE_LIB}.dll"
+                    "${PROJECT_BINARY_DIR}/bin")
+        elseif(EXISTS ${COMPILER_PATH}/${BASE_LIB}.dll)
+            add_custom_command(TARGET Package POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${COMPILER_PATH}/${BASE_LIB}.dll"
                     "${PROJECT_BINARY_DIR}/bin")
         endif ()
     endforeach ()
 endif ()
+
 add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data ${PROJECT_BINARY_DIR}/bin/data)

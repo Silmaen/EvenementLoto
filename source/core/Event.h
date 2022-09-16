@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #pragma once
-#include "CardPack.h"
 #include "GameRound.h"
 #include "Serializable.h"
 
@@ -33,7 +32,6 @@ public:
         GameRunning,   ///< Est en cours de partie
         GameFinished,  ///< Est en fin de partie
         DisplayRules,  ///< En affichage des règles de l’événement
-        DisplaySanity, ///< En affichage des règles sanitaires
         Finished       ///< Est fini
     };
 
@@ -174,18 +172,6 @@ public:
      */
     void setRules(const string& newRules);
 
-    /**
-     * @brief Accès aux règles sanitaires de l’événement
-     * @return Les règles.
-     */
-    const string& getSanityRules() const { return sanityRules; }
-
-    /**
-     * @brief Définit les règles sanitaires de l’événement.
-     * @param newRules Les règles.
-     */
-    void setSanityRules(const string& newRules);
-
     // ----- Manipulation des rounds ----
     /**
      * @brief Renvoie l’itérateur constant de début de parties.
@@ -249,9 +235,9 @@ public:
 
     /**
      * @brief Termine la partie en cours.
-     * @param w Le numéro de la grille à ajouter
+     * @param win Le numéro de la grille à ajouter
      */
-    void addWinnerToCurrentRound(const uint32_t w);
+    void addWinnerToCurrentRound(const std::string& win);
 
     /**
      * @brief Clos la partie en cours.
@@ -279,12 +265,6 @@ public:
      * resumeEvent() permet de retourner au statut précédent.
      */
     void displayRules();
-
-    /**
-     * @brief Passe l’événement en mode d’affichage des règles sanitaires.
-     * resumeEvent() permet de retourner au statut précédent.
-     */
-    void displaySanity();
 
     /**
      * @brief Reprend l’événement.
@@ -360,9 +340,6 @@ private:
     /// Les règles de l’événement
     string rules;
 
-    /// Les règles sanitaires de l’événement
-    string sanityRules;
-
     /// Liste des parties de l’événement.
     roundsType gameRounds;
 
@@ -375,8 +352,6 @@ private:
     /// Le chemin de base de l’événement
     path basePath;
 
-    /// Lien vers la liste des cartons
-    //[[maybe_unused]] CardPack* cartons= nullptr;
 };
 
 }// namespace evl::core

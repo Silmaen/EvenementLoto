@@ -8,10 +8,10 @@
 #include "MainWindow.h"
 #include "About.h"
 #include "BaseDialog.h"
-#include "ConfigCardPack.h"
 #include "ConfigEvent.h"
 #include "ConfigGameRounds.h"
 #include "ConfigGeneral.h"
+#include "WinnerInput.h"
 #include <QFileDialog>
 #include <QScreen>
 #include <fstream>
@@ -64,13 +64,6 @@ void MainWindow::actShowHelp() {
 
 void MainWindow::actShowGlobalParameters() {
     ConfigGeneral cfg(this);
-    cfg.preExec();
-    cfg.exec();
-}
-
-void MainWindow::actShowCardPackParameters() {
-    ConfigCardPack cfg(this);
-    cfg.getCardPack().getName()= "default";
     cfg.preExec();
     cfg.exec();
 }
@@ -215,7 +208,9 @@ void MainWindow::actStartStopRound() {
     } else if(currentEvent.getStatus() == core::Event::Status::GameStart) {
         currentEvent.startCurrentRound();
     } else if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-        currentEvent.addWinnerToCurrentRound(111);
+        WinnerInput wi(this);
+        if(wi.exec() == QDialog::Accepted)
+            currentEvent.addWinnerToCurrentRound(wi.getWinner().toStdString());
     } else if(currentEvent.getStatus() == core::Event::Status::GameFinished) {
         currentEvent.closeCurrentRound();
         numberGrid->resetPushed();
@@ -243,10 +238,11 @@ void MainWindow::actRandomPick() {
 }
 
 void MainWindow::actCancelPick() {
-    auto cur= currentEvent.findFirstNotFinished();
-    if(cur->sizeDraws() == 0)
+    auto cur   = currentEvent.findFirstNotFinished();
+    auto subcur= cur->getCurrentCSubRound();
+    if(subcur->getDraws().empty())
         return;
-    numberGrid->resetPushed(*cur->beginReverseDraws());
+    numberGrid->resetPushed(subcur->getDraws().back());
     cur->removeLastPick();
     updateDisplay();
 }
@@ -271,14 +267,6 @@ void MainWindow::actDisplayRules() {
         currentEvent.resumeEvent();
     else
         currentEvent.displayRules();
-    updateDisplay();
-}
-
-void MainWindow::actDisplaySanity() {
-    if(currentEvent.getStatus() == core::Event::Status::DisplaySanity)
-        currentEvent.resumeEvent();
-    else
-        currentEvent.displaySanity();
     updateDisplay();
 }
 
@@ -376,7 +364,6 @@ void MainWindow::updateMenus() {
     //   ui->actionGlobalParam  <- toujours actif, change jamais de texte
     //   ui->actionConfigEvent  <- toujours actif, change jamais de texte
     //   ui->actionConfigCard   <- jamais actif, caché
-    ui->actionConfigCard->setVisible(false);
     //   ui->actionConfigRounds
     if(currentEvent.getStatus() == core::Event::Status::Invalid)
         ui->actionConfigRounds->setEnabled(false);
@@ -460,6 +447,8 @@ void MainWindow::updateInfoRound() {
     ui->RoundDraws->setText("");
     ui->RoundName->setText("");
     ui->RoundPhase->setText("");
+    ui->RoundPhaseValue->setText("");
+    ui->RoundPhasePrise->setText("");
     auto cur= currentEvent.findFirstNotFinished();
     if(cur == currentEvent.endRounds())
         return;
@@ -469,18 +458,19 @@ void MainWindow::updateInfoRound() {
     if(cur->getStarting() == core::epoch) {
         ui->RoundDraws->setText("0");
     } else {
-        ui->RoundDraws->setText(QString::number(cur->sizeDraws()));
+        ui->RoundDraws->setText(QString::number(cur->drawsCount()));
     }
     ui->RoundName->setText(QString::number(currentEvent.getCurrentIndex() + 1) + " - " + QString::fromStdString(cur->getTypeStr()));
-    QString phase= QString::fromStdString(cur->getStatusStr());
 
+    QString phase= QString::fromStdString(cur->getStatusStr());
     if(cur->getStatus() == core::GameRound::Status::Started) {
         auto sub= cur->getCurrentCSubRound();
         if(sub != cur->endSubRound()) {
             phase+= " - " + QString::fromUtf8(sub->getTypeStr());
         }
+        ui->RoundPhaseValue->setText(QString::number(sub->getValue()) + "€");
+        ui->RoundPhasePrise->setText(QString::fromStdString(sub->getPrices()));
     }
-
     ui->RoundPhase->setText(phase);
 }
 
@@ -492,17 +482,18 @@ void MainWindow::updateDraws() {
     auto cur= currentEvent.findFirstNotFinished();
     if(cur == currentEvent.endRounds())
         return;
-    if(cur->sizeDraws() > 0) {
-        auto it= cur->beginReverseDraws();
+    auto draws= cur->getAllDraws();
+    if(!draws.empty()) {
+        auto it= draws.rbegin();
         ui->CurrentDraw->display(*it);
         ++it;
-        if(it != cur->endReverseDraws()) {
+        if(it != draws.rend()) {
             ui->LastNumber1->display(*it);
             ++it;
-            if(it != cur->endReverseDraws()) {
+            if(it != draws.rend()) {
                 ui->LastNumber2->display(*it);
                 ++it;
-                if(it != cur->endReverseDraws()) {
+                if(it != draws.rend()) {
                     ui->LastNumber3->display(*it);
                 } else {
                     ui->LastNumber3->display(0);
@@ -514,13 +505,11 @@ void MainWindow::updateDraws() {
             ui->LastNumber1->display(0);
         }
     }
-    QString draws;
     numberGrid->resetPushed();
-    for(auto draw= cur->beginDraws(); draw != cur->endDraws(); ++draw) {
-        draws+= QString::number(*draw) + " ";
-        numberGrid->setPushed(*draw);
+    for(auto draw: draws) {
+        numberGrid->setPushed(draw);
     }
-    ui->textLastDraw->setText(draws);
+    ui->textLastDraw->setText(QString::fromStdString(cur->getDrawStr()));
 }
 
 void MainWindow::updateCommands() {
@@ -528,49 +517,32 @@ void MainWindow::updateCommands() {
     updatePauseButtons();
     ui->DisplayRules->setEnabled(false);
     ui->CancelLastPick->setEnabled(false);
-    ui->DisplaySanity->setEnabled(false);
     ui->actionDisplayRules->setEnabled(false);
     ui->actionCancelLastPick->setEnabled(false);
-    ui->actionDisplaySanity->setEnabled(false);
+    ui->actionStartEndGameRound->setEnabled(false);
+    ui->actionPauseResumeGame->setEnabled(false);
     if(currentEvent.isEditable())
         return;
     ui->DisplayRules->setEnabled(true);
     ui->actionDisplayRules->setEnabled(true);
-    ui->DisplaySanity->setEnabled(true);
-    ui->actionDisplaySanity->setEnabled(true);
     if(currentEvent.getStatus() == core::Event::Status::DisplayRules) {
         ui->DisplayRules->setText("Retour");
         ui->actionDisplayRules->setText("Retour");
-        ui->DisplaySanity->setEnabled(false);
         ui->StartEndGameRound->setEnabled(false);
         ui->PauseResumeGame->setEnabled(false);
         ui->CancelLastPick->setEnabled(false);
-        ui->actionDisplaySanity->setEnabled(false);
-        ui->actionStartEndGameRound->setEnabled(false);
-        ui->actionPauseResumeGame->setEnabled(false);
-        ui->actionCancelLastPick->setEnabled(false);
-    } else if(currentEvent.getStatus() == core::Event::Status::DisplaySanity) {
-        ui->DisplaySanity->setText("Retour");
-        ui->actionDisplaySanity->setText("Retour");
-        ui->DisplayRules->setEnabled(false);
-        ui->StartEndGameRound->setEnabled(false);
-        ui->PauseResumeGame->setEnabled(false);
-        ui->CancelLastPick->setEnabled(false);
-        ui->actionDisplayRules->setEnabled(false);
         ui->actionStartEndGameRound->setEnabled(false);
         ui->actionPauseResumeGame->setEnabled(false);
         ui->actionCancelLastPick->setEnabled(false);
     } else {
         ui->DisplayRules->setText("Affichage règlement");
         ui->actionDisplayRules->setText("Affichage règlement");
-        ui->DisplaySanity->setText("Affichage sanitaire");
-        ui->actionDisplaySanity->setText("Affichage sanitaire");
     }
     // update cancel last pick
     auto cur= currentEvent.findFirstNotFinished();
     if(cur == currentEvent.endRounds())
         return;
-    if(cur->sizeDraws() > 0) {
+    if(!cur->emptyDraws()) {
         ui->CancelLastPick->setEnabled(true);
         ui->actionCancelLastPick->setEnabled(true);
     }
@@ -579,8 +551,6 @@ void MainWindow::updateCommands() {
 void MainWindow::updatePauseButtons() {
     ui->PauseResumeGame->setEnabled(false);
     if(currentEvent.getStatus() == core::Event::Status::DisplayRules)
-        return;
-    if(currentEvent.getStatus() == core::Event::Status::DisplaySanity)
         return;
     if(currentEvent.getStatus() == core::Event::Status::GameRunning || currentEvent.getStatus() == core::Event::Status::GameFinished) {
         ui->PauseResumeGame->setEnabled(true);
@@ -607,8 +577,6 @@ void MainWindow::updatePauseButtons() {
 void MainWindow::updateStartStopButton() {
     ui->StartEndGameRound->setEnabled(false);
     if(currentEvent.getStatus() == core::Event::Status::DisplayRules)
-        return;
-    if(currentEvent.getStatus() == core::Event::Status::DisplaySanity)
         return;
     if(currentEvent.getStatus() == core::Event::Status::EventStarted) {
         ui->StartEndGameRound->setEnabled(true);

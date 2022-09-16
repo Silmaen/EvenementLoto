@@ -159,6 +159,11 @@ public slots:
      */
     void actChangeSelectedSubGameRound();
 
+    /**
+     * @brief Action lors du changement de valeur de lot
+     */
+    void actChangePriceValue();
+
 private:
     /**
      * @brief Met à jour l’affichage
