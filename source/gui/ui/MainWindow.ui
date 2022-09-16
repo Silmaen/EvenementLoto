@@ -7,15 +7,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>888</width>
-    <height>744</height>
+    <width>1044</width>
+    <height>849</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Événement Loto</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../../resources/EvenementLoto.qrc">
+   <iconset resource="../../resources/EvenementLoto.qrc">
     <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png</iconset>
   </property>
   <property name="toolButtonStyle">
@@ -25,7 +25,10 @@
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="EventControl">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <property name="spacing">
+     <number>4</number>
+    </property>
     <property name="leftMargin">
      <number>2</number>
     </property>
@@ -38,10 +41,7 @@
     <property name="bottomMargin">
      <number>2</number>
     </property>
-    <property name="spacing">
-     <number>4</number>
-    </property>
-    <item row="0" column="0">
+    <item>
      <widget class="QSplitter" name="splitter">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -257,6 +257,7 @@
                  <property name="font">
                   <font>
                    <pointsize>55</pointsize>
+                   <weight>50</weight>
                    <bold>false</bold>
                   </font>
                  </property>
@@ -302,91 +303,6 @@
             <property name="bottomMargin">
              <number>2</number>
             </property>
-            <item>
-             <widget class="QGroupBox" name="roundInfos">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                <horstretch>1</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="title">
-               <string>Information partie</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_11">
-               <item row="0" column="0">
-                <widget class="QLabel" name="label_4">
-                 <property name="text">
-                  <string>Début</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="RoundStartTime">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_5">
-                 <property name="text">
-                  <string>Durée</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLineEdit" name="RoundDuration">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="label_6">
-                 <property name="text">
-                  <string>Tirages:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="RoundDraws">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Partie:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="RoundName">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="label_2">
-                 <property name="text">
-                  <string>Phase:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QLineEdit" name="RoundPhase">
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
             <item>
              <widget class="QFrame" name="lastNumbersDisplay">
               <property name="sizePolicy">
@@ -512,7 +428,7 @@
                   <string>Debut/fin partie</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
                    <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
                  </property>
                  <property name="flat">
@@ -526,7 +442,7 @@
                   <string>Pause/reprise partie</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
                    <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
                  </property>
                 </widget>
@@ -537,19 +453,8 @@
                   <string>Affichage règlement</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
                    <normaloff>:/icons/icons/terms-and-conditions.png</normaloff>:/icons/icons/terms-and-conditions.png</iconset>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="DisplaySanity">
-                 <property name="text">
-                  <string>Affichage Sanitaire</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
-                   <normaloff>:/icons/icons/comment_text.png</normaloff>:/icons/icons/comment_text.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -559,7 +464,7 @@
                   <string>Tirage Aléatoire</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
                    <normaloff>:/icons/icons/dice.png</normaloff>:/icons/icons/dice.png</iconset>
                  </property>
                 </widget>
@@ -576,7 +481,7 @@
                   <string>Annuler dernier tirage</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../../resources/EvenementLoto.qrc">
+                  <iconset resource="../../resources/EvenementLoto.qrc">
                    <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
                  </property>
                 </widget>
@@ -631,7 +536,7 @@
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <property name="usesScrollButtons">
            <bool>false</bool>
@@ -693,16 +598,6 @@
              </widget>
             </item>
             <item>
-             <widget class="QTextEdit" name="textLastDraw">
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer name="horizontalSpacer_5">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
@@ -720,6 +615,156 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tab">
+           <attribute name="title">
+            <string>Information partie</string>
+           </attribute>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Tirages</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_3">
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_6">
+                 <property name="text">
+                  <string>Nombre:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="RoundDraws">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0" colspan="2">
+                <widget class="QTextEdit" name="textLastDraw">
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="roundInfos">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="title">
+               <string>Timing</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_11">
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="RoundStartTime">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="RoundDuration">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>Durée</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label_4">
+                 <property name="text">
+                  <string>Début</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox_2">
+              <property name="title">
+               <string>Partie en cours</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout_4">
+               <item row="0" column="1">
+                <widget class="QLineEdit" name="RoundName">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>Phase:</string>
+                 </property>
+                </widget>
+               </item>
+                  <item row="1" column="1">
+                      <widget class="QLineEdit" name="RoundPhase">
+                          <property name="readOnly">
+                              <bool>true</bool>
+                          </property>
+                      </widget>
+                  </item>
+                  <item row="0" column="0">
+                      <widget class="QLabel" name="label">
+                          <property name="text">
+                              <string>Partie:</string>
+                          </property>
+                      </widget>
+                  </item>
+                  <item row="2" column="0">
+                      <widget class="QLabel" name="label_7">
+                          <property name="text">
+                              <string>Valeur</string>
+                          </property>
+                      </widget>
+                  </item>
+                  <item row="2" column="1">
+                      <widget class="QLineEdit" name="RoundPhaseValue">
+                          <property name="readOnly">
+                              <bool>true</bool>
+                          </property>
+                      </widget>
+                  </item>
+              </layout>
+             </widget>
+            </item>
+               <item>
+                   <widget class="QGroupBox" name="groupBox_3">
+                       <property name="title">
+                           <string>Lots</string>
+                       </property>
+                       <layout class="QGridLayout" name="gridLayout">
+                           <item row="0" column="0">
+                               <widget class="QTextEdit" name="RoundPhasePrise">
+                                   <property name="readOnly">
+                                       <bool>true</bool>
+                                   </property>
+                               </widget>
+                           </item>
+                       </layout>
+                   </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -733,8 +778,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>888</width>
-     <height>22</height>
+     <width>1044</width>
+        <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -742,7 +787,7 @@
      <string>Fichiers</string>
     </property>
     <property name="icon">
-     <iconset resource="../../../resources/EvenementLoto.qrc">
+     <iconset resource="../../resources/EvenementLoto.qrc">
       <normaloff>:/icons/icons/menu.png</normaloff>:/icons/icons/menu.png</iconset>
     </property>
     <property name="separatorsCollapsible">
@@ -767,7 +812,7 @@
      <string>Paramètres</string>
     </property>
     <property name="icon">
-     <iconset resource="../../../resources/EvenementLoto.qrc">
+     <iconset resource="../../resources/EvenementLoto.qrc">
       <normaloff>:/icons/icons/settings.png</normaloff>:/icons/icons/settings.png</iconset>
     </property>
     <property name="separatorsCollapsible">
@@ -780,7 +825,6 @@
     <addaction name="separator"/>
     <addaction name="actionConfigEvent"/>
     <addaction name="separator"/>
-    <addaction name="actionConfigCard"/>
     <addaction name="actionConfigRounds"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -788,7 +832,7 @@
      <string>Aide</string>
     </property>
     <property name="icon">
-     <iconset resource="../../../resources/EvenementLoto.qrc">
+     <iconset resource="../../resources/EvenementLoto.qrc">
       <normaloff>:/icons/icons/online-support.png</normaloff>:/icons/icons/online-support.png</iconset>
     </property>
     <addaction name="actionAbout"/>
@@ -800,7 +844,7 @@
      <string>Affichage</string>
     </property>
     <property name="icon">
-     <iconset resource="../../../resources/EvenementLoto.qrc">
+     <iconset resource="../../resources/EvenementLoto.qrc">
       <normaloff>:/icons/icons/windows-10-personalization.png</normaloff>:/icons/icons/windows-10-personalization.png</iconset>
     </property>
     <addaction name="actionFullScreen"/>
@@ -844,13 +888,12 @@
    <addaction name="actionStartEndGameRound"/>
    <addaction name="actionPauseResumeGame"/>
    <addaction name="actionDisplayRules"/>
-   <addaction name="actionDisplaySanity"/>
    <addaction name="actionRandomPick"/>
    <addaction name="actionCancelLastPick"/>
   </widget>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/info.png</normaloff>:/icons/icons/info.png</iconset>
    </property>
    <property name="text">
@@ -865,7 +908,7 @@
   </action>
   <action name="actionHelp">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/help.png</normaloff>:/icons/icons/help.png</iconset>
    </property>
    <property name="text">
@@ -874,23 +917,11 @@
   </action>
   <action name="actionGlobalParam">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/adjust.png</normaloff>:/icons/icons/adjust.png</iconset>
    </property>
    <property name="text">
     <string>Général</string>
-   </property>
-  </action>
-  <action name="actionConfigCard">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
-     <normaloff>:/icons/icons/puzzle.png</normaloff>:/icons/icons/puzzle.png</iconset>
-   </property>
-   <property name="text">
-    <string>Cartons</string>
    </property>
   </action>
   <action name="actionConfigRounds">
@@ -898,7 +929,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/services.png</normaloff>:/icons/icons/services.png</iconset>
    </property>
    <property name="text">
@@ -907,7 +938,7 @@
   </action>
   <action name="actionConfigEvent">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/details.png</normaloff>:/icons/icons/details.png</iconset>
    </property>
    <property name="text">
@@ -916,7 +947,7 @@
   </action>
   <action name="actionNewEvent">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/new-file.png</normaloff>:/icons/icons/new-file.png</iconset>
    </property>
    <property name="text">
@@ -925,7 +956,7 @@
   </action>
   <action name="actionLoadEvent">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/folder_open.png</normaloff>:/icons/icons/folder_open.png</iconset>
    </property>
    <property name="text">
@@ -937,7 +968,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/save.png</normaloff>:/icons/icons/save.png</iconset>
    </property>
    <property name="text">
@@ -949,7 +980,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/toggle-on.png</normaloff>:/icons/icons/toggle-on.png</iconset>
    </property>
    <property name="text">
@@ -958,7 +989,7 @@
   </action>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/shutdown.png</normaloff>:/icons/icons/shutdown.png</iconset>
    </property>
    <property name="text">
@@ -973,7 +1004,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/toggle-off.png</normaloff>:/icons/icons/toggle-off.png</iconset>
    </property>
    <property name="text">
@@ -985,7 +1016,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/save-as.png</normaloff>:/icons/icons/save-as.png</iconset>
    </property>
    <property name="text">
@@ -1005,7 +1036,7 @@
   </action>
   <action name="actionStartEndGameRound">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/submit-for-approval.png</normaloff>:/icons/icons/submit-for-approval.png</iconset>
    </property>
    <property name="text">
@@ -1014,7 +1045,7 @@
   </action>
   <action name="actionPauseResumeGame">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
    </property>
    <property name="text">
@@ -1023,7 +1054,7 @@
   </action>
   <action name="actionDisplayRules">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/terms-and-conditions.png</normaloff>:/icons/icons/terms-and-conditions.png</iconset>
    </property>
    <property name="text">
@@ -1032,7 +1063,7 @@
   </action>
   <action name="actionRandomPick">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/dice.png</normaloff>:/icons/icons/dice.png</iconset>
    </property>
    <property name="text">
@@ -1041,25 +1072,16 @@
   </action>
   <action name="actionCancelLastPick">
    <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
+    <iconset resource="../../resources/EvenementLoto.qrc">
      <normaloff>:/icons/icons/clear-symbol.png</normaloff>:/icons/icons/clear-symbol.png</iconset>
    </property>
    <property name="text">
     <string>Annuler dernier tirage</string>
    </property>
   </action>
-  <action name="actionDisplaySanity">
-   <property name="icon">
-    <iconset resource="../../../resources/EvenementLoto.qrc">
-     <normaloff>:/icons/icons/comment_text.png</normaloff>:/icons/icons/comment_text.png</iconset>
-   </property>
-   <property name="text">
-    <string>Affichage consignes sanitaire</string>
-   </property>
-  </action>
  </widget>
  <resources>
-  <include location="../../../resources/EvenementLoto.qrc"/>
+  <include location="../../resources/EvenementLoto.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -1131,22 +1153,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actShowEventParameters()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>418</x>
-     <y>352</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionConfigCard</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actShowCardPackParameters()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -1276,10 +1282,10 @@
    <receiver>MainWindow</receiver>
    <slot>actStartStopRound()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>398</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>1027</x>
+           <y>483</y>
+       </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>443</y>
@@ -1292,10 +1298,10 @@
    <receiver>MainWindow</receiver>
    <slot>actPauseResumeRound()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>424</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>1027</x>
+           <y>518</y>
+       </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>515</y>
@@ -1308,10 +1314,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRandomPick()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>497</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>1027</x>
+           <y>588</y>
+       </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>547</y>
@@ -1324,10 +1330,10 @@
    <receiver>MainWindow</receiver>
    <slot>actCancelPick()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>527</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>1027</x>
+           <y>623</y>
+       </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>583</y>
@@ -1340,10 +1346,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioPureRandom()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>102</x>
-     <y>599</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>118</x>
+           <y>715</y>
+       </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>614</y>
@@ -1356,10 +1362,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioPureManual()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>70</x>
-     <y>625</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>86</x>
+           <y>738</y>
+       </hint>
     <hint type="destinationlabel">
      <x>0</x>
      <y>652</y>
@@ -1372,10 +1378,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioBoth()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>90</x>
-     <y>651</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>106</x>
+           <y>761</y>
+       </hint>
     <hint type="destinationlabel">
      <x>0</x>
      <y>691</y>
@@ -1388,10 +1394,10 @@
    <receiver>MainWindow</receiver>
    <slot>actDisplayRules()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>873</x>
-     <y>450</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>1027</x>
+           <y>553</y>
+       </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>424</y>
@@ -1463,22 +1469,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionDisplaySanity</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actDisplaySanity()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>443</x>
-     <y>356</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>actionRandomPick</sender>
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
@@ -1510,28 +1500,11 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>DisplaySanity</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actDisplaySanity()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>802</x>
-     <y>472</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>443</x>
-     <y>356</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>actShowAbout()</slot>
   <slot>actShowHelp()</slot>
   <slot>actShowGlobalParameters()</slot>
-  <slot>actShowCardPackParameters()</slot>
   <slot>actShowGameRoundsParameters()</slot>
   <slot>actShowEventParameters()</slot>
   <slot>actNewFile()</slot>
@@ -1550,6 +1523,5 @@
   <slot>actRadioBoth()</slot>
   <slot>actDisplayRules()</slot>
   <slot>actChangeFullScreen()</slot>
-  <slot>actDisplaySanity()</slot>
  </slots>
 </ui>

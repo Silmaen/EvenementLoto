@@ -15,11 +15,11 @@ TEST(GameRound, Invalid) {
     GameRound gr{GameRound::Type::Inverse};
     EXPECT_EQ(gr.getStarting(), epoch);
     EXPECT_EQ(gr.getEnding(), epoch);
-    EXPECT_STREQ(gr.getStatusStr().c_str(), "prête");
+    EXPECT_STREQ(gr.getStatusStr().c_str(), "prêt");
     EXPECT_STREQ(gr.getTypeStr().c_str(), "Inverse");
 #ifdef EVL_DEBUG
     gr.invalidStatus();
-    EXPECT_STREQ(gr.getStatusStr().c_str(), "Statut inconnu");
+    EXPECT_STREQ(gr.getStatusStr().c_str(), "inconnu");
     EXPECT_STREQ(gr.getTypeStr().c_str(), "inconnu");
     gr.restoreStatus();
 #endif
@@ -43,15 +43,15 @@ TEST(GameRound, Name) {
 TEST(GameRound, Type) {
     GameRound gr{GameRound::Type::Enfant};
     gr.closeGameRound();
-    gr.addWinner(586);
+    gr.addWinner("586");
     gr.startGameRound();
     gr.setType(GameRound::Type::OneTwoQuineFullCard);
     EXPECT_STREQ(gr.getTypeStr().c_str(), "Enfant");
-    gr.addWinner(1586);
+    gr.addWinner("1586");
     EXPECT_EQ(gr.getStatus(), GameRound::Status::DisplayResult);
     EXPECT_EQ(gr.getCurrentCSubRound(), gr.endSubRound());
-    gr.addWinner(2586);
-    EXPECT_EQ(gr.beginSubRound()->getWinner(), 1586);
+    gr.addWinner("2586");
+    EXPECT_STREQ(gr.beginSubRound()->getWinner().c_str(), "1586");
 }
 
 TEST(GameRound, Types) {
@@ -70,29 +70,36 @@ TEST(GameRound, Types) {
     gr.setType(GameRound::Type::OneTwoQuineFullCard);
     EXPECT_STREQ(gr.getTypeStr().c_str(), "normale");
     EXPECT_EQ(gr.sizeSubRound(), 3);
+    gr.setType(GameRound::Type::Pause);
+    EXPECT_STREQ(gr.getTypeStr().c_str(), "Pause");
+    EXPECT_EQ(gr.sizeSubRound(), 0);
     gr.setType(GameRound::Type{-1});
 }
 TEST(GameRound, startStop) {
     GameRound gr{GameRound::Type::OneTwoQuineFullCard};
+    EXPECT_TRUE(gr.emptyDraws());
     gr.removeLastPick();
     gr.addPickedNumber(55);
+    EXPECT_TRUE(gr.emptyDraws());
     gr.startGameRound();
-    EXPECT_EQ(gr.getStatusStr(), "démarrée");
+    EXPECT_EQ(gr.getStatusStr(), "démarré");
     gr.startGameRound();
     gr.removeLastPick();
     gr.addPickedNumber(60);
+    EXPECT_FALSE(gr.emptyDraws());
     gr.addPickedNumber(60);
     gr.addPickedNumber(30);
     gr.addPickedNumber(45);
+    EXPECT_EQ(gr.drawsCount(), 4);
     gr.removeLastPick();
-    gr.addWinner(4875);
-    gr.addWinner(4876);
+    gr.addWinner("4875");
+    gr.addWinner("4876");
     EXPECT_TRUE(gr.isCurrentSubRoundLast());
-    gr.addWinner(4877);
+    gr.addWinner("4877");
     EXPECT_FALSE(gr.isCurrentSubRoundLast());
-    EXPECT_EQ(gr.getStatusStr(), "en affichage");
+    EXPECT_EQ(gr.getStatusStr(), "affichage résultat");
     gr.closeGameRound();
-    EXPECT_EQ(gr.getStatusStr(), "finie");
+    EXPECT_EQ(gr.getStatusStr(), "terminé");
 }
 
 TEST(GameRound, draws) {
@@ -101,11 +108,12 @@ TEST(GameRound, draws) {
     gr.addPickedNumber(60);
     gr.addPickedNumber(30);
     gr.addPickedNumber(45);
-    EXPECT_EQ(gr.sizeDraws(), 3);
-    EXPECT_NE(gr.beginReverseDraws(), gr.endReverseDraws());
-    EXPECT_NE(gr.beginDraws(), gr.endDraws());
-    EXPECT_EQ(*gr.beginReverseDraws(), 45);
-    EXPECT_EQ(*gr.beginDraws(), 60);
+    EXPECT_EQ(gr.drawsCount(), 3);
+    auto draws= gr.getAllDraws();
+    EXPECT_NE(draws.begin(), draws.end());
+    EXPECT_NE(draws.rbegin(), draws.rend());
+    EXPECT_EQ(*draws.rbegin(), 45);
+    EXPECT_EQ(*draws.begin(), 60);
 }
 
 TEST(GameRound, serialize) {
@@ -157,4 +165,29 @@ TEST(GameRound, TypeEnfant) {
     EXPECT_EQ(gr.sizeSubRound(), 1);
     auto it= gr.beginSubRound();
     EXPECT_EQ(it->getType(), SubGameRound::Type::OneQuine);
+}
+
+TEST(GameRound, results) {
+    GameRound gr{GameRound::Type::OneTwoQuineFullCard};
+    gr.startGameRound();
+    // simulate draws & winners
+    gr.addPickedNumber(5);
+    gr.addPickedNumber(78);
+    gr.addPickedNumber(45);
+    gr.addPickedNumber(23);
+    gr.addWinner("Mr X");
+    gr.addPickedNumber(65);
+    gr.addPickedNumber(12);
+    EXPECT_STREQ(gr.getDrawStr().c_str(),
+                 "simple quine: 5 78 45 23\ndouble quine: 65 12\n");
+    EXPECT_STREQ(gr.getWinnerStr().c_str(),
+                 "simple quine: Mr X\n");
+    gr.addPickedNumber(14);
+    gr.addPickedNumber(26);
+    gr.addWinner("Mr Y");
+    gr.addPickedNumber(27);
+    EXPECT_STREQ(gr.getDrawStr().c_str(),
+                 "simple quine: 5 78 45 23\ndouble quine: 65 12 14 26\ncarton plein: 27\n");
+    EXPECT_STREQ(gr.getWinnerStr().c_str(),
+                 "simple quine: Mr X\ndouble quine: Mr Y\n");
 }

@@ -17,10 +17,17 @@ const std::unordered_map<GameRound::Type, string> GameRound::TypeConvert= {
         {Type::OneTwoQuineFullCard, "normale"},
         {Type::Enfant, "Enfant"},
         {Type::Inverse, "Inverse"},
+        {Type::Pause, "Pause"},
 };
 
+const std::unordered_map<GameRound::Status, string> GameRound::StatusConvert= {
+        {Status::Started, "démarré"},
+        {Status::Ready, "prêt"},
+        {Status::DisplayResult, "affichage résultat"},
+        {Status::Finished, "terminé"},
+};
 // --- constructeurs ----
-GameRound::GameRound(GameRound::Type t) {
+GameRound::GameRound(const GameRound::Type& t) {
     setType(t);
 }
 
@@ -62,22 +69,17 @@ void GameRound::setType(const Type& t) {
     case Type::Inverse:
         subGames.emplace_back(SubGameRound::Type::FullCard);
         break;
+    case Type::Pause:
+        break;
     }
 }
 
 // ---- manipulation du statut ----
 string GameRound::getStatusStr() const {
-    switch(status) {
-    case Status::Ready:
-        return "prête";
-    case Status::Started:
-        return "démarrée";
-    case Status::Finished:
-        return "finie";
-    case Status::DisplayResult:
-        return "en affichage";
+    if(StatusConvert.contains(status)) {
+        return StatusConvert.at(status);
     }
-    return "Statut inconnu";
+    return "inconnu";
 }
 
 // ---- flux du jeu ----
@@ -91,24 +93,22 @@ void GameRound::startGameRound() {
 void GameRound::addPickedNumber(const uint8_t& num) {
     if(status != Status::Started)
         return;
-    draws.push_back(num);
+    getCurrentSubRound()->addPickedNumber(num);
 }
 
 void GameRound::removeLastPick() {
     if(status != Status::Started)
         return;
-    if(draws.size() == 0)
-        return;
-    draws.pop_back();
+    getCurrentSubRound()->removeLastPick();
 }
 
-void GameRound::addWinner(uint32_t win) {
+void GameRound::addWinner(const std::string& win) {
     if(status != Status::Started)
         return;
     auto i= getCurrentSubRound();
     i->setWinner(win);
     // on vérifie qu’on a encore des sous-parties à faire
-    i= getCurrentSubRound();
+    ++i;
     if(i == subGames.end()) {
         end   = clock::now();
         status= Status::DisplayResult;
@@ -123,24 +123,35 @@ void GameRound::closeGameRound() {
 
 // ---- Serialisation ----
 void GameRound::read(std::istream& is, int file_version) {
-    if(file_version < 3)
-        Id= 0;
-    else
+    if(file_version > currentSaveVersion) return;
+    if(file_version < 3)//----UNCOVER----
+        Id= 0;          //----UNCOVER----
+    else                //----UNCOVER----
         is.read(reinterpret_cast<char*>(&Id), sizeof(Id));
     is.read(reinterpret_cast<char*>(&type), sizeof(type));
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
-    drawsType::size_type l;
-    is.read(reinterpret_cast<char*>(&l), sizeof(drawsType::size_type));
-    draws.resize(l);
-    for(drawsType::size_type i= 0; i < l; ++i)
-        is.read(reinterpret_cast<char*>(&(draws[i])), sizeof(drawsType::value_type));
+    drawsType::size_type l= 0;
+    drawsType draws;
+    if(file_version < 4) {                                                               //----UNCOVER----
+        is.read(reinterpret_cast<char*>(&l), sizeof(drawsType::size_type));              //----UNCOVER----
+        draws.resize(l);                                                                 //----UNCOVER----
+        for(drawsType::size_type i= 0; i < l; ++i)                                       //----UNCOVER----
+            is.read(reinterpret_cast<char*>(&(draws[i])), sizeof(drawsType::value_type));//----UNCOVER----
+    }                                                                                    //----UNCOVER----
     subRoundsType::size_type l2;
     is.read(reinterpret_cast<char*>(&l2), sizeof(subRoundsType::size_type));
     subGames.resize(l2);
     for(subRoundsType::size_type i= 0; i < l2; ++i)
         subGames[i].read(is, file_version);
+    if(file_version < 4) {//----UNCOVER----
+        // faking sub game picking
+        uint32_t part= static_cast<uint32_t>(l / l2);    //----UNCOVER----
+        for(drawsType::size_type i= 0; i < l; ++i) {     //----UNCOVER----
+            subGames[i % part].addPickedNumber(draws[i]);//----UNCOVER----
+        }                                                //----UNCOVER----
+    }                                                    //----UNCOVER----
 }
 
 void GameRound::write(std::ostream& os) const {
@@ -149,10 +160,6 @@ void GameRound::write(std::ostream& os) const {
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
     os.write(reinterpret_cast<const char*>(&end), sizeof(end));
-    drawsType::size_type l= draws.size();
-    os.write(reinterpret_cast<const char*>(&l), sizeof(drawsType::size_type));
-    for(drawsType::size_type i= 0; i < l; ++i)
-        os.write(reinterpret_cast<const char*>(&(draws[i])), sizeof(drawsType::value_type));
     subRoundsType::size_type l2= subGames.size();
     os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
     for(subRoundsType::size_type i= 0; i < l2; ++i)
@@ -164,18 +171,15 @@ json GameRound::to_json() const {
     for(auto& game: subGames) {
         sub.push_back(game.to_json());
     }
-    return json{{"type", getTypeStr()}, {"Id", Id}, {"subGames", sub}, {"draws", draws}};
+    return json{{"type", getTypeStr()}, {"Id", Id}, {"subGames", sub}};
 }
 
 void GameRound::from_json(const json& j) {
     string srType;
     j.at("type").get_to(srType);
-    for(auto& s: TypeConvert) {
-        if(s.second == srType) {
-            type= s.first;
-            break;
-        }
-    }
+    auto result= std::find_if(TypeConvert.begin(), TypeConvert.end(), [&srType](const auto& item) { return item.second == srType; });
+    if(result != TypeConvert.end())
+        type= result->first;
     j.at("Id").get_to(Id);
     subGames.clear();
     for(auto& jj: j.at("subGames")) {
@@ -189,17 +193,17 @@ bool GameRound::isEditable() const {
 
 bool GameRound::isCurrentSubRoundLast() const {
     if(subGames.size() <= 1) return true;
-    if(subGames[subGames.size() - 2].getWinner() == 0) return false;
-    if(subGames[subGames.size() - 1].getWinner() == 0) return true;
+    if(subGames[subGames.size() - 2].getWinner().empty()) return false;
+    if(subGames[subGames.size() - 1].getWinner().empty()) return true;
     return false;
 }
 
 std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
-    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return s.getWinner() == 0; });
+    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return s.getWinner().empty(); });
 }
 
 std::vector<SubGameRound>::const_iterator GameRound::getCurrentCSubRound() const {
-    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner() == 0; });
+    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner().empty(); });
 }
 
 std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {
@@ -214,6 +218,32 @@ string GameRound::getName() const {
     if(type != Type::OneTwoQuineFullCard)
         res << " " << TypeConvert.at(type);
     return res.str();
+}
+
+GameRound::drawsType GameRound::getAllDraws() const {
+    drawsType displayDraws;
+    for(const auto& sub: subGames) {
+        displayDraws.insert(displayDraws.end(), sub.getDraws().begin(), sub.getDraws().end());
+    }
+    return displayDraws;
+}
+
+string GameRound::getDrawStr() const {
+    string result;
+    for(const auto& sub: subGames) {
+        if(sub.getDraws().empty()) break;
+        result+= fmt::format("{}: {}\n", sub.getTypeStr(), fmt::join(sub.getDraws(), " "));
+    }
+    return result;
+}
+
+string GameRound::getWinnerStr() const {
+    string result;
+    for(const auto& sub: subGames) {
+        if(sub.getWinner().empty()) break;
+        result+= fmt::format("{}: {}\n", sub.getTypeStr(), sub.getWinner());
+    }
+    return result;
 }
 
 }// namespace evl::core

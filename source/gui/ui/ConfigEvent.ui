@@ -2,26 +2,31 @@
 <ui version="4.0">
  <class>ConfigEvent</class>
  <widget class="QDialog" name="ConfigEvent">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>479</width>
-    <height>622</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Configuration événement</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+     <property name="geometry">
+         <rect>
+             <x>0</x>
+             <y>0</y>
+             <width>479</width>
+             <height>662</height>
+         </rect>
      </property>
+     <property name="windowTitle">
+         <string>Configuration événement</string>
+     </property>
+     <property name="windowIcon">
+         <iconset resource="../../resources/EvenementLoto.qrc">
+             <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png
+         </iconset>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+             <widget class="QGroupBox" name="groupBox">
+                 <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                     </sizepolicy>
+                 </property>
      <property name="title">
       <string>Configuration événement</string>
      </property>
@@ -192,53 +197,6 @@
     </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_4">
-     <property name="title">
-      <string>Règles Sanitaires</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_4">
-      <item row="1" column="2">
-       <widget class="QPushButton" name="buttonExportSanityRules">
-        <property name="text">
-         <string>Export</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources/EvenementLoto.qrc">
-          <normaloff>:/icons/icons/date-from.png</normaloff>:/icons/icons/date-from.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QPushButton" name="buttonImportSanityRules">
-        <property name="text">
-         <string>Import</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../../../resources/EvenementLoto.qrc">
-          <normaloff>:/icons/icons/date-to.png</normaloff>:/icons/icons/date-to.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="3">
-       <widget class="QTextEdit" name="textSanityRules"/>
-      </item>
-      <item row="1" column="1">
-       <spacer name="horizontalSpacer_8">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
       <string>Règlement</string>
@@ -250,8 +208,9 @@
          <string>Export</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/EvenementLoto.qrc">
-          <normaloff>:/icons/icons/date-from.png</normaloff>:/icons/icons/date-from.png</iconset>
+            <iconset resource="../../resources/EvenementLoto.qrc">
+                <normaloff>:/icons/icons/date-from.png</normaloff>:/icons/icons/date-from.png
+            </iconset>
         </property>
        </widget>
       </item>
@@ -261,8 +220,9 @@
          <string>Import</string>
         </property>
         <property name="icon">
-         <iconset resource="../../../resources/EvenementLoto.qrc">
-          <normaloff>:/icons/icons/date-to.png</normaloff>:/icons/icons/date-to.png</iconset>
+            <iconset resource="../../resources/EvenementLoto.qrc">
+                <normaloff>:/icons/icons/date-to.png</normaloff>:/icons/icons/date-to.png
+            </iconset>
         </property>
        </widget>
       </item>
@@ -406,7 +366,7 @@
   <tabstop>ButtonCancel</tabstop>
  </tabstops>
  <resources>
-  <include location="../../../resources/EvenementLoto.qrc"/>
+     <include location="../../resources/EvenementLoto.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -415,10 +375,10 @@
    <receiver>ConfigEvent</receiver>
    <slot>actOk()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>189</x>
-     <y>603</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>178</x>
+           <y>639</y>
+       </hint>
     <hint type="destinationlabel">
      <x>299</x>
      <y>189</y>
@@ -431,10 +391,10 @@
    <receiver>ConfigEvent</receiver>
    <slot>actApply()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>276</x>
-     <y>603</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>285</x>
+           <y>639</y>
+       </hint>
     <hint type="destinationlabel">
      <x>427</x>
      <y>189</y>
@@ -447,10 +407,10 @@
    <receiver>ConfigEvent</receiver>
    <slot>actCancel()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>363</x>
-     <y>603</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>392</x>
+           <y>639</y>
+       </hint>
     <hint type="destinationlabel">
      <x>474</x>
      <y>189</y>
@@ -479,10 +439,10 @@
    <receiver>ConfigEvent</receiver>
    <slot>actSearchLogo()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>459</x>
-     <y>114</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>455</x>
+           <y>126</y>
+       </hint>
     <hint type="destinationlabel">
      <x>478</x>
      <y>109</y>
@@ -511,45 +471,13 @@
    <receiver>ConfigEvent</receiver>
    <slot>actExportRules()</slot>
    <hints>
-    <hint type="sourcelabel">
-     <x>459</x>
-     <y>554</y>
-    </hint>
+       <hint type="sourcelabel">
+           <x>455</x>
+           <y>581</y>
+       </hint>
     <hint type="destinationlabel">
      <x>478</x>
      <y>445</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonImportSanityRules</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigEvent</receiver>
-   <slot>actImportSanityRules()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>375</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>-5</x>
-     <y>361</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonExportSanityRules</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigEvent</receiver>
-   <slot>actExportSanityRules()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>426</x>
-     <y>371</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>482</x>
-     <y>355</y>
     </hint>
    </hints>
   </connection>
@@ -562,7 +490,5 @@
   <slot>actSearchLogo()</slot>
   <slot>actImportRules()</slot>
   <slot>actExportRules()</slot>
-  <slot>actImportSanityRules()</slot>
-  <slot>actExportSanityRules()</slot>
  </slots>
 </ui>

@@ -33,6 +33,7 @@ public:
         OneTwoQuineFullCard,///< Une partie standard en remplissant une ligne, puis deux, puis le carton.
         Enfant,             ///< Une partie pour les enfants, similaire à OneQuine.
         Inverse,            ///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
+        Pause,              ///< Une fausse 'partie' pour matérialiser une pause.
     };
     static const std::unordered_map<Type, string> TypeConvert;
 
@@ -45,13 +46,14 @@ public:
         DisplayResult,///< Est en affichage de résultat.
         Finished      ///< La partie est finie
     };
+    static const std::unordered_map<Status, string> StatusConvert;
 
     // --- constructeurs ----
     /**
      * @brief Constructeur
      * @param t Le type de partie
      */
-    GameRound(Type t= Type::OneTwoQuineFullCard);
+    GameRound(const Type& t= Type::OneTwoQuineFullCard);
 
     // ---- manipulation du type de partie ----
     /**
@@ -104,7 +106,7 @@ public:
 
     // ---- flux du jeu ----
     /**
-     * @brief Débute la partie.
+     * @brief Commence la partie.
      */
     void startGameRound();
     /**
@@ -112,43 +114,22 @@ public:
      * @param num Numéro à ajouter
      */
     void addPickedNumber(const uint8_t& num);
-
-    /**
-     * @brief Renvoie un itérateur constant sur le début de la liste des tirages.
-     * @return Itérateur constant sur le début de la liste des tirages.
-     */
-    drawsType::const_iterator beginDraws() const { return draws.cbegin(); }
-    /**
-     * @brief Renvoie un itérateur constant sur la fin de la liste des tirages.
-     * @return Itérateur constant sur la fin de la liste des tirages.
-     */
-    drawsType::const_iterator endDraws() const { return draws.cend(); }
-    /**
-     * @brief Renvoie un itérateur inverse constant sur le début de la liste des tirages.
-     * @return Itérateur inverse constant sur le début de la liste des tirages.
-     */
-    drawsType::const_reverse_iterator beginReverseDraws() const { return draws.crbegin(); }
-    /**
-     * @brief Renvoie un itérateur inverse constant sur la fin de la liste des tirages.
-     * @return Itérateur inverse constant sur la fin de la liste des tirages.
-     */
-    drawsType::const_reverse_iterator endReverseDraws() const { return draws.crend(); }
-
-    /**
-     * @brief Renvoie le nombre de tirages.
-     * @return Le nombre de tirages.
-     */
-    drawsType::size_type sizeDraws() const { return draws.size(); }
-
     /**
      * @brief Supprime le dernier tirage.
      */
     void removeLastPick();
     /**
      * @brief donne un gagnant
-     * @param win Le numéro de la grille gagnante
+     * @param win Le nom du gagnant
      */
-    void addWinner(uint32_t win);
+    void addWinner(const std::string& win);
+
+    /**
+     * @brief Renvoie la liste des gagnants de sous-partie
+     * @return Les gagnants
+     */
+    string getWinnerStr() const;
+
     /**
      * @brief Close la Partie
      */
@@ -238,10 +219,38 @@ public:
     const int& getID() const { return Id; }
 
     /**
-     * @brief affichage de nom spécial
+     * @brief Affichage de nom spécial
      * @return Nom du round
      */
     string getName() const;
+
+    /**
+     * @brief Renvoie les tirages sous forme de chaine de caractère
+     * @return Les tirages
+     */
+    string getDrawStr() const;
+
+    /**
+     * @brief Renvoie la liste complète des tirages
+     * @return Liste des tirages
+     */
+    drawsType getAllDraws() const;
+
+    /**
+     * @brief Renvoie si des tirages sont présents
+     * @return true si aucun tirage
+     */
+    bool emptyDraws() const {
+        return subGames.empty() || subGames.front().getDraws().empty();
+    }
+
+    /**
+     * @brief Renvoie le nombre total de tirages.
+     * @return Le nombre de tirages.
+     */
+    drawsType::size_type drawsCount() const {
+        return std::accumulate(subGames.begin(), subGames.end(), 0ULL, [](drawsType::size_type accu, const auto& item) { return accu + item.getDraws().size(); });
+    }
 
 private:
     /**
@@ -268,8 +277,6 @@ private:
     /// La date et heure de début de partie
     timePoint end{};
 
-    /// La liste des numéros tirés.
-    drawsType draws;
 
     /// La liste des
     subRoundsType subGames;

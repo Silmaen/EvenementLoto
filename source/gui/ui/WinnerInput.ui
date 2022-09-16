@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>WinnerInput</class>
+    <widget class="QDialog" name="WinnerInput">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>404</width>
+                <height>309</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Saisi gagnants</string>
+        </property>
+        <property name="windowIcon">
+            <iconset resource="../../resources/EvenementLoto.qrc">
+                <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png
+            </iconset>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <widget class="QGroupBox" name="groupBox">
+                    <property name="title">
+                        <string>Nom du gagnant</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout">
+                        <item row="0" column="0">
+                            <widget class="QLineEdit" name="EditWinner"/>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <spacer name="verticalSpacer">
+                    <property name="orientation">
+                        <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                        <size>
+                            <width>20</width>
+                            <height>157</height>
+                        </size>
+                    </property>
+                </spacer>
+            </item>
+            <item>
+                <widget class="QFrame" name="frame">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                        <item>
+                            <spacer name="horizontalSpacer">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>130</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonOk">
+                                <property name="toolTip">
+                                    <string>Sauvegarde Et ferme La fenêtre</string>
+                                </property>
+                                <property name="text">
+                                    <string>Ok</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_3">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonCancel">
+                                <property name="toolTip">
+                                    <string>Ferme la fenêtre sans sauvegarder</string>
+                                </property>
+                                <property name="text">
+                                    <string>Annuler</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_4">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>130</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+        </layout>
+    </widget>
+    <resources>
+        <include location="../../resources/EvenementLoto.qrc"/>
+    </resources>
+    <connections>
+        <connection>
+            <sender>ButtonOk</sender>
+            <signal>clicked()</signal>
+            <receiver>WinnerInput</receiver>
+            <slot>accept()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>163</x>
+                    <y>270</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>-6</x>
+                    <y>182</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonCancel</sender>
+            <signal>clicked()</signal>
+            <receiver>WinnerInput</receiver>
+            <slot>reject()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>238</x>
+                    <y>277</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>407</x>
+                    <y>174</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+</ui>
