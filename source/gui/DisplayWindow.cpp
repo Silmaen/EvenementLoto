@@ -8,9 +8,11 @@
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
+#include <ranges>
 
 // Les trucs de QT
 #include <moc_DisplayWindow.cpp>
+#include <ranges>
 #include <ui/ui_DisplayWindow.h>
 
 namespace evl::gui {
@@ -133,10 +135,6 @@ void DisplayWindow::updateDisplay() {
         ui->PageManager->setCurrentIndex(6);
         updateDisplayRules();
         break;
-    case core::Event::Status::DisplaySanity:
-        ui->PageManager->setCurrentIndex(7);
-        updateDisplaySanityRules();
-        break;
     }
     // action de redimensionnement
     if(currentSize != size() || currentStatus != event->getStatus() || mwd->getTheme().isModified()) {
@@ -178,6 +176,7 @@ void DisplayWindow::updateRoundTitlePage() {
     ui->RT_SubRound_2->setVisible(false);
     ui->RT_SubRound_3->setVisible(false);
     switch(round->getType()) {
+    case core::GameRound::Type::Pause:
     case core::GameRound::Type::OneQuine:
     case core::GameRound::Type::TwoQuines:
     case core::GameRound::Type::FullCard:
@@ -241,8 +240,9 @@ void DisplayWindow::updateRoundTitlePage() {
 
 void DisplayWindow::updateRoundRunning() {
     resize();
-    auto round= event->getGameRound(static_cast<uint16_t>(event->getCurrentIndex()));
-    ui->RR_Title->setText(QString::fromUtf8(round->getName()));
+    auto round         = event->getGameRound(static_cast<uint16_t>(event->getCurrentIndex()));
+    const auto subRound= round->getCurrentCSubRound();
+    ui->RR_Title->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromStdString(subRound->getTypeStr()));
     // mise à jour de l’heure et durée
     auto now= core::clock::now();
     ui->RR_Clock->setText(QString::fromStdString(core::formatClockNoSecond(now)));
@@ -254,7 +254,13 @@ void DisplayWindow::updateRoundRunning() {
     br.setStyle(Qt::BrushStyle::SolidPattern);
     int i       = 0;
     QColor color= QColor(mwd->getTheme().getParam("selectedNumberColor").toString());
-    for(auto iDraw= round->beginReverseDraws(); iDraw != round->endReverseDraws(); ++iDraw) {
+    auto text   = QColor(mwd->getTheme().getParam("textColor").toString());
+    text.setRedF(1.0f - text.redF());
+    text.setGreenF(1.0f - text.greenF());
+    text.setBlueF(1.0f - text.blueF());
+    QBrush fr{text};
+    const auto draws= round->getAllDraws();
+    for(auto draw= draws.rbegin(); draw != draws.rend(); ++draw) {
         br.setColor(color);
         if(mwd->getTheme().getParam("fadeNumbers").toBool() &&
            i < mwd->getTheme().getParam("fadeNumbersAmount").toInt()) {
@@ -266,34 +272,20 @@ void DisplayWindow::updateRoundRunning() {
             }
         }
         ++i;
-        int row= (*iDraw - 1) / 10;
-        int col= (*iDraw - 1) % 10;
+        int row= (*draw - 1) / 10;
+        int col= (*draw - 1) % 10;
         ui->RR_NumberGrid->item(row, col)->setBackground(br);
+        ui->RR_NumberGrid->item(row, col)->setForeground(fr);
     }
     // mise à jour de l’affichage des derniers numéros
     ui->RR_CurrentDraw->display(0);
-    ui->RR_LastNumber1->display(0);
-    ui->RR_LastNumber2->display(0);
-    ui->RR_LastNumber3->display(0);
-    auto it= round->beginReverseDraws();
-    if(it != round->endReverseDraws()) {
+    auto it= draws.rbegin();
+    if(it != draws.rend()) {
         ui->RR_CurrentDraw->display(*it);
-        ++it;
-        if(it != round->endReverseDraws()) {
-            ui->RR_LastNumber1->display(*it);
-            ++it;
-            if(it != round->endReverseDraws()) {
-                ui->RR_LastNumber2->display(*it);
-                ++it;
-                if(it != round->endReverseDraws()) {
-                    ui->RR_LastNumber3->display(*it);
-                }
-            }
-        }
     }
-    // mise à jour affichage des lots et type de partie
-    ui->RR_SubRoundVictoryCondition->setText(QString::fromUtf8(round->getCurrentCSubRound()->getTypeStr()));
-    QString gain= QString::fromUtf8(round->getCurrentCSubRound()->getPrices());
+    // mise à jour de l'affichage des lots et type de partie
+    QString value= "Valeur du lot: " + QString::number(subRound->getValue()) + "€";
+    QString gain = QString::fromUtf8(subRound->getPrices());
     if(gain.isEmpty()) {
         ui->RR_SubRoundPrice->setVisible(false);
     } else {
@@ -302,16 +294,16 @@ void DisplayWindow::updateRoundRunning() {
             auto gains = gain.split("\n");
             int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
             if(gains.size() <= maxLine) {
-                ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+                ui->RR_SubRoundPrice->setText(value + "\n" + gain);
             } else {
                 QString s= gains[0];
                 for(int iLine= 1; iLine < maxLine; ++iLine) {
                     s+= "\n" + gains[iLine];
                 }
-                ui->RR_SubRoundPrice->setText("Gain:\n" + s);
+                ui->RR_SubRoundPrice->setText(value + "\n" + s);
             }
         } else {
-            ui->RR_SubRoundPrice->setText("Gain:\n" + gain);
+            ui->RR_SubRoundPrice->setText(value + "\n" + gain);
         }
     }
 }
@@ -320,12 +312,6 @@ void DisplayWindow::updateDisplayRules() {
     if(event->getRules().empty())
         return;
     ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
-}
-
-void DisplayWindow::updateDisplaySanityRules() {
-    if(event->getSanityRules().empty())
-        return;
-    ui->SR_Rules->setText(QString::fromUtf8(event->getSanityRules()));
 }
 
 void DisplayWindow::updateColors() {
@@ -346,6 +332,9 @@ void DisplayWindow::updateColors() {
 void DisplayWindow::initializeNumberGrid() {
     ui->RR_NumberGrid->setColumnCount(10);
     ui->RR_NumberGrid->setRowCount(9);
+    int px   = std::min(ui->RR_NumberGrid->width() / 10, ui->RR_NumberGrid->height() / 9) / 3;
+    auto font= QFont("Segoe UI", px);
+    font.setBold(true);
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
             QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col);
@@ -356,8 +345,7 @@ void DisplayWindow::initializeNumberGrid() {
             pCell->setFlags(Qt::ItemFlag::ItemIsEnabled);
             pCell->setText(QString::number(10 * row + col + 1));
             pCell->setTextAlignment(Qt::AlignCenter);
-            int px= std::min(ui->RR_NumberGrid->width() / 10, ui->RR_NumberGrid->height() / 9) / 3;
-            pCell->setFont(QFont("Segoe UI", px));
+            pCell->setFont(font);
         }
     }
 }
@@ -366,9 +354,12 @@ void DisplayWindow::resetGrid() {
     QBrush br;
     br.setColor(QColor(0, 0, 0, 0));
     br.setStyle(Qt::BrushStyle::SolidPattern);
+    auto text= QColor(mwd->getTheme().getParam("textColor").toString());
+    QBrush fr{text};
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
             ui->RR_NumberGrid->item(row, col)->setBackground(br);
+            ui->RR_NumberGrid->item(row, col)->setForeground(fr);
         }
     }
 }
@@ -424,6 +415,7 @@ void DisplayWindow::resize() {
     setting_ratio  = theme.getParam("gridTextRatio").toDouble();
     double gridRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(gridRatio);
+    baseFont.setBold(true);
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
             QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col);

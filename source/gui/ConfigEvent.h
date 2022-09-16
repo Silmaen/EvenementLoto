@@ -89,16 +89,6 @@ public slots:
      */
     void actExportRules();
 
-    /**
-     * @brief Action d'import des règles
-     */
-    void actImportSanityRules();
-
-    /**
-     * @brief Action d'export des règles'
-     */
-    void actExportSanityRules();
-
 private:
     /**
      * @brief Met à jour l’affichage

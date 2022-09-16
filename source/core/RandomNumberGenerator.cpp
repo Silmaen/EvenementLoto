@@ -35,28 +35,6 @@ uint8_t RandomNumberGenerator::pick() {
     return n;
 }
 
-std::vector<uint8_t> RandomNumberGenerator::generateLine() {
-    std::vector<uint8_t> res;
-    std::vector<uint8_t> dizaine;
-    for(uint8_t i= 0; i < nb_colones; ++i) {
-        while(true) {
-            uint8_t n  = static_cast<uint8_t>((std::rand()) % 90 + 1);
-            uint8_t diz= n / 10;
-            if(diz == 9) diz= 8;// cas du 90 qui doit être placé dans la colonne '8'
-            if(std::find(dizaine.begin(), dizaine.end(), diz) != dizaine.end())
-                continue;
-            if(std::find(alreadyPicked.begin(), alreadyPicked.end(), n) != alreadyPicked.end())
-                continue;
-            dizaine.push_back(diz);
-            res.push_back(n);
-            alreadyPicked.push_back(n);
-            break;
-        }
-    }
-    std::sort(res.begin(), res.end());
-    return res;
-}
-
 void RandomNumberGenerator::popNum() {
     if(!alreadyPicked.empty())
         alreadyPicked.pop_back();

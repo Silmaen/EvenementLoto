@@ -83,11 +83,6 @@ private:
     void updateDisplayRules();
 
     /**
-     * @brief Mise à jour de l’affichage de la page des règles sanitaires de l’événement.
-     */
-    void updateDisplaySanityRules();
-
-    /**
      * @brief Initialisation des numéros dans la grille.
      */
     void initializeNumberGrid();

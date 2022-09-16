@@ -14,6 +14,7 @@ namespace evl::core {
 void Event::read(std::istream& is, int) {
     uint16_t saveVersion;
     is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
+    if(saveVersion > currentSaveVersion) return;// incompatible
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     sizeType l, i;
     is.read(reinterpret_cast<char*>(&l), sizeof(l));
@@ -41,11 +42,12 @@ void Event::read(std::istream& is, int) {
         for(i= 0; i < l; ++i) is.read(&(rules[i]), charSize);
     }
     // version 3
-    if(saveVersion > 2) {
-        is.read(reinterpret_cast<char*>(&l), sizeof(l));
-        sanityRules.resize(l);
-        for(i= 0; i < l; ++i) is.read(&(sanityRules[i]), charSize);
-    }
+    if(saveVersion > 2 && saveVersion < 4) {                  //----UNCOVER----
+        string srules;                                        //----UNCOVER----
+        is.read(reinterpret_cast<char*>(&l), sizeof(l));      //----UNCOVER----
+        srules.resize(l);                                     //----UNCOVER----
+        for(i= 0; i < l; ++i) is.read(&(srules[i]), charSize);//----UNCOVER----
+    }                                                         //----UNCOVER----
     // version 1
     roundsType::size_type lv, iv;
     is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
@@ -78,10 +80,6 @@ void Event::write(std::ostream& os) const {
     l= rules.size();
     os.write(reinterpret_cast<char*>(&l), sizeof(l));
     for(i= 0; i < l; ++i) os.write(&(rules[i]), charSize);
-    // version >= 3
-    l= sanityRules.size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(sanityRules[i]), charSize);
     // version >= 1
     roundsType::size_type lv, iv;
     lv= gameRounds.size();
@@ -90,8 +88,6 @@ void Event::write(std::ostream& os) const {
 
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
     os.write(reinterpret_cast<const char*>(&end), sizeof(end));
-
-    // TODO: gérer les cartons
 }
 
 json Event::to_json() const {
@@ -210,13 +206,6 @@ void Event::setRules(const string& newRules) {
     checkValidConfig();
 }
 
-void Event::setSanityRules(const string& newRules) {
-    if(!isEditable())
-        return;
-    sanityRules= newRules;
-    checkValidConfig();
-}
-
 // ----- Manipulation des rounds ----
 void Event::pushGameRound(const GameRound& round) {
     if(!isEditable())
@@ -264,11 +253,11 @@ void Event::startCurrentRound() {
     }
 }
 
-void Event::addWinnerToCurrentRound(const uint32_t w) {
+void Event::addWinnerToCurrentRound(const std::string& win) {
     if(status != Status::GameRunning)
         return;
     auto it= findFirstNotFinished();
-    it->addWinner(w);
+    it->addWinner(win);
     if(it->getStatus() == GameRound::Status::DisplayResult) {
         changeStatus(Status::GameFinished);
     }
@@ -314,14 +303,8 @@ void Event::displayRules() {
     changeStatus(Status::DisplayRules);
 }
 
-void Event::displaySanity() {
-    if(isEditable())
-        return;
-    changeStatus(Status::DisplaySanity);
-}
-
 void Event::resumeEvent() {
-    if(status == Status::Paused || status == Status::DisplayRules || status == Status::DisplaySanity)
+    if(status == Status::Paused || status == Status::DisplayRules)
         restoreStatus();
 }
 

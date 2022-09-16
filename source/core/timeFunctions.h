@@ -59,7 +59,7 @@ inline string formatClockNoSecond(const timePoint& t) {
 inline string formatDuration(const duration& d) {
     auto s= std::chrono::duration_cast<std::chrono::seconds>(d).count();
     if(s < 60)
-        return fmt::format("{}", d);
+        return fmt::format("{:%Ss}", d);
     if(s < 3600)
         return fmt::format("{:%M:%S}", d);
     return fmt::format("{:%T}", d);

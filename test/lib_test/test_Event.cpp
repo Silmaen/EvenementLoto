@@ -60,7 +60,7 @@ TEST(Event, DefinesAfterStart) {
     evt.swapRoundByIndex(0, 0);
     evt.pushGameRound(GameRound());
     evt.deleteRoundByIndex(0);
-    evt.addWinnerToCurrentRound(156);
+    evt.addWinnerToCurrentRound("156");
     EXPECT_EQ(evt.sizeRounds(), 1);
     EXPECT_EQ(evt.getCurrentIndex(), 0);
 }
@@ -88,15 +88,9 @@ TEST(Event, displayScreens) {
     evt.pushGameRound(GameRound(GameRound::Type::Enfant));
     evt.displayRules();
     EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
-    evt.displaySanity();
-    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
     evt.startEvent();
     evt.displayRules();
     EXPECT_EQ(evt.getStatus(), Event::Status::DisplayRules);
-    evt.resumeEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
-    evt.displaySanity();
-    EXPECT_EQ(evt.getStatus(), Event::Status::DisplaySanity);
     evt.resumeEvent();
     EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
 }
@@ -114,13 +108,13 @@ TEST(Event, Workflow) {
     EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
     evt.startCurrentRound();
     EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
-    evt.addWinnerToCurrentRound(153);
+    evt.addWinnerToCurrentRound("153");
     EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
     evt.closeCurrentRound();
     EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
     evt.startCurrentRound();
     EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
-    evt.addWinnerToCurrentRound(152);
+    evt.addWinnerToCurrentRound("152");
     EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
     evt.closeCurrentRound();
     EXPECT_EQ(evt.getStatus(), Event::Status::Finished);
@@ -139,13 +133,13 @@ TEST(Event, WorkflowPauseRound) {
     evt.pauseEvent();
     EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
     evt.resumeEvent();
-    evt.addWinnerToCurrentRound(153);
+    evt.addWinnerToCurrentRound("153");
     evt.pauseEvent();
     EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
     evt.resumeEvent();
     evt.closeCurrentRound();
     evt.startCurrentRound();
-    evt.addWinnerToCurrentRound(152);
+    evt.addWinnerToCurrentRound("152");
     evt.closeCurrentRound();
     EXPECT_EQ(evt.findFirstNotFinished(), evt.endRounds());
 }

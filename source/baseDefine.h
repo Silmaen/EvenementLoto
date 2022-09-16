@@ -22,7 +22,7 @@ constexpr uint8_t nb_ligne= 3;
 constexpr uint8_t nb_colones= 5;
 
 /// Version des sauvegardes
-constexpr uint16_t currentSaveVersion= 3;
+constexpr uint16_t currentSaveVersion= 4;
 
 /// Définition d’un chemin vers un fichier ou répertoire
 using path= std::filesystem::path;

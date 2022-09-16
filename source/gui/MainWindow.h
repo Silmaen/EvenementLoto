@@ -7,10 +7,11 @@
  */
 #pragma once
 
-#include "../core/Event.h"
 #include "DisplayWindow.h"
 #include "VisualTheme.h"
 #include "WidgetNumberGrid.h"
+#include "core/Event.h"
+#include "core/RandomNumberGenerator.h"
 #include <QMainWindow>
 #include <QSettings>
 #include <QTimer>
@@ -79,11 +80,6 @@ private slots:
      * @brief Affiche la fenêtre des paramètres généraux.
      */
     void actShowGlobalParameters();
-
-    /**
-     * @brief Affiche la fenêtre de configuration des cartons.
-     */
-    void actShowCardPackParameters();
 
     /**
      * @brief Affiche la fenêtre de configuration des parties.
@@ -169,11 +165,6 @@ private slots:
      * @brief Action de passage en doe d’affichage des règles.
      */
     void actDisplayRules();
-
-    /**
-     * @brief Action de passage en doe d’affichage des règles.
-     */
-    void actDisplaySanity();
 
     /**
      * @brief Action de passage en doe d’affichage des règles.

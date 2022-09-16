@@ -62,17 +62,17 @@ function(qt_attach_to_target TARGET_ATTACH)
         if (EXISTS "${QT_PLUG_PATH}/plugins/platforms/qwindows.dll")
             add_custom_command(TARGET ${TARGET_ATTACH} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E make_directory
-                    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+                    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/platforms/")
             add_custom_command(TARGET ${TARGET_ATTACH} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${QT_PLUG_PATH}/plugins/platforms/qwindows.dll"
-                    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/plugins/platforms/")
+                    "$<TARGET_FILE_DIR:${PROJECT_NAME}>/platforms/")
         else ()
             message(WARNING "Cannot find the platform dll at ${QT_PLUG_PATH}/plugins/platforms/qwindows.dll")
         endif ()
         foreach (QT_LIB Core Gui Widgets)
             add_custom_command(TARGET ${TARGET_ATTACH} POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${QT_INSTALL_PATH}/bin/Qt${${PRJPREFIX}_QT_VERSION}${QT_LIB}.dll"
                     "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
         endforeach (QT_LIB)

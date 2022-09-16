@@ -20,7 +20,7 @@ TEST(timeFunction, timePoint) {
 }
 TEST(timeFunction, duration) {
     evl::core::duration t(0);
-    EXPECT_STREQ(evl::core::formatDuration(t).c_str(), "0s");
+    EXPECT_STREQ(evl::core::formatDuration(t).c_str(), "00s");
     t= evl::core::duration(std::chrono::seconds(15));
     EXPECT_STREQ(evl::core::formatDuration(t).c_str(), "15s");
     t= evl::core::duration(std::chrono::seconds(75));
