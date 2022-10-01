@@ -257,7 +257,6 @@
                  <property name="font">
                   <font>
                    <pointsize>55</pointsize>
-                   <weight>50</weight>
                    <bold>false</bold>
                   </font>
                  </property>
@@ -433,17 +432,6 @@
                  </property>
                  <property name="flat">
                   <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="PauseResumeGame">
-                 <property name="text">
-                  <string>Pause/reprise partie</string>
-                 </property>
-                 <property name="icon">
-                  <iconset resource="../../resources/EvenementLoto.qrc">
-                   <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -656,7 +644,7 @@
             <item>
              <widget class="QGroupBox" name="roundInfos">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
@@ -716,52 +704,52 @@
                  </property>
                 </widget>
                </item>
-                  <item row="1" column="1">
-                      <widget class="QLineEdit" name="RoundPhase">
-                          <property name="readOnly">
-                              <bool>true</bool>
-                          </property>
-                      </widget>
-                  </item>
-                  <item row="0" column="0">
-                      <widget class="QLabel" name="label">
-                          <property name="text">
-                              <string>Partie:</string>
-                          </property>
-                      </widget>
-                  </item>
-                  <item row="2" column="0">
-                      <widget class="QLabel" name="label_7">
-                          <property name="text">
-                              <string>Valeur</string>
-                          </property>
-                      </widget>
-                  </item>
-                  <item row="2" column="1">
-                      <widget class="QLineEdit" name="RoundPhaseValue">
-                          <property name="readOnly">
-                              <bool>true</bool>
-                          </property>
-                      </widget>
-                  </item>
+               <item row="1" column="1">
+                <widget class="QLineEdit" name="RoundPhase">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="0">
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>Partie:</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>Valeur</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="RoundPhaseValue">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
-               <item>
-                   <widget class="QGroupBox" name="groupBox_3">
-                       <property name="title">
-                           <string>Lots</string>
-                       </property>
-                       <layout class="QGridLayout" name="gridLayout">
-                           <item row="0" column="0">
-                               <widget class="QTextEdit" name="RoundPhasePrise">
-                                   <property name="readOnly">
-                                       <bool>true</bool>
-                                   </property>
-                               </widget>
-                           </item>
-                       </layout>
-                   </widget>
+            <item>
+             <widget class="QGroupBox" name="groupBox_3">
+              <property name="title">
+               <string>Lots</string>
+              </property>
+              <layout class="QGridLayout" name="gridLayout">
+               <item row="0" column="0">
+                <widget class="QTextEdit" name="RoundPhasePrise">
+                 <property name="readOnly">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
             </item>
            </layout>
           </widget>
@@ -779,7 +767,7 @@
      <x>0</x>
      <y>0</y>
      <width>1044</width>
-        <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -886,7 +874,6 @@
    <addaction name="actionConfigRounds"/>
    <addaction name="separator"/>
    <addaction name="actionStartEndGameRound"/>
-   <addaction name="actionPauseResumeGame"/>
    <addaction name="actionDisplayRules"/>
    <addaction name="actionRandomPick"/>
    <addaction name="actionCancelLastPick"/>
@@ -1041,15 +1028,6 @@
    </property>
    <property name="text">
     <string>Début/Fin partie</string>
-   </property>
-  </action>
-  <action name="actionPauseResumeGame">
-   <property name="icon">
-    <iconset resource="../../resources/EvenementLoto.qrc">
-     <normaloff>:/icons/icons/pause.png</normaloff>:/icons/icons/pause.png</iconset>
-   </property>
-   <property name="text">
-    <string>Pause/reprise partie</string>
    </property>
   </action>
   <action name="actionDisplayRules">
@@ -1282,29 +1260,13 @@
    <receiver>MainWindow</receiver>
    <slot>actStartStopRound()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>1027</x>
-           <y>483</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>1029</x>
+     <y>537</y>
+    </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>443</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>PauseResumeGame</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actPauseResumeRound()</slot>
-   <hints>
-       <hint type="sourcelabel">
-           <x>1027</x>
-           <y>518</y>
-       </hint>
-    <hint type="destinationlabel">
-     <x>887</x>
-     <y>515</y>
     </hint>
    </hints>
   </connection>
@@ -1314,10 +1276,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRandomPick()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>1027</x>
-           <y>588</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>1027</x>
+     <y>588</y>
+    </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>547</y>
@@ -1330,10 +1292,10 @@
    <receiver>MainWindow</receiver>
    <slot>actCancelPick()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>1027</x>
-           <y>623</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>1027</x>
+     <y>623</y>
+    </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>583</y>
@@ -1346,10 +1308,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioPureRandom()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>118</x>
-           <y>715</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>714</y>
+    </hint>
     <hint type="destinationlabel">
      <x>4</x>
      <y>614</y>
@@ -1362,10 +1324,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioPureManual()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>86</x>
-           <y>738</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>86</x>
+     <y>738</y>
+    </hint>
     <hint type="destinationlabel">
      <x>0</x>
      <y>652</y>
@@ -1378,10 +1340,10 @@
    <receiver>MainWindow</receiver>
    <slot>actRadioBoth()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>106</x>
-           <y>761</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>106</x>
+     <y>761</y>
+    </hint>
     <hint type="destinationlabel">
      <x>0</x>
      <y>691</y>
@@ -1394,10 +1356,10 @@
    <receiver>MainWindow</receiver>
    <slot>actDisplayRules()</slot>
    <hints>
-       <hint type="sourcelabel">
-           <x>1027</x>
-           <y>553</y>
-       </hint>
+    <hint type="sourcelabel">
+     <x>1027</x>
+     <y>553</y>
+    </hint>
     <hint type="destinationlabel">
      <x>887</x>
      <y>424</y>
@@ -1425,22 +1387,6 @@
    <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>actStartStopRound()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>443</x>
-     <y>356</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionPauseResumeGame</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>actPauseResumeRound()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
