@@ -26,14 +26,18 @@ public:
         Invalid,       ///< N'est pas valide
         MissingParties,///< L’événement est bien défini, mais il n’a pas de parties définies
         Ready,         ///< Prêt à être utilisé
-        EventStarted,  ///< Écran de début d’événement
-        Paused,        ///< Est en pause
-        GameStart,     ///< Est en début de partie
-        GameRunning,   ///< Est en cours de partie
-        GameFinished,  ///< Est en fin de partie
+        EventStarting, ///< Écran de début d’événement
+        GameRunning,   ///< Est en cours de jeu
         DisplayRules,  ///< En affichage des règles de l’événement
-        Finished       ///< Est fini
+        EventEnding,   ///< Écran de fin d’événement
+        Finished       ///< Est totalement fini
     };
+    static const std::unordered_map<Status, string> StatusConvert;
+    /**
+     * @brief Renvoie une chaine contenant le statut.
+     * @return Le statut.
+     */
+    [[nodiscard]] string getStatusStr() const;
 
     // ---- Serialisation ----
     /**
@@ -200,13 +204,18 @@ public:
      * @brief Cherche la première partie non terminée de la liste.
      * @return La première partie non terminée de la liste.
      */
-    roundsType::iterator findFirstNotFinished();
+    roundsType::const_iterator getCurrentCGameRound() const;
 
+    /**
+     * @brief Cherche la première partie non terminée de la liste.
+     * @return La première partie non terminée de la liste.
+     */
+    roundsType::iterator getCurrentGameRound();
     /**
      * @brief Renvoie l’index de la partie courante
      * @return Index de la partie courante
      */
-    int getCurrentIndex();
+    int getCurrentGameRoundIndex() const;
 
     /**
      * @brief Ajoute une partie au jeu
@@ -227,12 +236,24 @@ public:
      */
     void swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2);
 
-    // ----- Action sur le flow -----
-    /**
-     * @brief Démarre le round actuel.
-     */
-    void startCurrentRound();
+    // ----- Flow de l'événement -----
 
+    /**
+     * @brief Démarre l’événement
+     */
+    void nextState();
+
+    /**
+     * @brief Renvoie une chaine de caractère décrivant l'état courant
+     * @return L'état courant
+     */
+    string getStateString() const;
+
+    bool checkStateChanged() {
+        bool ch= changed;
+        changed= false;
+        return ch;
+    }
     /**
      * @brief Termine la partie en cours.
      * @param win Le numéro de la grille à ajouter
@@ -240,36 +261,10 @@ public:
     void addWinnerToCurrentRound(const std::string& win);
 
     /**
-     * @brief Clos la partie en cours.
-     */
-    void closeCurrentRound();
-
-    // ----- Flow de l'événement -----
-    /**
-     * @brief Démarre l’événement
-     */
-    void startEvent();
-    /**
-     * @brief Passe du titre au premier round
-     */
-    void ActiveFirstRound();
-
-    /**
-     * @brief Pause l’événement
-     * resumeEvent() permet de retourner au statut précédent.
-     */
-    void pauseEvent();
-
-    /**
      * @brief Passe l’événement en mode d’affichage des règles.
      * resumeEvent() permet de retourner au statut précédent.
      */
     void displayRules();
-
-    /**
-     * @brief Reprend l’événement.
-     */
-    void resumeEvent();
 
     /**
      * @brief Vérifie s’il est possible d’éditer l’événement
@@ -303,26 +298,23 @@ public:
      * @param p Le chemin vers l’événement
      */
     void setBasePath(const path& p);
-
+#ifdef EVL_DEBUG
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void invalidStatus() {
+        status= Status{-1};
+    }
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void restoreStatusDbg() {
+        status= Status::Ready;
+    }
+#endif
 private:
-    /**
-     * @brief Si l’événement est en phase d’édition, met à jour son statuT.
-     */
-    void checkValidConfig();
-
-    /**
-     * @brief Bascule à un nouveau statut et sauvegarde le précédent statut
-     * @param newStatus Le nouveau statut à adopter
-     */
-    void changeStatus(const Status& newStatus);
-
-    /**
-     * @brief Remet l’événement au statut précédent
-     */
-    void restoreStatus();
-
     /// Le statut de l’événement
-    Status status        = Status::Invalid;
+    Status status= Status::Invalid;
     /// Le précédent statut (pour pouvoir annuler)
     Status previousStatus= Status::Invalid;
 
@@ -352,6 +344,24 @@ private:
     /// Le chemin de base de l’événement
     path basePath;
 
+    /// status change
+    bool changed= false;
+
+    /**
+     * @brief Si l’événement est en phase d’édition, met à jour son statuT.
+     */
+    void checkValidConfig();
+
+    /**
+     * @brief Bascule à un nouveau statut et sauvegarde le précédent statut
+     * @param newStatus Le nouveau statut à adopter
+     */
+    void changeStatus(const Status& newStatus);
+
+    /**
+     * @brief Remet l’événement au statut précédent
+     */
+    void restoreStatus();
 };
 
 }// namespace evl::core

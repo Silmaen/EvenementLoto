@@ -132,11 +132,6 @@ private slots:
     void actStartStopRound();
 
     /**
-     * @brief Fonction pause et reprise d’une partie
-     */
-    void actPauseResumeRound();
-
-    /**
      * @brief Fonction Tirage aléatoire
      */
     void actRandomPick();
@@ -202,11 +197,6 @@ private:
      * @brief Mise à jour de l’affichage des radios boutons
      */
     void updateRadioButtons();
-
-    /**
-     * @brief Mise à jour de l’affichage du bouton de pause
-     */
-    void updatePauseButtons();
 
     /**
      * @brief Mise à jour de l’affichage du bouton de start/stop

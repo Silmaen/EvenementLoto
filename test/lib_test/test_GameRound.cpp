@@ -40,16 +40,78 @@ TEST(GameRound, Name) {
     EXPECT_STREQ(gr.getName().c_str(), "Partie 665 Inverse");
 }
 
+TEST(GameRound, SimpleFlow) {
+    GameRound gr{GameRound::Type::OneQuine};
+    auto sub= gr.getSubRound(0);
+    sub->define(SubGameRound::Type::OneQuine, "un canard en plastique", 1523);
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Ready);
+    EXPECT_EQ(sub->getStatus(), SubGameRound::Status::Ready);
+    EXPECT_EQ(gr.getLastCancelableDraw(), 255);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Running);
+    EXPECT_EQ(gr.getLastCancelableDraw(), 255);
+    EXPECT_EQ(sub->getStatus(), SubGameRound::Status::PreScreen);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Running);
+    EXPECT_EQ(sub->getStatus(), SubGameRound::Status::Running);
+    gr.addPickedNumber(39);
+    gr.addPickedNumber(12);
+    gr.addWinner("toto");
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::PostScreen);
+    EXPECT_EQ(sub->getStatus(), SubGameRound::Status::Done);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Done);
+    EXPECT_EQ(sub->getStatus(), SubGameRound::Status::Done);
+}
+
+TEST(GameRound, MultipleFlow) {
+    GameRound gr{GameRound::Type::OneQuineFullCard};
+    auto sub1= gr.getSubRound(0);
+    auto sub2= gr.getSubRound(1);
+    sub1->define(SubGameRound::Type::OneQuine, "un canard en plastique", 523);
+    sub2->define(SubGameRound::Type::FullCard, "deux canards en plastique", 40);
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Ready);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::Ready);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::Ready);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Running);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::PreScreen);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::Ready);
+    gr.nextStatus();
+    gr.addPickedNumber(39);
+    gr.addPickedNumber(12);
+    gr.addWinner("toto");
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Running);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::Done);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::PreScreen);
+    EXPECT_EQ(gr.getLastCancelableDraw(), 255);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Running);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::Done);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::Running);
+    gr.addPickedNumber(21);
+    gr.addPickedNumber(6);
+    EXPECT_EQ(gr.getLastCancelableDraw(), 6);
+    gr.addWinner("titi");
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::PostScreen);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::Done);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::Done);
+    gr.nextStatus();
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::Done);
+    EXPECT_EQ(sub1->getStatus(), SubGameRound::Status::Done);
+    EXPECT_EQ(sub2->getStatus(), SubGameRound::Status::Done);
+}
+
 TEST(GameRound, Type) {
     GameRound gr{GameRound::Type::Enfant};
-    gr.closeGameRound();
+    EXPECT_NE(gr.beginSubRound(), gr.endSubRound());
     gr.addWinner("586");
-    gr.startGameRound();
+    gr.nextStatus();
     gr.setType(GameRound::Type::OneTwoQuineFullCard);
     EXPECT_STREQ(gr.getTypeStr().c_str(), "Enfant");
     gr.addWinner("1586");
-    EXPECT_EQ(gr.getStatus(), GameRound::Status::DisplayResult);
-    EXPECT_EQ(gr.getCurrentCSubRound(), gr.endSubRound());
+    EXPECT_EQ(gr.getStatus(), GameRound::Status::PostScreen);
+    EXPECT_TRUE(gr.isCurrentSubRoundLast());
     gr.addWinner("2586");
     EXPECT_STREQ(gr.beginSubRound()->getWinner().c_str(), "1586");
 }
@@ -81,9 +143,9 @@ TEST(GameRound, startStop) {
     gr.removeLastPick();
     gr.addPickedNumber(55);
     EXPECT_TRUE(gr.emptyDraws());
-    gr.startGameRound();
+    gr.nextStatus();
     EXPECT_EQ(gr.getStatusStr(), "démarré");
-    gr.startGameRound();
+    gr.nextStatus();
     gr.removeLastPick();
     gr.addPickedNumber(60);
     EXPECT_FALSE(gr.emptyDraws());
@@ -97,14 +159,15 @@ TEST(GameRound, startStop) {
     EXPECT_TRUE(gr.isCurrentSubRoundLast());
     gr.addWinner("4877");
     EXPECT_FALSE(gr.isCurrentSubRoundLast());
-    EXPECT_EQ(gr.getStatusStr(), "affichage résultat");
-    gr.closeGameRound();
+    EXPECT_EQ(gr.getStatusStr(), "écran de fin");
+    gr.nextStatus();
+    gr.nextStatus();
     EXPECT_EQ(gr.getStatusStr(), "terminé");
 }
 
 TEST(GameRound, draws) {
     GameRound gr{GameRound::Type::OneTwoQuineFullCard};
-    gr.startGameRound();
+    gr.nextStatus();
     gr.addPickedNumber(60);
     gr.addPickedNumber(30);
     gr.addPickedNumber(45);
@@ -118,7 +181,7 @@ TEST(GameRound, draws) {
 
 TEST(GameRound, serialize) {
     GameRound gr{GameRound::Type::Enfant};
-    gr.startGameRound();
+    gr.nextStatus();
     gr.addPickedNumber(55);
     fs::path tmp= fs::temp_directory_path() / "test";
     fs::create_directories(tmp);
@@ -169,7 +232,7 @@ TEST(GameRound, TypeEnfant) {
 
 TEST(GameRound, results) {
     GameRound gr{GameRound::Type::OneTwoQuineFullCard};
-    gr.startGameRound();
+    gr.nextStatus();
     // simulate draws & winners
     gr.addPickedNumber(5);
     gr.addPickedNumber(78);
