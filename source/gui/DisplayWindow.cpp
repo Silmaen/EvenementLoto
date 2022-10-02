@@ -8,20 +8,28 @@
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
-#include <ranges>
 
 // Les trucs de QT
 #include <moc_DisplayWindow.cpp>
-#include <ranges>
+#include <spdlog/spdlog.h>
 #include <ui/ui_DisplayWindow.h>
 
 namespace evl::gui {
 
+const std::unordered_map<DisplayWindow::Page, int> DisplayWindow::PageIndex= {
+        {Page::MainTitle, 0},
+        {Page::PricesDisplay, 1},
+        {Page::NumberDisplay, 2},
+        {Page::EventStarting, 7},
+        {Page::PauseDisplay, 4},
+        {Page::RulesDisplay, 6},
+        {Page::EventEnding, 5},
+        {Page::RoundEnding, 3},
+};
+
 DisplayWindow::DisplayWindow(core::Event* evt, MainWindow* parent):
     QMainWindow(parent),
-    ui(new Ui::DisplayWindow),
-    timer(new QTimer(this)),
-    event(evt), mwd(parent) {
+    ui(new Ui::DisplayWindow), timer(new QTimer(this)), event(evt), mwd(parent) {
     ui->setupUi(this);
     connect(timer, &QTimer::timeout, this, QOverload<>::of(&DisplayWindow::updateDisplay));
     if(event != nullptr) {
@@ -29,7 +37,6 @@ DisplayWindow::DisplayWindow(core::Event* evt, MainWindow* parent):
         timer->start();
         initializeNumberGrid();
         resize();
-        currentStatus= event->getStatus();
     }
 }
 
@@ -103,6 +110,15 @@ void DisplayWindow::initializeDisplay() {
     }
 }
 
+void DisplayWindow::setPage(const Page& newPage) {
+    if(PageIndex.contains(newPage)) {
+        if(ui->PageManager->currentIndex() != PageIndex.at(newPage)) {
+            ui->PageManager->setCurrentIndex(PageIndex.at(newPage));
+            resize();
+        }
+    }
+}
+
 void DisplayWindow::updateDisplay() {
     if(event == nullptr)
         return;
@@ -110,51 +126,53 @@ void DisplayWindow::updateDisplay() {
     case core::Event::Status::Invalid:
     case core::Event::Status::MissingParties:
     case core::Event::Status::Ready:
-    case core::Event::Status::EventStarted:
-        ui->PageManager->setCurrentIndex(0);
+    case core::Event::Status::EventStarting:
+        setPage(Page::MainTitle);
         updateEventTitlePage();
         break;
-    case core::Event::Status::Paused:
-        ui->PageManager->setCurrentIndex(4);
+    case core::Event::Status::GameRunning: {
+        auto cur= event->getCurrentCGameRound();
+        if(cur->getType() == core::GameRound::Type::Pause) {
+            // round special type
+            setPage(Page::PauseDisplay);
+            updatePauseScreen();
+            break;
+        }
+        if(cur->getStatus() == core::GameRound::Status::PostScreen) {
+            // round special type
+            setPage(Page::RoundEnding);
+            updateRoundEndingPage();
+            break;
+        }
+        if(cur->getStatus() == core::GameRound::Status::Running) {
+            auto subcur= cur->getCurrentSubRound();
+            auto status= subcur->getStatus();
+            if(status == core::SubGameRound::Status::PreScreen) {
+                setPage(Page::PricesDisplay);
+                updateRoundTitlePage();
+                break;
+            }
+            if(status == core::SubGameRound::Status::Running) {
+                setPage(Page::NumberDisplay);
+                updateRoundRunning();
+                break;
+            }
+        }
         break;
-    case core::Event::Status::GameStart:
-        ui->PageManager->setCurrentIndex(1);
-        updateRoundTitlePage();
-        break;
-    case core::Event::Status::GameRunning:
-        ui->PageManager->setCurrentIndex(2);
-        updateRoundRunning();
-        break;
-    case core::Event::Status::GameFinished:
-        ui->PageManager->setCurrentIndex(3);
-        break;
-    case core::Event::Status::Finished:
-        ui->PageManager->setCurrentIndex(5);
-        break;
+    }
     case core::Event::Status::DisplayRules:
-        ui->PageManager->setCurrentIndex(6);
+        setPage(Page::RulesDisplay);
         updateDisplayRules();
+        break;
+    case core::Event::Status::EventEnding:
+    case core::Event::Status::Finished:
+        setPage(Page::EventEnding);
         break;
     }
     // action de redimensionnement
-    if(currentSize != size() || currentStatus != event->getStatus() || mwd->getTheme().isModified()) {
-        updateColors();
-        ui->ET_OrganizerLogo->setText("");
-        ui->RR_Logo->setText("");
-        ui->RT_Logo->setText("");
-        ui->RE_Logo->setText("");
-        ui->EP_Logo->setText("");
-        ui->EE_LogoA->setText("");
-        ui->EE_LogoB->setText("");
-        ui->ER_LogoA->setText("");
-        ui->ER_LogoB->setText("");
-        ui->SR_LogoA->setText("");
-        ui->SR_LogoB->setText("");
+    updateColors();
+    if(currentSize != size() || event->checkStateChanged() || mwd->getTheme().isModified())
         resize();
-        currentStatus= event->getStatus();
-    } else {
-        updateColors();
-    }
 }
 
 void DisplayWindow::updateEventTitlePage() {
@@ -170,78 +188,26 @@ void DisplayWindow::updateEventTitlePage() {
 }
 
 void DisplayWindow::updateRoundTitlePage() {
-    auto round= event->getGameRound(static_cast<uint16_t>(event->getCurrentIndex()));
-    ui->RT_RoundTitle->setText(QString::fromUtf8(round->getName()));
-    ui->RT_SubRound_1->setVisible(false);
-    ui->RT_SubRound_2->setVisible(false);
-    ui->RT_SubRound_3->setVisible(false);
-    switch(round->getType()) {
-    case core::GameRound::Type::Pause:
-    case core::GameRound::Type::OneQuine:
-    case core::GameRound::Type::TwoQuines:
-    case core::GameRound::Type::FullCard:
-        if(!round->getSubRound(0)->getPrices().empty()) {
-            ui->RT_SubRound_1->setVisible(true);
-            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        break;
-    case core::GameRound::Type::Enfant:
-        ui->RT_SubRound_1->setVisible(true);
-        if(round->getSubRound(0)->getPrices().empty()) {
-            ui->RT_SubRound_1->setText("partie enfant");
-        } else {
-            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        break;
-    case core::GameRound::Type::Inverse:
-        ui->RT_SubRound_1->setVisible(true);
-        if(round->getSubRound(0)->getPrices().empty()) {
-            ui->RT_SubRound_1->setText("partie Assis-debout");
-        } else {
-            ui->RT_SubRound_1->setText("Gain partie \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        break;
-    case core::GameRound::Type::OneQuineFullCard:
-        ui->RT_SubRound_1->setVisible(true);
-        ui->RT_SubRound_3->setVisible(true);
-        if(round->getSubRound(0)->getPrices().empty()) {
-            ui->RT_SubRound_1->setText("simple quine");
-        } else {
-            ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        if(round->getSubRound(1)->getPrices().empty()) {
-            ui->RT_SubRound_3->setText("carton plein");
-        } else {
-            ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
-        }
-        break;
-    case core::GameRound::Type::OneTwoQuineFullCard:
-        ui->RT_SubRound_1->setVisible(true);
-        ui->RT_SubRound_2->setVisible(true);
-        ui->RT_SubRound_3->setVisible(true);
-        if(round->getSubRound(0)->getPrices().empty()) {
-            ui->RT_SubRound_1->setText("simple quine");
-        } else {
-            ui->RT_SubRound_1->setText("Gain simple quine \n" + QString::fromUtf8(round->getSubRound(0)->getPrices()));
-        }
-        if(round->getSubRound(1)->getPrices().empty()) {
-            ui->RT_SubRound_2->setText("double quine");
-        } else {
-            ui->RT_SubRound_2->setText("Gain double quine \n" + QString::fromUtf8(round->getSubRound(1)->getPrices()));
-        }
-        if(round->getSubRound(2)->getPrices().empty()) {
-            ui->RT_SubRound_3->setText("carton plein");
-        } else {
-            ui->RT_SubRound_3->setText("Gain carton plein \n" + QString::fromUtf8(round->getSubRound(2)->getPrices()));
-        }
-        break;
+    auto round   = event->getCurrentCGameRound();
+    auto subRound= round->getCurrentSubRound();
+    ui->RT_RoundTitle->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromUtf8(subRound->getTypeStr()));
+    ui->RT_SubRound->setVisible(false);
+    ui->RT_Valeur->setVisible(false);
+    ui->RT_ValeurLbl->setVisible(false);
+    if(subRound->getPrices().empty())
+        return;
+    ui->RT_SubRound->setVisible(true);
+    ui->RT_SubRound->setText(QString::fromUtf8(subRound->getPrices()));
+    if(subRound->getValue() > 0) {
+        ui->RT_Valeur->setVisible(true);
+        ui->RT_ValeurLbl->setVisible(true);
+        ui->RT_Valeur->setText(QString::number(subRound->getValue()) + " €");
     }
 }
 
 void DisplayWindow::updateRoundRunning() {
-    resize();
-    auto round         = event->getGameRound(static_cast<uint16_t>(event->getCurrentIndex()));
-    const auto subRound= round->getCurrentCSubRound();
+    auto round         = event->getCurrentCGameRound();
+    const auto subRound= round->getCurrentSubRound();
     ui->RR_Title->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromStdString(subRound->getTypeStr()));
     // mise à jour de l’heure et durée
     auto now= core::clock::now();
@@ -284,8 +250,15 @@ void DisplayWindow::updateRoundRunning() {
         ui->RR_CurrentDraw->display(*it);
     }
     // mise à jour de l'affichage des lots et type de partie
-    QString value= "Valeur du lot: " + QString::number(subRound->getValue()) + "€";
-    QString gain = QString::fromUtf8(subRound->getPrices());
+
+    if(subRound->getValue() < 0.01) {
+        ui->RR_SubRoundValue->setVisible(false);
+    } else {
+        QString value= "Valeur du lot: \n" + QString::number(subRound->getValue()) + "€";
+        ui->RR_SubRoundValue->setVisible(true);
+        ui->RR_SubRoundValue->setText(value);
+    }
+    QString gain= QString::fromUtf8(subRound->getPrices());
     if(gain.isEmpty()) {
         ui->RR_SubRoundPrice->setVisible(false);
     } else {
@@ -294,16 +267,14 @@ void DisplayWindow::updateRoundRunning() {
             auto gains = gain.split("\n");
             int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
             if(gains.size() <= maxLine) {
-                ui->RR_SubRoundPrice->setText(value + "\n" + gain);
+                ui->RR_SubRoundPrice->setText(gain);
             } else {
                 QString s= gains[0];
-                for(int iLine= 1; iLine < maxLine; ++iLine) {
-                    s+= "\n" + gains[iLine];
-                }
-                ui->RR_SubRoundPrice->setText(value + "\n" + s);
+                for(int iLine= 1; iLine < maxLine; ++iLine) s+= "\n" + gains[iLine];
+                ui->RR_SubRoundPrice->setText(s);
             }
         } else {
-            ui->RR_SubRoundPrice->setText(value + "\n" + gain);
+            ui->RR_SubRoundPrice->setText(gain);
         }
     }
 }
@@ -312,6 +283,12 @@ void DisplayWindow::updateDisplayRules() {
     if(event->getRules().empty())
         return;
     ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
+}
+
+void DisplayWindow::updatePauseScreen() {
+}
+
+void DisplayWindow::updateRoundEndingPage() {
 }
 
 void DisplayWindow::updateColors() {
@@ -351,10 +328,11 @@ void DisplayWindow::initializeNumberGrid() {
 }
 
 void DisplayWindow::resetGrid() {
+    auto theme= mwd->getTheme();
     QBrush br;
     br.setColor(QColor(0, 0, 0, 0));
     br.setStyle(Qt::BrushStyle::SolidPattern);
-    auto text= QColor(mwd->getTheme().getParam("textColor").toString());
+    auto text= QColor(theme.getParam("textColor").toString());
     QBrush fr{text};
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
@@ -362,58 +340,14 @@ void DisplayWindow::resetGrid() {
             ui->RR_NumberGrid->item(row, col)->setForeground(fr);
         }
     }
-}
-
-void DisplayWindow::resize() {
-    initializeDisplay();
-    // taille de la font par défaut
-    if(mwd == nullptr)
-        return;
-    auto theme         = mwd->getTheme();
-    auto baseFont      = font();
-    double setting_ratio= theme.getParam("baseRatio").toDouble();
-    double baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
-    baseFont.setPointSizeF(baseRatio);
-    setFont(baseFont);
-
-    ui->RR_SubRoundPrice->setFont(baseFont);
-    QString text= ui->RR_SubRoundPrice->text();
-    auto nbLine  = text.split("\n").size();
-    if(nbLine > 4) {
-        double pricesRatio= 4.0 / static_cast<double>(nbLine) * baseRatio;
-        baseFont.setPointSizeF(pricesRatio);
-        ui->RR_SubRoundPrice->setFont(baseFont);
-    }
-
-    // taille font des titres
-    setting_ratio   = theme.getParam("titleRatio").toDouble();
-    double titleRatio= baseRatio * setting_ratio;
-    baseFont.setPointSizeF(titleRatio);
-    ui->ET_EventTitle->setFont(baseFont);
-    ui->RT_RoundTitle->setFont(baseFont);
-    ui->RR_Title->setFont(baseFont);
-    ui->RE_RoundEndTitle->setFont(baseFont);
-    ui->EP_Title->setFont(baseFont);
-    ui->EE_Title->setFont(baseFont);
-    ui->ER_Title->setFont(baseFont);
-    // taille de textes longs
-    setting_ratio      = theme.getParam("longTextRatio").toDouble();
-    double longTextRatio= baseRatio * setting_ratio;
-    baseFont.setPointSizeF(longTextRatio);
-    ui->ER_Rules->setFont(baseFont);
-    // Taille textes courts
-    setting_ratio       = theme.getParam("shortTextRatio").toDouble();
-    double shortTextRatio= baseRatio * setting_ratio;
-    baseFont.setPointSizeF(shortTextRatio);
-    ui->EP_Message->setFont(baseFont);
-    ui->EE_EndMessage->setFont(baseFont);
     // taille des lignes et colonnes de la grille
     ui->RR_NumberGrid->horizontalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->width() / 10);
     ui->RR_NumberGrid->verticalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->height() / 9);
-    currentSize= size();
     // taille de police dans la grille
-    setting_ratio  = theme.getParam("gridTextRatio").toDouble();
-    double gridRatio= baseRatio * setting_ratio;
+    double setting_ratio= theme.getParam("gridTextRatio").toDouble();
+    auto baseFont       = font();
+    double baseRatio    = std::min(width() * 1.0, height() * 1.4) * theme.getParam("baseRatio").toDouble();
+    double gridRatio    = baseRatio * setting_ratio;
     baseFont.setPointSizeF(gridRatio);
     baseFont.setBold(true);
     for(int row= 0; row < 9; ++row) {
@@ -424,6 +358,79 @@ void DisplayWindow::resize() {
             }
         }
     }
+}
+
+void DisplayWindow::resize() {
+    spdlog::trace("Resize call with size ({} {})", width(), height());
+    initializeDisplay();
+    // taille de la font par défaut
+    if(mwd == nullptr)
+        return;
+
+    ui->ET_OrganizerLogo->setText("");
+    ui->RR_Logo->setText("");
+    ui->RT_Logo->setText("");
+    ui->RE_Logo->setText("");
+    ui->EP_Logo->setText("");
+    ui->EE_LogoA->setText("");
+    ui->EE_LogoB->setText("");
+    ui->ER_LogoA->setText("");
+    ui->ER_LogoB->setText("");
+    ui->SR_LogoA->setText("");
+    ui->SR_LogoB->setText("");
+
+    auto theme       = mwd->getTheme();
+    auto baseFont    = font();
+    auto baseFontBold= font();
+    baseFontBold.setBold(true);
+    double setting_ratio= theme.getParam("baseRatio").toDouble();
+    double baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
+    baseFont.setPointSizeF(baseRatio);
+    baseFontBold.setPointSizeF(baseRatio);
+    setFont(baseFont);
+
+    ui->RR_SubRoundPrice->setFont(baseFont);
+    ui->RT_SubRound->setFont(baseFont);
+    // reduce size if too many lines
+    QString text= ui->RR_SubRoundPrice->text();
+    auto nbLine = text.split("\n").size();
+    if(nbLine > 4) {
+        double pricesRatio= 4.0 / static_cast<double>(nbLine) * baseRatio;
+        baseFont.setPointSizeF(pricesRatio);
+        ui->RR_SubRoundPrice->setFont(baseFont);
+    }
+
+    // taille font des titres
+    setting_ratio    = theme.getParam("titleRatio").toDouble();
+    double titleRatio= baseRatio * setting_ratio;
+    baseFont.setPointSizeF(titleRatio);
+    ui->ET_EventTitle->setFont(baseFont);
+    ui->RT_RoundTitle->setFont(baseFont);
+    ui->RR_Title->setFont(baseFont);
+    ui->RE_RoundEndTitle->setFont(baseFont);
+    ui->EP_Title->setFont(baseFont);
+    ui->EE_Title->setFont(baseFont);
+    ui->ER_Title->setFont(baseFont);
+    // taille de textes longs
+    setting_ratio       = theme.getParam("longTextRatio").toDouble();
+    double longTextRatio= baseRatio * setting_ratio;
+    baseFont.setPointSizeF(longTextRatio);
+    ui->ER_Rules->setFont(baseFont);
+    // Taille textes courts
+    setting_ratio        = theme.getParam("shortTextRatio").toDouble();
+    double shortTextRatio= baseRatio * setting_ratio;
+    baseFont.setPointSizeF(shortTextRatio);
+    ui->EP_Message->setFont(baseFont);
+    ui->EE_EndMessage->setFont(baseFont);
+
+    //
+    ui->RT_ValeurLbl->setFont(baseFontBold);
+    ui->RT_Valeur->setFont(baseFontBold);
+    ui->RR_SubRoundValue->setFont(baseFontBold);
+    //
+    resetGrid();
+    //
+    currentSize= size();
 }
 
 }// namespace evl::gui

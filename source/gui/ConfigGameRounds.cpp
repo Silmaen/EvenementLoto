@@ -287,7 +287,7 @@ void ConfigGameRounds::updateDisplayResults() {
     ui->StartingDate->setText(QString::fromUtf8(core::formatClock(round->getStarting())));
     ui->NumberDraws->setText(QString::number(round->drawsCount()));
     ui->TextDraws->setText(QString::fromStdString(round->getDrawStr()));
-    if(round->getStatus() == core::GameRound::Status::Started) {
+    if(round->getStatus() == core::GameRound::Status::Running) {
         ui->EndingDate->setEnabled(false);
         ui->Duration->setEnabled(false);
         ui->ListWinners->setEnabled(false);

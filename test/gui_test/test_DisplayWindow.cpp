@@ -10,7 +10,6 @@
 #include "gui/baseDefinitions.h"
 #include "test_GuiHelpers.h"
 #include <gtest/gtest.h>
-//#include <ui/ui_DisplayWindow.h>
 
 using namespace evl::gui;
 
@@ -19,7 +18,6 @@ TEST(gui_DisplayWindow, base) {
     evl::core::Event evl;
     DisplayWindow a{&evl};
     a.updateDisplay();
-    //    EXPECT_EQ(a.getUi()->PageManager->currentIndex(), 0);
     test::finalize();
 }
 

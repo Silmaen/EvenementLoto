@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "GameRound.h"
+#include <spdlog/spdlog.h>
 
 namespace evl::core {
 
@@ -21,11 +22,12 @@ const std::unordered_map<GameRound::Type, string> GameRound::TypeConvert= {
 };
 
 const std::unordered_map<GameRound::Status, string> GameRound::StatusConvert= {
-        {Status::Started, "démarré"},
         {Status::Ready, "prêt"},
-        {Status::DisplayResult, "affichage résultat"},
-        {Status::Finished, "terminé"},
+        {Status::Running, "démarré"},
+        {Status::PostScreen, "écran de fin"},
+        {Status::Done, "terminé"},
 };
+
 // --- constructeurs ----
 GameRound::GameRound(const GameRound::Type& t) {
     setType(t);
@@ -83,42 +85,60 @@ string GameRound::getStatusStr() const {
 }
 
 // ---- flux du jeu ----
-void GameRound::startGameRound() {
-    if(status != Status::Ready)
-        return;// start allowed only if ready
-    start = clock::now();
-    status= Status::Started;
-}
 
-void GameRound::addPickedNumber(const uint8_t& num) {
-    if(status != Status::Started)
-        return;
-    getCurrentSubRound()->addPickedNumber(num);
-}
-
-void GameRound::removeLastPick() {
-    if(status != Status::Started)
-        return;
-    getCurrentSubRound()->removeLastPick();
-}
-
-void GameRound::addWinner(const std::string& win) {
-    if(status != Status::Started)
-        return;
-    auto i= getCurrentSubRound();
-    i->setWinner(win);
-    // on vérifie qu’on a encore des sous-parties à faire
-    ++i;
-    if(i == subGames.end()) {
-        end   = clock::now();
-        status= Status::DisplayResult;
+void GameRound::nextStatus() {
+    auto sub= getCurrentSubRound();
+    switch(status) {
+    case Status::Ready:
+        start = clock::now();
+        status= Status::Running;
+        sub->nextStatus();
+        break;
+    case Status::Running:
+        if(sub == subGames.end()) {
+            end   = clock::now();
+            status= Status::PostScreen;
+        } else {
+            sub->nextStatus();
+        }
+        break;
+    case Status::PostScreen:
+        status= Status::Done;
+        break;
+    case Status::Done:// last status
+        break;
     }
 }
 
-void GameRound::closeGameRound() {
-    if(status != Status::DisplayResult)
+string GameRound::getStateString() const {
+    string result= fmt::format("Partie {} {}", getID(), getName());
+    if(type != Type::Pause) {
+        result+= fmt::format(" - {}", getStatusStr());
+        if(status == Status::Running) {
+            auto sub= getCurrentSubRound();
+            result+= fmt::format(" - {} {}", sub->getTypeStr(), sub->getStatusStr());
+        }
+    }
+    return result;
+}
+
+void GameRound::addPickedNumber(const uint8_t& num) {
+    if(status == Status::Running)
+        getCurrentSubRound()->addPickedNumber(num);
+}
+
+void GameRound::removeLastPick() {
+    if(status == Status::Running)
+        getCurrentSubRound()->removeLastPick();
+}
+
+void GameRound::addWinner(const std::string& win) {
+    if(status != Status::Running)
         return;
-    status= Status::Finished;
+    auto sub= getCurrentSubRound();
+    sub->setWinner(win);
+    if(sub->isFinished())
+        nextStatus();
 }
 
 // ---- Serialisation ----
@@ -155,6 +175,7 @@ void GameRound::read(std::istream& is, int file_version) {
 }
 
 void GameRound::write(std::ostream& os) const {
+    spdlog::debug("Écriture d'un GameRound dans un stream");
     os.write(reinterpret_cast<const char*>(&Id), sizeof(Id));
     os.write(reinterpret_cast<const char*>(&type), sizeof(type));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
@@ -164,6 +185,7 @@ void GameRound::write(std::ostream& os) const {
     os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
     for(subRoundsType::size_type i= 0; i < l2; ++i)
         subGames[i].write(os);
+    spdlog::debug("Fin d'écriture d'un GameRound dans un stream");
 }
 
 json GameRound::to_json() const {
@@ -193,17 +215,17 @@ bool GameRound::isEditable() const {
 
 bool GameRound::isCurrentSubRoundLast() const {
     if(subGames.size() <= 1) return true;
-    if(subGames[subGames.size() - 2].getWinner().empty()) return false;
-    if(subGames[subGames.size() - 1].getWinner().empty()) return true;
+    if(!subGames[subGames.size() - 2].isFinished()) return false;
+    if(!subGames[subGames.size() - 1].isFinished()) return true;
     return false;
 }
 
 std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
-    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return s.getWinner().empty(); });
+    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return !s.isFinished(); });
 }
 
-std::vector<SubGameRound>::const_iterator GameRound::getCurrentCSubRound() const {
-    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return s.getWinner().empty(); });
+std::vector<SubGameRound>::const_iterator GameRound::getCurrentSubRound() const {
+    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return !s.isFinished(); });
 }
 
 std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {

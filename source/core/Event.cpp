@@ -7,13 +7,34 @@
  */
 #include "Event.h"
 #include <fstream>
+#include <spdlog/spdlog.h>
 
 namespace evl::core {
 
+const std::unordered_map<Event::Status, string> Event::StatusConvert= {
+        {Status::Invalid, "invalide"},
+        {Status::MissingParties, "manque les parties"},
+        {Status::Ready, "prêt"},
+        {Status::EventStarting, "démarré"},
+        {Status::GameRunning, "en cours"},
+        {Status::DisplayRules, "en affichage des règles"},
+        {Status::EventEnding, "finalisation"},
+        {Status::Finished, "fini"},
+};
+
+string Event::getStatusStr() const {
+    if(StatusConvert.contains(status)) {
+        return StatusConvert.at(status);
+    }
+    return "inconnu";
+}
+
 // ---- Serialisation ----
 void Event::read(std::istream& is, int) {
+    spdlog::debug("Event - Lecture d'un Event depuis un stream");
     uint16_t saveVersion;
     is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
+    spdlog::debug("Version des données du stream: {}, version courante: {}", saveVersion, currentSaveVersion);
     if(saveVersion > currentSaveVersion) return;// incompatible
     is.read(reinterpret_cast<char*>(&status), sizeof(status));
     sizeType l, i;
@@ -53,11 +74,15 @@ void Event::read(std::istream& is, int) {
     is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
     gameRounds.resize(lv);
     for(iv= 0; iv < lv; ++iv) gameRounds[iv].read(is, saveVersion);
+    spdlog::info("Event lu et contenant {} parties", lv);
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
+    spdlog::debug("Fin de lecture d'un Event depuis un stream");
+    spdlog::info("Event in state: {}", getStateString());
 }
 
 void Event::write(std::ostream& os) const {
+    spdlog::debug("Écriture d'un Event dans un stream");
     os.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     sizeType l, i;
@@ -88,6 +113,7 @@ void Event::write(std::ostream& os) const {
 
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
     os.write(reinterpret_cast<const char*>(&end), sizeof(end));
+    spdlog::debug("Fin de l'écriture d'un Event dans un stream");
 }
 
 json Event::to_json() const {
@@ -226,16 +252,20 @@ void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
     std::swap(gameRounds[idx], gameRounds[idx2]);
 }
 
-Event::roundsType::iterator Event::findFirstNotFinished() {
-    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Finished; });
+Event::roundsType::const_iterator Event::getCurrentCGameRound() const {
+    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
+}
+
+Event::roundsType::iterator Event::getCurrentGameRound() {
+    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
 }
 
 Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {
     return std::next(gameRounds.begin(), idx);
 }
 
-int Event::getCurrentIndex() {
-    uint64_t i= static_cast<uint64_t>(findFirstNotFinished() - gameRounds.begin());
+int Event::getCurrentGameRoundIndex() const {
+    uint64_t i= static_cast<uint64_t>(getCurrentCGameRound() - gameRounds.begin());
     if(i >= gameRounds.size())
         return -1;
     return static_cast<int>(i);
@@ -243,69 +273,73 @@ int Event::getCurrentIndex() {
 
 // ----- Action sur le flow -----
 
-void Event::startCurrentRound() {
-    if(status != Status::GameStart)
-        return;
-    auto it= findFirstNotFinished();
-    it->startGameRound();
-    if(it->getStatus() == GameRound::Status::Started) {
-        changeStatus(Status::GameRunning);
+void Event::nextState() {
+    auto statusSave= status;
+    changed        = false;
+    auto sub       = getCurrentGameRound();
+    switch(status) {
+    case Status::Invalid:
+        checkValidConfig();// rien à faire si c'est invalide!
+        break;
+    case Status::MissingParties:
+        checkValidConfig();// rien à faire si c'est invalide!
+        break;
+    case Status::Ready:
+        status= Status::EventStarting;
+        break;
+    case Status::EventStarting:
+        status= Status::GameRunning;
+        sub->nextStatus();
+        break;
+    case Status::DisplayRules:
+        status= Status::GameRunning;
+        break;
+    case Status::GameRunning:
+        if(sub == gameRounds.end()) {
+            status= Status::EventEnding;
+        } else {
+            sub->nextStatus();
+            if(sub->isFinished()) nextState();
+            changed= true;
+        }
+        break;
+    case Status::EventEnding:
+        status= Status::Finished;
+        break;
+    case Status::Finished:
+        break;
     }
+    if(statusSave != status)
+        changed= true;
+    if(changed)
+        spdlog::info("Event switching to {}", getStateString());
+    else
+        spdlog::info("Event stay in {}", getStateString());
+}
+
+string Event::getStateString() const {
+    string result= fmt::format("Event {}", getStatusStr());
+    if(status == Status::GameRunning) {
+        auto sub= getCurrentCGameRound();
+        result+= fmt::format(" - {}", sub->getStateString());
+    }
+    return result;
 }
 
 void Event::addWinnerToCurrentRound(const std::string& win) {
     if(status != Status::GameRunning)
         return;
-    auto it= findFirstNotFinished();
-    it->addWinner(win);
-    if(it->getStatus() == GameRound::Status::DisplayResult) {
-        changeStatus(Status::GameFinished);
+    auto round= getCurrentGameRound();
+    round->addWinner(win);
+    if(round->isFinished()) {
+        nextState();
     }
-}
-
-void Event::closeCurrentRound() {
-    if(status != Status::GameFinished)
-        return;
-    auto it= findFirstNotFinished();
-    it->closeGameRound();
-    if(it->getStatus() == GameRound::Status::Finished) {
-        changeStatus(Status::GameStart);
-        ++it;
-        if(it == endRounds()) {
-            changeStatus(Status::Finished);
-            end= clock::now();
-        }
-    }
-}
-
-// ----- Flow de l'événement -----
-void Event::startEvent() {
-    if(status != Status::Ready)
-        return;
-    start= clock::now();
-    changeStatus(Status::EventStarted);
-}
-
-void Event::ActiveFirstRound() {
-    if(status != Status::EventStarted)
-        return;
-    changeStatus(Status::GameStart);
-}
-
-void Event::pauseEvent() {
-    if(status == Status::GameFinished || status == Status::GameRunning)
-        changeStatus(Status::Paused);
 }
 
 void Event::displayRules() {
     if(isEditable())
         return;
     changeStatus(Status::DisplayRules);
-}
-
-void Event::resumeEvent() {
-    if(status == Status::Paused || status == Status::DisplayRules)
-        restoreStatus();
 }
 
 void Event::changeStatus(const Status& newStatus) {

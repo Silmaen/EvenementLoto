@@ -19,12 +19,47 @@ TEST(SubGameRound, types) {
     SubGameRound partie3(SubGameRound::Type::Inverse, "");
     EXPECT_STREQ(partie3.getTypeStr().c_str(), "inverse");
     SubGameRound partie4(SubGameRound::Type{-1}, "une moto");
-    EXPECT_STREQ(partie4.getTypeStr().c_str(), "Type Inconnu");
+    EXPECT_STREQ(partie4.getTypeStr().c_str(), "inconnu");
+#ifdef EVL_DEBUG
+    partie4.invalidStatus();
+    EXPECT_STREQ(partie4.getStatusStr().c_str(), "inconnu");
+    partie4.restoreStatus();
+#endif
+}
+
+TEST(SubGameRound, flow) {
+    SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto", 152.12);
+    EXPECT_STREQ(partie.getStatusStr().c_str(), "prêt");
+    partie.addPickedNumber(52);
+    partie.removeLastPick();
+    partie.nextStatus();
+    EXPECT_STREQ(partie.getStatusStr().c_str(), "affichage");
+    partie.addPickedNumber(21);
+    partie.setWinner("Mme Y");
+    partie.nextStatus();
+    EXPECT_STREQ(partie.getStatusStr().c_str(), "en cours");
+    EXPECT_TRUE(partie.emptyDraws());
+    partie.addPickedNumber(84);
+    partie.addPickedNumber(63);
+    partie.addPickedNumber(47);
+    partie.addPickedNumber(12);
+    partie.removeLastPick();
+    partie.nextStatus();
+    EXPECT_STREQ(partie.getStatusStr().c_str(), "en cours");
+    partie.setWinner("Mr X");
+    EXPECT_STREQ(partie.getStatusStr().c_str(), "fini");
+    EXPECT_TRUE(partie.isFinished());
+    EXPECT_EQ(partie.getDraws().size(), 3);
+    partie.removeLastPick();
+    partie.nextStatus();
+    EXPECT_EQ(partie.getDraws().size(), 3);
 }
 
 TEST(SubGameRound, serialize) {
     SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto", 152.12);
     EXPECT_FALSE(partie.isFinished());
+    partie.nextStatus();
+    partie.nextStatus();
     partie.setWinner("mr X");
     EXPECT_TRUE(partie.isFinished());
     fs::path tmp= fs::temp_directory_path() / "test";

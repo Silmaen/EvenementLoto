@@ -82,6 +82,9 @@ private:
      */
     void updateDisplayRules();
 
+    void updatePauseScreen();
+    void updateRoundEndingPage();
+
     /**
      * @brief Initialisation des numéros dans la grille.
      */
@@ -97,6 +100,20 @@ private:
      */
     void resetGrid();
 
+    enum struct Page {
+        MainTitle,
+        EventStarting,
+        PricesDisplay,
+        NumberDisplay,
+        PauseDisplay,
+        RulesDisplay,
+        EventEnding,
+        RoundEnding
+    };
+    static const std::unordered_map<Page, int> PageIndex;
+
+    void setPage(const Page& newPage);
+
     /// Lien vers la page UI.
     Ui::DisplayWindow* ui;
     /// Lien vers le timer.
@@ -105,8 +122,6 @@ private:
     core::Event* event;
     /// La taille actuelle de l’image
     QSize currentSize;
-    /// sauvegarde du statut
-    core::Event::Status currentStatus;
     /// Lien vers la MainWindow
     MainWindow* mwd= nullptr;
 };
