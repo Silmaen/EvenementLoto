@@ -27,6 +27,16 @@ public:
         Inverse   ///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
     };
     static const std::unordered_map<Type, string> TypeConvert;
+    /**
+     * @brief Liste des statuts de sous-parties connus.
+     */
+    enum struct Status {
+        Ready,    ///< Sous partie prê^te à jouer.
+        PreScreen,///< Sous-partie en affichage.
+        Running,  ///< Sous partie en cours.
+        Done      ///< Sous partie finie.
+    };
+    static const std::unordered_map<Status, string> StatusConvert;
 
     /**
      * @brief Constructeur Avec données
@@ -76,31 +86,56 @@ public:
     const string getTypeStr() const;
 
     /**
+     * @brief Renvoie le statut de sous-partie.
+     * @return Le statut de sous-partie.
+     */
+    const Status& getStatus() const { return status; }
+
+    /**
+     * @brief Renvoie le nom du statut de sous-partie
+     * @return Le nom du statut de sous-partie
+     */
+    const string getStatusStr() const;
+
+    /**
+     * @brief Advance to the next status if possible
+     */
+    void nextStatus();
+
+    /**
      * @brief Ajoute le numéro dans la liste des numéros tirés
      * @param num Numéro à ajouter
      */
     void addPickedNumber(const uint8_t& num) {
-        draws.push_back(num);
+        if(status == Status::Running)
+            draws.push_back(num);
     }
 
     /**
      * @brief Supprime le dernier tirage.
      */
     void removeLastPick() {
-        if(!draws.empty()) draws.pop_back();
+        if(status == Status::Running && !draws.empty())
+            draws.pop_back();
     }
 
     /**
-     * @brief Accès à la lioste des tirage
+     * @brief Accès à la liste des tirage
      * @return La liste des tirages
      */
     const drawsType& getDraws() const { return draws; }
 
     /**
+     * @brief Renvoie si la liste des tirage est vide
+     * @return True si pas de tirage
+     */
+    bool emptyDraws() const { return draws.empty(); }
+
+    /**
      * @brief Vérifie si la sous-partie est finie.
      * @return True si la partie est finie.
      */
-    bool isFinished() const { return !winner.empty(); }
+    bool isFinished() const { return status == Status::Done; }
 
     /**
      * @brief Renvoie le numéro de la grille gagnante.
@@ -113,7 +148,10 @@ public:
      * @param winner_ Le numéro de la grille gagnante
      */
     void setWinner(const string& winner_) {
-        winner= winner_;
+        if(status == Status::Running) {
+            winner= winner_;
+            nextStatus();
+        }
     }
 
     /**
@@ -140,18 +178,35 @@ public:
      * @param j Le json à lire
      */
     void from_json(const json& j) override;
-
+#ifdef EVL_DEBUG
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void invalidStatus() {
+        status= Status{-1};
+        type  = Type{-1};
+    }
+    /**
+     * @brief define invalide Status for testing purpose
+     */
+    void restoreStatus() {
+        status= Status::Ready;
+        type  = Type::OneQuine;
+    }
+#endif
 private:
-    /// La liste des prix pour cette sous-partie
-    string prices;
+    /// Le type de la sous-partie
+    Type type= Type::OneQuine;
+    /// Le statut de la sous-partie
+    Status status= Status::Ready;
     /// La valeur du lot
     double pricesValue= 0;
-    /// Le type de la sous-partie
-    Type type;
+    /// La liste des prix pour cette sous-partie
+    string prices= "";
     /// Le nom du gagnant
-    string winner;
+    string winner= "";
     /// La liste des numéros tirés.
-    drawsType draws;
+    drawsType draws= {};
 };
 
 }// namespace evl::core

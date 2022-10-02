@@ -41,10 +41,10 @@ public:
      * @brief Les status possibles de la partie
      */
     enum struct Status {
-        Ready,        ///< La partie est prête à être jouée
-        Started,      ///< La partie est démarrée
-        DisplayResult,///< Est en affichage de résultat.
-        Finished      ///< La partie est finie
+        Ready,     ///< La partie est prête à être jouée
+        Running,   ///< La partie est démarrée
+        PostScreen,///< La partie est en affichage de fin.
+        Done       ///< La partie est finie
     };
     static const std::unordered_map<Status, string> StatusConvert;
 
@@ -87,6 +87,11 @@ public:
      */
     [[nodiscard]] const Status& getStatus() const { return status; }
 
+    /**
+     * @brief Renvoie si le round est fini
+     * @return True si le round est fini
+     */
+    [[nodiscard]] bool isFinished() const { return status == Status::Done; }
 #ifdef EVL_DEBUG
     /**
      * @brief define invalide Status for testing purpose
@@ -106,18 +111,27 @@ public:
 
     // ---- flux du jeu ----
     /**
-     * @brief Commence la partie.
+     * @brief Advance to the next status if possible
      */
-    void startGameRound();
+    void nextStatus();
+
+    /**
+     * @brief Renvoie une chaine de caractère décrivant l'état courant
+     * @return L'état courant
+     */
+    string getStateString() const;
+
     /**
      * @brief Ajoute le numéro dans la liste des numéros tirés
      * @param num Numéro à ajouter
      */
     void addPickedNumber(const uint8_t& num);
+
     /**
      * @brief Supprime le dernier tirage.
      */
     void removeLastPick();
+
     /**
      * @brief donne un gagnant
      * @param win Le nom du gagnant
@@ -129,11 +143,6 @@ public:
      * @return Les gagnants
      */
     string getWinnerStr() const;
-
-    /**
-     * @brief Close la Partie
-     */
-    void closeGameRound();
 
     // ---- Serialisation ----
     /**
@@ -184,7 +193,7 @@ public:
      * @brief Accès à la sous-partie courante l’interface
      * @return Itérateur constant sur la sous-partie courante
      */
-    subRoundsType::const_iterator getCurrentCSubRound() const;
+    subRoundsType::const_iterator getCurrentSubRound() const;
     /**
      * @brief Accès à la sous-partie courante
      * @return Itérateur constant sur la sous-partie courante
@@ -224,6 +233,7 @@ public:
      */
     string getName() const;
 
+    // ----------- Draws management -----------------
     /**
      * @brief Renvoie les tirages sous forme de chaine de caractère
      * @return Les tirages
@@ -245,6 +255,17 @@ public:
     }
 
     /**
+     * @brief Renvoie le dernier numéro tiré qui est annuable (255 sinon)
+     * @return Dernier numéro tiré
+     */
+    uint8_t getLastCancelableDraw() const {
+        if(status != Status::Running) return 255;
+        if(emptyDraws()) return 255;
+        if(getCurrentSubRound()->emptyDraws()) return 255;
+        return getCurrentSubRound()->getDraws().back();
+    }
+
+    /**
      * @brief Renvoie le nombre total de tirages.
      * @return Le nombre de tirages.
      */
@@ -253,17 +274,8 @@ public:
     }
 
 private:
-    /**
-     * @brief Accès à la sous-partie courante
-     * @return Pointeur vers la sous-partie courante
-     */
-    subRoundsType::iterator getCurrentSubRound();
-
-    /**
-     * @brief Determine si la partie peut être éditée.
-     * @return True si la partie est éditable
-     */
-    [[nodiscard]] bool isEditable() const;
+    /// Le numéro de la partie (à ne pas afficher si négatif)
+    int Id= 0;
 
     /// Le type de partie.
     Type type= Type::OneTwoQuineFullCard;
@@ -277,12 +289,22 @@ private:
     /// La date et heure de début de partie
     timePoint end{};
 
-
     /// La liste des
     subRoundsType subGames;
 
-    /// Le numéro de la partie (à ne pas afficher si négatif)
-    int Id= 0;
+    // ---------------- private functions ----------------
+
+    /**
+     * @brief Accès à la sous-partie courante
+     * @return Pointeur vers la sous-partie courante
+     */
+    subRoundsType::iterator getCurrentSubRound();
+
+    /**
+     * @brief Determine si la partie peut être éditée.
+     * @return True si la partie est éditable
+     */
+    [[nodiscard]] bool isEditable() const;
 };
 
 }// namespace evl::core

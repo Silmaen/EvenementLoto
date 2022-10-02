@@ -25,8 +25,13 @@ TEST(Event, DefaultDefines) {
     EXPECT_STREQ(evt.getOrganizerLogo().string().c_str(), "");
     evt.pushGameRound(GameRound());
     EXPECT_EQ(evt.sizeRounds(), 1);
-    evt.startEvent();
+    evt.nextState();
     EXPECT_EQ(evt.getStatus(), Event::Status::Invalid);
+#ifdef EVL_DEBUG
+    evt.invalidStatus();
+    EXPECT_STREQ(evt.getStatusStr().c_str(), "inconnu");
+    evt.restoreStatusDbg();
+#endif
 }
 
 TEST(Event, BaseDefines) {
@@ -52,22 +57,22 @@ TEST(Event, DefinesAfterStart) {
     evt.setName("toto");
     evt.setOrganizerName("toto tata");
     evt.pushGameRound(GameRound());
-    evt.pauseEvent();
-    evt.resumeEvent();
-    evt.startCurrentRound();
-    evt.closeCurrentRound();
-    evt.startEvent();
+    evt.nextState();
+    evt.nextState();
+    evt.nextState();
+    evt.nextState();
+    evt.nextState();
     evt.swapRoundByIndex(0, 0);
     evt.pushGameRound(GameRound());
     evt.deleteRoundByIndex(0);
     evt.addWinnerToCurrentRound("156");
     EXPECT_EQ(evt.sizeRounds(), 1);
-    EXPECT_EQ(evt.getCurrentIndex(), 0);
+    EXPECT_EQ(evt.getCurrentGameRoundIndex(), 0);
 }
 
 TEST(Event, RoundManipulation) {
     Event evt;
-    evt.ActiveFirstRound();
+    evt.nextState();
     evt.setName("toto");
     evt.setOrganizerName("toto tata");
     evt.pushGameRound(GameRound());
@@ -88,11 +93,11 @@ TEST(Event, displayScreens) {
     evt.pushGameRound(GameRound(GameRound::Type::Enfant));
     evt.displayRules();
     EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
-    evt.startEvent();
+    evt.nextState();
     evt.displayRules();
     EXPECT_EQ(evt.getStatus(), Event::Status::DisplayRules);
-    evt.resumeEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
+    evt.nextState();
+    EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
 }
 
 TEST(Event, Workflow) {
@@ -102,46 +107,20 @@ TEST(Event, Workflow) {
     evt.pushGameRound(GameRound(GameRound::Type::Enfant));
     evt.pushGameRound(GameRound(GameRound::Type::Enfant));
     EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
-    evt.startEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarted);
-    evt.ActiveFirstRound();
-    EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
-    evt.startCurrentRound();
+    evt.nextState();
+    EXPECT_EQ(evt.getStatus(), Event::Status::EventStarting);
+    evt.nextState();
     EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
     evt.addWinnerToCurrentRound("153");
-    EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
-    evt.closeCurrentRound();
-    EXPECT_EQ(evt.getStatus(), Event::Status::GameStart);
-    evt.startCurrentRound();
+    evt.nextState();
+    EXPECT_TRUE(evt.checkStateChanged());
+    EXPECT_FALSE(evt.checkStateChanged());
     EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
     evt.addWinnerToCurrentRound("152");
-    EXPECT_EQ(evt.getStatus(), Event::Status::GameFinished);
-    evt.closeCurrentRound();
+    evt.nextState();
+    EXPECT_EQ(evt.getStatus(), Event::Status::EventEnding);
+    evt.nextState();
     EXPECT_EQ(evt.getStatus(), Event::Status::Finished);
-}
-
-TEST(Event, WorkflowPauseRound) {
-    Event evt;
-    evt.setName("toto");
-    evt.setOrganizerName("toto tata");
-    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
-    evt.pushGameRound(GameRound(GameRound::Type::Enfant));
-    EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
-    evt.startEvent();
-    evt.ActiveFirstRound();
-    evt.startCurrentRound();
-    evt.pauseEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
-    evt.resumeEvent();
-    evt.addWinnerToCurrentRound("153");
-    evt.pauseEvent();
-    EXPECT_EQ(evt.getStatus(), Event::Status::Paused);
-    evt.resumeEvent();
-    evt.closeCurrentRound();
-    evt.startCurrentRound();
-    evt.addWinnerToCurrentRound("152");
-    evt.closeCurrentRound();
-    EXPECT_EQ(evt.findFirstNotFinished(), evt.endRounds());
 }
 
 TEST(Event, Serialize) {

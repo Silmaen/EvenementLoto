@@ -33,7 +33,7 @@ TEST(gui_ConfigEvent, ControlButtons) {
     evt.pushGameRound(gr);
     a.setEvent(evt);
     a.actOk();
-    evt.startEvent();
+    evt.nextState();
     a.setEvent(evt);
     a.actOk();
     a.actApply();
