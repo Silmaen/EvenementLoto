@@ -284,6 +284,12 @@ void MainWindow::updateClocks() {
     if(cur->getStarting() == core::epoch)// round pas commencé, pas de mise à jour
         return;
     ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(core::clock::now() - cur->getStarting())));
+
+    // event chrono
+    core::timePoint start= currentEvent.getStarting();
+    core::timePoint end  = currentEvent.getEnding();
+    if(start != core::epoch && end == core::epoch)
+        ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
 }
 
 void MainWindow::checkDisplayWindow() {
@@ -389,8 +395,10 @@ void MainWindow::updateInfoEvent() {
         return;
     ui->CurrentDate->setText(QString::fromUtf8(core::formatCalendar(start)));
     ui->StartingHour->setText(QString::fromUtf8(core::formatClockNoSecond(start)));
-    if(end == core::epoch)
+    if(end == core::epoch) {
+        ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
         return;
+    }
     ui->EndingHour->setText(QString::fromUtf8(core::formatClockNoSecond(end)));
     ui->Duration->setText(QString::fromUtf8(core::formatDuration(end - start)));
 }
@@ -473,6 +481,8 @@ void MainWindow::updateDraws() {
     if(currentEvent.getStatus() != core::Event::Status::GameRunning) {
         ui->lastNumbersDisplay->setEnabled(false);
         ui->GroupPickManual->setEnabled(false);
+        ui->RandomPick->setEnabled(false);
+        ui->actionRandomPick->setEnabled(false);
         return;
     }
     auto cur = currentEvent.getCurrentCGameRound();
@@ -480,10 +490,11 @@ void MainWindow::updateDraws() {
     if(cur->getType() == core::GameRound::Type::Pause || cur->getStatus() != core::GameRound::Status::Running || scur->getStatus() != core::SubGameRound::Status::Running) {
         ui->lastNumbersDisplay->setEnabled(false);
         ui->GroupPickManual->setEnabled(false);
+        ui->RandomPick->setEnabled(false);
+        ui->actionRandomPick->setEnabled(false);
         return;
     }
     ui->lastNumbersDisplay->setEnabled(true);
-    ui->GroupPickManual->setEnabled(true);
     ui->CurrentDraw->display(0);
     ui->LastNumber1->display(0);
     ui->LastNumber2->display(0);
@@ -524,7 +535,6 @@ void MainWindow::updateCommands() {
     ui->CancelLastPick->setEnabled(false);
     ui->actionDisplayRules->setEnabled(false);
     ui->actionCancelLastPick->setEnabled(false);
-    ui->actionStartEndGameRound->setEnabled(false);
     if(currentEvent.isEditable())
         return;
     ui->DisplayRules->setEnabled(true);
@@ -533,18 +543,14 @@ void MainWindow::updateCommands() {
         ui->DisplayRules->setText("Retour");
         ui->actionDisplayRules->setText("Retour");
         ui->StartEndGameRound->setEnabled(false);
-        ui->CancelLastPick->setEnabled(false);
         ui->actionStartEndGameRound->setEnabled(false);
-        ui->actionCancelLastPick->setEnabled(false);
     } else {
         ui->DisplayRules->setText("Affichage règlement");
         ui->actionDisplayRules->setText("Affichage règlement");
     }
     // update cancel last pick
     auto cur= currentEvent.getCurrentCGameRound();
-    if(cur == currentEvent.endRounds())
-        return;
-    if(!cur->emptyDraws()) {
+    if(cur != currentEvent.endRounds() && cur->getLastCancelableDraw() != 255) {
         ui->CancelLastPick->setEnabled(true);
         ui->actionCancelLastPick->setEnabled(true);
     }
