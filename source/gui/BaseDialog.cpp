@@ -8,6 +8,7 @@
 #include "BaseDialog.h"
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QMessageBox>
 
 namespace evl::gui::dialog {
 
@@ -35,10 +36,11 @@ path openFile(const FileTypes& type, bool exist) {
                             "fichier json (*.json)"});
     else if(type == FileTypes::Images)
         dia.setNameFilters({
-                "Toutes les images supportées (*.png *.jpg *.jpeg *.bmp)",
-                "Fichiers png (*.png)",
-                "Fichiers jpg (*.jpg, *.jpeg)",
-                "Fichiers bmp (*.bmp)",
+                "Toutes les images supportées (*.png *.jpg *.jpeg *.bmp *.svg)",
+                "Fichiers portable network graphics (*.png)",
+                "Fichiers join photographic expert group (*.jpg, *.jpeg)",
+                "Fichiers bitmap (*.bmp)",
+                "Fichiers scalar vector Graphic (*.svg)",
         });
     if(dia.exec()) {
         return path{dia.selectedFiles()[0].toStdString()};

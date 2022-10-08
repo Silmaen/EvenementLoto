@@ -46,8 +46,9 @@ DisplayWindow::~DisplayWindow() {
 }
 
 void setPixMap(QLabel* where, const QString& name, const QImage& img) {
-    if(where->text() != name) {// charge l’image seulement une fois
-        where->setText(name);
+    QString realName= name + "_" + QString::number(where->width()) + "_" + QString::number(where->height());
+    if(where->text() != realName) {// charge l’image seulement une fois
+        where->setText(realName);
         where->setPixmap(QPixmap::fromImage(img.scaled(where->size(), Qt::KeepAspectRatio)));
     }
 }
@@ -80,20 +81,19 @@ void DisplayWindow::initializeDisplay() {
             ui->SR_LogoA->setVisible(false);
             ui->SR_LogoB->setVisible(false);
         } else {
-            QString imgName(QString::fromUtf8(event->getOrganizerLogoFull().string()));
-            QImage img;
-            img.load(imgName);
-            setPixMap(ui->ET_OrganizerLogo, imgName, img);
-            setPixMap(ui->RR_Logo, imgName, img);
-            setPixMap(ui->RT_Logo, imgName, img);
-            setPixMap(ui->RE_Logo, imgName, img);
-            setPixMap(ui->EP_Logo, imgName, img);
-            setPixMap(ui->EE_LogoA, imgName, img);
-            setPixMap(ui->EE_LogoB, imgName, img);
-            setPixMap(ui->ER_LogoA, imgName, img);
-            setPixMap(ui->ER_LogoB, imgName, img);
-            setPixMap(ui->SR_LogoA, imgName, img);
-            setPixMap(ui->SR_LogoB, imgName, img);
+            QImage img  = loadImage(event->getOrganizerLogoFull());
+            QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+            setPixMap(ui->ET_OrganizerLogo, name, img);
+            setPixMap(ui->RR_Logo, name, img);
+            setPixMap(ui->RT_Logo, name, img);
+            setPixMap(ui->RE_Logo, name, img);
+            setPixMap(ui->EP_Logo, name, img);
+            setPixMap(ui->EE_LogoA, name, img);
+            setPixMap(ui->EE_LogoB, name, img);
+            setPixMap(ui->ER_LogoA, name, img);
+            setPixMap(ui->ER_LogoB, name, img);
+            setPixMap(ui->SR_LogoA, name, img);
+            setPixMap(ui->SR_LogoB, name, img);
         }
     }
     if(event->getLogoFull().empty()) {
@@ -102,10 +102,8 @@ void DisplayWindow::initializeDisplay() {
         if(!exists(event->getLogoFull())) {
             ui->ET_EventLogo->setVisible(false);
         } else {
-            QString imgName(QString::fromUtf8(event->getLogoFull().string()));
-            QImage img;
-            img.load(imgName);
-            setPixMap(ui->ET_EventLogo, imgName, img);
+            QImage img= loadImage(event->getLogoFull());
+            setPixMap(ui->ET_EventLogo, QString::fromUtf8(event->getLogoFull().string()), img);
         }
     }
 }
@@ -372,10 +370,13 @@ void DisplayWindow::resize() {
     ui->RT_Logo->setText("");
     ui->RE_Logo->setText("");
     ui->EP_Logo->setText("");
+
     ui->EE_LogoA->setText("");
     ui->EE_LogoB->setText("");
+
     ui->ER_LogoA->setText("");
     ui->ER_LogoB->setText("");
+
     ui->SR_LogoA->setText("");
     ui->SR_LogoB->setText("");
 
