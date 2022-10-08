@@ -286,6 +286,7 @@ void Event::nextState() {
         break;
     case Status::Ready:
         status= Status::EventStarting;
+        start = clock::now();
         break;
     case Status::EventStarting:
         status= Status::GameRunning;
@@ -299,7 +300,10 @@ void Event::nextState() {
             status= Status::EventEnding;
         } else {
             sub->nextStatus();
-            if(sub->isFinished()) nextState();
+            if(sub->isFinished()) {
+                end= clock::now();
+                nextState();
+            }
             changed= true;
         }
         break;

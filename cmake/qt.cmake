@@ -1,8 +1,8 @@
 #
 #  QT Package
 #
-set(${PRJPREFIX}_QT_COMPONENTS_LIST Core Gui Widgets OpenGLWidgets)
-set(${PRJPREFIX}_QT_COMPONENTS_LIST_LIB Qt::Core Qt::Gui Qt::Widgets)
+set(${PRJPREFIX}_QT_COMPONENTS_LIST Core Gui Widgets OpenGLWidgets Svg)
+set(${PRJPREFIX}_QT_COMPONENTS_LIST_LIB Qt::Core Qt::Gui Qt::Widgets Qt::Svg)
 #
 # Base initialization
 #
