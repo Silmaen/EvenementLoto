@@ -60,7 +60,8 @@ void DisplayWindow::initializeDisplay() {
         ui->RR_Logo->setVisible(false);
         ui->RT_Logo->setVisible(false);
         ui->RE_Logo->setVisible(false);
-        ui->EP_Logo->setVisible(false);
+        ui->EP_LogoA->setVisible(false);
+        ui->EP_LogoB->setVisible(false);
         ui->EE_LogoA->setVisible(false);
         ui->EE_LogoB->setVisible(false);
         ui->ER_LogoA->setVisible(false);
@@ -73,7 +74,8 @@ void DisplayWindow::initializeDisplay() {
             ui->RR_Logo->setVisible(false);
             ui->RT_Logo->setVisible(false);
             ui->RE_Logo->setVisible(false);
-            ui->EP_Logo->setVisible(false);
+            ui->EP_LogoA->setVisible(false);
+            ui->EP_LogoB->setVisible(false);
             ui->EE_LogoA->setVisible(false);
             ui->EE_LogoB->setVisible(false);
             ui->ER_LogoA->setVisible(false);
@@ -87,7 +89,8 @@ void DisplayWindow::initializeDisplay() {
             setPixMap(ui->RR_Logo, name, img);
             setPixMap(ui->RT_Logo, name, img);
             setPixMap(ui->RE_Logo, name, img);
-            setPixMap(ui->EP_Logo, name, img);
+            setPixMap(ui->EP_LogoA, name, img);
+            setPixMap(ui->EP_LogoB, name, img);
             setPixMap(ui->EE_LogoA, name, img);
             setPixMap(ui->EE_LogoB, name, img);
             setPixMap(ui->ER_LogoA, name, img);
@@ -284,6 +287,38 @@ void DisplayWindow::updateDisplayRules() {
 }
 
 void DisplayWindow::updatePauseScreen() {
+    auto slide_Path= event->getBasePath() / "slides";
+    if(!exists(slide_Path))
+        return;
+    std::vector<path> slides;
+    string print;
+    const std::vector<path> extension{".png", ".jpg", ".svg"};
+    for(const auto& ipath: std::filesystem::directory_iterator(slide_Path)) {
+        if(std::find(extension.begin(), extension.end(), ipath.path().extension()) == extension.end()) {
+            spdlog::trace("Path: {} bad ext: {}", ipath.path().string(), ipath.path().extension().string());
+            continue;
+        }
+        spdlog::trace("Path: {} added!", ipath.path().string());
+        slides.push_back(ipath);
+        print+= fmt::format(" {}", ipath.path().string());
+    }
+    spdlog::debug("Slides: {}", print);
+    if(slides.empty()) {
+        QImage img  = loadImage(event->getOrganizerLogoFull());
+        QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+        setPixMap(ui->EP_Text, name, img);
+        return;
+    }
+    static size_t curSlide   = 0;
+    static core::timePoint tp= core::epoch;
+    auto length              = static_cast<int>(mwd->getTheme().getParam("tempoDiapoPause").toDouble() * 1000);
+    if(std::chrono::duration_cast<std::chrono::milliseconds>(core::clock::now() - tp).count() < length)
+        return;
+
+    tp        = core::clock::now();
+    curSlide  = (curSlide + 1) % slides.size();
+    auto slide= loadImage(slides[curSlide]);
+    setPixMap(ui->EP_Text, QString::fromUtf8(slides[curSlide].string()), slide);
 }
 
 void DisplayWindow::updateRoundEndingPage() {
@@ -369,7 +404,8 @@ void DisplayWindow::resize() {
     ui->RR_Logo->setText("");
     ui->RT_Logo->setText("");
     ui->RE_Logo->setText("");
-    ui->EP_Logo->setText("");
+    ui->EP_LogoA->setText("");
+    ui->EP_LogoB->setText("");
 
     ui->EE_LogoA->setText("");
     ui->EE_LogoB->setText("");

@@ -71,6 +71,7 @@ void ConfigGeneral::SaveFile() {
         mwd->getTheme().setParam("fadeNumbers", ui->checkFadeNumbers->isChecked());
         mwd->getTheme().setParam("fadeNumbersAmount", ui->spinFadeAmount->value());
         mwd->getTheme().setParam("fadeNumbersStrength", ui->spinFadeStrength->value());
+        mwd->getTheme().setParam("tempoDiapoPause", ui->spinTempoDiapo->value());
         mwd->getTheme().writeInSettings();
         mwd->syncSettings();
     }
@@ -174,6 +175,7 @@ void ConfigGeneral::preExec() {
         actFadeActivationChange();
         ui->spinFadeAmount->setValue(mwd->getTheme().getParam("fadeNumbersAmount").toInt());
         ui->spinFadeStrength->setValue(mwd->getTheme().getParam("fadeNumbersStrength").toInt());
+        ui->spinTempoDiapo->setValue(mwd->getTheme().getParam("tempoDiapoPause").toDouble());
     }
 }
 
