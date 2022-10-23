@@ -3,31 +3,30 @@
  <class>ConfigGeneral</class>
  <widget class="QDialog" name="ConfigGeneral">
   <property name="geometry">
-      <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>441</width>
-          <height>729</height>
-      </rect>
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>441</width>
+    <height>774</height>
+   </rect>
   </property>
-     <property name="windowTitle">
-         <string>Configuration générale</string>
+  <property name="windowTitle">
+   <string>Configuration générale</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../resources/EvenementLoto.qrc">
+    <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="windowIcon">
-         <iconset resource="../../resources/EvenementLoto.qrc">
-             <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png
-         </iconset>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-             <widget class="QGroupBox" name="groupBox">
-                 <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                     </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
+     <property name="minimumSize">
       <size>
        <width>151</width>
        <height>61</height>
@@ -191,12 +190,12 @@
            </property>
            <widget class="QWidget" name="scrollAreaWidgetContents">
             <property name="geometry">
-                <rect>
-                    <x>0</x>
-                    <y>0</y>
-                    <width>398</width>
-                    <height>447</height>
-                </rect>
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>419</width>
+              <height>513</height>
+             </rect>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_3">
              <property name="leftMargin">
@@ -527,6 +526,25 @@
                   </property>
                   <property name="text">
                    <string>Force de la fondue</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_17">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>24</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>Temps d'affiche de diapo en pause</string>
                   </property>
                  </widget>
                 </item>
@@ -966,6 +984,22 @@
                   </property>
                  </widget>
                 </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinTempoDiapo">
+                  <property name="alignment">
+                   <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="stepType">
+                   <enum>QAbstractSpinBox::AdaptiveDecimalStepType</enum>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
                </layout>
               </widget>
              </item>
@@ -1159,7 +1193,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>155</x>
-     <y>710</y>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
      <x>117</x>
@@ -1175,7 +1209,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>257</x>
-     <y>710</y>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
      <x>224</x>
@@ -1191,7 +1225,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>359</x>
-     <y>710</y>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
      <x>336</x>
@@ -1306,7 +1340,7 @@
      <y>430</y>
     </hint>
     <hint type="destinationlabel">
-     <x>445</x>
+     <x>440</x>
      <y>456</y>
     </hint>
    </hints>
@@ -1322,7 +1356,7 @@
      <y>526</y>
     </hint>
     <hint type="destinationlabel">
-     <x>445</x>
+     <x>440</x>
      <y>486</y>
     </hint>
    </hints>
@@ -1338,7 +1372,7 @@
      <y>569</y>
     </hint>
     <hint type="destinationlabel">
-     <x>445</x>
+     <x>440</x>
      <y>538</y>
     </hint>
    </hints>
@@ -1354,7 +1388,7 @@
      <y>601</y>
     </hint>
     <hint type="destinationlabel">
-     <x>447</x>
+     <x>440</x>
      <y>578</y>
     </hint>
    </hints>
@@ -1370,7 +1404,7 @@
      <y>450</y>
     </hint>
     <hint type="destinationlabel">
-     <x>446</x>
+     <x>440</x>
      <y>442</y>
     </hint>
    </hints>
