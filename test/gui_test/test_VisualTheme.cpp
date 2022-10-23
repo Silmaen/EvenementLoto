@@ -67,7 +67,7 @@ TEST(gui_VisualTheme, ExportJSON) {
     std::ifstream inFile(file, std::ios::in);
     std::string resu{(std::istreambuf_iterator<char>(inFile)), (std::istreambuf_iterator<char>())};
     inFile.close();
-    EXPECT_STREQ(resu.c_str(), "{\n    \"theme\": {\n        \"backgroundColor\": \"#F0F0F0\",\n        \"baseRatio\": 0.02,\n        \"fadeNumbers\": true,\n        \"fadeNumbersAmount\": 3,\n        \"fadeNumbersStrength\": 10,\n        \"gridBackgroundColor\": \"#F0F0F0\",\n        \"gridTextRatio\": 0.85,\n        \"longTextRatio\": 0.6,\n        \"name\": \"default\",\n        \"selectedNumberColor\": \"#FF7000\",\n        \"shortTextRatio\": 1.4,\n        \"textColor\": \"#000000\",\n        \"titleRatio\": 2.0,\n        \"truncatePrice\": true,\n        \"truncatePriceLines\": 3\n    }\n}");
+    EXPECT_STREQ(resu.c_str(), "{\n    \"theme\": {\n        \"backgroundColor\": \"#F0F0F0\",\n        \"baseRatio\": 0.02,\n        \"fadeNumbers\": true,\n        \"fadeNumbersAmount\": 3,\n        \"fadeNumbersStrength\": 10,\n        \"gridBackgroundColor\": \"#F0F0F0\",\n        \"gridTextRatio\": 0.85,\n        \"longTextRatio\": 0.6,\n        \"name\": \"default\",\n        \"selectedNumberColor\": \"#FF7000\",\n        \"shortTextRatio\": 1.4,\n        \"tempoDiapoPause\": 1.0,\n        \"textColor\": \"#000000\",\n        \"titleRatio\": 2.0,\n        \"truncatePrice\": true,\n        \"truncatePriceLines\": 3\n    }\n}");
     fs::remove_all(tmp);
 }
 

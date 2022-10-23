@@ -32,6 +32,7 @@ static const params themeDefaults{
         {"fadeNumbers", true},
         {"fadeNumbersAmount", 3},
         {"fadeNumbersStrength", 10},
+        {"tempoDiapoPause", 1.0},
 };
 
 /**
