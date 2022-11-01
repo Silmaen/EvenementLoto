@@ -39,6 +39,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Werror -Weverything -pedantic
             -Wno-c++98-compat
             -Wno-c++98-compat-pedantic
+            -Wno-c++20-compat
             -Wno-padded
             -Wno-used-but-marked-unused
             -Wno-exit-time-destructors

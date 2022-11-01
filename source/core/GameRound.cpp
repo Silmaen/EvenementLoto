@@ -172,6 +172,18 @@ void GameRound::read(std::istream& is, int file_version) {
             subGames[i % part].addPickedNumber(draws[i]);//----UNCOVER----
         }                                                //----UNCOVER----
     }                                                    //----UNCOVER----
+    diapoPath = path{};
+    diapoDelay= 0;
+    if(type == Type::Pause && file_version > 4) {
+        sizeType len;
+        is.read(reinterpret_cast<char*>(&len), sizeof(sizeType));
+        string tmp;
+        tmp.resize(len);
+        for(sizeType i= 0; i < l; i++)
+            is.read(reinterpret_cast<char*>(&tmp[i]), charSize);
+        diapoPath= tmp;
+        is.read(reinterpret_cast<char*>(&diapoDelay), sizeof(double));
+    }
 }
 
 void GameRound::write(std::ostream& os) const {
@@ -185,6 +197,12 @@ void GameRound::write(std::ostream& os) const {
     os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
     for(subRoundsType::size_type i= 0; i < l2; ++i)
         subGames[i].write(os);
+    if(type == Type::Pause) {
+        sizeType l3= diapoPath.string().size();
+        os.write(reinterpret_cast<const char*>(&l3), sizeof(l3));
+        for(sizeType i= 0; i < l3; ++i) os.write(&(diapoPath.string()[i]), charSize);
+        os.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
+    }
     spdlog::debug("Fin d'écriture d'un GameRound dans un stream");
 }
 
@@ -266,6 +284,15 @@ string GameRound::getWinnerStr() const {
         result+= fmt::format("{}: {}\n", sub.getTypeStr(), sub.getWinner());
     }
     return result;
+}
+
+void GameRound::setDiapo(const string& path, const double delai) {
+    diapoPath = path;
+    diapoDelay= delai;
+}
+
+std::tuple<path, double> GameRound::getDiapo() const {
+    return {diapoPath, diapoDelay};
 }
 
 }// namespace evl::core

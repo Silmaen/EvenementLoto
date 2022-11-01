@@ -287,22 +287,21 @@ void DisplayWindow::updateDisplayRules() {
 }
 
 void DisplayWindow::updatePauseScreen() {
-    auto slide_Path= event->getBasePath() / "slides";
-    if(!exists(slide_Path))
+    auto round          = event->getCurrentCGameRound();
+    auto [dPath, dDelay]= round->getDiapo();
+    if(dPath.empty() || dDelay <= 0 || !exists(dPath)) {
+        QImage img  = loadImage(event->getOrganizerLogoFull());
+        QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+        setPixMap(ui->EP_Text, name, img);
         return;
-    std::vector<path> slides;
-    string print;
-    const std::vector<path> extension{".png", ".jpg", ".svg"};
-    for(const auto& ipath: std::filesystem::directory_iterator(slide_Path)) {
-        if(std::find(extension.begin(), extension.end(), ipath.path().extension()) == extension.end()) {
-            spdlog::trace("Path: {} bad ext: {}", ipath.path().string(), ipath.path().extension().string());
-            continue;
-        }
-        spdlog::trace("Path: {} added!", ipath.path().string());
-        slides.push_back(ipath);
-        print+= fmt::format(" {}", ipath.path().string());
     }
-    spdlog::debug("Slides: {}", print);
+    std::vector<path> slides;
+    const std::vector<path> extension{".png", ".jpg", ".svg"};
+    for(const auto& ipath: std::filesystem::directory_iterator(dPath)) {
+        if(std::find(extension.begin(), extension.end(), ipath.path().extension()) == extension.end())
+            continue;
+        slides.push_back(ipath);
+    }
     if(slides.empty()) {
         QImage img  = loadImage(event->getOrganizerLogoFull());
         QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
@@ -311,10 +310,8 @@ void DisplayWindow::updatePauseScreen() {
     }
     static size_t curSlide   = 0;
     static core::timePoint tp= core::epoch;
-    auto length              = static_cast<int>(mwd->getTheme().getParam("tempoDiapoPause").toDouble() * 1000);
-    if(std::chrono::duration_cast<std::chrono::milliseconds>(core::clock::now() - tp).count() < length)
+    if(static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(core::clock::now() - tp).count()) / 1000.0 < dDelay)
         return;
-
     tp        = core::clock::now();
     curSlide  = (curSlide + 1) % slides.size();
     auto slide= loadImage(slides[curSlide]);
