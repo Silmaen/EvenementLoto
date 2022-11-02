@@ -164,6 +164,10 @@ public slots:
      */
     void actChangePriceValue();
 
+    void actChangePause();
+
+    void actFindDiapo();
+
 private:
     /**
      * @brief Met à jour l’affichage
@@ -183,6 +187,10 @@ private:
      * @brief Mets à jour l’affichage de la partie d’affichage de résultat
      */
     void updateDisplayResults();
+    /**
+     * @brief Met à jour l’affichage de la partie d’édition
+     */
+    void updateDisplayPhase();
 
     /**
      * @brief Renvoie la liste des types de partie

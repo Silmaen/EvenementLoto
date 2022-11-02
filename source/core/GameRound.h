@@ -273,6 +273,16 @@ public:
         return std::accumulate(subGames.begin(), subGames.end(), 0ULL, [](drawsType::size_type accu, const auto& item) { return accu + item.getDraws().size(); });
     }
 
+    void setDiapo(const string& path, const double delai);
+
+    std::tuple<path, double> getDiapo() const;
+
+    /**
+     * @brief Check if the round has diaporama
+     * @return true if there is a diaporama
+     */
+    [[nodiscard]] bool hasDiapo() const { return type == Type::Pause && (!diapoPath.empty() || diapoDelay > 0); }
+
 private:
     /// Le numéro de la partie (à ne pas afficher si négatif)
     int Id= 0;
@@ -292,6 +302,11 @@ private:
     /// La liste des
     subRoundsType subGames;
 
+    /// Diaporama Path (only in pause)
+    path diapoPath{};
+
+    /// Diaporama delay (only in pause)
+    double diapoDelay= 0;
     // ---------------- private functions ----------------
 
     /**

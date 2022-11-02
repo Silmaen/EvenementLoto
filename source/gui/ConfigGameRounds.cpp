@@ -14,7 +14,8 @@
 
 namespace evl::gui {
 
-static bool in_update_loop= false;
+static bool in_update_loop  = false;
+static bool in_update_prices= false;
 
 ConfigGameRounds::ConfigGameRounds(QWidget* parent):
     QDialog(parent),
@@ -76,6 +77,7 @@ void ConfigGameRounds::actMoveGameRoundAfter() {
         return;
     if(cur >= static_cast<int>(gameEvent.sizeRounds() - 1))// déjà en dernière position
         return;
+    ui->listGameRound->setCurrentRow(cur + 1);
     gameEvent.swapRoundByIndex(static_cast<uint16_t>(cur), static_cast<uint16_t>(cur + 1));
     updateDisplay();
 }
@@ -84,6 +86,7 @@ void ConfigGameRounds::actMoveGameRoundBefore() {
     int cur= ui->listGameRound->currentRow();
     if(cur < 1)// rien de sélectionné ou déjà en première position
         return;
+    ui->listGameRound->setCurrentRow(cur - 1);
     gameEvent.swapRoundByIndex(static_cast<uint16_t>(cur), static_cast<uint16_t>(cur - 1));
     updateDisplay();
 }
@@ -112,7 +115,8 @@ void ConfigGameRounds::actChangeRoundNumber(int) {
 void ConfigGameRounds::actEndEditingPrice() {
     if(in_update_loop)
         return;
-    int cur= ui->listGameRound->currentRow();
+    in_update_prices= true;
+    int cur         = ui->listGameRound->currentRow();
     if(cur < 0)
         return;
     auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
@@ -122,6 +126,7 @@ void ConfigGameRounds::actEndEditingPrice() {
     auto subround= round->getSubRound(static_cast<uint32_t>(scur));
     subround->define(subround->getType(), ui->TextPrices->toPlainText().toStdString(), ui->PricesValue->value());
     updateDisplay();
+    in_update_prices= false;
 }
 
 void ConfigGameRounds::actChangePriceValue() {
@@ -139,6 +144,29 @@ void ConfigGameRounds::actMoveSubGameRoundAfter() {
 }
 void ConfigGameRounds::actMoveSubGameRoundBefore() {
 }
+
+void ConfigGameRounds::actChangePause() {
+    int cur= ui->listGameRound->currentRow();
+    if(cur < 0) return;
+    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    if(round->getType() != core::GameRound::Type::Pause) return;
+    if(ui->PauseDiapo->isChecked()) {
+        if(ui->PauseDiapoFolder->text().isEmpty() && ui->PauseDiapoDelay->value() <= 0) {
+            round->setDiapo(ui->PauseDiapoFolder->text().toStdString(), 1.2);
+        } else {
+            round->setDiapo(ui->PauseDiapoFolder->text().toStdString(), ui->PauseDiapoDelay->value());
+        }
+    } else {
+        round->setDiapo("", 0);
+    }
+    updateDisplay();
+}
+
+void ConfigGameRounds::actFindDiapo() {
+    auto fold= dialog::openFile(dialog::FileTypes::Folder, true);
+    ui->PauseDiapoFolder->setText(QString::fromStdString(fold.string()));
+}
+
 // -----------------
 
 void ConfigGameRounds::actChangeSelectedGameRound() {
@@ -231,25 +259,7 @@ void ConfigGameRounds::updateDisplayEdits() {
         } else {
             ui->listSubRound->setCurrentRow(scur);
         }
-        scur= ui->listSubRound->currentRow();// re-update l'indice
-        // remplissage de la configuration de la phase
-        if(scur >= 0) {
-            ui->groupPhase->setEnabled(true);
-            auto subRound= round->getSubRound(static_cast<uint32_t>(scur));
-            ui->SubRoundTypes->clear();
-            ui->SubRoundTypes->addItems(getVictoryType(round->getType()));
-            ui->SubRoundTypes->setCurrentIndex(getVictoryIndex(round->getType(), subRound->getType()));
-            auto p= ui->TextPrices->textCursor();
-            ui->TextPrices->clear();
-            ui->TextPrices->setText(QString::fromUtf8(subRound->getPrices()));
-            ui->TextPrices->setTextCursor(p);
-            ui->PricesValue->setValue(subRound->getValue());
-        } else {
-            ui->groupPhase->setEnabled(false);
-            ui->SubRoundTypes->clear();
-            ui->TextPrices->clear();
-            ui->PricesValue->setValue(0);
-        }
+        updateDisplayPhase();
     } else {
         ui->listSubRound->clear();
         ui->groupSubRound->setEnabled(false);
@@ -260,6 +270,49 @@ void ConfigGameRounds::updateDisplayEdits() {
     }
     // on libère le mutex
     in_update_loop= false;
+}
+
+void ConfigGameRounds::updateDisplayPhase() {
+    int cur   = ui->listGameRound->currentRow();
+    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    if(round->getType() == core::GameRound::Type::Pause) {
+        ui->PhaseConfiguration->setCurrentIndex(1);
+        if(round->hasDiapo()) {
+            ui->PauseDiapo->setChecked(true);
+            ui->PauseNothing->setChecked(false);
+            ui->FramePauseDiapo->setEnabled(true);
+            auto [dPath, dDelay]= round->getDiapo();
+            ui->PauseDiapoFolder->setText(QString::fromStdString(dPath.string()));
+            ui->PauseDiapoDelay->setValue(dDelay);
+        } else {
+            ui->PauseDiapo->setChecked(false);
+            ui->PauseNothing->setChecked(true);
+            ui->PauseDiapoFolder->clear();
+            ui->PauseDiapoDelay->setValue(0);
+            ui->FramePauseDiapo->setEnabled(false);
+        }
+        return;
+    }
+    int scur= ui->listSubRound->currentRow();
+    if(scur >= 0) {
+        ui->groupPhase->setEnabled(true);
+        ui->PhaseConfiguration->setCurrentIndex(0);
+        auto subRound= round->getSubRound(static_cast<uint32_t>(scur));
+        ui->SubRoundTypes->clear();
+        ui->SubRoundTypes->addItems(getVictoryType(round->getType()));
+        ui->SubRoundTypes->setCurrentIndex(getVictoryIndex(round->getType(), subRound->getType()));
+        if(!in_update_prices)
+            ui->TextPrices->setText(QString::fromUtf8(subRound->getPrices()));
+        ui->PricesValue->setValue(subRound->getValue());
+    } else {
+        ui->groupPhase->setEnabled(false);
+        ui->PhaseConfiguration->setCurrentIndex(0);
+        ui->SubRoundTypes->clear();
+        ui->TextPrices->clear();
+        ui->PricesValue->setValue(0);
+        ui->PauseDiapoDelay->setValue(1.2);
+        ui->PauseDiapoFolder->clear();
+    }
 }
 
 void ConfigGameRounds::updateDisplayResults() {
