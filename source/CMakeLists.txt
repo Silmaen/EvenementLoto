@@ -7,7 +7,7 @@ file(GLOB_RECURSE
         ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/core/*.h
         )
-add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
+add_library(${CMAKE_PROJECT_NAME}_lib SHARED ${SRCS})
 target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC .)
 
 # ----==== third party ====----
@@ -42,7 +42,7 @@ file(GLOB_RECURSE
         SRCS_UI
         ${CMAKE_CURRENT_SOURCE_DIR}/gui/*
         )
-add_library(${CMAKE_PROJECT_NAME}_ui ${SRCS_UI})
+add_library(${CMAKE_PROJECT_NAME}_ui SHARED ${SRCS_UI})
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui
         ${CMAKE_PROJECT_NAME}_lib
         )

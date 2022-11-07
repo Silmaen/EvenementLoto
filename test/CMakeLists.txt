@@ -50,7 +50,7 @@ FOREACH (child ${children})
             add_dependencies(All_Tests ${${child}_exe})
             add_custom_command(TARGET All_Tests POST_BUILD
                     COMMAND ${${PRJPREFIX_LOWER}_${child}_test_command}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
         ENDIF ()
     ENDIF ()

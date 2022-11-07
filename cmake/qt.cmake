@@ -70,7 +70,7 @@ function(qt_attach_to_target TARGET_ATTACH)
         else ()
             message(WARNING "Cannot find the platform dll at ${QT_PLUG_PATH}/plugins/platforms/qwindows.dll")
         endif ()
-        foreach (QT_LIB Core Gui Widgets)
+        foreach (QT_LIB ${${PRJPREFIX}_QT_COMPONENTS_LIST})
             add_custom_command(TARGET ${TARGET_ATTACH} POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${QT_INSTALL_PATH}/bin/Qt${${PRJPREFIX}_QT_VERSION}${QT_LIB}.dll"

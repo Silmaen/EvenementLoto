@@ -3,11 +3,13 @@
 #
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(EXE_EXT ".exe")
-    set(LIB_EXT ".exe")
+    set(LIB_EXT ".dll")
     set(${PRJPREFIX}_GNU_MINIMAL 12)
     set(${PRJPREFIX}_CLANG_MINIMAL 14)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(EXE_EXT "")
+    set(LIB_EXT ".so")
     set(${PRJPREFIX}_GNU_MINIMAL 12.0)
     set(${PRJPREFIX}_CLANG_MINIMAL 14.0)
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
@@ -48,6 +50,8 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
+
+SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_compile_definitions(${PRJPREFIX}_DEBUG)
