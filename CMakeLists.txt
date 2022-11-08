@@ -37,32 +37,16 @@ add_subdirectory(test)
 #
 # ---=== Packaging ===---
 #
+include(CPack)
 add_custom_target(Package
         DEPENDS ${CMAKE_PROJECT_NAME})
 set(PACKAGE_BINARY ${PROJECT_BINARY_DIR}/source)
 
 set(PACKAGE_LOCATION ${PROJECT_BINARY_DIR}/bin)
 # copy main executable
-add_custom_command(
-        TARGET Package POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PACKAGE_BINARY}/${CMAKE_PROJECT_NAME}${EXE_EXT} ${PACKAGE_LOCATION}/${CMAKE_PROJECT_NAME}${EXE_EXT})
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     # copy along dlls
-    foreach (QT_LIB Core Gui Widgets)
-        add_custom_command(
-                TARGET Package POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E copy ${PACKAGE_BINARY}/Qt6${QT_LIB}.dll
-                ${PACKAGE_LOCATION}/Qt6${QT_LIB}.dll)
-    endforeach()
-    add_custom_command(TARGET Package POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory
-            "${PACKAGE_LOCATION}/platforms/")
-    add_custom_command(TARGET Package POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "${PACKAGE_BINARY}/platforms/qwindows.dll"
-            "${PACKAGE_LOCATION}/platforms/")
-
     cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
     foreach (BASE_LIB winpthread-1 stdc++-6 gcc_s_seh-1
             fmt
@@ -74,7 +58,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${COMPILER_PATH}/lib${BASE_LIB}.dll"
                     "${PROJECT_BINARY_DIR}/bin")
-        elseif(EXISTS ${COMPILER_PATH}/${BASE_LIB}.dll)
+        elseif (EXISTS ${COMPILER_PATH}/${BASE_LIB}.dll)
             add_custom_command(TARGET Package POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
                     "${COMPILER_PATH}/${BASE_LIB}.dll"
@@ -87,3 +71,13 @@ add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data ${PROJECT_BINARY_DIR}/bin/data)
 
+install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION .)
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    add_custom_command(
+            TARGET Package POST_BUILD
+            COMMAND ${CMAKE_CPACK_COMMAND} -G ZIP)
+else ()
+    add_custom_command(
+            TARGET Package POST_BUILD
+            COMMAND ${CMAKE_CPACK_COMMAND} -G TGZ)
+endif ()
