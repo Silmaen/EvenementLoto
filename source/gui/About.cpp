@@ -22,4 +22,4 @@ About::~About() {
     delete ui;
 }
 
-}// namespace evl
+}// namespace evl::gui

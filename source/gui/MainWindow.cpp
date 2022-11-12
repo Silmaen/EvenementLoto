@@ -14,7 +14,8 @@
 #include "WinnerInput.h"
 #include <QFileDialog>
 #include <QScreen>
-#include <fstream>
+#include <QScrollBar>
+#include <core/Logger.h>
 #include <iostream>
 
 // Les trucs de QT
@@ -156,11 +157,13 @@ void MainWindow::actSaveAsFile() {
 }
 
 void MainWindow::actStartEvent() {
-    if(!dialog::question("Démarrage de l’événement.",
-                         "Êtes-vous sûr de vouloir démarrer l’événement ?",
-                         "Une fois démarré, la configuration de l’événement et de ses parties ne pourra plus être modifié."))
-        return;
-    currentEvent.nextState();
+    if(currentEvent.getStatus() == core::Event::Status::Ready) {
+        if(!dialog::question("Démarrage de l’événement.",
+                             "Êtes-vous sûr de vouloir démarrer l’événement ?",
+                             "Une fois démarré, la configuration de l’événement et de ses parties ne pourra plus être modifié."))
+            return;
+        currentEvent.nextState();
+    }
     updateDisplay();
     timer->start();
     displayWindow= new DisplayWindow(&currentEvent, this);
@@ -273,6 +276,20 @@ void MainWindow::updateClocks() {
     //
     // Horloge principale
     ui->CurrentTime->setText(QString::fromStdString(core::formatClock(core::clock::now())));
+    // update logfile
+    logUpdateCounter++;
+    if(ui->tabWidget->tabText(ui->tabWidget->currentIndex()) == "Log" && logUpdateCounter > 20) {
+        logUpdateCounter= 0;
+        std::ifstream file(evl::getLogPath(), std::ios::in);
+        QString text;
+        for(string line; getline(file, line);) {
+            text+= QString::fromStdString(line) + "\n";
+        }
+        ui->textLog->setText(text);
+        ui->textLog->verticalScrollBar()->setValue(ui->textLog->verticalScrollBar()->maximum());
+    }
+    // Mise à jour des stats
+    updateStats();
     // horloge partie en cours
     auto cur= currentEvent.getCurrentCGameRound();
     // check si la fenêtre d'affichage est ouverte ou fermée
@@ -305,12 +322,17 @@ void MainWindow::checkDisplayWindow() {
         return;
     autoSaveCounter= 0;
     QVariant p     = settings.value("path/data_path", "");
-    if(p.toString() == "")
+    if(p.toString() == "") {
+        spdlog::warn("Backup Save: pas de chemin vers les data");
         return;
+    }
     path pt(p.toString().toStdString());
-    if(!exists(pt))
+    if(!exists(pt)) {
+        spdlog::warn("Backup Save: répertoire de data inexistant");
         return;
+    }
     pt= pt / "rescue.lev";
+    spdlog::debug("Backup partie in {}", pt.string());
     saveFile(pt);
 }
 
@@ -375,6 +397,39 @@ void MainWindow::updateMenus() {
 
 void MainWindow::updateBottomFrame() {
     updateRadioButtons();
+}
+
+void MainWindow::updateStats() {
+    if(currentEvent.getStatus() == core::Event::Status::Invalid ||
+       currentEvent.getStatus() == core::Event::Status::MissingParties ||
+       currentEvent.getStatus() == core::Event::Status::Ready)
+        return;
+    auto cur= currentEvent.getCurrentCGameRound();
+    // pas de round en courts
+    if(cur == currentEvent.endRounds())
+        return;
+    auto res= currentEvent.getStats();
+
+    ui->MostPickNb->setText(QString::number(res.mostPickNb));
+    ui->MostPickList->setText(QString::fromStdString(fmt::format("{}", fmt::join(res.mostPickList, " "))));
+    ui->LessPickNb->setText(QString::number(res.lessPickNb));
+    ui->LessPickList->setText(QString::fromStdString(fmt::format("{}", fmt::join(res.lessPickList, " "))));
+
+    ui->RoundLongest->setText(QString::fromStdString(core::formatDuration(res.roundLongest)));
+    ui->RoundShortest->setText(QString::fromStdString(core::formatDuration(res.roundShortest)));
+    ui->RoundAverage->setText(QString::fromStdString(core::formatDuration(res.roundAverage)));
+
+    ui->SubRoundLongest->setText(QString::fromStdString(core::formatDuration(res.subRoundLongest)));
+    ui->SubRoundShortest->setText(QString::fromStdString(core::formatDuration(res.subRoundShortest)));
+    ui->SubRoundAverage->setText(QString::fromStdString(core::formatDuration(res.subRoundAverage)));
+
+    ui->RoundMostNb->setText(QString::number(res.roundMostNb));
+    ui->RoundLeastNb->setText(QString::number(res.roundLessNb));
+    ui->RoundAverageNb->setText(QString::number(res.roundAverageNb));
+
+    ui->SubRoundMostNb->setText(QString::number(res.subRoundMostNb));
+    ui->SubRoundLeastNb->setText(QString::number(res.subRoundLessNb));
+    ui->SubRoundAverageNb->setText(QString::number(res.subRoundAverageNb));
 }
 
 void MainWindow::updateInfoEvent() {

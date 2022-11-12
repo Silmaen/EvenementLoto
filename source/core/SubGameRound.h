@@ -7,6 +7,7 @@
 */
 #pragma once
 #include "Serializable.h"
+#include "timeFunctions.h"
 
 namespace evl::core {
 
@@ -178,6 +179,19 @@ public:
      * @param j Le json à lire
      */
     void from_json(const json& j) override;
+
+    // ---- accès aux timers ----
+    /**
+     * @brief Accès à la date de départ
+     * @return La date de départ
+     */
+    const timePoint& getStarting() const { return start; }
+
+    /**
+     * @brief Accès à la date de fin
+     * @return La date de fin
+     */
+    const timePoint& getEnding() const { return end; }
 #ifdef EVL_DEBUG
     /**
      * @brief define invalide Status for testing purpose
@@ -207,6 +221,11 @@ private:
     string winner= "";
     /// La liste des numéros tirés.
     drawsType draws= {};
+    /// La date et heure de début de partie
+    timePoint start{};
+
+    /// La date et heure de début de partie
+    timePoint end{};
 };
 
 }// namespace evl::core

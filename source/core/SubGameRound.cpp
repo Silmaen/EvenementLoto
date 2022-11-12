@@ -40,6 +40,7 @@ const string SubGameRound::getStatusStr() const {
 void SubGameRound::nextStatus() {
     switch(status) {
     case Status::Ready:
+        start= clock::now();
         if(!prices.empty())
             status= Status::PreScreen;
         else
@@ -49,8 +50,10 @@ void SubGameRound::nextStatus() {
         status= Status::Running;
         break;
     case Status::Running:
-        if(!winner.empty())
+        if(!winner.empty()) {
             status= Status::Done;
+            end   = clock::now();
+        }
         break;
     case Status::Done:// the last status!
         break;
@@ -90,6 +93,10 @@ void SubGameRound::read(std::istream& bs, int file_version) {
         for(drawsType::size_type i= 0; i < ld; ++i)
             bs.read(reinterpret_cast<char*>(&(draws[i])), sizeof(drawsType::value_type));
     }
+    if(file_version > 5) {
+        bs.read(reinterpret_cast<char*>(&start), sizeof(start));
+        bs.read(reinterpret_cast<char*>(&end), sizeof(end));
+    }
 }
 
 void SubGameRound::write(std::ostream& bs) const {
@@ -111,6 +118,8 @@ void SubGameRound::write(std::ostream& bs) const {
     bs.write(reinterpret_cast<const char*>(&ld), sizeof(drawsType::size_type));
     for(drawsType::size_type i= 0; i < ld; ++i)
         bs.write(reinterpret_cast<const char*>(&(draws[i])), sizeof(drawsType::value_type));
+    bs.write(reinterpret_cast<const char*>(&start), sizeof(start));
+    bs.write(reinterpret_cast<const char*>(&end), sizeof(end));
 }
 
 json SubGameRound::to_json() const {
