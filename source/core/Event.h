@@ -8,6 +8,7 @@
 #pragma once
 #include "GameRound.h"
 #include "Serializable.h"
+#include "Statistics.h"
 
 namespace evl::core {
 
@@ -298,6 +299,13 @@ public:
      * @param p Le chemin vers l’événement
      */
     void setBasePath(const path& p);
+
+    /**
+     * @brief Renvoie le nombre de tirages et la liste des numéros les moins tirés
+     * @return Les statistiques
+     */
+    Statistics getStats(bool withoutChild= true) const;
+
 #ifdef EVL_DEBUG
     /**
      * @brief define invalide Status for testing purpose

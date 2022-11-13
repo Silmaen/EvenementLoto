@@ -42,4 +42,4 @@ private:
     Ui::About* ui;
 };
 
-}// namespace evl
+}// namespace evl::gui

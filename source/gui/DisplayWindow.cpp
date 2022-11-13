@@ -8,10 +8,10 @@
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
+#include <spdlog/spdlog.h>
 
 // Les trucs de QT
 #include <moc_DisplayWindow.cpp>
-#include <spdlog/spdlog.h>
 #include <ui/ui_DisplayWindow.h>
 
 namespace evl::gui {

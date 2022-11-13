@@ -16,13 +16,8 @@
  */
 namespace evl {
 
-/// Nombre de lignes sur un carton
-constexpr uint8_t nb_ligne= 3;
-/// Nombre de colonnes sur un carton
-constexpr uint8_t nb_colones= 5;
-
 /// Version des sauvegardes
-constexpr uint16_t currentSaveVersion= 5;
+constexpr uint16_t currentSaveVersion= 6;
 
 /// Définition d’un chemin vers un fichier ou répertoire
 using path= std::filesystem::path;
@@ -33,5 +28,24 @@ using string= std::string;
 using sizeType= std::string::size_type;
 /// La taille mémoire d’un caractère de chaine.
 constexpr auto charSize= sizeof(string::value_type);
+
+/// Variable qui va contenir le chemin vers ce programme
+static path baseExecPath;
+
+#ifndef EVL_AUTHOR
+#define EVL_AUTHOR "Damien Lachouette"
+#endif
+#ifndef EVL_MAJOR
+#define EVL_MAJOR "0"
+#endif
+#ifndef EVL_MINOR
+#define EVL_MINOR "xx"
+#endif
+#ifndef EVL_PATCH
+#define EVL_PATCH "dev"
+#endif
+static const string EVL_VERSION   = string(EVL_MAJOR) + string(".") + string(EVL_MINOR) + string(".") + string(EVL_PATCH);
+static const string EVL_AUTHOR_STR= string(EVL_AUTHOR);
+static const string EVL_APP       = "Événement Loto";
 
 }// namespace evl

@@ -9,21 +9,10 @@
 #include "gui/baseDefinitions.h"
 #include <QApplication>
 #include <QCommandLineParser>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/spdlog.h>
+#include <core/Logger.h>
 
 using namespace evl::gui;
 using namespace std::filesystem;
-
-void startSpdlog() {
-    spdlog::default_logger()->sinks().push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>((baseExecPath / "exec.log").generic_string()));
-#ifdef EVL_DEBUG
-    spdlog::set_level(spdlog::level::trace);
-    spdlog::flush_every(std::chrono::seconds(1U));
-#else
-    spdlog::set_level(spdlog::level::info);
-#endif
-}
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
@@ -32,16 +21,20 @@ int main(int argc, char* argv[]) {
     parser.addHelpOption();
     parser.addVersionOption();
     parser.process(app);
-    baseExecPath= absolute(path(argv[0])).parent_path();
-    QCoreApplication::setOrganizationName("Damien Lachouette");
-    QCoreApplication::setApplicationName("Événement Loto");
-    QCoreApplication::setApplicationVersion("1.0");
-    startSpdlog();
-    spdlog::info("Démarrage de l'application Événement Loto version 1.0 créée par Damien Lachouette");
+    evl::baseExecPath= absolute(path(argv[0])).parent_path();
+    QCoreApplication::setOrganizationName(QString::fromStdString(evl::EVL_AUTHOR_STR));
+    QCoreApplication::setApplicationName(QString::fromStdString(evl::EVL_APP));
+    QCoreApplication::setApplicationVersion(QString::fromStdString(evl::EVL_VERSION));
+    evl::resetLogFile();
+    evl::startSpdlog();
+    spdlog::info("---------------------------------------------------------------------------------------");
+    spdlog::info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION, evl::EVL_AUTHOR_STR);
     MainWindow window;
     window.syncSettings();
     window.show();
     auto ret= app.exec();
-    spdlog::info("Sortie de l'application Événement Loto Avec le code {}", ret);
+    spdlog::info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
+    spdlog::info("---------------------------------------------------------------------------------------");
+    spdlog::shutdown();
     return ret;
 }

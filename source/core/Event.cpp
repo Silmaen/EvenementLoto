@@ -31,7 +31,6 @@ string Event::getStatusStr() const {
 
 // ---- Serialisation ----
 void Event::read(std::istream& is, int) {
-    spdlog::debug("Event - Lecture d'un Event depuis un stream");
     uint16_t saveVersion;
     is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
     spdlog::debug("Version des données du stream: {}, version courante: {}", saveVersion, currentSaveVersion);
@@ -77,12 +76,10 @@ void Event::read(std::istream& is, int) {
     spdlog::info("Event lu et contenant {} parties", lv);
     is.read(reinterpret_cast<char*>(&start), sizeof(start));
     is.read(reinterpret_cast<char*>(&end), sizeof(end));
-    spdlog::debug("Fin de lecture d'un Event depuis un stream");
     spdlog::info("Event in state: {}", getStateString());
 }
 
 void Event::write(std::ostream& os) const {
-    spdlog::debug("Écriture d'un Event dans un stream");
     os.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
     sizeType l, i;
@@ -113,7 +110,6 @@ void Event::write(std::ostream& os) const {
 
     os.write(reinterpret_cast<const char*>(&start), sizeof(start));
     os.write(reinterpret_cast<const char*>(&end), sizeof(end));
-    spdlog::debug("Fin de l'écriture d'un Event dans un stream");
 }
 
 json Event::to_json() const {
@@ -353,6 +349,20 @@ void Event::changeStatus(const Status& newStatus) {
 
 void Event::restoreStatus() {
     status= previousStatus;
+}
+
+Statistics Event::getStats(bool withoutChild) const {
+    Statistics stat;
+    for(const auto& round: gameRounds) {
+        if(round.getType() == GameRound::Type::Pause)
+            continue;
+        if(round.getStatus() == GameRound::Status::Ready)
+            break;
+        if(withoutChild && round.getType() == GameRound::Type::Enfant)
+            continue;
+        stat.pushRound(round);
+    }
+    return stat;
 }
 
 Serializable::~Serializable()= default;

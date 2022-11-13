@@ -53,6 +53,11 @@ endif ()
 
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
+add_compile_definitions(${PRJPREFIX}_MAJOR="${CMAKE_PROJECT_VERSION_MAJOR}")
+add_compile_definitions(${PRJPREFIX}_MINOR="${CMAKE_PROJECT_VERSION_MINOR}")
+add_compile_definitions(${PRJPREFIX}_PATCH="${CMAKE_PROJECT_VERSION_PATCH}")
+add_compile_definitions(${PRJPREFIX}_AUTHOR="Damien Lachouette")
+
 if (CMAKE_BUILD_TYPE MATCHES "Debug")
     add_compile_definitions(${PRJPREFIX}_DEBUG)
 endif ()

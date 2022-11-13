@@ -18,8 +18,6 @@
  */
 namespace evl::gui {
 
-/// Variable qui va contenir le chemin vers ce programme
-static path baseExecPath;
 /// Nom du fichier de configuration générale de base.
 inline path iniFile= "config.ini";
 
