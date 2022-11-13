@@ -219,6 +219,11 @@ private:
     void updateDraws();
 
     /**
+     * @brief Mise à jour des données de statistiques
+     */
+    void updateStats();
+
+    /**
      * @brief Mise à jour des commandes
      */
     void updateCommands();
@@ -235,7 +240,7 @@ private:
     void saveFile(const path& where);
 
     /// Lien vers la page UI.
-    Ui::MainWindow* ui;
+    Ui::MainWindow* ui= nullptr;
 
     /// Les settings généraux.
     QSettings settings;
@@ -244,7 +249,7 @@ private:
     core::Event currentEvent;
 
     /// Timer interne
-    QTimer* timer;
+    QTimer* timer= nullptr;
 
     /// Fenêtre d’affichage sur le second écran.
     DisplayWindow* displayWindow= nullptr;
@@ -262,7 +267,10 @@ private:
     path currentFile= path{};
 
     /// Simple compteur pour ralentir la sauvegarde automatique
-    int autoSaveCounter;
+    int autoSaveCounter= 0;
+
+    /// Compteur de ralentissement de l'actualisation du Log
+    int logUpdateCounter= 0;
 
     /// Variable mise à vraie au début de la procédure de mise à jour de l'affichage pour éviter les récursions infinies
     bool onUpdate= false;

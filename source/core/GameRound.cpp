@@ -6,7 +6,6 @@
  * All modification must get authorization from the author.
  */
 #include "GameRound.h"
-#include <spdlog/spdlog.h>
 
 namespace evl::core {
 
@@ -187,7 +186,6 @@ void GameRound::read(std::istream& is, int file_version) {
 }
 
 void GameRound::write(std::ostream& os) const {
-    spdlog::debug("Écriture d'un GameRound dans un stream");
     os.write(reinterpret_cast<const char*>(&Id), sizeof(Id));
     os.write(reinterpret_cast<const char*>(&type), sizeof(type));
     os.write(reinterpret_cast<const char*>(&status), sizeof(status));
@@ -203,7 +201,6 @@ void GameRound::write(std::ostream& os) const {
         for(sizeType i= 0; i < l3; ++i) os.write(&(diapoPath.string()[i]), charSize);
         os.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
     }
-    spdlog::debug("Fin d'écriture d'un GameRound dans un stream");
 }
 
 json GameRound::to_json() const {

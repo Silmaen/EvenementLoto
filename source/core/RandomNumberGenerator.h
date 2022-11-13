@@ -59,4 +59,4 @@ private:
     std::vector<uint8_t> alreadyPicked;
 };
 
-}// namespace evl
+}// namespace evl::core
