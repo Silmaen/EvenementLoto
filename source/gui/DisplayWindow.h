@@ -115,11 +115,11 @@ private:
     void setPage(const Page& newPage);
 
     /// Lien vers la page UI.
-    Ui::DisplayWindow* ui;
+    Ui::DisplayWindow* ui= nullptr;
     /// Lien vers le timer.
-    QTimer* timer;
+    QTimer* timer= nullptr;
     /// Lien vers l’événement en cours
-    core::Event* event;
+    core::Event* event= nullptr;
     /// La taille actuelle de l’image
     QSize currentSize;
     /// Lien vers la MainWindow

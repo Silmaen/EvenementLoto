@@ -105,7 +105,6 @@ private:
 
     /// L’événement en cours d’édition
     core::Event gameEvent;
-
 };
 
 }// namespace evl::gui
