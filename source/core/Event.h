@@ -199,7 +199,7 @@ public:
      * @param idx L’index de la partie
      * @return La partie
      */
-    roundsType::iterator getGameRound(const uint16_t& idx);
+    roundsType::iterator getGameRound(const uint32_t& idx);
 
     /**
      * @brief Cherche la première partie non terminée de la liste.

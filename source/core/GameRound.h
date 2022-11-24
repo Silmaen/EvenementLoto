@@ -199,6 +199,11 @@ public:
      */
     subRoundsType::iterator getSubRound(uint32_t index);
     /**
+     * @brief Accès à la sous-partie courante
+     * @return Itérateur constant sur la sous-partie courante
+     */
+    subRoundsType::const_iterator getSubRound(uint32_t index)const;
+    /**
      * @brief Renvoie un itérateur constant sur le début de la liste des subround.
      * @return Itérateur constant sur le début de la liste des subround.
      */

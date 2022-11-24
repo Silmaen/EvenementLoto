@@ -123,6 +123,20 @@ void DisplayWindow::setPage(const Page& newPage) {
 void DisplayWindow::updateDisplay() {
     if(event == nullptr)
         return;
+    if(mode == Mode::Preview) {
+        auto cur= event->getGameRound(roundIndex);
+        if(cur->getType() == core::GameRound::Type::Pause) {
+            setPage(Page::PauseDisplay);
+            updatePauseScreen();
+        } else {
+            setPage(Page::PricesDisplay);
+            updateRoundTitlePage();
+        }
+        // action de redimensionnement
+        updateColors();
+        resize();
+        return;
+    }
     switch(event->getStatus()) {
     case core::Event::Status::Invalid:
     case core::Event::Status::MissingParties:
@@ -189,8 +203,15 @@ void DisplayWindow::updateEventTitlePage() {
 }
 
 void DisplayWindow::updateRoundTitlePage() {
-    auto round   = event->getCurrentCGameRound();
-    auto subRound= round->getCurrentSubRound();
+    core::Event::roundsType::const_iterator round;
+    core::GameRound::subRoundsType::const_iterator subRound;
+    if(mode == Mode::Preview) {
+        round   = event->getGameRound(roundIndex);
+        subRound= round->getSubRound(subRoundIndex);
+    } else {
+        round   = event->getCurrentCGameRound();
+        subRound= round->getCurrentSubRound();
+    }
     ui->RT_RoundTitle->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromUtf8(subRound->getTypeStr()));
     ui->RT_SubRound->setVisible(false);
     ui->RT_Valeur->setVisible(false);
@@ -207,8 +228,8 @@ void DisplayWindow::updateRoundTitlePage() {
 }
 
 void DisplayWindow::updateRoundRunning() {
-    auto round         = event->getCurrentCGameRound();
-    const auto subRound= round->getCurrentSubRound();
+    auto round   = event->getCurrentCGameRound();
+    auto subRound= round->getCurrentSubRound();
     ui->RR_Title->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromStdString(subRound->getTypeStr()));
     // mise à jour de l’heure et durée
     auto now= core::clock::now();
@@ -287,7 +308,11 @@ void DisplayWindow::updateDisplayRules() {
 }
 
 void DisplayWindow::updatePauseScreen() {
-    auto round          = event->getCurrentCGameRound();
+    core::Event::roundsType::const_iterator round;
+    if(mode == Mode::Preview)
+        round= event->getGameRound(roundIndex);
+    else
+        round= event->getCurrentCGameRound();
     auto [dPath, dDelay]= round->getDiapo();
     if(dPath.empty() || dDelay <= 0 || !exists(dPath)) {
         QImage img  = loadImage(event->getOrganizerLogoFull());
@@ -391,11 +416,12 @@ void DisplayWindow::resetGrid() {
 }
 
 void DisplayWindow::resize() {
-    spdlog::trace("Resize call with size ({} {})", width(), height());
     initializeDisplay();
     // taille de la font par défaut
-    if(mwd == nullptr)
+    if(mwd == nullptr) {
+        spdlog::warn("No mainwindows link for Resize!!");
         return;
+    }
 
     ui->ET_OrganizerLogo->setText("");
     ui->RR_Logo->setText("");

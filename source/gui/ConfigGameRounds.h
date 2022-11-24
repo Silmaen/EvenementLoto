@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../core/Event.h"
+#include "DisplayWindow.h"
 #include <QDialog>
 
 namespace Ui {
@@ -31,7 +32,7 @@ public:
      * @brief Constructeur.
      * @param parent Le widget Parent.
      */
-    explicit ConfigGameRounds(QWidget* parent= nullptr);
+    explicit ConfigGameRounds(MainWindow* parent= nullptr);
 
     /**
      * @brief Destructeur.
@@ -168,6 +169,10 @@ public slots:
 
     void actFindDiapo();
 
+    void actTogglePreview();
+
+    void actTogglePreviewFullScreen();
+
 private:
     /**
      * @brief Met à jour l’affichage
@@ -221,6 +226,12 @@ private:
 
     /// Variable mise à vrai lors de la mise à jour de l’affichage pour éviter les récursions infinies.
     bool onUpdate= false;
+
+    /// Pointeur vers une fenêtre d'affichage pour la prévisualisation
+    DisplayWindow* displayPreview = nullptr;
+
+    /// Pointeur vers la fenêtre principale parente
+    MainWindow* _parent = nullptr;
 };
 
 }// namespace evl::gui
