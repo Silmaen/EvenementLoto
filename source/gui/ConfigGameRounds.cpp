@@ -7,6 +7,8 @@
  */
 #include "ConfigGameRounds.h"
 #include "BaseDialog.h"
+#include "MainWindow.h"
+#include <QScreen>
 
 // Les trucs de QT
 #include "moc_ConfigGameRounds.cpp"
@@ -17,14 +19,17 @@ namespace evl::gui {
 static bool in_update_loop  = false;
 static bool in_update_prices= false;
 
-ConfigGameRounds::ConfigGameRounds(QWidget* parent):
+ConfigGameRounds::ConfigGameRounds(MainWindow* parent):
     QDialog(parent),
-    ui(new Ui::ConfigGameRounds) {
+    ui(new Ui::ConfigGameRounds),
+    _parent(parent) {
     ui->setupUi(this);
 }
 
 ConfigGameRounds::~ConfigGameRounds() {
     delete ui;
+    if(displayPreview != nullptr)
+        delete displayPreview;
 }
 
 void ConfigGameRounds::actOk() {
@@ -169,6 +174,37 @@ void ConfigGameRounds::actFindDiapo() {
 
 // -----------------
 
+void ConfigGameRounds::actTogglePreview() {
+    if(ui->checkPreVisu->isChecked()) {
+        displayPreview= new DisplayWindow(&gameEvent, _parent);
+    } else {
+        delete displayPreview;
+        displayPreview= nullptr;
+    }
+    actTogglePreviewFullScreen();
+}
+
+void ConfigGameRounds::actTogglePreviewFullScreen() {
+    if(displayPreview == nullptr)
+        return;
+    QList<QScreen*> screens= QApplication::screens();
+    if(screens.size() < 2 || !ui->checkFullScreenPreVisu->isChecked()) {
+        displayPreview->showNormal();
+    } else {
+        for(QScreen* s: screens) {
+            if(s == screen())
+                continue;
+            QRect sizes= s->geometry();
+            displayPreview->move(sizes.x(), sizes.y());
+            break;
+        }
+        displayPreview->showFullScreen();
+    }
+    updateDisplay();
+}
+
+// -----------------
+
 void ConfigGameRounds::actChangeSelectedGameRound() {
     updateDisplay();
 }
@@ -196,7 +232,8 @@ void ConfigGameRounds::updateDisplay() {
     if(gameEvent.isEditable()) {
         ui->groupResult->setEnabled(false);
         ui->groupSubRound->setEnabled(true);
-        ui->groupPhase->setEnabled(true);
+        ui->PhaseConfiguration->setEnabled(true);
+        ui->groupPreview->setEnabled(true);
         ui->btnAddRound->setEnabled(true);
         ui->btnAddRound->setEnabled(true);
         ui->btnDelRound->setEnabled(true);
@@ -206,7 +243,8 @@ void ConfigGameRounds::updateDisplay() {
     } else {
         ui->groupResult->setEnabled(true);
         ui->groupSubRound->setEnabled(false);
-        ui->groupPhase->setEnabled(false);
+        ui->PhaseConfiguration->setEnabled(false);
+        ui->groupPreview->setEnabled(false);
         ui->btnAddRound->setEnabled(false);
         ui->btnDelRound->setEnabled(false);
         ui->btnDownRound->setEnabled(false);
@@ -264,7 +302,7 @@ void ConfigGameRounds::updateDisplayEdits() {
         ui->listSubRound->clear();
         ui->groupSubRound->setEnabled(false);
         ui->GameRoundTypes->clear();
-        ui->groupPhase->setEnabled(false);
+        ui->PhaseConfiguration->setEnabled(false);
         ui->SubRoundTypes->clear();
         ui->TextPrices->clear();
     }
@@ -277,6 +315,13 @@ void ConfigGameRounds::updateDisplayPhase() {
     auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
     if(round->getType() == core::GameRound::Type::Pause) {
         ui->PhaseConfiguration->setCurrentIndex(1);
+        if(displayPreview) {
+            displayPreview->setMode(DisplayWindow::Mode::Preview);
+            if (cur <0)
+                displayPreview->setRoundIndex(0, 0);
+            else
+                displayPreview->setRoundIndex(static_cast<uint32_t>(cur), 0);
+        }
         if(round->hasDiapo()) {
             ui->PauseDiapo->setChecked(true);
             ui->PauseNothing->setChecked(false);
@@ -294,8 +339,14 @@ void ConfigGameRounds::updateDisplayPhase() {
         return;
     }
     int scur= ui->listSubRound->currentRow();
+    if(displayPreview) {
+        displayPreview->setMode(DisplayWindow::Mode::Preview);
+        uint32_t ccur = cur>0?static_cast<uint32_t>(cur):0;
+        uint32_t sccur = scur>0?static_cast<uint32_t>(scur):0;
+        displayPreview->setRoundIndex(ccur, sccur);
+    }
     if(scur >= 0) {
-        ui->groupPhase->setEnabled(true);
+        ui->PhaseConfiguration->setEnabled(true);
         ui->PhaseConfiguration->setCurrentIndex(0);
         auto subRound= round->getSubRound(static_cast<uint32_t>(scur));
         ui->SubRoundTypes->clear();
@@ -305,7 +356,7 @@ void ConfigGameRounds::updateDisplayPhase() {
             ui->TextPrices->setText(QString::fromUtf8(subRound->getPrices()));
         ui->PricesValue->setValue(subRound->getValue());
     } else {
-        ui->groupPhase->setEnabled(false);
+        ui->PhaseConfiguration->setEnabled(false);
         ui->PhaseConfiguration->setCurrentIndex(0);
         ui->SubRoundTypes->clear();
         ui->TextPrices->clear();

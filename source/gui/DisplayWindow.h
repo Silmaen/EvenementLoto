@@ -9,6 +9,7 @@
 #include "../core/Event.h"
 #include <QMainWindow>
 #include <QTimer>
+#include <spdlog/spdlog.h>
 
 namespace Ui {
 
@@ -60,6 +61,22 @@ public:
      * @brief Redimensionnement de la grille
      */
     void resize();
+
+    /**
+     * @brief Modes de fonctionnement
+     */
+    enum struct Mode {
+        Game, /// in game
+        Preview /// in preview
+    };
+    void setMode(const Mode& newMode){
+        mode = newMode;
+    }
+    void setRoundIndex(uint32_t rIndex, uint32_t srIndex){
+        spdlog::trace("setting round {} sub {}",rIndex,srIndex);
+        roundIndex = rIndex;
+        subRoundIndex = srIndex;
+    }
 
 private:
     /**
@@ -124,6 +141,10 @@ private:
     QSize currentSize;
     /// Lien vers la MainWindow
     MainWindow* mwd= nullptr;
+
+    Mode mode = Mode::Game;
+    uint32_t roundIndex = 0;
+    uint32_t subRoundIndex = 0;
 };
 
 }// namespace evl::gui
