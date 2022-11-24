@@ -70,7 +70,7 @@ void MainWindow::actShowGlobalParameters() {
 }
 
 void MainWindow::actShowGameRoundsParameters() {
-    ConfigGameRounds cfg;
+    ConfigGameRounds cfg(this);
     cfg.setEvent(currentEvent);
     cfg.preExec();
     if(cfg.exec() == QDialog::Accepted) {

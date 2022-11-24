@@ -256,7 +256,7 @@ Event::roundsType::iterator Event::getCurrentGameRound() {
     return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
 }
 
-Event::roundsType::iterator Event::getGameRound(const uint16_t& idx) {
+Event::roundsType::iterator Event::getGameRound(const uint32_t& idx) {
     return std::next(gameRounds.begin(), idx);
 }
 
