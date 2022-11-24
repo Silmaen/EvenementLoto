@@ -176,12 +176,17 @@ void GameRound::read(std::istream& is, int file_version) {
     if(type == Type::Pause && file_version > 4) {
         sizeType len;
         is.read(reinterpret_cast<char*>(&len), sizeof(sizeType));
-        string tmp;
-        tmp.resize(len);
-        for(sizeType i= 0; i < l; i++)
-            is.read(reinterpret_cast<char*>(&tmp[i]), charSize);
-        diapoPath= tmp;
-        is.read(reinterpret_cast<char*>(&diapoDelay), sizeof(double));
+        if(len == 0) {
+            diapoPath.clear();
+            diapoDelay= 0.0;
+        } else {
+            string tmp;
+            tmp.resize(len);
+            for(sizeType i= 0; i < len; i++)
+                is.read(reinterpret_cast<char*>(&tmp[i]), charSize);
+            diapoPath= tmp;
+            is.read(reinterpret_cast<char*>(&diapoDelay), sizeof(double));
+        }
     }
 }
 
@@ -198,8 +203,10 @@ void GameRound::write(std::ostream& os) const {
     if(type == Type::Pause) {
         sizeType l3= diapoPath.string().size();
         os.write(reinterpret_cast<const char*>(&l3), sizeof(l3));
-        for(sizeType i= 0; i < l3; ++i) os.write(&(diapoPath.string()[i]), charSize);
-        os.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
+        if (l3 > 0 ) {
+            for(sizeType i= 0; i < l3; ++i) os.write(&(diapoPath.string()[i]), charSize);
+            os.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
+        }
     }
 }
 
@@ -244,6 +251,9 @@ std::vector<SubGameRound>::const_iterator GameRound::getCurrentSubRound() const 
 }
 
 std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {
+    return std::next(subGames.begin(), index);
+}
+std::vector<SubGameRound>::const_iterator GameRound::getSubRound(uint32_t index) const{
     return std::next(subGames.begin(), index);
 }
 

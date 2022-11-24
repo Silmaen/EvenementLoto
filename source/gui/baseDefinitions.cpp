@@ -9,7 +9,6 @@
 #include <QMessageBox>
 #include <QPainter>
 #include <QSvgRenderer>
-#include <spdlog/spdlog.h>
 
 namespace evl::gui {
 
@@ -23,7 +22,6 @@ void showNotImplemented(const QString& from) {
 }
 
 QImage loadImage(const path& from) {
-    spdlog::debug("Loading image {} with type: {}.", from.string(), from.extension().string());
     QString imgName(QString::fromUtf8(from.string()));
     if(from.extension() == ".svg") {
         QSvgRenderer renderer(imgName);
