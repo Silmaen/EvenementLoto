@@ -20,6 +20,7 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 * Ce projet dépend de la librairie Qt6
 * Ce projet dépend de la librairie nlohmann json
 * Ce projet dépend de la librairie fmt
+* Ce projet dépend de la librairie spdlog
 * Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
@@ -27,7 +28,7 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 
 ### Compilateur
 
-Le programme a été correctement compilé avec :
+Le programme a été correctement compilé avec:
 
 * windows
   * gcc 12 (mingw)
@@ -39,43 +40,59 @@ Le programme a été correctement compilé avec :
 
 ## Roadmap
 
-### Version 0.3 (In development)
+### Version 0.4 (In development)
 
-* Affichage
-  * [ ] affichage des lots
-    * [ ] sous forme liste
-    * [ ] à chaque changement de quine
-    * [X] affichage de la valeur
-  * [X] affichage de la phase dans le titre de la partie
-  * [X] améliorer la lisibilité les derniers numéros tirés
-  * [X] Police par défaut en gras pour les numéros de la grille
 * Contrôle et paramètres
   * [ ] choix de l’écran de plein écran
   * [ ] permettre le choix de la police de caractère
   * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
     * [ ] ajouter le réglage de cette valeur
     * [ ] permettre de régler cette valeur dans les onglets du bas
+* Affichage
+  * [ ] Affichage sur l'écran présentateur de la liste des lots lot de la phase d'annonce
+  * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
+* moteur de jeu
+  * [ ] Données
+    * [ ] édition de lots sous forme de liste d’articles
+  * [ ] Permettre de passer l'étape de saisi du gagnant
+  * [ ] Gestion des gagnants multiple
+    * [ ] permettre de départager les gagnants multiples (tirage au sort ou saisi)
+  * [ ] Résultat
+    * [ ] Génération du rapport de fin d'événement
+    * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
+  * [ ] Flexibilité en jeu
+    * [ ] permettre de réorganiser les parties non entamées
+    * [ ] permettre l'édition de parties non entamée
+* Documentation
+  * [ ] Écrire les pages d’aide
+* Sauvegarde et restauration
+  * [ ] mettre à jour les import/export json
+* Packaging
+  * [ ] Faire des paquets linux
+
+### Version 0.3 (Released 28 november 2022)
+
+* Affichage
+  * [X] affichage des lots
+    * [X] à chaque changement de quine
+    * [X] affichage de la valeur
+  * [X] affichage de la phase dans le titre de la partie
+  * [X] améliorer la lisibilité les derniers numéros tirés
+  * [X] Police par défaut en gras pour les numéros de la grille
 * moteur de jeu
   * [ ] Données
     * [X] ajout de la valeur de lot
-    * [ ] édition de lots sous forme de liste d’articles
-    * [ ] correction du mouvement de curseur lors de la rédaction des lots
-  * [ ] ajout de stats
-    * [ ] de sorties des numéros
-    * [ ] de temps de parties
-  * [ ] Gestion des gagnants multiple
-    * [ ] permettre de départager les gagnants multiples (tirage au sort ou saisi)
-    * [ ] garder trace des consolés
+    * [X] correction du mouvement de curseur lors de la rédaction des lots
+  * [X] ajout de stats
+    * [X] de sorties des numéros
+    * [X] de temps de parties
   * [ ] Résultat
-    * [X] Saisi du nom du gagnant
     * [ ] Génération du rapport de fin d'événement
 * Compilation
   * [X] Test compilation Linux
     * [X] Ubuntu 22.04
     * [X] Archlinux
   * [X] Mise en place test CI
-* Documentation
-  * [ ] Écrire les pages d’aide
 
 ### Version 0.2 (Released 30 november 2021)
 
