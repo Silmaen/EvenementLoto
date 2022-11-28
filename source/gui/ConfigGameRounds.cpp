@@ -24,6 +24,9 @@ ConfigGameRounds::ConfigGameRounds(MainWindow* parent):
     ui(new Ui::ConfigGameRounds),
     _parent(parent) {
     ui->setupUi(this);
+    /*Set invisible because import/export to json not yet accurate */
+    ui->ButtonImport->setVisible(false);
+    ui->ButtonExport->setVisible(false);
 }
 
 ConfigGameRounds::~ConfigGameRounds() {
