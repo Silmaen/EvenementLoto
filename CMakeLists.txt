@@ -1,39 +1,42 @@
 #
 #  CMAKE du projet d'événement loto
 #
-cmake_minimum_required(VERSION 3.22)
-
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 #
 # ---=== GENERALITIES ===---
 #
-project(EvenementLoto VERSION 0.3.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.24)
 set(PRJPREFIX EVL)
 set(PRJPREFIX_LOWER evl)
-set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
-set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_VERBOSE_MAKEFILE off)
+project(EvenementLoto VERSION 0.3.0 LANGUAGES CXX)
+#
+# ---=== Options ===---
+#
+option(${PRJPREFIX}_DOC_ONLY "To only generate documentation" OFF)
 
+
+set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
 #
 # ---=== Base Configs ===---
 #
 include(cmake/BaseConfig.cmake)
-#
-# ---=== Dependencies ===---
-#
-add_subdirectory(external)
 
-#
-# ---=== The Program ===---
-#
-add_subdirectory(source)
 
-#
-# ---=== TESTING PROCEDURES ===---
-#
-enable_testing()
-add_subdirectory(test)
+if (NOT ${PRJPREFIX}_DOC_ONLY)
+    #
+    # ---=== The Program ===---
+    #
+    add_subdirectory(source)
+
+    #
+    # ---=== TESTING PROCEDURES ===---
+    #
+
+    if (${PRJPREFIX}_TESTING)
+        enable_testing()
+        add_subdirectory(test)
+    endif ()
+endif ()
 #
 # ---=== Packaging ===---
 #
@@ -52,7 +55,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
             fmt
             winpthread-1 freetype-6 harfbuzz-0 md4c png16-16 zlib1 bz2-1 brotlidec brotlicommon glib-2.0-0 intl-8 graphite2
             b2-1 double-conversion icuin71 icudt71 icuuc71 pcre2-8-0 pcre2-16-0 iconv-2 pcre-1
-            )
+    )
         if (EXISTS ${COMPILER_PATH}/lib${BASE_LIB}.dll)
             add_custom_command(TARGET Package POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different

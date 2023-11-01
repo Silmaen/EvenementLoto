@@ -6,11 +6,11 @@
  * All modification must get authorization from the author.
  */
 
+#include "external/json.h"
 #include "gui/VisualTheme.h"
 #include "test_GuiHelpers.h"
 #include <fstream>
 #include <gtest/gtest.h>
-#include <nlohmann/json.hpp>
 
 namespace fs= std::filesystem;
 using json  = nlohmann::json;

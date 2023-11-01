@@ -6,9 +6,9 @@
 * All modification must get authorization from the author.
 */
 #include "VisualTheme.h"
+#include "external/json.h"
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 namespace evl::gui {
 
