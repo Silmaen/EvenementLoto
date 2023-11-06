@@ -1,0 +1,13 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "include": [
+    "cmake/CMakePresetsMinGW.json",
+    "cmake/CMakePresetsLinux.json",
+    "cmake/CMakePresetsCI.json"
+  ]
+}

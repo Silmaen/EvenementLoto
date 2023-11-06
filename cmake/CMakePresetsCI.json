@@ -1,0 +1,47 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "include": [
+    "CMakePresetsBase.json",
+    "CMakePresetsMinGW.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "Documentation",
+      "inherits": "base",
+      "cacheVariables": {
+        "OWL_DOC_ONLY": "ON",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "CodeCoverage",
+      "inherits": "gcc-debug",
+      "cacheVariables": {
+        "OWL_COVERAGE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "CodeCoverage_mingw",
+      "inherits": "mingw-gcc-debug",
+      "cacheVariables": {
+        "OWL_COVERAGE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    }
+  ]
+}
