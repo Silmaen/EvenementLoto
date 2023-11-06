@@ -25,6 +25,20 @@ using duration= std::chrono::duration<double>;
 constexpr timePoint epoch{};
 
 /**
+ * @brief Tronque le temp ou la durée à la seonde près.
+ * @tparam T Template pour pouvoir appliquer cette fonction à une durée ou un point de temps.
+ * @param t L'objet à tronquer.
+ * @return Le temps tronqué.
+ */
+template<class T>
+constexpr inline T floorMinutes(const T& t) {
+    return std::chrono::floor<std::chrono::minutes>(t);
+}
+constexpr inline auto getSeconds(const timePoint& t) {
+    return std::chrono::duration_cast<std::chrono::seconds>(t - floorMinutes(t)).count();
+}
+
+/**
  * @brief Formatage d’un point dans le temps comme date du calendrier
  * @param t Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
@@ -39,7 +53,7 @@ inline string formatCalendar(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
 inline string formatClock(const timePoint& t) {
-    return fmt::format("{:%T}", t);
+    return fmt::format("{:%R}:{:02d}", floorMinutes(t), getSeconds(t));
 }
 
 /**
@@ -59,10 +73,10 @@ inline string formatClockNoSecond(const timePoint& t) {
 inline string formatDuration(const duration& d) {
     auto s= std::chrono::duration_cast<std::chrono::seconds>(d).count();
     if(s < 60)
-        return fmt::format("{:%Ss}", d);
+        return fmt::format("{:02d}", s);
     if(s < 3600)
-        return fmt::format("{:%M:%S}", d);
-    return fmt::format("{:%T}", d);
+        return fmt::format("{:%M}:{:02d}", d, s % 60);
+    return fmt::format("{:%R}:{:02d}", d, s % 3600);
 }
 
 }// namespace evl::core

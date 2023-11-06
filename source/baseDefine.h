@@ -16,7 +16,7 @@
  */
 namespace evl {
 
-/// Version des sauvegardes
+/// Version des sauvegardes.
 constexpr uint16_t currentSaveVersion= 6;
 
 /// Définition d’un chemin vers un fichier ou répertoire

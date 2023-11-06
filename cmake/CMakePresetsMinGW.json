@@ -1,0 +1,51 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "include": [
+    "CMakePresetsBase.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "mingw-gcc-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "inherits": [
+        "toolset-mingw",
+        "gcc-release"
+      ]
+    },
+    {
+      "name": "mingw-gcc-debug",
+      "inherits": [
+        "toolset-mingw",
+        "gcc-debug"
+      ]
+    },
+    {
+      "name": "mingw-clang-release",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      },
+      "inherits": [
+        "toolset-mingw",
+        "clang-release"
+      ]
+    },
+    {
+      "name": "mingw-clang-debug",
+      "inherits": [
+        "toolset-mingw",
+        "clang-debug"
+      ]
+    }
+  ]
+}

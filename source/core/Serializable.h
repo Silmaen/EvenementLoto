@@ -7,12 +7,13 @@
  */
 #pragma once
 #include "../baseDefine.h"
+#include "external/json.h"
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 namespace evl::core {
 
 using json= nlohmann::json;
+
 /**
  * @brief Class de base pour la sérialisation dans des fichiers
  */

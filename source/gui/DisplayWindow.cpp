@@ -321,7 +321,7 @@ void DisplayWindow::updatePauseScreen() {
         return;
     }
     std::vector<path> slides;
-    const std::vector<path> extension{".png", ".jpg", ".svg"};
+    const std::vector<path> extension{".png", ".jpg", ".jpeg", ".svg", ".PNG", ".JPG", ".JPEG", ".SVG"};
     for(const auto& ipath: std::filesystem::directory_iterator(dPath)) {
         if(std::find(extension.begin(), extension.end(), ipath.path().extension()) == extension.end())
             continue;
