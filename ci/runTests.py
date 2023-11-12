@@ -7,13 +7,15 @@ from sys import stderr
 root_dir = Path(__file__).resolve().parent.parent
 
 
-def runtest(build_path: str):
+def runtest(build_path: str, no_gui: bool = False):
     build_dir = root_dir / build_path
     if not build_dir.exists():
         print(f"ERROR: no build dir '{build_dir}' found.", file=stderr)
         exit(66)
     list_tests = []
     for file in (build_dir / "bin").iterdir():
+        if no_gui and "gui" in file.name.lower():  # skip gui tests
+            continue
         if "unit_test" in file.name:
             list_tests.append(file)
     is_ok = True
@@ -31,9 +33,10 @@ def runtest(build_path: str):
 def main():
     parser = ArgumentParser()
     parser.add_argument("build", type=str, help="The path to the build relative to source")
+    parser.add_argument("--no-gui", action="store_true", help="If we should skip the gui tests")
     args = parser.parse_args()
 
-    if not runtest(args.build):
+    if not runtest(args.build, args.no_gui):
         exit(1)
 
 
