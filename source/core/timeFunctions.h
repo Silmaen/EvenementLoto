@@ -72,11 +72,14 @@ inline string formatClockNoSecond(const timePoint& t) {
  */
 inline string formatDuration(const duration& d) {
     int32_t s= static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(d).count());
-    if(s < 60)
-        return fmt::format("{:02d}s", s);
-    if(s < 3600)
-        return fmt::format("{:%M}:{:02d}", d, s % 60);
-    return fmt::format("{:%R}:{:02d}", d, s % 60);
+    int32_t m= (s / 60) % 60;
+    int32_t h= s / 3600;
+    s        = s % 60;
+    if(h > 0)
+        return fmt::format("{:02d}:{:02d}:{:02d}", h, m, s);
+    if(m > 0)
+        return fmt::format("{:02d}:{:02d}", m, s);
+    return fmt::format("{:02d}s", s);
 }
 
 }// namespace evl::core
