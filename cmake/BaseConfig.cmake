@@ -62,8 +62,12 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
             -Wno-global-constructors
-            -Wno-unsafe-buffer-usage
     )
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 17)
+        target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
+                -Wno-unsafe-buffer-usage
+        )
+    endif ()
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
