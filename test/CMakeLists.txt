@@ -1,6 +1,6 @@
 
 if (WIN32)
-    set(CMAKE_PREFIX_PATH ${${PRJPREFIX}_QT_DIR})
+    list(PREPEND CMAKE_PREFIX_PATH ${${PRJPREFIX}_QT_DIR})
     set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
     if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
         set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
@@ -13,7 +13,8 @@ endif ()
 FILE(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 
 add_custom_target(All_Tests)
-find_package(GTest REQUIRED)
+# googletest
+find_package(GTest 1.13 REQUIRED)
 
 FOREACH (child ${children})
     if (${child} MATCHES "test_helper")
