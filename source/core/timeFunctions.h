@@ -34,8 +34,8 @@ template<class T>
 constexpr inline T floorMinutes(const T& t) {
     return std::chrono::floor<std::chrono::minutes>(t);
 }
-constexpr inline auto getSeconds(const timePoint& t) {
-    return std::chrono::duration_cast<std::chrono::seconds>(t - floorMinutes(t)).count();
+constexpr inline uint32_t getSeconds(const timePoint& t) {
+    return static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::seconds>(t - floorMinutes(t)).count());
 }
 
 /**
@@ -71,12 +71,12 @@ inline string formatClockNoSecond(const timePoint& t) {
  * @return Une chaine de caractères formatant la durée
  */
 inline string formatDuration(const duration& d) {
-    auto s= std::chrono::duration_cast<std::chrono::seconds>(d).count();
+    int32_t s= static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(d).count());
     if(s < 60)
-        return fmt::format("{:02d}", s);
+        return fmt::format("{:02d}s", s);
     if(s < 3600)
         return fmt::format("{:%M}:{:02d}", d, s % 60);
-    return fmt::format("{:%R}:{:02d}", d, s % 3600);
+    return fmt::format("{:%R}:{:02d}", d, s % 60);
 }
 
 }// namespace evl::core

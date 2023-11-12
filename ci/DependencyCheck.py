@@ -4,8 +4,8 @@ from sys import stderr
 
 dependencies = [
     {"name": "magic_enum", "version": "*", "header": True},
-    {"name": "fmt", "version": "10.0.0", "header": False},
-    {"name": "spdlog", "version": "1.11.0", "header": False},
+    {"name": "fmt", "version": "10.1.1", "header": False},
+    {"name": "spdlog", "version": "1.12.0", "header": False},
     {"name": "googletest", "version": "*", "header": False},
 ]
 
