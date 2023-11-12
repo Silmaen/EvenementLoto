@@ -7,7 +7,10 @@
  */
 
 #pragma once
+
+#ifdef TEST_TRACE
 #include <spdlog/sinks/basic_file_sink.h>
+#endif
 #include <spdlog/spdlog.h>
 
 inline void startSpdlog() {
