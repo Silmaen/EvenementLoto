@@ -1,1394 +1,1432 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ConfigGeneral</class>
- <widget class="QDialog" name="ConfigGeneral">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>441</width>
-    <height>774</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Configuration générale</string>
-  </property>
-  <property name="windowIcon">
-   <iconset resource="../../resources/EvenementLoto.qrc">
-    <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png</iconset>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>151</width>
-       <height>61</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Répertoires par défaut</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="minimumSize">
-         <size>
-          <width>53</width>
-          <height>24</height>
-         </size>
+    <class>ConfigGeneral</class>
+    <widget class="QDialog" name="ConfigGeneral">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>441</width>
+                <height>758</height>
+            </rect>
         </property>
-        <property name="text">
-         <string>Données:</string>
+        <property name="windowTitle">
+            <string>Configuration générale</string>
         </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="DataLocation">
-        <property name="statusTip">
-         <string>Répertoire par défaut dans lequel seront placés les données.</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="SearchFolder">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>26</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>26</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="statusTip">
-         <string>Ouvre une boite de dialogue pour choisir le dossier.</string>
-        </property>
-        <property name="text">
-         <string>...</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupTheme">
-     <property name="title">
-      <string>Thème</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QFrame" name="frameThemeFile">
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Raised</enum>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Thème actuel:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="editThemeName">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonImportTheme">
-           <property name="text">
-            <string>Importer</string>
-           </property>
-           <property name="icon">
+        <property name="windowIcon">
             <iconset resource="../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/date-to.png</normaloff>:/icons/icons/date-to.png</iconset>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="buttonExportTheme">
-           <property name="text">
-            <string>Exporter</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../../resources/EvenementLoto.qrc">
-             <normaloff>:/icons/icons/date-from.png</normaloff>:/icons/icons/date-from.png</iconset>
-           </property>
-          </widget>
-         </item>
+                <normaloff>:/fav/icons/mainIcon.png</normaloff>:/fav/icons/mainIcon.png
+            </iconset>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+                <widget class="QGroupBox" name="groupBox">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>151</width>
+                            <height>61</height>
+                        </size>
+                    </property>
+                    <property name="title">
+                        <string>Répertoires par défaut</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout">
+                        <item row="0" column="0">
+                            <widget class="QLabel" name="label">
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>53</width>
+                                        <height>24</height>
+                                    </size>
+                                </property>
+                                <property name="text">
+                                    <string>Données:</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="1">
+                            <widget class="QLineEdit" name="DataLocation">
+                                <property name="statusTip">
+                                    <string>Répertoire par défaut dans lequel seront placés les données.</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item row="0" column="2">
+                            <widget class="QPushButton" name="SearchFolder">
+                                <property name="sizePolicy">
+                                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                        <horstretch>0</horstretch>
+                                        <verstretch>0</verstretch>
+                                    </sizepolicy>
+                                </property>
+                                <property name="minimumSize">
+                                    <size>
+                                        <width>26</width>
+                                        <height>24</height>
+                                    </size>
+                                </property>
+                                <property name="maximumSize">
+                                    <size>
+                                        <width>26</width>
+                                        <height>24</height>
+                                    </size>
+                                </property>
+                                <property name="statusTip">
+                                    <string>Ouvre une boite de dialogue pour choisir le dossier.</string>
+                                </property>
+                                <property name="text">
+                                    <string>...</string>
+                                </property>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QGroupBox" name="groupTheme">
+                    <property name="title">
+                        <string>Thème</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_2">
+                        <property name="spacing">
+                            <number>2</number>
+                        </property>
+                        <property name="leftMargin">
+                            <number>0</number>
+                        </property>
+                        <property name="topMargin">
+                            <number>0</number>
+                        </property>
+                        <property name="rightMargin">
+                            <number>0</number>
+                        </property>
+                        <property name="bottomMargin">
+                            <number>0</number>
+                        </property>
+                        <item>
+                            <widget class="QFrame" name="frameThemeFile">
+                                <property name="frameShape">
+                                    <enum>QFrame::NoFrame</enum>
+                                </property>
+                                <property name="frameShadow">
+                                    <enum>QFrame::Raised</enum>
+                                </property>
+                                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                    <item>
+                                        <widget class="QLabel" name="label_2">
+                                            <property name="text">
+                                                <string>Thème actuel:</string>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QLineEdit" name="editThemeName">
+                                            <property name="sizePolicy">
+                                                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                                                    <horstretch>0</horstretch>
+                                                    <verstretch>0</verstretch>
+                                                </sizepolicy>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="buttonImportTheme">
+                                            <property name="text">
+                                                <string>Importer</string>
+                                            </property>
+                                            <property name="icon">
+                                                <iconset resource="../../resources/EvenementLoto.qrc">
+                                                    <normaloff>:/icons/icons/date-to.png</normaloff>
+                                                    :/icons/icons/date-to.png
+                                                </iconset>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                    <item>
+                                        <widget class="QPushButton" name="buttonExportTheme">
+                                            <property name="text">
+                                                <string>Exporter</string>
+                                            </property>
+                                            <property name="icon">
+                                                <iconset resource="../../resources/EvenementLoto.qrc">
+                                                    <normaloff>:/icons/icons/date-from.png</normaloff>
+                                                    :/icons/icons/date-from.png
+                                                </iconset>
+                                            </property>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </widget>
+                        </item>
+                        <item>
+                            <widget class="QGroupBox" name="groupCustomization">
+                                <property name="title">
+                                    <string>Personnalisation</string>
+                                </property>
+                                <property name="flat">
+                                    <bool>true</bool>
+                                </property>
+                                <layout class="QGridLayout" name="gridLayout_2">
+                                    <property name="leftMargin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="topMargin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="rightMargin">
+                                        <number>0</number>
+                                    </property>
+                                    <property name="bottomMargin">
+                                        <number>0</number>
+                                    </property>
+                                    <item row="1" column="0">
+                                        <widget class="QScrollArea" name="scrollArea">
+                                            <property name="frameShape">
+                                                <enum>QFrame::NoFrame</enum>
+                                            </property>
+                                            <property name="widgetResizable">
+                                                <bool>true</bool>
+                                            </property>
+                                            <widget class="QWidget" name="scrollAreaWidgetContents">
+                                                <property name="geometry">
+                                                    <rect>
+                                                        <x>0</x>
+                                                        <y>0</y>
+                                                        <width>419</width>
+                                                        <height>497</height>
+                                                    </rect>
+                                                </property>
+                                                <layout class="QHBoxLayout" name="horizontalLayout_3">
+                                                    <property name="leftMargin">
+                                                        <number>6</number>
+                                                    </property>
+                                                    <property name="topMargin">
+                                                        <number>0</number>
+                                                    </property>
+                                                    <property name="rightMargin">
+                                                        <number>6</number>
+                                                    </property>
+                                                    <property name="bottomMargin">
+                                                        <number>0</number>
+                                                    </property>
+                                                    <item>
+                                                        <widget class="QFrame" name="frameLeft">
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                                    <horstretch>2</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
+                                                            <property name="frameShape">
+                                                                <enum>QFrame::NoFrame</enum>
+                                                            </property>
+                                                            <property name="frameShadow">
+                                                                <enum>QFrame::Raised</enum>
+                                                            </property>
+                                                            <layout class="QVBoxLayout" name="verticalLayout_3">
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_4">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Facteur d'échelle principal</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_5">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Facteur d'échelle de titre</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_6">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Facteur déchelle texte court
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_7">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Facteur d'échelle texte long
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_3">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Facteur d'échelle de la grille
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="Line" name="line">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Qt::Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_8">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Couleur de l'arrière plan</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_9">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Couleur de l'arrière plan de la
+                                                                                grille
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_15">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Tronquer lignes de lots</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_16">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Nombre maximum de lignes de lots
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_10">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Couleur du texte</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="Line" name="line_3">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Qt::Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_11">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Couleur chiffre sélectionné</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_12">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Activation de la fondu de couleur
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_13">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Fondu sur combien de chiffres
+                                                                            </string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QLabel" name="label_14">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Force de la fondue</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                            </layout>
+                                                        </widget>
+                                                    </item>
+                                                    <item>
+                                                        <widget class="QFrame" name="frameRight">
+                                                            <property name="sizePolicy">
+                                                                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                                                                    <horstretch>1</horstretch>
+                                                                    <verstretch>0</verstretch>
+                                                                </sizepolicy>
+                                                            </property>
+                                                            <property name="frameShape">
+                                                                <enum>QFrame::NoFrame</enum>
+                                                            </property>
+                                                            <property name="frameShadow">
+                                                                <enum>QFrame::Raised</enum>
+                                                            </property>
+                                                            <layout class="QVBoxLayout" name="verticalLayout_4">
+                                                                <item>
+                                                                    <widget class="QDoubleSpinBox" name="spinMainScale">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="decimals">
+                                                                            <number>3</number>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <double>0.010000000000000</double>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <double>0.050000000000000</double>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <double>0.001000000000000</double>
+                                                                        </property>
+                                                                        <property name="stepType">
+                                                                            <enum>QAbstractSpinBox::DefaultStepType
+                                                                            </enum>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <double>0.020000000000000</double>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QDoubleSpinBox"
+                                                                            name="spinTitleScale">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <double>1.000000000000000</double>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <double>5.000000000000000</double>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <double>0.100000000000000</double>
+                                                                        </property>
+                                                                        <property name="stepType">
+                                                                            <enum>QAbstractSpinBox::DefaultStepType
+                                                                            </enum>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <double>2.000000000000000</double>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QDoubleSpinBox"
+                                                                            name="spinShortTextScale">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <double>0.200000000000000</double>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <double>3.000000000000000</double>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <double>0.100000000000000</double>
+                                                                        </property>
+                                                                        <property name="stepType">
+                                                                            <enum>QAbstractSpinBox::DefaultStepType
+                                                                            </enum>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <double>1.400000000000000</double>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QDoubleSpinBox"
+                                                                            name="spinLongTextScale">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <double>0.200000000000000</double>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <double>3.000000000000000</double>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <double>0.100000000000000</double>
+                                                                        </property>
+                                                                        <property name="stepType">
+                                                                            <enum>QAbstractSpinBox::DefaultStepType
+                                                                            </enum>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <double>0.600000000000000</double>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QDoubleSpinBox"
+                                                                            name="spinGridTextScale">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <double>0.200000000000000</double>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <double>2.000000000000000</double>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <double>0.010000000000000</double>
+                                                                        </property>
+                                                                        <property name="stepType">
+                                                                            <enum>QAbstractSpinBox::DefaultStepType
+                                                                            </enum>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <double>0.850000000000000</double>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="Line" name="line_2">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Qt::Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QPushButton"
+                                                                            name="buttonBackgroundColor">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="autoFillBackground">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>#f0f0f0</string>
+                                                                        </property>
+                                                                        <property name="flat">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QPushButton"
+                                                                            name="buttonGridBackgroundColor">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="autoFillBackground">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>#f0f0f0</string>
+                                                                        </property>
+                                                                        <property name="flat">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QCheckBox" name="checkTruncatePrice">
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Activé</string>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QSpinBox"
+                                                                            name="spinTruncatePriceLines">
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <number>1</number>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <number>15</number>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <number>3</number>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QPushButton" name="buttonTextColor">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="autoFillBackground">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>#000000</string>
+                                                                        </property>
+                                                                        <property name="flat">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="Line" name="line_4">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="orientation">
+                                                                            <enum>Qt::Horizontal</enum>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QPushButton"
+                                                                            name="buttonSelectedNumberColor">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="autoFillBackground">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>#ff7000</string>
+                                                                        </property>
+                                                                        <property name="flat">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QCheckBox" name="checkFadeNumbers">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="text">
+                                                                            <string>Activé</string>
+                                                                        </property>
+                                                                        <property name="checked">
+                                                                            <bool>true</bool>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QSpinBox" name="spinFadeAmount">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <number>10</number>
+                                                                        </property>
+                                                                        <property name="value">
+                                                                            <number>3</number>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                                <item>
+                                                                    <widget class="QSpinBox" name="spinFadeStrength">
+                                                                        <property name="sizePolicy">
+                                                                            <sizepolicy hsizetype="Preferred"
+                                                                                        vsizetype="Fixed">
+                                                                                <horstretch>0</horstretch>
+                                                                                <verstretch>0</verstretch>
+                                                                            </sizepolicy>
+                                                                        </property>
+                                                                        <property name="minimumSize">
+                                                                            <size>
+                                                                                <width>0</width>
+                                                                                <height>24</height>
+                                                                            </size>
+                                                                        </property>
+                                                                        <property name="alignment">
+                                                                            <set>Qt::AlignCenter</set>
+                                                                        </property>
+                                                                        <property name="minimum">
+                                                                            <number>-100</number>
+                                                                        </property>
+                                                                        <property name="maximum">
+                                                                            <number>100</number>
+                                                                        </property>
+                                                                        <property name="singleStep">
+                                                                            <number>4</number>
+                                                                        </property>
+                                                                    </widget>
+                                                                </item>
+                                                            </layout>
+                                                        </widget>
+                                                    </item>
+                                                </layout>
+                                            </widget>
+                                        </widget>
+                                    </item>
+                                    <item row="0" column="0">
+                                        <widget class="QFrame" name="frame_2">
+                                            <property name="frameShape">
+                                                <enum>QFrame::NoFrame</enum>
+                                            </property>
+                                            <property name="frameShadow">
+                                                <enum>QFrame::Raised</enum>
+                                            </property>
+                                            <layout class="QHBoxLayout" name="horizontalLayout_4">
+                                                <item>
+                                                    <spacer name="horizontalSpacer_6">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Horizontal</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>40</width>
+                                                                <height>20</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                                <item>
+                                                    <widget class="QPushButton" name="buttonReset">
+                                                        <property name="text">
+                                                            <string>Reset</string>
+                                                        </property>
+                                                        <property name="icon">
+                                                            <iconset resource="../../resources/EvenementLoto.qrc">
+                                                                <normaloff>:/icons/icons/restart.png</normaloff>
+                                                                :/icons/icons/restart.png
+                                                            </iconset>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QPushButton" name="buttonRestore">
+                                                        <property name="text">
+                                                            <string>Restorer</string>
+                                                        </property>
+                                                        <property name="icon">
+                                                            <iconset resource="../../resources/EvenementLoto.qrc">
+                                                                <normaloff>:/icons/icons/countdown.png</normaloff>
+                                                                :/icons/icons/countdown.png
+                                                            </iconset>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <spacer name="horizontalSpacer_7">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Horizontal</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>40</width>
+                                                                <height>20</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                            </layout>
+                                        </widget>
+                                    </item>
+                                </layout>
+                            </widget>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
+            <item>
+                <widget class="QFrame" name="frame">
+                    <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="frameShape">
+                        <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="frameShadow">
+                        <enum>QFrame::Raised</enum>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout">
+                        <item>
+                            <spacer name="horizontalSpacer">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>62</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonOk">
+                                <property name="toolTip">
+                                    <string>Sauvegarde Et ferme La fenêtre</string>
+                                </property>
+                                <property name="text">
+                                    <string>Ok</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_2">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonApply">
+                                <property name="toolTip">
+                                    <string>Sauvegarde sans fermer la fenêtre</string>
+                                </property>
+                                <property name="text">
+                                    <string>Appliquer</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_3">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeType">
+                                    <enum>QSizePolicy::Preferred</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>20</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                        <item>
+                            <widget class="QPushButton" name="ButtonCancel">
+                                <property name="toolTip">
+                                    <string>Ferme la fenêtre sans sauvegarder</string>
+                                </property>
+                                <property name="text">
+                                    <string>Annuler</string>
+                                </property>
+                            </widget>
+                        </item>
+                        <item>
+                            <spacer name="horizontalSpacer_4">
+                                <property name="orientation">
+                                    <enum>Qt::Horizontal</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                    <size>
+                                        <width>62</width>
+                                        <height>20</height>
+                                    </size>
+                                </property>
+                            </spacer>
+                        </item>
+                    </layout>
+                </widget>
+            </item>
         </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupCustomization">
-        <property name="title">
-         <string>Personnalisation</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item row="1" column="0">
-          <widget class="QScrollArea" name="scrollArea">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="widgetResizable">
-            <bool>true</bool>
-           </property>
-           <widget class="QWidget" name="scrollAreaWidgetContents">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>0</y>
-              <width>419</width>
-              <height>513</height>
-             </rect>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_3">
-             <property name="leftMargin">
-              <number>6</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>6</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QFrame" name="frameLeft">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>2</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QLabel" name="label_4">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Facteur d'échelle principal</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_5">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Facteur d'échelle de titre</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_6">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Facteur déchelle texte court</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_7">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Facteur d'échelle texte long</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_3">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Facteur d'échelle de la grille</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="line">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_8">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Couleur de l'arrière plan</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_9">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Couleur de l'arrière plan de la grille</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_15">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Tronquer lignes de lots</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_16">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Nombre maximum de lignes de lots</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_10">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Couleur du texte</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="line_3">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_11">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Couleur chiffre sélectionné</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_12">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Activation de la fondu de couleur</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_13">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Fondu sur combien de chiffres</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QLabel" name="label_14">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Force de la fondue</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item>
-              <widget class="QFrame" name="frameRight">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>1</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
-               </property>
-               <property name="frameShadow">
-                <enum>QFrame::Raised</enum>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spinMainScale">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="decimals">
-                   <number>3</number>
-                  </property>
-                  <property name="minimum">
-                   <double>0.010000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>0.050000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.001000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
-                  </property>
-                  <property name="value">
-                   <double>0.020000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spinTitleScale">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="minimum">
-                   <double>1.000000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>5.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
-                  </property>
-                  <property name="value">
-                   <double>2.000000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spinShortTextScale">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="minimum">
-                   <double>0.200000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>3.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
-                  </property>
-                  <property name="value">
-                   <double>1.400000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spinLongTextScale">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="minimum">
-                   <double>0.200000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>3.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.100000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
-                  </property>
-                  <property name="value">
-                   <double>0.600000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QDoubleSpinBox" name="spinGridTextScale">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="minimum">
-                   <double>0.200000000000000</double>
-                  </property>
-                  <property name="maximum">
-                   <double>2.000000000000000</double>
-                  </property>
-                  <property name="singleStep">
-                   <double>0.010000000000000</double>
-                  </property>
-                  <property name="stepType">
-                   <enum>QAbstractSpinBox::DefaultStepType</enum>
-                  </property>
-                  <property name="value">
-                   <double>0.850000000000000</double>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="line_2">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="buttonBackgroundColor">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>#f0f0f0</string>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="buttonGridBackgroundColor">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>#f0f0f0</string>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkTruncatePrice">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Activé</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="spinTruncatePriceLines">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>15</number>
-                  </property>
-                  <property name="value">
-                   <number>3</number>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="buttonTextColor">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>#000000</string>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="Line" name="line_4">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="buttonSelectedNumberColor">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="autoFillBackground">
-                   <bool>true</bool>
-                  </property>
-                  <property name="text">
-                   <string>#ff7000</string>
-                  </property>
-                  <property name="flat">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QCheckBox" name="checkFadeNumbers">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Activé</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="spinFadeAmount">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="maximum">
-                   <number>10</number>
-                  </property>
-                  <property name="value">
-                   <number>3</number>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QSpinBox" name="spinFadeStrength">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>24</height>
-                   </size>
-                  </property>
-                  <property name="alignment">
-                   <set>Qt::AlignCenter</set>
-                  </property>
-                  <property name="minimum">
-                   <number>-100</number>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>4</number>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QFrame" name="frame_2">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="frameShadow">
-            <enum>QFrame::Raised</enum>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <spacer name="horizontalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="buttonReset">
-              <property name="text">
-               <string>Reset</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../../resources/EvenementLoto.qrc">
-                <normaloff>:/icons/icons/restart.png</normaloff>:/icons/icons/restart.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="buttonRestore">
-              <property name="text">
-               <string>Restorer</string>
-              </property>
-              <property name="icon">
-               <iconset resource="../../resources/EvenementLoto.qrc">
-                <normaloff>:/icons/icons/countdown.png</normaloff>:/icons/icons/countdown.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_7">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>62</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="ButtonOk">
-        <property name="toolTip">
-         <string>Sauvegarde Et ferme La fenêtre</string>
-        </property>
-        <property name="text">
-         <string>Ok</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Preferred</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="ButtonApply">
-        <property name="toolTip">
-         <string>Sauvegarde sans fermer la fenêtre</string>
-        </property>
-        <property name="text">
-         <string>Appliquer</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_3">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Preferred</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="ButtonCancel">
-        <property name="toolTip">
-         <string>Ferme la fenêtre sans sauvegarder</string>
-        </property>
-        <property name="text">
-         <string>Annuler</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_4">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>62</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-  </layout>
- </widget>
- <resources>
-  <include location="../../resources/EvenementLoto.qrc"/>
- </resources>
- <connections>
-  <connection>
-   <sender>ButtonOk</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actOk()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>155</x>
-     <y>755</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>117</x>
-     <y>202</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ButtonApply</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actApply()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>257</x>
-     <y>755</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>224</x>
-     <y>202</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>ButtonCancel</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actCancel()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>359</x>
-     <y>755</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>336</x>
-     <y>202</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SearchFolder</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actSearchFolder()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>421</x>
-     <y>58</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>260</x>
-     <y>0</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonReset</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actResetTheme()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>217</x>
-     <y>186</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>162</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonImportTheme</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actImportTheme()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>340</x>
-     <y>125</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>206</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonExportTheme</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actExportTheme()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>421</x>
-     <y>125</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>118</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonRestore</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actRestoreTheme()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>298</x>
-     <y>186</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>154</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBackgroundColor</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actBackgroundColorChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>398</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>237</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonGridBackgroundColor</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actGridBackgroundColorChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>430</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>456</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonTextColor</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actTextColorChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>526</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>486</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonSelectedNumberColor</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actSelectedNumbersColorChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>423</x>
-     <y>569</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>538</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkFadeNumbers</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actFadeActivationChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>418</x>
-     <y>601</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>578</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>checkTruncatePrice</sender>
-   <signal>clicked()</signal>
-   <receiver>ConfigGeneral</receiver>
-   <slot>actTruncatePriceChange()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>321</x>
-     <y>450</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>440</x>
-     <y>442</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
- <slots>
-  <slot>actOk()</slot>
-  <slot>actApply()</slot>
-  <slot>actCancel()</slot>
-  <slot>actSearchFolder()</slot>
-  <slot>actResetTheme()</slot>
-  <slot>actImportTheme()</slot>
-  <slot>actExportTheme()</slot>
-  <slot>actRestoreTheme()</slot>
-  <slot>actBackgroundColorChange()</slot>
-  <slot>actGridBackgroundColorChange()</slot>
-  <slot>actTextColorChange()</slot>
-  <slot>actSelectedNumbersColorChange()</slot>
-  <slot>actFadeActivationChange()</slot>
-  <slot>actTruncatePriceChange()</slot>
- </slots>
+    <resources>
+        <include location="../../resources/EvenementLoto.qrc"/>
+    </resources>
+    <connections>
+        <connection>
+            <sender>ButtonOk</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actOk()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>155</x>
+                    <y>755</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>117</x>
+                    <y>202</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonApply</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actApply()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>257</x>
+                    <y>755</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>224</x>
+                    <y>202</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>ButtonCancel</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actCancel()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>359</x>
+                    <y>755</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>336</x>
+                    <y>202</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>SearchFolder</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actSearchFolder()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>421</x>
+                    <y>58</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>260</x>
+                    <y>0</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonReset</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actResetTheme()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>217</x>
+                    <y>186</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>162</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonImportTheme</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actImportTheme()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>340</x>
+                    <y>125</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>206</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonExportTheme</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actExportTheme()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>421</x>
+                    <y>125</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>118</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonRestore</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actRestoreTheme()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>298</x>
+                    <y>186</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>154</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonBackgroundColor</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actBackgroundColorChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>460</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>237</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonGridBackgroundColor</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actGridBackgroundColorChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>490</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>456</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonTextColor</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actTextColorChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>580</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>486</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>buttonSelectedNumberColor</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actSelectedNumbersColorChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>619</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>538</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>checkFadeNumbers</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actFadeActivationChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>649</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>578</y>
+                </hint>
+            </hints>
+        </connection>
+        <connection>
+            <sender>checkTruncatePrice</sender>
+            <signal>clicked()</signal>
+            <receiver>ConfigGeneral</receiver>
+            <slot>actTruncatePriceChange()</slot>
+            <hints>
+                <hint type="sourcelabel">
+                    <x>414</x>
+                    <y>520</y>
+                </hint>
+                <hint type="destinationlabel">
+                    <x>440</x>
+                    <y>442</y>
+                </hint>
+            </hints>
+        </connection>
+    </connections>
+    <slots>
+        <slot>actOk()</slot>
+        <slot>actApply()</slot>
+        <slot>actCancel()</slot>
+        <slot>actSearchFolder()</slot>
+        <slot>actResetTheme()</slot>
+        <slot>actImportTheme()</slot>
+        <slot>actExportTheme()</slot>
+        <slot>actRestoreTheme()</slot>
+        <slot>actBackgroundColorChange()</slot>
+        <slot>actGridBackgroundColorChange()</slot>
+        <slot>actTextColorChange()</slot>
+        <slot>actSelectedNumbersColorChange()</slot>
+        <slot>actFadeActivationChange()</slot>
+        <slot>actTruncatePriceChange()</slot>
+        <slot>actDarkThemeChange()</slot>
+        <slot>actScreenChange()</slot>
+    </slots>
 </ui>

@@ -170,22 +170,48 @@ void MainWindow::actStartEvent() {
     actChangeFullScreen();
 }
 
+void MainWindow::actChangeScreen() {
+    int screenId           = ui->SelectScreen->currentIndex();
+    QList<QScreen*> screens= QApplication::screens();
+    if(screens.size() > 2) {
+        int id    = 0;
+        int mainId= 0;
+        for(QScreen* scr: screens) {
+            if(scr == screen()) {
+                mainId= id;
+                break;
+            }
+            ++id;
+        }
+        if(screenId == mainId) {
+            screenId= (mainId + 1) % screens.size();
+        }
+        settings.setValue("display/screen_id", screenId);
+        spdlog::debug("setting screen {}", screenId);
+    } else {
+        settings.setValue("display/screen_id", -1);
+    }
+    syncSettings();
+    actChangeFullScreen();
+}
+
 void MainWindow::actChangeFullScreen() {
     if(displayWindow == nullptr)
         return;
+
+    bool fullScreen= ui->CheckFullScreen->isChecked();
+    settings.setValue("display/full_screen", fullScreen);
+    int screenId           = settings.value("display/screen_id", 0).toInt();
     QList<QScreen*> screens= QApplication::screens();
-    if(screens.size() < 2 || !ui->actionFullScreen->isChecked()) {
+    if(screenId < 0 || !fullScreen) {
         displayWindow->showNormal();
     } else {
-        for(QScreen* s: screens) {
-            if(s == screen())
-                continue;
-            QRect sizes= s->geometry();
-            displayWindow->move(sizes.x(), sizes.y());
-            break;
-        }
+        spdlog::debug("using screen {}", screenId);
+        QRect sizes= screens[screenId]->geometry();
+        displayWindow->move(sizes.x(), sizes.y());
         displayWindow->showFullScreen();
     }
+    syncSettings();
 }
 
 void MainWindow::actEndEvent() {
@@ -397,6 +423,38 @@ void MainWindow::updateMenus() {
 
 void MainWindow::updateBottomFrame() {
     updateRadioButtons();
+    // gestion des écrans
+    if(ui->SelectScreen->count() == 0) {
+        updateScreenList();
+    }
+    bool fullScreen= settings.value("display/full_screen", true).toBool();
+    if(fullScreen != ui->CheckFullScreen->isChecked())
+        ui->CheckFullScreen->setChecked(fullScreen);
+    int screenId= settings.value("display/screen_id", 0).toInt();
+    if(screenId != ui->SelectScreen->currentIndex())
+        ui->SelectScreen->setCurrentIndex(screenId);
+}
+
+void MainWindow::updateScreenList() {
+    ui->SelectScreen->clear();
+    QList<QScreen*> screens= QApplication::screens();
+    int id                 = 0;
+    int mainId             = 0;
+    for(QScreen* scr: screens) {
+        if(scr == screen())
+            mainId= id;
+        ui->SelectScreen->addItem(QString::number(id) + " - " + scr->name());
+        ++id;
+    }
+    int screenId= settings.value("display/screen_id", 0).toInt();
+    if(screenId >= id || screenId == mainId) {
+        if(screens.size() > 2) {
+            screenId= (mainId + 1) % id;
+            settings.setValue("display/screen_id", screenId);
+        } else {
+            settings.setValue("display/screen_id", -1);
+        }
+    }
 }
 
 void MainWindow::updateStats() {

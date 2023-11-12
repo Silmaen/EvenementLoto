@@ -11,9 +11,11 @@
 #ifdef __clang__
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wcovered-switch-default"
-#pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
 #pragma clang diagnostic ignored "-Wweak-vtables"
 #pragma clang diagnostic ignored "-Wnewline-eof"
+#if(__clang_major__ >= 17)
+#pragma clang diagnostic ignored "-Wdeprecated-literal-operator"
+#endif
 #endif
 #include "nlohmann/json.hpp"
 #ifdef __clang__
