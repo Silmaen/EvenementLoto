@@ -157,14 +157,19 @@ private slots:
     void actRadioBoth();
 
     /**
-     * @brief Action de passage en doe d’affichage des règles.
+     * @brief Action de passage en mode d’affichage des règles.
      */
     void actDisplayRules();
 
     /**
-     * @brief Action de passage en doe d’affichage des règles.
+     * @brief Action de passage en de l'affichage en plein écran.
      */
     void actChangeFullScreen();
+
+    /**
+     * @brief Action de changement d'écran d'affichage.
+     */
+    void actChangeScreen();
 
     /**
      * @brief Action d'appui sur la grille
@@ -232,6 +237,11 @@ private:
      * @brief Vérifie que la fenêtre d'affichage est visible et active le bouton si elle doit l'être
      */
     void checkDisplayWindow();
+
+    /**
+     * @brief Update the list of screens
+     */
+    void updateScreenList();
 
     /**
      * @brief Sauve dans un fichier

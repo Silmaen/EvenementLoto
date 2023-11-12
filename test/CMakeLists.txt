@@ -1,6 +1,6 @@
 
 if (WIN32)
-    set(CMAKE_PREFIX_PATH ${${PRJPREFIX}_QT_DIR})
+    list(PREPEND CMAKE_PREFIX_PATH ${${PRJPREFIX}_QT_DIR})
     set(QT_INSTALL_PATH "${CMAKE_PREFIX_PATH}")
     if (NOT EXISTS "${QT_INSTALL_PATH}/bin")
         set(QT_INSTALL_PATH "${QT_INSTALL_PATH}/..")
@@ -13,6 +13,8 @@ endif ()
 FILE(GLOB children RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/*)
 
 add_custom_target(All_Tests)
+# googletest
+find_package(GTest 1.13 REQUIRED)
 
 FOREACH (child ${children})
     if (${child} MATCHES "test_helper")
@@ -22,14 +24,14 @@ FOREACH (child ${children})
         file(GLOB_RECURSE
                 SRCS
                 ${CMAKE_CURRENT_SOURCE_DIR}/${child}/*.cpp
-                )
+        )
         IF ("${SRCS} " STREQUAL " ")
             message(STATUS "Test folder '${child}' is empty, skipping")
         ELSE ()
             set(${child}_exe ${PRJPREFIX_LOWER}_${child}_unit_test)
             add_executable(${${child}_exe} ${SRCS})
             target_include_directories(${${child}_exe} PUBLIC test_helper)
-            target_link_libraries(${${child}_exe} gtest)
+            target_link_libraries(${${child}_exe} GTest::gtest)
             target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
             if (${child} MATCHES "[g]ui")
                 target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui)
@@ -37,7 +39,7 @@ FOREACH (child ${children})
                     target_compile_options(${${child}_exe} PRIVATE
                             -Wno-reserved-identifier
                             -Wno-missing-prototypes
-                            )
+                    )
                 endif ()
             endif ()
             if (CMAKE_SYSTEM_NAME MATCHES "Linux")

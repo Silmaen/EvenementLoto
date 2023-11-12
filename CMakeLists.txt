@@ -13,6 +13,7 @@ project(EvenementLoto VERSION 0.3.0 LANGUAGES CXX)
 # ---=== Options ===---
 #
 option(${PRJPREFIX}_DOC_ONLY "To only generate documentation" OFF)
+option(${PRJPREFIX}_TESTING "To build the tests" ON)
 
 
 set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
