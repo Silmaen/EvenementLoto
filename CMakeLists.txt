@@ -73,10 +73,15 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
         endif ()
     endforeach ()
 endif ()
-
 add_custom_command(
         TARGET Package POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data ${PROJECT_BINARY_DIR}/bin/data)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/document/Readme.md ${PROJECT_BINARY_DIR}/bin)
+add_custom_command(
+        TARGET Package POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/bin/data
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/data/base_rules.txt ${PROJECT_BINARY_DIR}/bin/data
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/slides ${PROJECT_BINARY_DIR}/bin/data
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/theme ${PROJECT_BINARY_DIR}/bin/data)
 
 install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION .)
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -88,3 +93,7 @@ else ()
             TARGET Package POST_BUILD
             COMMAND ${CMAKE_CPACK_COMMAND} -G TGZ)
 endif ()
+
+#
+# ---=== End ===---
+#
