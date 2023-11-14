@@ -18,16 +18,16 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 ### Dépendance
 
 * Ce projet dépend de la librairie Qt6 (qui doit être installé sur le système)
-* Ce projet dépende de python3.10 ou suppérieur
-* Ce projet dépend de dependency manager [depmanager](https://github.com/Silmaen/DepManager)
+* Ce projet dépend de python3.10 ou supérieur
+* Ce projet dépend de dependency manager [DepManager](https://github.com/Silmaen/DepManager)
     * Pour l'installer par pip: `pip intall depmanager`
-    * les librairie doivent exister en local ou sur un serveur remote conbfiguré avec depmanger.
+    * Les librairies doivent exister en local ou sur un serveur remote configuré avec DepManager.
 * Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code.
     * Pour l'installer par pip: `pip intall gcovr`
 * Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
-* Depmanager va premettre de gérer les autres dépendences externer
+* Depmanager va permettre de gérer les autres dépendances externer
     * fmt
     * spdlog
     * magic_enum
@@ -39,19 +39,18 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 Le programme a été correctement compilé avec:
 
 * windows
-    * gcc 12 (mingw)
-    * clang 14 (mingw)
+    * gcc 13 (mingw)
+    * clang 17 (mingw)
 
 * linux
     * gcc 12
-    * clang 14
+    * clang 15
 
 ## Roadmap
 
 ### Version 0.4 (In development)
 
 * Contrôle et paramètres
-    * [ ] choix de l’écran de plein écran
     * [ ] permettre le choix de la police de caractère
     * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
         * [ ] ajouter le réglage de cette valeur
@@ -63,20 +62,25 @@ Le programme a été correctement compilé avec:
     * [ ] Données
         * [ ] édition de lots sous forme de liste d’articles
     * [ ] Permettre de passer l'étape de saisi du gagnant
-    * [ ] Gestion des gagnants multiple
-        * [ ] permettre de départager les gagnants multiples (tirage au sort ou saisi)
-    * [ ] Résultat
-        * [ ] Génération du rapport de fin d'événement
-        * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
-    * [ ] Flexibilité en jeu
-        * [ ] permettre de réorganiser les parties non entamées
-        * [ ] permettre l'édition de parties non entamée
+    * [ ] Gestion des multiples gagnants
+        * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
+        * [ ] Résultat
+            * [ ] Génération du rapport de fin d'événement
+            * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
+        * [ ] Flexibilité en jeu
+            * [ ] permettre de réorganiser les parties non entamées
+            * [ ] permettre l'édition de parties non entamée
 * Documentation
     * [ ] Écrire les pages d’aide
 * Sauvegarde et restauration
     * [ ] mettre à jour les import/export json
+
+### Version 0.3.1 (Released 26 november 2023)
+
+* Contrôle et paramètres
+    * [X] choix de l’écran de plein écran
 * Packaging
-    * [ ] Faire des paquets linux
+    * [X] Faire des paquets linux
 
 ### Version 0.3 (Released 28 november 2022)
 
@@ -108,12 +112,12 @@ Le programme a été correctement compilé avec:
     * [X] Affichage logo organisateur dans les vues intermédiaires
     * [X] Affichage du règlement
         * [X] Bouton permettant le ré-affichage à n’importe quel moment
-    * [X] Affichage consignes sanitaire
-    * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
-    * [X] Permettre Affichage en plein écran sur le second écran
-        * [X] Permettre le choix/configuration du mode plein écran.
-    * [X] Affichage Pause round
-    * [x] Modification des labels cartons et partie si partie démarrée.
+    * [X] Affichage consignes sanitaires
+        * [X] Meilleur affichage du statut de la partie en cours dans la fenêtre principale
+        * [X] Permettre Affichage en plein écran sur le second écran
+            * [X] Permettre le choix/configuration du mode plein écran.
+        * [X] Affichage Pause round
+        * [x] Modification des labels cartons et partie si partie démarrée.
 * Thème
     * [X] Ajout d’icônes sur les boutons et actions
         * [X] Ajout des icônes manquantes
@@ -130,7 +134,7 @@ Le programme a été correctement compilé avec:
     * [X] Edition du règlement dans la fenêtre de configuration de l’événement.
 * Sauvegarde et restauration
     * [X] import fiches de lot en json
-    * [X] Version des sauvegardes binaire
+    * [X] Version des sauvegardes binaires
         * [X] Permettre l’ouverture de vielles versions
     * [X] Chemin relatif au lieu de stockage du fichier binaire pour les images
         * [X] Copie des images dans le dossier contenant le fichier de sauvegarde
