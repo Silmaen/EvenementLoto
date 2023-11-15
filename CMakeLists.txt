@@ -80,8 +80,8 @@ add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/bin/data
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/data/base_rules.txt ${PROJECT_BINARY_DIR}/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/slides ${PROJECT_BINARY_DIR}/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/theme ${PROJECT_BINARY_DIR}/bin/data)
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/slides ${PROJECT_BINARY_DIR}/bin/data/slides
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/theme ${PROJECT_BINARY_DIR}/bin/data/theme)
 
 install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION .)
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")

@@ -8,7 +8,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>1044</width>
-                <height>849</height>
+                <height>844</height>
             </rect>
         </property>
         <property name="palette">
@@ -1206,7 +1206,8 @@
                                                                         <iconset
                                                                                 resource="../../resources/EvenementLoto.qrc">
                                                                             <normaloff>
-                                                                                :/icons/icons/submit-for-approval.png</normaloff>
+                                                                                :/icons/icons/submit-for-approval.png
+                                                                            </normaloff>
                                                                             :/icons/icons/submit-for-approval.png
                                                                         </iconset>
                                                                     </property>
@@ -1224,7 +1225,8 @@
                                                                         <iconset
                                                                                 resource="../../resources/EvenementLoto.qrc">
                                                                             <normaloff>
-                                                                                :/icons/icons/terms-and-conditions.png</normaloff>
+                                                                                :/icons/icons/terms-and-conditions.png
+                                                                            </normaloff>
                                                                             :/icons/icons/terms-and-conditions.png
                                                                         </iconset>
                                                                     </property>
@@ -1239,7 +1241,8 @@
                                                                         <iconset
                                                                                 resource="../../resources/EvenementLoto.qrc">
                                                                             <normaloff>
-                                                                                :/icons/icons/dice.png</normaloff>
+                                                                                :/icons/icons/dice.png
+                                                                            </normaloff>
                                                                             :/icons/icons/dice.png
                                                                         </iconset>
                                                                     </property>
@@ -1261,7 +1264,8 @@
                                                                         <iconset
                                                                                 resource="../../resources/EvenementLoto.qrc">
                                                                             <normaloff>
-                                                                                :/icons/icons/clear-symbol.png</normaloff>
+                                                                                :/icons/icons/clear-symbol.png
+                                                                            </normaloff>
                                                                             :/icons/icons/clear-symbol.png
                                                                         </iconset>
                                                                     </property>
