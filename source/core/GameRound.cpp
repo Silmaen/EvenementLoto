@@ -7,6 +7,8 @@
  */
 #include "GameRound.h"
 
+#include "StringUtils.h"
+
 namespace evl::core {
 
 const std::unordered_map<GameRound::Type, string> GameRound::TypeConvert= {
@@ -110,12 +112,12 @@ void GameRound::nextStatus() {
 }
 
 string GameRound::getStateString() const {
-    string result= fmt::format("Partie {} {}", getID(), getName());
+    string result= std::format("Partie {} {}", getID(), getName());
     if(type != Type::Pause) {
-        result+= fmt::format(" - {}", getStatusStr());
+        result+= std::format(" - {}", getStatusStr());
         if(status == Status::Running) {
             auto sub= getCurrentSubRound();
-            result+= fmt::format(" - {} {}", sub->getTypeStr(), sub->getStatusStr());
+            result+= std::format(" - {} {}", sub->getTypeStr(), sub->getStatusStr());
         }
     }
     return result;
@@ -279,7 +281,7 @@ string GameRound::getDrawStr() const {
     string result;
     for(const auto& sub: subGames) {
         if(sub.getDraws().empty()) break;
-        result+= fmt::format("{}: {}\n", sub.getTypeStr(), fmt::join(sub.getDraws(), " "));
+        result+= std::format("{}: {}\n", sub.getTypeStr(), join(sub.getDraws(), " "));
     }
     return result;
 }
@@ -288,7 +290,7 @@ string GameRound::getWinnerStr() const {
     string result;
     for(const auto& sub: subGames) {
         if(sub.getWinner().empty()) break;
-        result+= fmt::format("{}: {}\n", sub.getTypeStr(), sub.getWinner());
+        result+= std::format("{}: {}\n", sub.getTypeStr(), sub.getWinner());
     }
     return result;
 }
