@@ -8,7 +8,7 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}"
 cmake_minimum_required(VERSION 3.24)
 set(PRJPREFIX EVL)
 set(PRJPREFIX_LOWER evl)
-project(EvenementLoto VERSION 0.3.1 LANGUAGES CXX)
+project(EvenementLoto VERSION 0.3.2 LANGUAGES CXX)
 #
 # ---=== Options ===---
 #

@@ -9,7 +9,6 @@
 #pragma once
 #include "../baseDefine.h"
 #include <chrono>
-#include <fmt/chrono.h>
 #include <iomanip>
 #include <locale>
 
@@ -44,7 +43,8 @@ constexpr inline uint32_t getSeconds(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
  */
 inline string formatCalendar(const timePoint& t) {
-    return fmt::format("{:%d %B %Y}", t);
+    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    return std::format("{:%d %B %Y}", local);
 }
 
 /**
@@ -53,7 +53,8 @@ inline string formatCalendar(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
 inline string formatClock(const timePoint& t) {
-    return fmt::format("{:%R}:{:02d}", floorMinutes(t), getSeconds(t));
+    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    return std::format("{:%R}:{:02d}", local, getSeconds(t));
 }
 
 /**
@@ -62,7 +63,8 @@ inline string formatClock(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
  */
 inline string formatClockNoSecond(const timePoint& t) {
-    return fmt::format("{:%R}", t);
+    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    return std::format("{:%R}", local);
 }
 
 /**
@@ -76,10 +78,10 @@ inline string formatDuration(const duration& d) {
     int32_t h= s / 3600;
     s        = s % 60;
     if(h > 0)
-        return fmt::format("{:02d}:{:02d}:{:02d}", h, m, s);
+        return std::format("{:02d}:{:02d}:{:02d}", h, m, s);
     if(m > 0)
-        return fmt::format("{:02d}:{:02d}", m, s);
-    return fmt::format("{:02d}s", s);
+        return std::format("{:02d}:{:02d}", m, s);
+    return std::format("{:02d}s", s);
 }
 
 }// namespace evl::core

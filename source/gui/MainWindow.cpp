@@ -19,6 +19,7 @@
 #include <iostream>
 
 // Les trucs de QT
+#include <core/StringUtils.h>
 #include <moc_MainWindow.cpp>
 #include <ui/ui_MainWindow.h>
 
@@ -469,9 +470,9 @@ void MainWindow::updateStats() {
     auto res= currentEvent.getStats();
 
     ui->MostPickNb->setText(QString::number(res.mostPickNb));
-    ui->MostPickList->setText(QString::fromStdString(fmt::format("{}", fmt::join(res.mostPickList, " "))));
+    ui->MostPickList->setText(QString::fromStdString(join(res.mostPickList, " ")));
     ui->LessPickNb->setText(QString::number(res.lessPickNb));
-    ui->LessPickList->setText(QString::fromStdString(fmt::format("{}", fmt::join(res.lessPickList, " "))));
+    ui->LessPickList->setText(QString::fromStdString(join(res.lessPickList, " ")));
 
     ui->RoundLongest->setText(QString::fromStdString(core::formatDuration(res.roundLongest)));
     ui->RoundShortest->setText(QString::fromStdString(core::formatDuration(res.roundShortest)));
@@ -557,7 +558,6 @@ void MainWindow::updateRadioButtons() {
 void MainWindow::updateInfoRound() {
     // reset all infos
     ui->RoundStartTime->setText("");
-    //ui->RoundDuration->setText(""); // fait côé horloge
     ui->RoundDraws->setText("");
     ui->RoundName->setText("");
     ui->RoundPhase->setText("");
