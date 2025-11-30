@@ -1,0 +1,11 @@
+remote:
+    # If package not found locally, do you allow for download?
+    pull: true
+    # If newer remote package exists, download it? (implies 'pull')
+    pull-newer: true
+packages:
+  spdlog:
+    version: 1.16.0
+    kind: "static"
+  magic_enum:
+    version: 0.9.7

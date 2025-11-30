@@ -15,15 +15,15 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Bas
 # json
 
 #fmt
-find_package(fmt 8 REQUIRED)
-message(STATUS "Found fmt")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt::fmt)
+#find_package(fmt REQUIRED)
+#message(STATUS "Found fmt")
+#target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC fmt::fmt)
 
 #spdlog
 find_package(spdlog REQUIRED)
 message(STATUS "Found spdlog")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog)
-target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC SPDLOG_FMT_EXTERNAL)
+#target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC SPDLOG_FMT_EXTERNAL)
 
 #magic enum
 find_package(magic_enum REQUIRED)

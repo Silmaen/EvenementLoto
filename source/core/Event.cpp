@@ -8,6 +8,7 @@
 #include "Event.h"
 #include <fstream>
 #include <spdlog/spdlog.h>
+#include "StringUtils.h"
 
 namespace evl::core {
 
@@ -318,10 +319,10 @@ void Event::nextState() {
 }
 
 string Event::getStateString() const {
-    string result= fmt::format("Event {}", getStatusStr());
+    string result= std::format("Event {}", getStatusStr());
     if(status == Status::GameRunning) {
         auto sub= getCurrentCGameRound();
-        result+= fmt::format(" - {}", sub->getStateString());
+        result+= std::format(" - {}", sub->getStateString());
     }
     return result;
 }
