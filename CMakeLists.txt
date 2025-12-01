@@ -6,24 +6,29 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}"
 # ---=== GENERALITIES ===---
 #
 cmake_minimum_required(VERSION 3.24)
-set(PRJPREFIX EVL)
-set(PRJPREFIX_LOWER evl)
+set(PROJECT_PREFIX EVL)
+set(PROJECT_PREFIX_LOWER evl)
 project(EvenementLoto VERSION 0.3.2 LANGUAGES CXX)
 #
 # ---=== Options ===---
 #
-option(${PRJPREFIX}_DOC_ONLY "To only generate documentation" OFF)
-option(${PRJPREFIX}_TESTING "To build the tests" ON)
+option(${PROJECT_PREFIX}_DOC_ONLY "To only generate documentation" OFF)
+option(${PROJECT_PREFIX}_TESTING "To build the tests" ON)
 
 
-set(${PRJPREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
+set(${PROJECT_PREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
 #
 # ---=== Base Configs ===---
 #
 include(cmake/BaseConfig.cmake)
 
 
-if (NOT ${PRJPREFIX}_DOC_ONLY)
+if (NOT ${PROJECT_PREFIX}_DOC_ONLY)
+    #
+    # ---=== Sanitizers ===---
+    #
+    include(Sanitizers)
+
     #
     # ---=== The Program ===---
     #
@@ -33,7 +38,7 @@ if (NOT ${PRJPREFIX}_DOC_ONLY)
     # ---=== TESTING PROCEDURES ===---
     #
 
-    if (${PRJPREFIX}_TESTING)
+    if (${PROJECT_PREFIX}_TESTING)
         enable_testing()
         add_subdirectory(test)
     endif ()
