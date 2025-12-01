@@ -5,6 +5,8 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
+
 #include "baseDefinitions.h"
 #include <QMessageBox>
 #include <QPainter>
@@ -22,16 +24,15 @@ void showNotImplemented(const QString& from) {
 }
 
 QImage loadImage(const path& from) {
-    QString imgName(QString::fromUtf8(from.string()));
+    const QString imgName(QString::fromUtf8(from.string()));
     if(from.extension() == ".svg") {
         QSvgRenderer renderer(imgName);
-        double ratio= renderer.viewBoxF().height() / renderer.viewBoxF().width();
+        const double ratio= renderer.viewBoxF().height() / renderer.viewBoxF().width();
         QImage img(1920, static_cast<int>(1920 * ratio), QImage::Format_ARGB32);
         QPainter painter(&img);
         renderer.render(&painter);
         return img;
-    } else {
-        return QImage(imgName);
     }
+    return QImage(imgName);
 }
 }// namespace evl::gui

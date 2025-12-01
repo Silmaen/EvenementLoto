@@ -5,14 +5,14 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "RandomNumberGenerator.h"
+#include "pch.h"
+
 #include "../baseDefine.h"
-#include <algorithm>
-#include <chrono>
+#include "RandomNumberGenerator.h"
 
 namespace evl::core {
 
-RandomNumberGenerator::RandomNumberGenerator(bool debug) {
+RandomNumberGenerator::RandomNumberGenerator(const bool debug) {
     if(debug)
         std::srand(1234);
     else
@@ -20,7 +20,7 @@ RandomNumberGenerator::RandomNumberGenerator(bool debug) {
 }
 
 bool RandomNumberGenerator::addPick(const uint8_t& num) {
-    if(std::find(alreadyPicked.begin(), alreadyPicked.end(), num) != alreadyPicked.end())
+    if(std::ranges::find(alreadyPicked, num) != alreadyPicked.end())
         return false;
     alreadyPicked.push_back(num);
     return true;
@@ -28,9 +28,9 @@ bool RandomNumberGenerator::addPick(const uint8_t& num) {
 
 uint8_t RandomNumberGenerator::pick() {
     if(alreadyPicked.size() >= 90) return 255;
-    uint8_t n= static_cast<uint8_t>((std::rand()) % 90 + 1);
-    while(std::find(alreadyPicked.begin(), alreadyPicked.end(), n) != alreadyPicked.end())
-        n= static_cast<uint8_t>((std::rand()) % 90 + 1);
+    uint8_t n= static_cast<uint8_t>(std::rand() % 90 + 1);
+    while(std::ranges::find(alreadyPicked, n) != alreadyPicked.end())
+        n= static_cast<uint8_t>(std::rand() % 90 + 1);
     alreadyPicked.push_back(n);
     return n;
 }

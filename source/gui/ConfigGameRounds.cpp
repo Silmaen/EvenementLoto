@@ -5,8 +5,10 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "ConfigGameRounds.h"
+#include "pch.h"
+
 #include "BaseDialog.h"
+#include "ConfigGameRounds.h"
 #include "MainWindow.h"
 #include <QScreen>
 
@@ -45,14 +47,14 @@ void ConfigGameRounds::actApply() {
 }
 
 void ConfigGameRounds::actImportRounds() {
-    path file= dialog::openFile(dialog::FileTypes::JSON, true);
+    const path file= dialog::openFile(dialog::FileTypes::JSON, true);
     if(file.empty())
         return;
     gameEvent.importJSON(file);
 }
 
-void ConfigGameRounds::actExportRounds() {
-    path file= dialog::openFile(dialog::FileTypes::JSON, false);
+void ConfigGameRounds::actExportRounds() const {
+    const path file= dialog::openFile(dialog::FileTypes::JSON, false);
     if(file.empty())
         return;
     gameEvent.exportJSON(file);
@@ -72,7 +74,7 @@ void ConfigGameRounds::actCreateGameRound() {
 }
 
 void ConfigGameRounds::actDeleteGameRound() {
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 0)// rien de sélectionné
         return;
     gameEvent.deleteRoundByIndex(static_cast<uint16_t>(cur));
@@ -80,10 +82,10 @@ void ConfigGameRounds::actDeleteGameRound() {
 }
 
 void ConfigGameRounds::actMoveGameRoundAfter() {
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 0)// rien de sélectionné
         return;
-    if(cur >= static_cast<int>(gameEvent.sizeRounds() - 1))// déjà en dernière position
+    if(std::cmp_greater_equal(cur, gameEvent.sizeRounds() - 1))// déjà en dernière position
         return;
     ui->listGameRound->setCurrentRow(cur + 1);
     gameEvent.swapRoundByIndex(static_cast<uint16_t>(cur), static_cast<uint16_t>(cur + 1));
@@ -91,7 +93,7 @@ void ConfigGameRounds::actMoveGameRoundAfter() {
 }
 
 void ConfigGameRounds::actMoveGameRoundBefore() {
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 1)// rien de sélectionné ou déjà en première position
         return;
     ui->listGameRound->setCurrentRow(cur - 1);
@@ -102,10 +104,10 @@ void ConfigGameRounds::actMoveGameRoundBefore() {
 void ConfigGameRounds::actChangeGameRoundType(int newIndex) {
     if(in_update_loop)
         return;
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 0)
         return;
-    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
     round->setType(static_cast<core::GameRound::Type>(newIndex));
     updateDisplay();
 }
@@ -113,7 +115,7 @@ void ConfigGameRounds::actChangeGameRoundType(int newIndex) {
 void ConfigGameRounds::actChangeRoundNumber(int) {
     if(in_update_loop)
         return;
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 0)
         return;
     gameEvent.getGameRound(static_cast<uint16_t>(cur))->setID(ui->spinRoundNumber->value());
@@ -124,14 +126,14 @@ void ConfigGameRounds::actEndEditingPrice() {
     if(in_update_loop)
         return;
     in_update_prices= true;
-    int cur         = ui->listGameRound->currentRow();
+    const int cur   = ui->listGameRound->currentRow();
     if(cur < 0)
         return;
-    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
-    int scur  = ui->listSubRound->currentRow();
+    const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    const int scur  = ui->listSubRound->currentRow();
     if(scur < 0)
         return;
-    auto subround= round->getSubRound(static_cast<uint32_t>(scur));
+    const auto subround= round->getSubRound(static_cast<uint32_t>(scur));
     subround->define(subround->getType(), ui->TextPrices->toPlainText().toStdString(), ui->PricesValue->value());
     updateDisplay();
     in_update_prices= false;
@@ -154,9 +156,9 @@ void ConfigGameRounds::actMoveSubGameRoundBefore() {
 }
 
 void ConfigGameRounds::actChangePause() {
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     if(cur < 0) return;
-    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
     if(round->getType() != core::GameRound::Type::Pause) return;
     if(ui->PauseDiapo->isChecked()) {
         if(ui->PauseDiapoFolder->text().isEmpty() && ui->PauseDiapoDelay->value() <= 0) {
@@ -170,8 +172,8 @@ void ConfigGameRounds::actChangePause() {
     updateDisplay();
 }
 
-void ConfigGameRounds::actFindDiapo() {
-    auto fold= dialog::openFile(dialog::FileTypes::Folder, true);
+void ConfigGameRounds::actFindDiapo() const {
+    const auto fold= dialog::openFile(dialog::FileTypes::Folder, true);
     ui->PauseDiapoFolder->setText(QString::fromStdString(fold.string()));
 }
 
@@ -190,14 +192,13 @@ void ConfigGameRounds::actTogglePreview() {
 void ConfigGameRounds::actTogglePreviewFullScreen() {
     if(displayPreview == nullptr)
         return;
-    QList<QScreen*> screens= QApplication::screens();
-    if(screens.size() < 2 || !ui->checkFullScreenPreVisu->isChecked()) {
+    if(QList<QScreen*> screens= QApplication::screens(); screens.size() < 2 || !ui->checkFullScreenPreVisu->isChecked()) {
         displayPreview->showNormal();
     } else {
-        for(QScreen* s: screens) {
+        for(const QScreen* s: screens) {
             if(s == screen())
                 continue;
-            QRect sizes= s->geometry();
+            const QRect sizes= s->geometry();
             displayPreview->move(sizes.x(), sizes.y());
             break;
         }
@@ -257,10 +258,10 @@ void ConfigGameRounds::updateDisplay() {
     onUpdate= false;
 }
 
-void ConfigGameRounds::updateDisplayRoundList() {
+void ConfigGameRounds::updateDisplayRoundList() const {
 
     // remplissage de la liste des parties
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     ui->listGameRound->clear();
     int idx= 1;
     for(auto it= gameEvent.beginRounds(); it != gameEvent.endRounds(); ++it, ++idx) {
@@ -280,16 +281,15 @@ void ConfigGameRounds::updateDisplayEdits() {
     if(in_update_loop) return;
     in_update_loop= true;
     updateDisplayRoundList();
-    int cur= ui->listGameRound->currentRow();
     // remplissage des sous-rounds
-    if(cur >= 0) {
+    if(const int cur= ui->listGameRound->currentRow(); cur >= 0) {
         ui->groupSubRound->setEnabled(true);
         ui->GameRoundTypes->clear();
         ui->GameRoundTypes->addItems(getRoundTypes());
-        auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+        const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
         ui->GameRoundTypes->setCurrentIndex(static_cast<int>(round->getType()));
         ui->spinRoundNumber->setValue(round->getID());
-        int scur= ui->listSubRound->currentRow();
+        const int scur= ui->listSubRound->currentRow();
         ui->listSubRound->clear();
         int idx= 1;
         for(auto it= round->beginSubRound(); it != round->endSubRound(); ++it, ++idx) {
@@ -314,13 +314,13 @@ void ConfigGameRounds::updateDisplayEdits() {
 }
 
 void ConfigGameRounds::updateDisplayPhase() {
-    int cur   = ui->listGameRound->currentRow();
-    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    const int cur   = ui->listGameRound->currentRow();
+    const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
     if(round->getType() == core::GameRound::Type::Pause) {
         ui->PhaseConfiguration->setCurrentIndex(1);
         if(displayPreview) {
             displayPreview->setMode(DisplayWindow::Mode::Preview);
-            if (cur <0)
+            if(cur < 0)
                 displayPreview->setRoundIndex(0, 0);
             else
                 displayPreview->setRoundIndex(static_cast<uint32_t>(cur), 0);
@@ -341,17 +341,17 @@ void ConfigGameRounds::updateDisplayPhase() {
         }
         return;
     }
-    int scur= ui->listSubRound->currentRow();
+    const int scur= ui->listSubRound->currentRow();
     if(displayPreview) {
         displayPreview->setMode(DisplayWindow::Mode::Preview);
-        uint32_t ccur = cur>0?static_cast<uint32_t>(cur):0;
-        uint32_t sccur = scur>0?static_cast<uint32_t>(scur):0;
+        const uint32_t ccur = cur > 0 ? static_cast<uint32_t>(cur) : 0;
+        const uint32_t sccur= scur > 0 ? static_cast<uint32_t>(scur) : 0;
         displayPreview->setRoundIndex(ccur, sccur);
     }
     if(scur >= 0) {
         ui->PhaseConfiguration->setEnabled(true);
         ui->PhaseConfiguration->setCurrentIndex(0);
-        auto subRound= round->getSubRound(static_cast<uint32_t>(scur));
+        const auto subRound= round->getSubRound(static_cast<uint32_t>(scur));
         ui->SubRoundTypes->clear();
         ui->SubRoundTypes->addItems(getVictoryType(round->getType()));
         ui->SubRoundTypes->setCurrentIndex(getVictoryIndex(round->getType(), subRound->getType()));
@@ -371,7 +371,7 @@ void ConfigGameRounds::updateDisplayPhase() {
 
 void ConfigGameRounds::updateDisplayResults() {
     updateDisplayRoundList();
-    int cur= ui->listGameRound->currentRow();
+    const int cur= ui->listGameRound->currentRow();
     // nettoyage de tous les champs
     ui->StartingDate->setText("");
     ui->EndingDate->setText("");
@@ -388,7 +388,7 @@ void ConfigGameRounds::updateDisplayResults() {
         ui->ListWinners->setEnabled(false);
         return;
     }
-    auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
+    const auto round= gameEvent.getGameRound(static_cast<uint16_t>(cur));
     if(round->getStatus() == core::GameRound::Status::Ready)
         return;
     ui->StartingDate->setText(QString::fromUtf8(core::formatClock(round->getStarting())));

@@ -5,6 +5,8 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
+
 #include "About.h"
 
 // Les trucs de QT

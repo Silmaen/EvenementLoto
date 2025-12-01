@@ -90,7 +90,7 @@ public:
      * @brief Si le thème a été modifié, mais pas encore lu
      * @return Vrai si le theme n’a encore jamais été lu et a été modifié.
      */
-    const bool& isModified() { return toUpdate; }
+    const bool& isModified() const { return toUpdate; }
 
 private:
     /// Les settings généraux.

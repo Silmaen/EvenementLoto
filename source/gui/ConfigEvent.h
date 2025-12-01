@@ -72,12 +72,12 @@ public slots:
     /**
      * @brief Action de recherche de logo d’organisateur
      */
-    void actSearchOrgaLogo();
+    void actSearchOrgaLogo() const;
 
     /**
      * @brief Action de recherche de logo d’événement.
      */
-    void actSearchLogo();
+    void actSearchLogo() const;
 
     /**
      * @brief Action d’import des règles
@@ -87,13 +87,13 @@ public slots:
     /**
      * @brief Action d’export des règles
      */
-    void actExportRules();
+    void actExportRules() const;
 
 private:
     /**
      * @brief Met à jour l’affichage
      */
-    void updateDisplay();
+    void updateDisplay() const;
 
     /**
      * @brief Charge une configuration depuis un fichier

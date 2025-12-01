@@ -6,8 +6,11 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+
 #include "Serializable.h"
 #include "SubGameRound.h"
+#include <numeric>
+#include <unordered_map>
 #include <vector>
 
 namespace evl::core {
@@ -24,7 +27,7 @@ public:
     /**
      * @brief Liste des types de parties connus.
      */
-    enum struct Type {
+    enum struct Type : uint8_t {
         OneQuine,           ///< Une partie standard en remplissant une ligne seulement avant reset.
         TwoQuines,          ///< Une partie standard en remplissant deux lignes seulement.
         FullCard,           ///< Une partie standard en remplissant le carton seulement.
@@ -39,7 +42,7 @@ public:
     /**
      * @brief Les status possibles de la partie
      */
-    enum struct Status {
+    enum struct Status : uint8_t {
         Ready,     ///< La partie est prête à être jouée
         Running,   ///< La partie est démarrée
         PostScreen,///< La partie est en affichage de fin.
@@ -52,7 +55,7 @@ public:
      * @brief Constructeur
      * @param t Le type de partie
      */
-    GameRound(const Type& t= Type::OneTwoQuineFullCard);
+    explicit GameRound(const Type& t= Type::OneTwoQuineFullCard);
 
     // ---- manipulation du type de partie ----
     /**
@@ -96,8 +99,8 @@ public:
      * @brief define invalide Status for testing purpose
      */
     void invalidStatus() {
-        status= Status{-1};
-        type  = Type{-1};
+        status= Status{255};
+        type  = Type{255};
     }
     /**
      * @brief define invalide Status for testing purpose
@@ -161,13 +164,13 @@ public:
      * @brief Écriture dans un json.
      * @return Le json à remplir
      */
-    json to_json() const override;
+    Json::Value to_json() const override;
 
     /**
      * @brief Lecture depuis un json
      * @param j Le json à lire
      */
-    void from_json(const json& j) override;
+    void from_json(const Json::Value& j) override;
 
     // ---- accès aux timers ----
     /**
@@ -277,7 +280,7 @@ public:
         return std::accumulate(subGames.begin(), subGames.end(), 0ULL, [](drawsType::size_type accu, const auto& item) { return accu + item.getDraws().size(); });
     }
 
-    void setDiapo(const string& path, const double delai);
+    void setDiapo(const string& path, double delai);
 
     std::tuple<path, double> getDiapo() const;
 

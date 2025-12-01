@@ -191,7 +191,7 @@ private:
     /**
     * @brief Mise à jour de l’affichage de menus.
     */
-    void updateMenus();
+    void updateMenus() const;
 
     /**
      * @brief Mise à jour du board du bas.
@@ -201,7 +201,7 @@ private:
     /**
      * @brief Mise à jour de l’affichage des radios boutons
      */
-    void updateRadioButtons();
+    void updateRadioButtons() const;
 
     /**
      * @brief Mise à jour de l’affichage du bouton de start/stop
@@ -211,22 +211,22 @@ private:
     /**
      * @brief Mise à jour de l’affichage des informations de l’événement
      */
-    void updateInfoEvent();
+    void updateInfoEvent() const;
 
     /**
      * @brief Mise à jour de l’affichage des informations de partie
      */
-    void updateInfoRound();
+    void updateInfoRound() const;
 
     /**
      * @brief Mise à jour des numéros tirés
      */
-    void updateDraws();
+    void updateDraws() const;
 
     /**
      * @brief Mise à jour des données de statistiques
      */
-    void updateStats();
+    void updateStats() const;
 
     /**
      * @brief Mise à jour des commandes
@@ -288,7 +288,7 @@ private:
     /**
      * @brief Mode de tirage des numéros
      */
-    enum struct DrawMode {
+    enum struct DrawMode : uint8_t {
         Both,     ///< À la fois manuel et tirage aléatoire par la machine
         PickOnly, ///< Seulement le tirage machine
         ManualOnly///< Seulement le tirage manuel (machine à boule)

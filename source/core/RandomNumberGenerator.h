@@ -23,7 +23,7 @@ public:
      * @brief Constructeur de base.
      * @param debug Si mis à vrai, utilise une seed déterministe.
      */
-    RandomNumberGenerator(bool debug= false);
+    explicit RandomNumberGenerator(bool debug= false);
 
     /**
      * @brief Remet à zéro la liste des numéros déjà tiré.

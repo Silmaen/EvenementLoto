@@ -5,14 +5,22 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "pch.h"
+
 #include "BaseDialog.h"
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QSettings>
 
 namespace evl::gui::dialog {
 
-path openFile(const FileTypes& type, bool exist) {
+path openFile(const FileTypes& type, const bool exist) {
+    QSettings settings;
+    QString lastDir= settings.value("dialog/last_dir", "").toString();
+    if(lastDir.isEmpty()) {
+        lastDir= settings.value("path/data_path", QString::fromStdString(baseExecPath.string())).toString();
+    }
     QFileDialog dia;
     if(exist) {
         dia.setAcceptMode(QFileDialog::AcceptOpen);
@@ -23,7 +31,7 @@ path openFile(const FileTypes& type, bool exist) {
         dia.setAcceptMode(QFileDialog::AcceptSave);
         dia.setFileMode(QFileDialog::AnyFile);
     }
-    dia.setDirectory(QString::fromStdString(baseExecPath.string()));
+    dia.setDirectory(lastDir);
     if(type == FileTypes::EventSave)
         dia.setNameFilter("fichier événement (*.lev)");
     else if(type == FileTypes::JSON)
@@ -43,6 +51,8 @@ path openFile(const FileTypes& type, bool exist) {
                 "Fichiers scalar vector Graphic (*.svg)",
         });
     if(dia.exec()) {
+        const QString selectedFile= dia.selectedFiles()[0];
+        settings.setValue("dialog/last_dir", QFileInfo(selectedFile).absolutePath());
         return path{dia.selectedFiles()[0].toStdString()};
     }
     return path{};
