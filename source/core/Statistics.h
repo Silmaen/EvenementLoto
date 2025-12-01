@@ -17,62 +17,62 @@ namespace evl::core {
  */
 class Statistics {
 public:
-    /**
-     * @brief Default constructor.
-     */
-    Statistics()= default;
-    /**
-     * @brief Default copy constructor
-     */
-    Statistics(const Statistics&)= default;
-    /**
-     * @brief Default move constructor
-     */
-    Statistics(Statistics&&)= default;
-    /**
-     * @brief Default copy assignation
-     * @return this
-     */
-    Statistics& operator=(const Statistics&)= default;
-    /**
-     * @brief Default move assignation
-     * @return this
-     */
-    Statistics& operator=(Statistics&&)= default;
-    /**
-     * @brief Destructor.
-     */
-    ~Statistics()= default;
+	/**
+	 * @brief Default constructor.
+	 */
+	Statistics() = default;
+	/**
+	 * @brief Default copy constructor
+	 */
+	Statistics(const Statistics&) = default;
+	/**
+	 * @brief Default move constructor
+	 */
+	Statistics(Statistics&&) = default;
+	/**
+	 * @brief Default copy assignation
+	 * @return this
+	 */
+	auto operator=(const Statistics&) -> Statistics& = default;
+	/**
+	 * @brief Default move assignation
+	 * @return this
+	 */
+	auto operator=(Statistics&&) -> Statistics& = default;
+	/**
+	 * @brief Destructor.
+	 */
+	~Statistics() = default;
 
-    void pushRound(const GameRound& round);
+	void pushRound(const GameRound& round);
 
-    using pickList= std::vector<uint8_t>;
+	using pickList = std::vector<uint8_t>;
 
-    int lessPickNb= 0;
-    pickList lessPickList;
+	int lessPickNb = 0;
+	pickList lessPickList;
 
-    int mostPickNb= 0;
-    pickList mostPickList;
+	int mostPickNb = 0;
+	pickList mostPickList;
 
-    int roundLessNb      = 0;
-    int roundMostNb      = 0;
-    double roundAverageNb= 0.0;
+	int roundLessNb = 0;
+	int roundMostNb = 0;
+	double roundAverageNb = 0.0;
 
-    int subRoundLessNb      = 0;
-    int subRoundMostNb      = 0;
-    double subRoundAverageNb= 0.0;
+	int subRoundLessNb = 0;
+	int subRoundMostNb = 0;
+	double subRoundAverageNb = 0.0;
 
-    duration roundLongest    = duration::zero();
-    duration roundShortest   = duration::max();
-    duration roundAverage    = duration::zero();
-    duration subRoundLongest = duration::zero();
-    duration subRoundShortest= duration::max();
-    duration subRoundAverage = duration::zero();
+	duration roundLongest = duration::zero();
+	duration roundShortest = duration::max();
+	duration roundAverage = duration::zero();
+	duration subRoundLongest = duration::zero();
+	duration subRoundShortest = duration::max();
+	duration subRoundAverage = duration::zero();
 
 private:
-    int nbRounds   = 0;
-    int nbSubRounds= 0;
-    pickList pickCounts;
+	int nbRounds = 0;
+	int nbSubRounds = 0;
+	pickList pickCounts;
 };
 
 }// namespace evl::core

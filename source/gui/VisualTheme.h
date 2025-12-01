@@ -14,24 +14,24 @@
 namespace evl::gui {
 
 /// Le type de liste de paramètre
-using params= std::unordered_map<QString, QVariant>;
+using params = std::unordered_map<QString, QVariant>;
 /// Liste des valeurs par défaut des paramètres
 static const params themeDefaults{
-        {"name", "default"},
-        {"baseRatio", 0.02},
-        {"titleRatio", 2.0},
-        {"gridTextRatio", 0.85},
-        {"shortTextRatio", 1.4},
-        {"longTextRatio", 0.6},
-        {"backgroundColor", "#F0F0F0"},
-        {"gridBackgroundColor", "#F0F0F0"},
-        {"truncatePrice", true},
-        {"truncatePriceLines", 3},
-        {"textColor", "#000000"},
-        {"selectedNumberColor", "#FF7000"},
-        {"fadeNumbers", true},
-        {"fadeNumbersAmount", 3},
-        {"fadeNumbersStrength", 10},
+		{"name", "default"},
+		{"baseRatio", 0.02},
+		{"titleRatio", 2.0},
+		{"gridTextRatio", 0.85},
+		{"shortTextRatio", 1.4},
+		{"longTextRatio", 0.6},
+		{"backgroundColor", "#F0F0F0"},
+		{"gridBackgroundColor", "#F0F0F0"},
+		{"truncatePrice", true},
+		{"truncatePriceLines", 3},
+		{"textColor", "#000000"},
+		{"selectedNumberColor", "#FF7000"},
+		{"fadeNumbers", true},
+		{"fadeNumbersAmount", 3},
+		{"fadeNumbersStrength", 10},
 };
 
 /**
@@ -39,66 +39,66 @@ static const params themeDefaults{
  */
 class VisualTheme {
 public:
-    /**
-     * @brief Constructeur
-     * @param set Lien vers les settings
-     */
-    explicit VisualTheme(QSettings* set);
+	/**
+	 * @brief Constructeur
+	 * @param set Lien vers les settings
+	 */
+	explicit VisualTheme(QSettings* set);
 
-    /**
-     * @brief Remet tous les paramètres aux valeurs d’usine
-     */
-    void resetFactory();
+	/**
+	 * @brief Remet tous les paramètres aux valeurs d’usine
+	 */
+	void resetFactory();
 
-    /**
-     * @brief Exporte les paramètres dans un fichier JSON
-     * @param file le Fichier JSON
-     */
-    void exportJSON(const path& file) const;
+	/**
+	 * @brief Exporte les paramètres dans un fichier JSON
+	 * @param file le Fichier JSON
+	 */
+	void exportJSON(const path& file) const;
 
-    /**
-     * @brief Importe les paramètres depuis un fichier JSON
-     * @param file le fichier JSON
-     */
-    void importJSON(const path& file);
+	/**
+	 * @brief Importe les paramètres depuis un fichier JSON
+	 * @param file le fichier JSON
+	 */
+	void importJSON(const path& file);
 
-    /**
-     * @brief Récupération des valeurs depuis les paramètres
-     */
-    void setFromSettings();
-    /**
-     * @brief Écrit dans les paramètres
-     */
-    void writeInSettings();
+	/**
+	 * @brief Récupération des valeurs depuis les paramètres
+	 */
+	void setFromSettings();
+	/**
+	 * @brief Écrit dans les paramètres
+	 */
+	void writeInSettings();
 
-    /**
-     * @brief Accède à un paramètre.
-     * @param key Le nom du paramètre.
-     * @return Sa valeur si celui-ci existe (un QVariant vide sinon).
-     */
-    const QVariant& getParam(const QString& key);
+	/**
+	 * @brief Accède à un paramètre.
+	 * @param key Le nom du paramètre.
+	 * @return Sa valeur si celui-ci existe (un QVariant vide sinon).
+	 */
+	const QVariant& getParam(const QString& key);
 
-    /**
-     * @brief Définition d’un paramètre
-     * Ne défini un paramètre que si celui-ci existe dans la liste des défauts et si le type de valeur correspond bien
-     * @param key Le nom du paramètre.
-     * @param value La valeur du paramètre.
-     */
-    void setParam(const QString& key, const QVariant& value);
+	/**
+	 * @brief Définition d’un paramètre
+	 * Ne défini un paramètre que si celui-ci existe dans la liste des défauts et si le type de valeur correspond bien
+	 * @param key Le nom du paramètre.
+	 * @param value La valeur du paramètre.
+	 */
+	void setParam(const QString& key, const QVariant& value);
 
-    /**
-     * @brief Si le thème a été modifié, mais pas encore lu
-     * @return Vrai si le theme n’a encore jamais été lu et a été modifié.
-     */
-    const bool& isModified() { return toUpdate; }
+	/**
+	 * @brief Si le thème a été modifié, mais pas encore lu
+	 * @return Vrai si le theme n’a encore jamais été lu et a été modifié.
+	 */
+	const bool& isModified() const { return toUpdate; }
 
 private:
-    /// Les settings généraux.
-    QSettings* settings;
-    /// Les paramètres
-    params parameters= themeDefaults;
-    /// Si le thème a été modifié
-    bool toUpdate= true;
+	/// Les settings généraux.
+	QSettings* settings;
+	/// Les paramètres
+	params parameters = themeDefaults;
+	/// Si le thème a été modifié
+	bool toUpdate = true;
 };
 
 }// namespace evl::gui

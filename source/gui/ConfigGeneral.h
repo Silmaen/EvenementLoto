@@ -24,108 +24,112 @@ class MainWindow;
 /**
  * @brief Classe D’affichage de la Fenêtre permettant de configurer les cartons.
  */
-class ConfigGeneral: public QDialog {
-    Q_OBJECT
+class ConfigGeneral : public QDialog {
+	Q_OBJECT
 public:
-    /**
-     * @brief Constructeur.
-     * @param parent Le widget Parent.
-     */
-    explicit ConfigGeneral(MainWindow* parent= nullptr);
+	/**
+	 * @brief Constructeur.
+	 * @param parent Le widget Parent.
+	 */
+	explicit ConfigGeneral(MainWindow* parent = nullptr);
 
-    /**
-     * @brief Destructeur.
-     */
-    ~ConfigGeneral() override;
+	/**
+	 * @brief Destructeur.
+	 */
+	~ConfigGeneral() override;
 
+	ConfigGeneral(const ConfigGeneral&) = delete;
+	auto operator=(const ConfigGeneral&) -> ConfigGeneral& = delete;
+	ConfigGeneral(ConfigGeneral&&) = delete;
+	auto operator=(ConfigGeneral&&) -> ConfigGeneral& = delete;
 public slots:
 
-    /**
-     * @brief Surcharge de la commande d’exécution.
-     */
-    void preExec();
+	/**
+	 * @brief Surcharge de la commande d’exécution.
+	 */
+	void preExec() const;
 
-    /**
-     * @brief Réagit à une action sur le bouton Apply.
-     */
-    void actApply();
+	/**
+	 * @brief Réagit à une action sur le bouton Apply.
+	 */
+	void actApply() const;
 
-    /**
-     * @brief Réagit à une action sur le bouton cancel.
-     */
-    void actCancel();
+	/**
+	 * @brief Réagit à une action sur le bouton cancel.
+	 */
+	void actCancel();
 
-    /**
-     * @brief Réagit à une action sur le bouton ok.
-     */
-    void actOk();
+	/**
+	 * @brief Réagit à une action sur le bouton ok.
+	 */
+	void actOk();
 
-    /**
-     * @brief Réagit au clic sur la recherche d’un dossier.
-     */
-    void actSearchFolder();
+	/**
+	 * @brief Réagit au clic sur la recherche d’un dossier.
+	 */
+	void actSearchFolder() const;
 
-    /**
-     * @brief Réagit au clic sur la recherche d’un dossier.
-     */
-    void actResetTheme();
+	/**
+	 * @brief Réagit au clic sur la recherche d’un dossier.
+	 */
+	void actResetTheme() const;
 
-    /**
-     * @brief Réagit au clic sur la recherche d’un dossier.
-     */
-    void actRestoreTheme();
+	/**
+	 * @brief Réagit au clic sur la recherche d’un dossier.
+	 */
+	void actRestoreTheme() const;
 
-    /**
-     * @brief Réagit au clic sur la recherche d’un dossier.
-     */
-    void actImportTheme();
+	/**
+	 * @brief Réagit au clic sur la recherche d’un dossier.
+	 */
+	void actImportTheme() const;
 
-    /**
-    * @brief Réagit au clic sur la recherche d’un dossier.
-    */
-    void actExportTheme();
+	/**
+	* @brief Réagit au clic sur la recherche d’un dossier.
+	*/
+	void actExportTheme() const;
 
-    /**
-     * @brief Réagit au clic de la couleur de fond.
-     */
-    void actBackgroundColorChange();
+	/**
+	 * @brief Réagit au clic de la couleur de fond.
+	 */
+	void actBackgroundColorChange() const;
 
-    /**
-     * @brief Réagit au clic de la couleur de fond de la grille.
-     */
-    void actGridBackgroundColorChange();
+	/**
+	 * @brief Réagit au clic de la couleur de fond de la grille.
+	 */
+	void actGridBackgroundColorChange() const;
 
-    /**
-     * @brief Réagit au clic de la couleur du texte.
-     */
-    void actSelectedNumbersColorChange();
+	/**
+	 * @brief Réagit au clic de la couleur du texte.
+	 */
+	void actSelectedNumbersColorChange() const;
 
-    /**
-     * @brief action d'appui sur la troncature de prix
-     */
-    void actTruncatePriceChange();
+	/**
+	 * @brief action d'appui sur la troncature de prix
+	 */
+	void actTruncatePriceChange() const;
 
-    /**
-    * @brief Réagit au clic de la couleur des chiffres sélectionnés.
-    */
-    void actTextColorChange();
+	/**
+	* @brief Réagit au clic de la couleur des chiffres sélectionnés.
+	*/
+	void actTextColorChange() const;
 
-    /**
-    * @brief Réagit au clic de la couleur de fond.
-    */
-    void actFadeActivationChange();
+	/**
+	* @brief Réagit au clic de la couleur de fond.
+	*/
+	void actFadeActivationChange() const;
 
 private:
-    /**
-     * @brief Charge une configuration depuis un fichier
-     */
-    void SaveFile();
+	/**
+	 * @brief Charge une configuration depuis un fichier
+	 */
+	void SaveFile() const;
 
-    /// Lien vers la page UI.
-    Ui::ConfigGeneral* ui;
+	/// Lien vers la page UI.
+	Ui::ConfigGeneral* ui;
 
-    /// Lien vers la MainWindow
-    MainWindow* mwd= nullptr;
+	/// Lien vers la MainWindow
+	MainWindow* mwd = nullptr;
 };
 
 }// namespace evl::gui

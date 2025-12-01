@@ -14,16 +14,15 @@
       "name": "Documentation",
       "inherits": "base",
       "cacheVariables": {
-        "OWL_DOC_ONLY": "ON",
-        "CMAKE_C_COMPILER": "clang",
+        "EVL_DOC_ONLY": "ON",
         "CMAKE_CXX_COMPILER": "clang++"
       }
     },
     {
-      "name": "CodeCoverage",
+      "name": "CodeCoverage_gcc",
       "inherits": "gcc-debug",
       "cacheVariables": {
-        "OWL_COVERAGE": "ON"
+        "EVL_ENABLE_COVERAGE": "ON"
       },
       "condition": {
         "type": "equals",
@@ -32,15 +31,111 @@
       }
     },
     {
-      "name": "CodeCoverage_mingw",
+      "name": "CodeCoverage_clang",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "CodeCoverage_gcc_mingw",
       "inherits": "mingw-gcc-debug",
       "cacheVariables": {
-        "OWL_COVERAGE": "ON"
+        "EVL_ENABLE_COVERAGE": "ON"
       },
       "condition": {
         "type": "equals",
         "lhs": "${hostSystemName}",
         "rhs": "Windows"
+      }
+    },
+    {
+      "name": "CodeCoverage_clang_mingw",
+      "inherits": "mingw-clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "clang-tidy",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_CLANG_TIDY": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "clang-tidy_mingw",
+      "inherits": "mingw-clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_CLANG_TIDY": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "sanitizer-address",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_ADDRESS_SANITIZER": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-thread",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_THREAD_SANITIZER": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-undefined-behavior",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "sanitizer-leak",
+      "inherits": "clang-debug",
+      "cacheVariables": {
+        "EVL_ENABLE_LEAK_SANITIZER": "ON"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
       }
     }
   ]

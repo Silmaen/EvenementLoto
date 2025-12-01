@@ -24,22 +24,22 @@ namespace evl::gui {
  * @brief Classe D’affichage de la boite de dialogue d’à propos.
  */
 class About: public QDialog {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    /**
-     * @brief Constructeur.
-     * @param parent Le widget Parent.
-     */
-    explicit About(QWidget* parent= nullptr);
+	/**
+	 * @brief Constructeur.
+	 * @param parent Le widget Parent.
+	 */
+	explicit About(QWidget* parent= nullptr);
 
-    /**
-     * @brief Destructeur.
-     */
-    ~About() override;
+	/**
+	 * @brief Destructeur.
+	 */
+	~About() override;
 
 private:
-    /// Lien vers la page UI.
-    Ui::About* ui;
+	/// Lien vers la page UI.
+	Ui::About* ui;
 };
 
 }// namespace evl::gui

@@ -6,9 +6,7 @@
  * All modification must get authorization from the author.
  */
 
-#include <gtest/gtest.h>
 #include "gui/baseDefinitions.h"
+#include <gtest/gtest.h>
 
-TEST(baseDefinitions, configfile){
-    EXPECT_EQ(evl::gui::getIniFile(),evl::gui::iniFile);
-}
+TEST(baseDefinitions, configfile) { EXPECT_EQ(evl::gui::getIniFile(), evl::gui::iniFile); }

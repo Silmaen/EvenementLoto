@@ -5,6 +5,8 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
+
 #include "About.h"
 
 // Les trucs de QT
@@ -14,12 +16,12 @@
 namespace evl::gui {
 
 About::About(QWidget* parent):
-    QDialog(parent),
-    ui(new Ui::About) {
-    ui->setupUi(this);
+	QDialog(parent),
+	ui(new Ui::About) {
+	ui->setupUi(this);
 }
 About::~About() {
-    delete ui;
+	delete ui;
 }
 
 }// namespace evl::gui

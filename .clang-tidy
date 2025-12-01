@@ -1,19 +1,61 @@
-Checks: '
-    -*,
-    -*braces-around-statements,
-
-    modernize-*,
-    -modernize-avoid-c-arrays,
-    -modernize-use-auto,
-    -modernize-use-nodiscard,
-    -modernize-use-trailing-return-type,
-
-    performance-*,
-
-    readability-function-cognitive-complexity,
+# Generated from CLion Inspection settings
+---
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*(\.h|\.hpp)$'
+HeaderFileExtensions: [ 'h', 'hpp' ]
+ImplementationFileExtensions: [ 'cpp' ]
+FormatStyle: 'file'
+Checks: '*,
+  -abseil-*,
+  -altera-*,
+  -android-*,
+  -boost-*,
+  -darwin-*,
+  -fuchsia-*,
+  -hicpp-*,
+  -linuxkernel-*,
+  -llvmlibc-*,
+  -mpi-*,
+  -objc-*,
+  -openmp-*,
+  -zircon-*,
+  -bugprone-easily-swappable-parameters,
+  -cert-err58-cpp,
+  -cert-msc30-c,
+  -cert-msc50-cpp,
+  -concurrency-mt-unsafe,
+  -cppcoreguidelines-avoid-c-arrays,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -cppcoreguidelines-macro-usage,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-pro-bounds-array-to-pointer-decay,
+  -cppcoreguidelines-pro-bounds-avoid-unchecked-container-access,
+  -cppcoreguidelines-pro-bounds-constant-array-index,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-union-access,
+  -cppcoreguidelines-pro-type-vararg,
+  -google-*,
+  google-explicit-constructor,
+  google-readability-casting,
+  google-runtime-int,
+  google-runtime-operator,
+  -llvm-header-guard,
+  -llvm-include-order,
+  -misc-header-include-cycle,
+  -misc-include-cleaner,
+  -misc-non-private-member-variables-in-classes,
+  -modernize-avoid-c-arrays,
+  -portability-avoid-pragma-once,
+  -readability-braces-around-statements,
+  -readability-identifier-length,
+  -readability-math-missing-parentheses,
+  -readability-uppercase-literal-suffix,
+  -*magic-numbers,
+  -*named-parameter,
 '
-WarningsAsErrors: '
-  -*,
-'
-#HeaderFilterRegex: '^(?!.*[\/\\]Library*[\/\\]).*' # Ignoring header files from Library/
-HeaderFilterRegex: '.*'
+
+CheckOptions:
+  - key: readability-function-cognitive-complexity.Threshold
+    value: 75

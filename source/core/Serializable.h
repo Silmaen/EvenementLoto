@@ -7,52 +7,49 @@
  */
 #pragma once
 #include "../baseDefine.h"
-#include "external/json.h"
-#include <iostream>
+#include <json/json.h>
 
 namespace evl::core {
-
-using json= nlohmann::json;
 
 /**
  * @brief Class de base pour la sérialisation dans des fichiers
  */
 class Serializable {
 public:
-    Serializable()                              = default;
-    Serializable(const Serializable&)           = default;
-    Serializable(Serializable&&)                = default;
-    Serializable& operator=(const Serializable&)= default;
-    Serializable& operator=(Serializable&&)     = default;
-    /**
-     * @brief Destructeur
-     */
-    virtual ~Serializable();
+	Serializable() = default;
+	Serializable(const Serializable&) = default;
+	Serializable(Serializable&&) = default;
+	auto operator=(const Serializable&) -> Serializable& = default;
+	auto operator=(Serializable&&) -> Serializable& = default;
+	/**
+	 * @brief Destructeur
+	 */
+	virtual ~Serializable();
 
-    /**
-     * @brief Lecture depuis un stream
-     * @param bs Le stream d’entrée.
-     * @param file_version La version du fichier à lire
-     */
-    virtual void read(std::istream& bs, int file_version)= 0;
+	/**
+	 * @brief Lecture depuis un stream
+	 * @param bs Le stream d’entrée.
+	 * @param file_version La version du fichier à lire
+	 */
+	virtual void read(std::istream& bs, int file_version) = 0;
 
-    /**
-     * @brief Écriture dans un stream.
-     * @param bs Le stream où écrire.
-     */
-    virtual void write(std::ostream& bs) const= 0;
+	/**
+	 * @brief Écriture dans un stream.
+	 * @param bs Le stream où écrire.
+	 */
+	virtual void write(std::ostream& bs) const = 0;
 
-    /**
-     * @brief Écriture dans un json.
-     * @return Le json à remplir
-     */
-    virtual json to_json() const= 0;
+	/**
+	 * @brief Écriture dans un json.
+	 * @return Le json à remplir
+	 */
+	[[nodiscard]] virtual auto to_json() const -> Json::Value = 0;
 
-    /**
-     * @brief Lecture depuis un json
-     * @param j Le json à lire
-     */
-    virtual void from_json(const json& j)= 0;
+	/**
+	 * @brief Lecture depuis un json
+	 * @param j Le json à lire
+	 */
+	virtual void from_json(const Json::Value& j) = 0;
 };
 
 }// namespace evl::core
