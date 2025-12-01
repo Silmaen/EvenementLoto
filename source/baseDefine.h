@@ -17,17 +17,17 @@
 namespace evl {
 
 /// Version des sauvegardes.
-constexpr uint16_t currentSaveVersion= 6;
+constexpr uint16_t currentSaveVersion = 6;
 
 /// Définition d’un chemin vers un fichier ou répertoire
-using path= std::filesystem::path;
+using path = std::filesystem::path;
 
 /// Définition des chaines de caractères
-using string= std::string;
+using string = std::string;
 /// Le type définissant la taille de la chaine
-using sizeType= std::string::size_type;
+using sizeType = std::string::size_type;
 /// La taille mémoire d’un caractère de chaine.
-constexpr auto charSize= sizeof(string::value_type);
+constexpr auto charSize = sizeof(string::value_type);
 
 /// Variable qui va contenir le chemin vers ce programme
 static path baseExecPath;
@@ -44,8 +44,8 @@ static path baseExecPath;
 #ifndef EVL_PATCH
 #define EVL_PATCH "dev"
 #endif
-static const string EVL_VERSION   = string(EVL_MAJOR) + string(".") + string(EVL_MINOR) + string(".") + string(EVL_PATCH);
-static const string EVL_AUTHOR_STR= string(EVL_AUTHOR);
-static const string EVL_APP       = "Événement Loto";
+static const string EVL_VERSION = string(EVL_MAJOR) + string(".") + string(EVL_MINOR) + string(".") + string(EVL_PATCH);
+static const string EVL_AUTHOR_STR = string(EVL_AUTHOR);
+static const string EVL_APP = "Événement Loto";
 
 }// namespace evl

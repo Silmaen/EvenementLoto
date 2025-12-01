@@ -26,212 +26,212 @@ namespace evl::gui {
  * @brief Classe D’affichage de la Fenêtre permettant de configurer les cartons.
  */
 class ConfigGameRounds: public QDialog {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    /**
-     * @brief Constructeur.
-     * @param parent Le widget Parent.
-     */
-    explicit ConfigGameRounds(MainWindow* parent= nullptr);
+	/**
+	 * @brief Constructeur.
+	 * @param parent Le widget Parent.
+	 */
+	explicit ConfigGameRounds(MainWindow* parent= nullptr);
 
-    /**
-     * @brief Destructeur.
-     */
-    ~ConfigGameRounds() override;
+	/**
+	 * @brief Destructeur.
+	 */
+	~ConfigGameRounds() override;
 
-    /**
-     * @brief Accès à l’événement de la boite de dialogue
-     * @return L’événement.
-     */
-    const core::Event& getEvent() const { return gameEvent; }
+	/**
+	 * @brief Accès à l’événement de la boite de dialogue
+	 * @return L’événement.
+	 */
+	const core::Event& getEvent() const { return gameEvent; }
 
-    /**
-     * @brief Défini l’événement à éditer.
-     * @param e L’événement.
-     */
-    void setEvent(const core::Event& e);
+	/**
+	 * @brief Défini l’événement à éditer.
+	 * @param e L’événement.
+	 */
+	void setEvent(const core::Event& e);
 
-    /**
-     * @brief Accès extérieur aux éléments d’interface.
-     * @return Pointeur vers la classe interne d’interface.
-     */
-    const Ui::ConfigGameRounds* getUi() const { return ui; }
+	/**
+	 * @brief Accès extérieur aux éléments d’interface.
+	 * @return Pointeur vers la classe interne d’interface.
+	 */
+	const Ui::ConfigGameRounds* getUi() const { return ui; }
 public slots:
 
-    /**
-     * @brief Surcharge de la commande d’exécution.
-     */
-    void preExec();
+	/**
+	 * @brief Surcharge de la commande d’exécution.
+	 */
+	void preExec();
 
-    /**
-     * @brief Réagit à une action sur le bouton Apply.
-     */
-    void actApply();
+	/**
+	 * @brief Réagit à une action sur le bouton Apply.
+	 */
+	void actApply();
 
-    /**
-     * @brief Réagit à une action sur le bouton cancel.
-     */
-    void actCancel();
+	/**
+	 * @brief Réagit à une action sur le bouton cancel.
+	 */
+	void actCancel();
 
-    /**
-     * @brief Réagit à une action sur le bouton ok.
-     */
-    void actOk();
+	/**
+	 * @brief Réagit à une action sur le bouton ok.
+	 */
+	void actOk();
 
-    /**
-     * @brief Action lors du click sur le bouton d’import de partie.
-     */
-    void actImportRounds();
+	/**
+	 * @brief Action lors du click sur le bouton d’import de partie.
+	 */
+	void actImportRounds();
 
-    /**
-     * @brief Action lors du click sur le bouton d’export de partie.
-     */
-    void actExportRounds() const;
+	/**
+	 * @brief Action lors du click sur le bouton d’export de partie.
+	 */
+	void actExportRounds() const;
 
-    /**
-     * @brief Action lors du click sur le bouton de création de partie.
-     */
-    void actCreateGameRound();
+	/**
+	 * @brief Action lors du click sur le bouton de création de partie.
+	 */
+	void actCreateGameRound();
 
-    /**
-     * @brief Action lors du click sur le bouton de suppression de partie.
-     */
-    void actDeleteGameRound();
+	/**
+	 * @brief Action lors du click sur le bouton de suppression de partie.
+	 */
+	void actDeleteGameRound();
 
-    /**
-     * @brief Action lors clic sur le bouton Avant.
-     */
-    void actMoveGameRoundAfter();
+	/**
+	 * @brief Action lors clic sur le bouton Avant.
+	 */
+	void actMoveGameRoundAfter();
 
-    /**
-     * @brief Action lors clic sur le bouton Après.
-     */
-    void actMoveGameRoundBefore();
+	/**
+	 * @brief Action lors clic sur le bouton Après.
+	 */
+	void actMoveGameRoundBefore();
 
-    /**
-     * @brief Changement de type de partie
-     * @param newIndex Index du nouveau type de partie
-     */
-    void actChangeGameRoundType(int newIndex);
+	/**
+	 * @brief Changement de type de partie
+	 * @param newIndex Index du nouveau type de partie
+	 */
+	void actChangeGameRoundType(int newIndex);
 
-    /**
-     * @brief Changement du numéro de la partie
-     * @param index Nouveau numéro de partie
-     */
-    void actChangeRoundNumber(int index);
+	/**
+	 * @brief Changement du numéro de la partie
+	 * @param index Nouveau numéro de partie
+	 */
+	void actChangeRoundNumber(int index);
 
-    /**
-     * @brief Changement du type de sous-partie
-     * @param newIndex Nouvel index de type de sous-partie
-     */
-    void actChangeSubGameRoundType(int newIndex);
+	/**
+	 * @brief Changement du type de sous-partie
+	 * @param newIndex Nouvel index de type de sous-partie
+	 */
+	void actChangeSubGameRoundType(int newIndex);
 
-    /**
-     * @brief Action à la fin de l’édition des lots.
-     */
-    void actEndEditingPrice();
+	/**
+	 * @brief Action à la fin de l’édition des lots.
+	 */
+	void actEndEditingPrice();
 
-    /**
-     * @brief Création d’une nouvelle sous-partie
-     */
-    void actCreateSubGameRound();
+	/**
+	 * @brief Création d’une nouvelle sous-partie
+	 */
+	void actCreateSubGameRound();
 
-    /**
-     * @brief Suppression d’une sous-partie
-     */
-    void actDeleteSubGameRound();
-    /**
-     * @brief Action lors clic sur le bouton Avant.
-     */
-    void actMoveSubGameRoundAfter();
+	/**
+	 * @brief Suppression d’une sous-partie
+	 */
+	void actDeleteSubGameRound();
+	/**
+	 * @brief Action lors clic sur le bouton Avant.
+	 */
+	void actMoveSubGameRoundAfter();
 
-    /**
-     * @brief Action lors clic sur le bouton Après.
-     */
-    void actMoveSubGameRoundBefore();
+	/**
+	 * @brief Action lors clic sur le bouton Après.
+	 */
+	void actMoveSubGameRoundBefore();
 
-    /**
-     * @brief Action lors du changement de partie
-     */
-    void actChangeSelectedGameRound();
+	/**
+	 * @brief Action lors du changement de partie
+	 */
+	void actChangeSelectedGameRound();
 
-    /**
-     * @brief Action lors du changement de sous-partie
-     */
-    void actChangeSelectedSubGameRound();
+	/**
+	 * @brief Action lors du changement de sous-partie
+	 */
+	void actChangeSelectedSubGameRound();
 
-    /**
-     * @brief Action lors du changement de valeur de lot
-     */
-    void actChangePriceValue();
+	/**
+	 * @brief Action lors du changement de valeur de lot
+	 */
+	void actChangePriceValue();
 
-    void actChangePause();
+	void actChangePause();
 
-    void actFindDiapo() const;
+	void actFindDiapo() const;
 
-    void actTogglePreview();
+	void actTogglePreview();
 
-    void actTogglePreviewFullScreen();
+	void actTogglePreviewFullScreen();
 
 private:
-    /**
-     * @brief Met à jour l’affichage
-     */
-    void updateDisplay();
+	/**
+	 * @brief Met à jour l’affichage
+	 */
+	void updateDisplay();
 
-    /**
-     * @brief Met à jour l’affichage de la partie d’édition
-     */
-    void updateDisplayEdits();
-    /**
-     * @brief Met à jour l’affichage de la partie d’édition
-     */
-    void updateDisplayRoundList() const;
+	/**
+	 * @brief Met à jour l’affichage de la partie d’édition
+	 */
+	void updateDisplayEdits();
+	/**
+	 * @brief Met à jour l’affichage de la partie d’édition
+	 */
+	void updateDisplayRoundList() const;
 
-    /**
-     * @brief Mets à jour l’affichage de la partie d’affichage de résultat
-     */
-    void updateDisplayResults();
-    /**
-     * @brief Met à jour l’affichage de la partie d’édition
-     */
-    void updateDisplayPhase();
+	/**
+	 * @brief Mets à jour l’affichage de la partie d’affichage de résultat
+	 */
+	void updateDisplayResults();
+	/**
+	 * @brief Met à jour l’affichage de la partie d’édition
+	 */
+	void updateDisplayPhase();
 
-    /**
-     * @brief Renvoie la liste des types de partie
-     * @return La liste des types de partie
-     */
-    static QStringList getRoundTypes();
+	/**
+	 * @brief Renvoie la liste des types de partie
+	 * @return La liste des types de partie
+	 */
+	static QStringList getRoundTypes();
 
-    /**
-     * @brief Renvoie la liste des conditions de victoire en fonction du type de partie
-     * @param t Le type de partie.
-     * @return La liste des conditions de victoires.
-     */
-    static QStringList getVictoryType(const core::GameRound::Type& t);
+	/**
+	 * @brief Renvoie la liste des conditions de victoire en fonction du type de partie
+	 * @param t Le type de partie.
+	 * @return La liste des conditions de victoires.
+	 */
+	static QStringList getVictoryType(const core::GameRound::Type& t);
 
-    /**
-     * @brief Renvoie l’index dans le menu déroulant en fonction de son remplissage
-     * @param t Le type de partie
-     * @param st Le type de phase
-     * @return L'index/
-     */
-    static int getVictoryIndex(const core::GameRound::Type& t, const core::SubGameRound::Type& st);
+	/**
+	 * @brief Renvoie l’index dans le menu déroulant en fonction de son remplissage
+	 * @param t Le type de partie
+	 * @param st Le type de phase
+	 * @return L'index/
+	 */
+	static int getVictoryIndex(const core::GameRound::Type& t, const core::SubGameRound::Type& st);
 
-    ///Lien vers la page UI.
-    Ui::ConfigGameRounds* ui;
+	///Lien vers la page UI.
+	Ui::ConfigGameRounds* ui;
 
-    /// L’événement en cours d’édition
-    core::Event gameEvent;
+	/// L’événement en cours d’édition
+	core::Event gameEvent;
 
-    /// Variable mise à vrai lors de la mise à jour de l’affichage pour éviter les récursions infinies.
-    bool onUpdate= false;
+	/// Variable mise à vrai lors de la mise à jour de l’affichage pour éviter les récursions infinies.
+	bool onUpdate= false;
 
-    /// Pointeur vers une fenêtre d'affichage pour la prévisualisation
-    DisplayWindow* displayPreview= nullptr;
+	/// Pointeur vers une fenêtre d'affichage pour la prévisualisation
+	DisplayWindow* displayPreview= nullptr;
 
-    /// Pointeur vers la fenêtre principale parente
-    MainWindow* _parent= nullptr;
+	/// Pointeur vers la fenêtre principale parente
+	MainWindow* _parent= nullptr;
 };
 
 }// namespace evl::gui

@@ -8,8 +8,8 @@
 #include "../TestMainHelper.h"
 #include <gtest/gtest.h>
 
-int main(int argc, char** argv) {
-    startSpdlog();
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+auto main(int argc, char** argv) -> int {
+	startSpdlog();
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

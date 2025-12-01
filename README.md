@@ -12,8 +12,14 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 
 ### Variables de construction
 
-* `EVL_COVERAGE` active ou non le calcul de la couverture de code.
+* `EVL_ENABLE_COVERAGE` active ou non le calcul de la couverture de code.
   (nécessite `gcovr` voir dépendances)
+* `EVL_ENABLE_CLANG_TIDY` active ou non l’utilisation de clang-tidy durant la compilation.
+* `EVL_ENABLE_ADDRESS_SANITIZER` active ou non l’utilisation de l’address sanitizer durant la compilation.
+* `EVL_ENABLE_THREAD_SANITIZER` active ou non l’utilisation du thread sanitizer durant la compilation.
+* `EVL_ENABLE_MEMORY_SANITIZER` active ou non l’utilisation du memory sanitizer durant la compilation.
+* `EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER` active ou non l’utilisation de l’undefined behavior sanitizer durant la
+  compilation.
 
 ### Dépendance
 
@@ -23,12 +29,12 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
     * Pour l'installer par pip: `pip intall depmanager`
     * Les librairies doivent exister en local ou sur un serveur remote configuré avec DepManager.
 * Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code.
-    * Pour l'installer par pip: `pip intall gcovr`
+    * Pour l'installer par pip: `pip install gcovr`
 * Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
 * Depmanager va permettre de gérer les autres dépendances externer
-    * fmt
+    * jsoncpp
     * spdlog
     * magic_enum
     * googletest
@@ -43,10 +49,15 @@ Le programme a été correctement compilé avec:
     * clang 17 (mingw)
 
 * linux
-    * gcc 12
-    * clang 15
+    * gcc 13
+    * clang 18
 
 ## Roadmap
+
+### Version 0.5 (Planned for 2026)
+
+* Documentation
+    * [ ] Écrire les pages d’aide
 
 ### Version 0.4 (In development)
 
@@ -56,24 +67,28 @@ Le programme a été correctement compilé avec:
         * [ ] ajouter le réglage de cette valeur
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
+    * [ ] Refonte de l'affichage en ImGui, suppression de QT.
     * [ ] Affichage sur l'écran présentateur de la liste des lots lot de la phase d'annonce
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
+    * [ ] Amélioration du rendu des boutons de numéro sur la grille du présentateur
+        * [ ] Plus grand police d'écriture
+        * [ ] Meilleure différence de contraste entre numéro tiré et non tiré
 * moteur de jeu
     * [ ] Données
         * [ ] édition de lots sous forme de liste d’articles
     * [ ] Permettre de passer l'étape de saisi du gagnant
     * [ ] Gestion des multiples gagnants
         * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
-        * [ ] Résultat
-            * [ ] Génération du rapport de fin d'événement
-            * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
-        * [ ] Flexibilité en jeu
-            * [ ] permettre de réorganiser les parties non entamées
-            * [ ] permettre l'édition de parties non entamée
-* Documentation
-    * [ ] Écrire les pages d’aide
+    * [ ] Résultat
+        * [ ] Génération du rapport de fin d'événement
+        * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
+    * [ ] Flexibilité en jeu
+        * [ ] permettre de réorganiser les parties non entamées
+        * [ ] permettre l'édition de parties non entamée
+
 * Sauvegarde et restauration
-    * [ ] mettre à jour les import/export json
+    * [X] mettre à jour les import/export json
+    * [ ] Permettre l'import/export au format YAML
 
 ### Version 0.3.1 (Released 26 november 2023)
 

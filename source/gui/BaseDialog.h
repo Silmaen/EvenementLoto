@@ -18,12 +18,12 @@ namespace evl::gui::dialog {
  * @brief Les type de fichiers
  */
 enum struct FileTypes : uint8_t {
-    EventSave,/// La sauvegarde d’un événement
-    Images,   /// La liste des images supportées
-    JSON,     /// Un fichier JSON
-    Text,     /// Fichiers textes ou markdown
-    ThemeFile,/// Fichier de thème
-    Folder,   /// Un dossier
+	EventSave,/// La sauvegarde d’un événement
+	Images,   /// La liste des images supportées
+	JSON,	 /// Un fichier JSON
+	Text,	 /// Fichiers textes ou markdown
+	ThemeFile,/// Fichier de thème
+	Folder,   /// Un dossier
 };
 
 /**
