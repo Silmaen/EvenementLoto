@@ -6,7 +6,8 @@
  * All modification must get authorization from the author.
  */
 #pragma once
-#include <random>
+
+#include <cstdint>
 #include <vector>
 
 /**
@@ -19,44 +20,44 @@ namespace evl::core {
  */
 class RandomNumberGenerator {
 public:
-    /**
-     * @brief Constructeur de base.
-     * @param debug Si mis à vrai, utilise une seed déterministe.
-     */
-    explicit RandomNumberGenerator(bool debug= false);
+	/**
+	 * @brief Constructeur de base.
+	 * @param debug Si mis à vrai, utilise une seed déterministe.
+	 */
+	explicit RandomNumberGenerator(bool debug = false);
 
-    /**
-     * @brief Remet à zéro la liste des numéros déjà tiré.
-     */
-    void resetPick() { alreadyPicked.clear(); }
+	/**
+	 * @brief Remet à zéro la liste des numéros déjà tiré.
+	 */
+	void resetPick() { alreadyPicked.clear(); }
 
-    /**
-     * @brief Ajoute manuellement un numéro à la liste des numéros déjà tirés.
-     * @param num Le numéro à ajouter.
-     * @return False si le numéro est déjà dans la liste.
-     */
-    bool addPick(const uint8_t& num);
+	/**
+	 * @brief Ajoute manuellement un numéro à la liste des numéros déjà tirés.
+	 * @param num Le numéro qu'il faut ajouter.
+	 * @return False si le numéro est déjà dans la liste.
+	 */
+	auto addPick(const uint8_t& num) -> bool;
 
-    /**
-     * @brief Tire au sort un numéro non déjà tiré.
-     * @return Le numéro tiré.
-     */
-    [[nodiscard]] uint8_t pick();
+	/**
+	 * @brief Tire au sort un numéro non déjà tiré.
+	 * @return Le numéro tiré.
+	 */
+	[[nodiscard]] auto pick() -> uint8_t;
 
-    /**
-     * @brief Renvoie la liste des numéros tirés.
-     * @return La liste des numéros tirés.
-     */
-    [[nodiscard]] const std::vector<uint8_t>& getPicked() const { return alreadyPicked; }
+	/**
+	 * @brief Renvoie la liste des numéros tirés.
+	 * @return La liste des numéros tirés.
+	 */
+	[[nodiscard]] auto getPicked() const -> const std::vector<uint8_t>& { return alreadyPicked; }
 
-    /**
-     * @brief Retire le dernier numéro tiré de la liste.
-     */
-    void popNum();
+	/**
+	 * @brief Retire le dernier numéro tiré de la liste.
+	 */
+	void popNum();
 
 private:
-    /// Liste des numéros déjà tirer.
-    std::vector<uint8_t> alreadyPicked;
+	/// Liste des numéros déjà tirer.
+	std::vector<uint8_t> alreadyPicked;
 };
 
 }// namespace evl::core

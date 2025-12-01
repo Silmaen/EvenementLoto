@@ -15,7 +15,6 @@
       "inherits": "base",
       "cacheVariables": {
         "EVL_DOC_ONLY": "ON",
-        "CMAKE_C_COMPILER": "clang",
         "CMAKE_CXX_COMPILER": "clang++"
       }
     },

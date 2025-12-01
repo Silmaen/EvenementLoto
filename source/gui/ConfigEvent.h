@@ -27,84 +27,84 @@ class MainWindow;
  * @brief Classe D’affichage de la Fenêtre permettant de configurer les cartons.
  */
 class ConfigEvent: public QDialog {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    /**
-     * @brief Constructeur.
-     * @param parent Le widget Parent.
-     */
-    explicit ConfigEvent(MainWindow* parent= nullptr);
+	/**
+	 * @brief Constructeur.
+	 * @param parent Le widget Parent.
+	 */
+	explicit ConfigEvent(MainWindow* parent= nullptr);
 
-    /**
-     * @brief Destructeur.
-     */
-    ~ConfigEvent() override;
+	/**
+	 * @brief Destructeur.
+	 */
+	~ConfigEvent() override;
 
-    /**
-     * @brief Accès à l’événement de la boite de dialogue
-     * @return L’événement.
-     */
-    const core::Event& getEvent() const { return gameEvent; }
+	/**
+	 * @brief Accès à l’événement de la boite de dialogue
+	 * @return L’événement.
+	 */
+	const core::Event& getEvent() const { return gameEvent; }
 
-    /**
-     * @brief Défini l’événement à éditer.
-     * @param e L’événement.
-     */
-    void setEvent(const core::Event& e);
+	/**
+	 * @brief Défini l’événement à éditer.
+	 * @param e L’événement.
+	 */
+	void setEvent(const core::Event& e);
 
 public slots:
 
-    /**
-     * @brief Réagit à une action sur le bouton Apply.
-     */
-    void actApply();
+	/**
+	 * @brief Réagit à une action sur le bouton Apply.
+	 */
+	void actApply();
 
-    /**
-     * @brief Réagit à une action sur le bouton cancel.
-     */
-    void actCancel();
+	/**
+	 * @brief Réagit à une action sur le bouton cancel.
+	 */
+	void actCancel();
 
-    /**
-     * @brief Réagit à une action sur le bouton ok.
-     */
-    void actOk();
+	/**
+	 * @brief Réagit à une action sur le bouton ok.
+	 */
+	void actOk();
 
-    /**
-     * @brief Action de recherche de logo d’organisateur
-     */
-    void actSearchOrgaLogo() const;
+	/**
+	 * @brief Action de recherche de logo d’organisateur
+	 */
+	void actSearchOrgaLogo() const;
 
-    /**
-     * @brief Action de recherche de logo d’événement.
-     */
-    void actSearchLogo() const;
+	/**
+	 * @brief Action de recherche de logo d’événement.
+	 */
+	void actSearchLogo() const;
 
-    /**
-     * @brief Action d’import des règles
-     */
-    void actImportRules();
+	/**
+	 * @brief Action d’import des règles
+	 */
+	void actImportRules();
 
-    /**
-     * @brief Action d’export des règles
-     */
-    void actExportRules() const;
+	/**
+	 * @brief Action d’export des règles
+	 */
+	void actExportRules() const;
 
 private:
-    /**
-     * @brief Met à jour l’affichage
-     */
-    void updateDisplay() const;
+	/**
+	 * @brief Met à jour l’affichage
+	 */
+	void updateDisplay() const;
 
-    /**
-     * @brief Charge une configuration depuis un fichier
-     */
-    void SaveFile();
+	/**
+	 * @brief Charge une configuration depuis un fichier
+	 */
+	void SaveFile();
 
-    /// Lien vers la page UI.
-    Ui::ConfigEvent* ui;
+	/// Lien vers la page UI.
+	Ui::ConfigEvent* ui;
 
-    /// L’événement en cours d’édition
-    core::Event gameEvent;
+	/// L’événement en cours d’édition
+	core::Event gameEvent;
 };
 
 }// namespace evl::gui

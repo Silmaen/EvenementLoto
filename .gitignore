@@ -35,3 +35,4 @@
 output*
 documentation/build
 CMakeUserPresets.json
+Doxyfile

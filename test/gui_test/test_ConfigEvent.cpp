@@ -13,31 +13,31 @@
 using namespace evl::gui;
 
 TEST(gui_ConfigEvent, base) {
-    test::initialize();
-    ConfigEvent a{};
-    EXPECT_STREQ(a.getEvent().getName().c_str(), "");
-    a.setEvent(a.getEvent());
-    test::finalize();
+	test::initialize();
+	ConfigEvent a{};
+	EXPECT_STREQ(a.getEvent().getName().c_str(), "");
+	a.setEvent(a.getEvent());
+	test::finalize();
 }
 
 TEST(gui_ConfigEvent, ControlButtons) {
-    test::initialize();
-    ConfigEvent a{};
-    evl::core::Event evt;
-    evt.setName("toto");
-    evt.setOrganizerName("titi");
-    evt.setLocation("ici");
-    evt.setLogo("ttt");
-    evt.setOrganizerLogo("ttt");
-    evl::core::GameRound gr;
-    evt.pushGameRound(gr);
-    a.setEvent(evt);
-    a.actOk();
-    evt.nextState();
-    a.setEvent(evt);
-    a.actOk();
-    a.actApply();
-    a.actCancel();
-    EXPECT_STREQ(a.getEvent().getName().c_str(), "toto");
-    test::finalize();
+	test::initialize();
+	ConfigEvent a{};
+	evl::core::Event evt;
+	evt.setName("toto");
+	evt.setOrganizerName("titi");
+	evt.setLocation("ici");
+	evt.setLogo("ttt");
+	evt.setOrganizerLogo("ttt");
+	evl::core::GameRound gr;
+	evt.pushGameRound(gr);
+	a.setEvent(evt);
+	a.actOk();
+	evt.nextState();
+	a.setEvent(evt);
+	a.actOk();
+	a.actApply();
+	a.actCancel();
+	EXPECT_STREQ(a.getEvent().getName().c_str(), "toto");
+	test::finalize();
 }

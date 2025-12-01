@@ -15,18 +15,10 @@
 
 namespace evl::gui {
 
-WinnerInput::WinnerInput(QWidget* parent):
-    QDialog(parent),
-    ui(new Ui::WinnerInput) {
-    ui->setupUi(this);
-}
+WinnerInput::WinnerInput(QWidget* parent) : QDialog(parent), ui(new Ui::WinnerInput) { ui->setupUi(this); }
 
-WinnerInput::~WinnerInput() {
-    delete ui;
-}
+WinnerInput::~WinnerInput() { delete ui; }
 
-QString WinnerInput::getWinner() const {
-    return ui->EditWinner->text();
-}
+QString WinnerInput::getWinner() const { return ui->EditWinner->text(); }
 
 }// namespace evl::gui

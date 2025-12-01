@@ -14,18 +14,18 @@ namespace evl::gui::test {
 static QApplication* aa;
 
 inline void finalize() {
-    aa->quit();
-    delete aa;
-    aa= nullptr;
+	aa->quit();
+	delete aa;
+	aa= nullptr;
 }
 
 inline void initialize() {
-    if(aa != nullptr)
-        finalize();
-    char arg0[] = "test";
-    char* argv[]= {&arg0[0]};
-    int argc    = 1;
-    aa          = new QApplication(argc, argv);
+	if(aa != nullptr)
+		finalize();
+	char arg0[] = "test";
+	char* argv[]= {&arg0[0]};
+	int argc	= 1;
+	aa		  = new QApplication(argc, argv);
 }
 
 }// namespace evl::gui::test

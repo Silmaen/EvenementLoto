@@ -14,24 +14,24 @@
 using namespace evl::gui;
 
 TEST(gui_ConfigGameRounds, base) {
-    test::initialize();
-    ConfigGameRounds gr;
-    EXPECT_STREQ(gr.getEvent().getName().c_str(), "");
-    gr.setEvent(gr.getEvent());
-    test::finalize();
+	test::initialize();
+	ConfigGameRounds gr;
+	EXPECT_STREQ(gr.getEvent().getName().c_str(), "");
+	gr.setEvent(gr.getEvent());
+	test::finalize();
 }
 
 TEST(gui_ConfigGameRounds, saveFile) {
-    test::initialize();
-    ConfigGameRounds gr;
-    evl::core::Event evt;
-    evt.setName("toto");
-    evt.setOrganizerName("bob");
-    evl::core::GameRound grd;
-    evt.pushGameRound(grd);// add invalid game round
-    gr.setEvent(evt);
-    gr.actCancel();
-    gr.actApply();
-    gr.actOk();
-    test::finalize();
+	test::initialize();
+	ConfigGameRounds gr;
+	evl::core::Event evt;
+	evt.setName("toto");
+	evt.setOrganizerName("bob");
+	evl::core::GameRound grd;
+	evt.pushGameRound(grd);// add invalid game round
+	gr.setEvent(evt);
+	gr.actCancel();
+	gr.actApply();
+	gr.actOk();
+	test::finalize();
 }

@@ -13,10 +13,10 @@
 using namespace evl::gui;
 
 TEST(gui_ConfigGeneral, ControlButtons) {
-    test::initialize();
-    ConfigGeneral g;
-    g.actOk();
-    g.actApply();
-    g.actCancel();
-    test::finalize();
+	test::initialize();
+	ConfigGeneral g;
+	g.actOk();
+	g.actApply();
+	g.actCancel();
+	test::finalize();
 }

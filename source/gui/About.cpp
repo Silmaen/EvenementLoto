@@ -16,12 +16,12 @@
 namespace evl::gui {
 
 About::About(QWidget* parent):
-    QDialog(parent),
-    ui(new Ui::About) {
-    ui->setupUi(this);
+	QDialog(parent),
+	ui(new Ui::About) {
+	ui->setupUi(this);
 }
 About::~About() {
-    delete ui;
+	delete ui;
 }
 
 }// namespace evl::gui

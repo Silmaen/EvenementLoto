@@ -17,13 +17,13 @@
 namespace evl::gui {
 
 /// Nom du fichier de configuration générale de base.
-inline path iniFile= "config.ini";
+inline path iniFile = "config.ini";
 
 /**
  * @brief Construit le chemin vers le fichier de configuration initiale
  * @return Le chemin complet vers le fichier de configuration.
  */
-inline path getIniFile() { return baseExecPath / iniFile; }
+inline auto getIniFile() -> path { return baseExecPath / iniFile; }
 
 // forward declarations
 class MainWindow;
@@ -38,15 +38,15 @@ class About;
  */
 void showNotImplemented(const QString& from);
 
-QImage loadImage(const path& from);
+auto loadImage(const path& from) -> QImage;
 
-/// Namespace regroupant les clées des paramètres.
+/// Namespace regroupant les clés des paramètres.
 namespace settings {
 
 /// Clé vers le dataPath.
-inline QString dataPathKey= "path/data_path";
+inline QString dataPathKey = "path/data_path";
 /// Valeur par défaut du dataPath.
-inline QString dataPathDefault= "";
+inline QString dataPathDefault = "";
 
 }// namespace settings
 
