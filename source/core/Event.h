@@ -23,7 +23,7 @@ public:
     /**
      * @brief Liste des statuts possibles.
      */
-    enum struct Status {
+    enum struct Status : uint8_t {
         Invalid,       ///< N'est pas valide
         MissingParties,///< L’événement est bien défini, mais il n’a pas de parties définies
         Ready,         ///< Prêt à être utilisé
@@ -58,13 +58,13 @@ public:
      * @brief Écriture dans un json.
      * @return Le json à remplir
      */
-    json to_json() const override;
+    Json::Value to_json() const override;
 
     /**
      * @brief Lecture depuis un json
      * @param j Le json à lire
      */
-    void from_json(const json& j) override;
+    void from_json(const Json::Value& j) override;
 
     /**
      * @brief Export des parties au format JSON
@@ -251,8 +251,8 @@ public:
     string getStateString() const;
 
     bool checkStateChanged() {
-        bool ch= changed;
-        changed= false;
+        const bool ch= changed;
+        changed      = false;
         return ch;
     }
     /**
@@ -311,7 +311,7 @@ public:
      * @brief define invalide Status for testing purpose
      */
     void invalidStatus() {
-        status= Status{-1};
+        status= Status{255};
     }
     /**
      * @brief define invalide Status for testing purpose

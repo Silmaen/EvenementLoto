@@ -86,7 +86,7 @@ public slots:
     /**
      * @brief Action lors du click sur le bouton d’export de partie.
      */
-    void actExportRounds();
+    void actExportRounds() const;
 
     /**
      * @brief Action lors du click sur le bouton de création de partie.
@@ -167,7 +167,7 @@ public slots:
 
     void actChangePause();
 
-    void actFindDiapo();
+    void actFindDiapo() const;
 
     void actTogglePreview();
 
@@ -186,7 +186,7 @@ private:
     /**
      * @brief Met à jour l’affichage de la partie d’édition
      */
-    void updateDisplayRoundList();
+    void updateDisplayRoundList() const;
 
     /**
      * @brief Mets à jour l’affichage de la partie d’affichage de résultat
@@ -228,10 +228,10 @@ private:
     bool onUpdate= false;
 
     /// Pointeur vers une fenêtre d'affichage pour la prévisualisation
-    DisplayWindow* displayPreview = nullptr;
+    DisplayWindow* displayPreview= nullptr;
 
     /// Pointeur vers la fenêtre principale parente
-    MainWindow* _parent = nullptr;
+    MainWindow* _parent= nullptr;
 };
 
 }// namespace evl::gui

@@ -10,8 +10,6 @@
 #include "../baseDefine.h"
 #include <QCoreApplication>
 #include <QString>
-#include <QStringList>
-#include <QTime>
 
 /**
  * @brief Namespace des fonctions d’affichage.

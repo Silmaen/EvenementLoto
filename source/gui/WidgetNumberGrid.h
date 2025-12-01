@@ -42,22 +42,22 @@ public:
      * @brief Defini comme appuyé le bouton
      * @param index lLe bouton
      */
-    void setPushed(int index);
+    void setPushed(int index) const;
     /**
      * @brief Remet à zéro le bouton
      * @param index Le bouton
      */
-    void resetPushed(int index);
+    void resetPushed(int index) const;
     /**
      * @brief Remet à zéro tous les boutons
      */
-    void resetPushed();
+    void resetPushed() const;
 
     /**
      * @brief Compte le nombre de boutons poussés
      * @return Le nombre.
      */
-    uint8_t getNumberPushed();
+    uint8_t getNumberPushed() const;
 
 public slots:
 
@@ -440,7 +440,7 @@ private:
      * @param idx Index du bouton
      * @return Pointeur sur le bouton
      */
-    QPushButton* getButton(int idx);
+    QPushButton* getButton(int idx) const;
     /// Lien vers la page UI.
     Ui::WidgetNumberGrid* ui;
 };

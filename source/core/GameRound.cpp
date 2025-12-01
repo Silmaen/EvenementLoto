@@ -5,8 +5,9 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "GameRound.h"
+#include "pch.h"
 
+#include "GameRound.h"
 #include "StringUtils.h"
 
 namespace evl::core {
@@ -30,7 +31,7 @@ const std::unordered_map<GameRound::Status, string> GameRound::StatusConvert= {
 };
 
 // --- constructeurs ----
-GameRound::GameRound(const GameRound::Type& t) {
+GameRound::GameRound(const Type& t) {
     setType(t);
 }
 
@@ -88,7 +89,7 @@ string GameRound::getStatusStr() const {
 // ---- flux du jeu ----
 
 void GameRound::nextStatus() {
-    auto sub= getCurrentSubRound();
+    const auto sub= getCurrentSubRound();
     switch(status) {
     case Status::Ready:
         start = clock::now();
@@ -116,7 +117,7 @@ string GameRound::getStateString() const {
     if(type != Type::Pause) {
         result+= std::format(" - {}", getStatusStr());
         if(status == Status::Running) {
-            auto sub= getCurrentSubRound();
+            const auto sub= getCurrentSubRound();
             result+= std::format(" - {} {}", sub->getTypeStr(), sub->getStatusStr());
         }
     }
@@ -136,48 +137,48 @@ void GameRound::removeLastPick() {
 void GameRound::addWinner(const std::string& win) {
     if(status != Status::Running)
         return;
-    auto sub= getCurrentSubRound();
+    const auto sub= getCurrentSubRound();
     sub->setWinner(win);
     if(sub->isFinished())
         nextStatus();
 }
 
 // ---- Serialisation ----
-void GameRound::read(std::istream& is, int file_version) {
-    if(file_version > currentSaveVersion) return;
+void GameRound::read(std::istream& bs, const int file_version) {
+    if(std::cmp_greater(file_version, currentSaveVersion)) return;
     if(file_version < 3)//----UNCOVER----
         Id= 0;          //----UNCOVER----
     else                //----UNCOVER----
-        is.read(reinterpret_cast<char*>(&Id), sizeof(Id));
-    is.read(reinterpret_cast<char*>(&type), sizeof(type));
-    is.read(reinterpret_cast<char*>(&status), sizeof(status));
-    is.read(reinterpret_cast<char*>(&start), sizeof(start));
-    is.read(reinterpret_cast<char*>(&end), sizeof(end));
+        bs.read(reinterpret_cast<char*>(&Id), sizeof(Id));
+    bs.read(reinterpret_cast<char*>(&type), sizeof(type));
+    bs.read(reinterpret_cast<char*>(&status), sizeof(status));
+    bs.read(reinterpret_cast<char*>(&start), sizeof(start));
+    bs.read(reinterpret_cast<char*>(&end), sizeof(end));
     drawsType::size_type l= 0;
     drawsType draws;
-    if(file_version < 4) {                                                               //----UNCOVER----
-        is.read(reinterpret_cast<char*>(&l), sizeof(drawsType::size_type));              //----UNCOVER----
-        draws.resize(l);                                                                 //----UNCOVER----
-        for(drawsType::size_type i= 0; i < l; ++i)                                       //----UNCOVER----
-            is.read(reinterpret_cast<char*>(&(draws[i])), sizeof(drawsType::value_type));//----UNCOVER----
-    }                                                                                    //----UNCOVER----
+    if(file_version < 4) {                                                             //----UNCOVER----
+        bs.read(reinterpret_cast<char*>(&l), sizeof(drawsType::size_type));            //----UNCOVER----
+        draws.resize(l);                                                               //----UNCOVER----
+        for(drawsType::size_type i= 0; i < l; ++i)                                     //----UNCOVER----
+            bs.read(reinterpret_cast<char*>(&draws[i]), sizeof(drawsType::value_type));//----UNCOVER----
+    }//----UNCOVER----
     subRoundsType::size_type l2;
-    is.read(reinterpret_cast<char*>(&l2), sizeof(subRoundsType::size_type));
+    bs.read(reinterpret_cast<char*>(&l2), sizeof(subRoundsType::size_type));
     subGames.resize(l2);
     for(subRoundsType::size_type i= 0; i < l2; ++i)
-        subGames[i].read(is, file_version);
+        subGames[i].read(bs, file_version);
     if(file_version < 4) {//----UNCOVER----
         // faking sub game picking
-        uint32_t part= static_cast<uint32_t>(l / l2);    //----UNCOVER----
-        for(drawsType::size_type i= 0; i < l; ++i) {     //----UNCOVER----
-            subGames[i % part].addPickedNumber(draws[i]);//----UNCOVER----
-        }                                                //----UNCOVER----
-    }                                                    //----UNCOVER----
+        const uint32_t part= static_cast<uint32_t>(l / l2);//----UNCOVER----
+        for(drawsType::size_type i= 0; i < l; ++i) {       //----UNCOVER----
+            subGames[i % part].addPickedNumber(draws[i]);  //----UNCOVER----
+        }//----UNCOVER----
+    }//----UNCOVER----
     diapoPath = path{};
     diapoDelay= 0;
     if(type == Type::Pause && file_version > 4) {
         sizeType len;
-        is.read(reinterpret_cast<char*>(&len), sizeof(sizeType));
+        bs.read(reinterpret_cast<char*>(&len), sizeof(sizeType));
         if(len == 0) {
             diapoPath.clear();
             diapoDelay= 0.0;
@@ -185,50 +186,52 @@ void GameRound::read(std::istream& is, int file_version) {
             string tmp;
             tmp.resize(len);
             for(sizeType i= 0; i < len; i++)
-                is.read(reinterpret_cast<char*>(&tmp[i]), charSize);
+                bs.read(reinterpret_cast<char*>(&tmp[i]), charSize);
             diapoPath= tmp;
-            is.read(reinterpret_cast<char*>(&diapoDelay), sizeof(double));
+            bs.read(reinterpret_cast<char*>(&diapoDelay), sizeof(double));
         }
     }
 }
 
-void GameRound::write(std::ostream& os) const {
-    os.write(reinterpret_cast<const char*>(&Id), sizeof(Id));
-    os.write(reinterpret_cast<const char*>(&type), sizeof(type));
-    os.write(reinterpret_cast<const char*>(&status), sizeof(status));
-    os.write(reinterpret_cast<const char*>(&start), sizeof(start));
-    os.write(reinterpret_cast<const char*>(&end), sizeof(end));
-    subRoundsType::size_type l2= subGames.size();
-    os.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
+void GameRound::write(std::ostream& bs) const {
+    bs.write(reinterpret_cast<const char*>(&Id), sizeof(Id));
+    bs.write(reinterpret_cast<const char*>(&type), sizeof(type));
+    bs.write(reinterpret_cast<const char*>(&status), sizeof(status));
+    bs.write(reinterpret_cast<const char*>(&start), sizeof(start));
+    bs.write(reinterpret_cast<const char*>(&end), sizeof(end));
+    const subRoundsType::size_type l2= subGames.size();
+    bs.write(reinterpret_cast<const char*>(&l2), sizeof(subRoundsType::size_type));
     for(subRoundsType::size_type i= 0; i < l2; ++i)
-        subGames[i].write(os);
+        subGames[i].write(bs);
     if(type == Type::Pause) {
-        sizeType l3= diapoPath.string().size();
-        os.write(reinterpret_cast<const char*>(&l3), sizeof(l3));
-        if (l3 > 0 ) {
-            for(sizeType i= 0; i < l3; ++i) os.write(&(diapoPath.string()[i]), charSize);
-            os.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
+        const sizeType l3= diapoPath.string().size();
+        bs.write(reinterpret_cast<const char*>(&l3), sizeof(l3));
+        if(l3 > 0) {
+            for(sizeType i= 0; i < l3; ++i) bs.write(&(diapoPath.string()[i]), charSize);
+            bs.write(reinterpret_cast<const char*>(&diapoDelay), sizeof(double));
         }
     }
 }
 
-json GameRound::to_json() const {
-    nlohmann::json sub;
+Json::Value GameRound::to_json() const {
+    Json::Value sub;
     for(auto& game: subGames) {
-        sub.push_back(game.to_json());
+        sub.append(game.to_json());
     }
-    return json{{"type", getTypeStr()}, {"Id", Id}, {"subGames", sub}};
+    Json::Value result;
+    result["type"]    = getTypeStr();
+    result["Id"]      = Id;
+    result["subGames"]= sub;
+    return result;
 }
 
-void GameRound::from_json(const json& j) {
-    string srType;
-    j.at("type").get_to(srType);
-    auto result= std::find_if(TypeConvert.begin(), TypeConvert.end(), [&srType](const auto& item) { return item.second == srType; });
-    if(result != TypeConvert.end())
+void GameRound::from_json(const Json::Value& j) {
+    string srType= j.get("type", "").asString();
+    if(const auto result= std::ranges::find_if(TypeConvert, [&srType](const auto& item) { return item.second == srType; }); result != TypeConvert.end())
         type= result->first;
-    j.at("Id").get_to(Id);
+    Id= j.get("Id", 0).asInt();
     subGames.clear();
-    for(auto& jj: j.at("subGames")) {
+    for(auto& jj: j.get("subGames", Json::Value::null)) {
         subGames.emplace_back().from_json(jj);
     }
 }
@@ -245,17 +248,17 @@ bool GameRound::isCurrentSubRoundLast() const {
 }
 
 std::vector<SubGameRound>::iterator GameRound::getCurrentSubRound() {
-    return std::find_if(subGames.begin(), subGames.end(), [](const SubGameRound& s) { return !s.isFinished(); });
+    return std::ranges::find_if(subGames, [](const SubGameRound& s) { return !s.isFinished(); });
 }
 
 std::vector<SubGameRound>::const_iterator GameRound::getCurrentSubRound() const {
-    return std::find_if(subGames.cbegin(), subGames.cend(), [](const SubGameRound& s) { return !s.isFinished(); });
+    return std::ranges::find_if(subGames, [](const SubGameRound& s) { return !s.isFinished(); });
 }
 
 std::vector<SubGameRound>::iterator GameRound::getSubRound(uint32_t index) {
     return std::next(subGames.begin(), index);
 }
-std::vector<SubGameRound>::const_iterator GameRound::getSubRound(uint32_t index) const{
+std::vector<SubGameRound>::const_iterator GameRound::getSubRound(const uint32_t index) const {
     return std::next(subGames.begin(), index);
 }
 

@@ -9,8 +9,6 @@
 #pragma once
 #include "../baseDefine.h"
 #include <chrono>
-#include <iomanip>
-#include <locale>
 
 namespace evl::core {
 /// Le type d'horloge
@@ -30,10 +28,10 @@ constexpr timePoint epoch{};
  * @return Le temps tronqué.
  */
 template<class T>
-constexpr inline T floorMinutes(const T& t) {
+constexpr T floorMinutes(const T& t) {
     return std::chrono::floor<std::chrono::minutes>(t);
 }
-constexpr inline uint32_t getSeconds(const timePoint& t) {
+constexpr uint32_t getSeconds(const timePoint& t) {
     return static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::seconds>(t - floorMinutes(t)).count());
 }
 
@@ -43,7 +41,7 @@ constexpr inline uint32_t getSeconds(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
  */
 inline string formatCalendar(const timePoint& t) {
-    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    auto local= std::chrono::zoned_time{std::chrono::current_zone(), t};
     return std::format("{:%d %B %Y}", local);
 }
 
@@ -53,7 +51,7 @@ inline string formatCalendar(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
 inline string formatClock(const timePoint& t) {
-    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    auto local= std::chrono::zoned_time{std::chrono::current_zone(), t};
     return std::format("{:%R}:{:02d}", local, getSeconds(t));
 }
 
@@ -63,7 +61,7 @@ inline string formatClock(const timePoint& t) {
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
  */
 inline string formatClockNoSecond(const timePoint& t) {
-    auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+    auto local= std::chrono::zoned_time{std::chrono::current_zone(), t};
     return std::format("{:%R}", local);
 }
 

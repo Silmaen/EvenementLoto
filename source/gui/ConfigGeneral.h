@@ -43,12 +43,12 @@ public slots:
     /**
      * @brief Surcharge de la commande d’exécution.
      */
-    void preExec();
+    void preExec() const;
 
     /**
      * @brief Réagit à une action sur le bouton Apply.
      */
-    void actApply();
+    void actApply() const;
 
     /**
      * @brief Réagit à une action sur le bouton cancel.
@@ -63,63 +63,63 @@ public slots:
     /**
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
-    void actSearchFolder();
+    void actSearchFolder() const;
 
     /**
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
-    void actResetTheme();
+    void actResetTheme() const;
 
     /**
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
-    void actRestoreTheme();
+    void actRestoreTheme() const;
 
     /**
      * @brief Réagit au clic sur la recherche d’un dossier.
      */
-    void actImportTheme();
+    void actImportTheme() const;
 
     /**
     * @brief Réagit au clic sur la recherche d’un dossier.
     */
-    void actExportTheme();
+    void actExportTheme() const;
 
     /**
      * @brief Réagit au clic de la couleur de fond.
      */
-    void actBackgroundColorChange();
+    void actBackgroundColorChange() const;
 
     /**
      * @brief Réagit au clic de la couleur de fond de la grille.
      */
-    void actGridBackgroundColorChange();
+    void actGridBackgroundColorChange() const;
 
     /**
      * @brief Réagit au clic de la couleur du texte.
      */
-    void actSelectedNumbersColorChange();
+    void actSelectedNumbersColorChange() const;
 
     /**
      * @brief action d'appui sur la troncature de prix
      */
-    void actTruncatePriceChange();
+    void actTruncatePriceChange() const;
 
     /**
     * @brief Réagit au clic de la couleur des chiffres sélectionnés.
     */
-    void actTextColorChange();
+    void actTextColorChange() const;
 
     /**
     * @brief Réagit au clic de la couleur de fond.
     */
-    void actFadeActivationChange();
+    void actFadeActivationChange() const;
 
 private:
     /**
      * @brief Charge une configuration depuis un fichier
      */
-    void SaveFile();
+    void SaveFile() const;
 
     /// Lien vers la page UI.
     Ui::ConfigGeneral* ui;

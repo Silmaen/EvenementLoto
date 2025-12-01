@@ -5,6 +5,8 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "pch.h"
+
 #include "DisplayWindow.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
@@ -46,14 +48,13 @@ DisplayWindow::~DisplayWindow() {
 }
 
 void setPixMap(QLabel* where, const QString& name, const QImage& img) {
-    QString realName= name + "_" + QString::number(where->width()) + "_" + QString::number(where->height());
-    if(where->text() != realName) {// charge l’image seulement une fois
+    if(const QString realName= name + "_" + QString::number(where->width()) + "_" + QString::number(where->height()); where->text() != realName) {// charge l’image seulement une fois
         where->setText(realName);
         where->setPixmap(QPixmap::fromImage(img.scaled(where->size(), Qt::KeepAspectRatio)));
     }
 }
 
-void DisplayWindow::initializeDisplay() {
+void DisplayWindow::initializeDisplay() const {
     //  les images
     if(event->getOrganizerLogoFull().empty()) {
         ui->ET_OrganizerLogo->setVisible(false);
@@ -83,8 +84,8 @@ void DisplayWindow::initializeDisplay() {
             ui->SR_LogoA->setVisible(false);
             ui->SR_LogoB->setVisible(false);
         } else {
-            QImage img  = loadImage(event->getOrganizerLogoFull());
-            QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+            const QImage img  = loadImage(event->getOrganizerLogoFull());
+            const QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
             setPixMap(ui->ET_OrganizerLogo, name, img);
             setPixMap(ui->RR_Logo, name, img);
             setPixMap(ui->RT_Logo, name, img);
@@ -105,7 +106,7 @@ void DisplayWindow::initializeDisplay() {
         if(!exists(event->getLogoFull())) {
             ui->ET_EventLogo->setVisible(false);
         } else {
-            QImage img= loadImage(event->getLogoFull());
+            const QImage img= loadImage(event->getLogoFull());
             setPixMap(ui->ET_EventLogo, QString::fromUtf8(event->getLogoFull().string()), img);
         }
     }
@@ -124,8 +125,7 @@ void DisplayWindow::updateDisplay() {
     if(event == nullptr)
         return;
     if(mode == Mode::Preview) {
-        auto cur= event->getGameRound(roundIndex);
-        if(cur->getType() == core::GameRound::Type::Pause) {
+        if(const auto cur= event->getGameRound(roundIndex); cur->getType() == core::GameRound::Type::Pause) {
             setPage(Page::PauseDisplay);
             updatePauseScreen();
         } else {
@@ -146,7 +146,7 @@ void DisplayWindow::updateDisplay() {
         updateEventTitlePage();
         break;
     case core::Event::Status::GameRunning: {
-        auto cur= event->getCurrentCGameRound();
+        const auto cur= event->getCurrentCGameRound();
         if(cur->getType() == core::GameRound::Type::Pause) {
             // round special type
             setPage(Page::PauseDisplay);
@@ -160,8 +160,8 @@ void DisplayWindow::updateDisplay() {
             break;
         }
         if(cur->getStatus() == core::GameRound::Status::Running) {
-            auto subcur= cur->getCurrentSubRound();
-            auto status= subcur->getStatus();
+            const auto subcur= cur->getCurrentSubRound();
+            const auto status= subcur->getStatus();
             if(status == core::SubGameRound::Status::PreScreen) {
                 setPage(Page::PricesDisplay);
                 updateRoundTitlePage();
@@ -190,7 +190,7 @@ void DisplayWindow::updateDisplay() {
         resize();
 }
 
-void DisplayWindow::updateEventTitlePage() {
+void DisplayWindow::updateEventTitlePage() const {
     ui->ET_EventDate->setText(QString::fromUtf8(core::formatCalendar(event->getStarting())));
     ui->ET_EventTitle->setText(QString::fromUtf8(event->getName()));
     ui->ET_OrganizerName->setText(QString::fromUtf8(event->getOrganizerName()));
@@ -202,7 +202,7 @@ void DisplayWindow::updateEventTitlePage() {
     }
 }
 
-void DisplayWindow::updateRoundTitlePage() {
+void DisplayWindow::updateRoundTitlePage() const {
     core::Event::roundsType::const_iterator round;
     core::GameRound::subRoundsType::const_iterator subRound;
     if(mode == Mode::Preview) {
@@ -227,7 +227,7 @@ void DisplayWindow::updateRoundTitlePage() {
     }
 }
 
-void DisplayWindow::updateRoundRunning() {
+void DisplayWindow::updateRoundRunning() const {
     auto round   = event->getCurrentCGameRound();
     auto subRound= round->getCurrentSubRound();
     ui->RR_Title->setText(QString::fromUtf8(round->getName()) + " - " + QString::fromStdString(subRound->getTypeStr()));
@@ -240,35 +240,33 @@ void DisplayWindow::updateRoundRunning() {
     resetGrid();
     QBrush br;
     br.setStyle(Qt::BrushStyle::SolidPattern);
-    int i       = 0;
-    QColor color= QColor(mwd->getTheme().getParam("selectedNumberColor").toString());
-    auto text   = QColor(mwd->getTheme().getParam("textColor").toString());
+    int i     = 0;
+    auto color= QColor(mwd->getTheme().getParam("selectedNumberColor").toString());
+    auto text = QColor(mwd->getTheme().getParam("textColor").toString());
     text.setRedF(1.0f - text.redF());
     text.setGreenF(1.0f - text.greenF());
     text.setBlueF(1.0f - text.blueF());
     QBrush fr{text};
     const auto draws= round->getAllDraws();
-    for(auto draw= draws.rbegin(); draw != draws.rend(); ++draw) {
+    for(unsigned char draw: std::ranges::reverse_view(draws)) {
         br.setColor(color);
         if(mwd->getTheme().getParam("fadeNumbers").toBool() &&
            i < mwd->getTheme().getParam("fadeNumbersAmount").toInt()) {
-            int strength= mwd->getTheme().getParam("fadeNumbersStrength").toInt();
-            if(strength < 0) {
+            if(int strength= mwd->getTheme().getParam("fadeNumbersStrength").toInt(); strength < 0) {
                 color= color.darker(100 - strength);
             } else {
                 color= color.lighter(100 + strength);
             }
         }
         ++i;
-        int row= (*draw - 1) / 10;
-        int col= (*draw - 1) % 10;
+        int row= (draw - 1) / 10;
+        int col= (draw - 1) % 10;
         ui->RR_NumberGrid->item(row, col)->setBackground(br);
         ui->RR_NumberGrid->item(row, col)->setForeground(fr);
     }
     // mise à jour de l’affichage des derniers numéros
     ui->RR_CurrentDraw->display(0);
-    auto it= draws.rbegin();
-    if(it != draws.rend()) {
+    if(const auto it= draws.rbegin(); it != draws.rend()) {
         ui->RR_CurrentDraw->display(*it);
     }
     // mise à jour de l'affichage des lots et type de partie
@@ -280,15 +278,13 @@ void DisplayWindow::updateRoundRunning() {
         ui->RR_SubRoundValue->setVisible(true);
         ui->RR_SubRoundValue->setText(value);
     }
-    QString gain= QString::fromUtf8(subRound->getPrices());
-    if(gain.isEmpty()) {
+    if(QString gain= QString::fromUtf8(subRound->getPrices()); gain.isEmpty()) {
         ui->RR_SubRoundPrice->setVisible(false);
     } else {
         ui->RR_SubRoundPrice->setVisible(true);
         if(mwd->getTheme().getParam("truncatePrice").toBool()) {
-            auto gains = gain.split("\n");
-            int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt();
-            if(gains.size() <= maxLine) {
+            auto gains= gain.split("\n");
+            if(int maxLine= mwd->getTheme().getParam("truncatePriceLines").toInt(); gains.size() <= maxLine) {
                 ui->RR_SubRoundPrice->setText(gain);
             } else {
                 QString s= gains[0];
@@ -301,13 +297,13 @@ void DisplayWindow::updateRoundRunning() {
     }
 }
 
-void DisplayWindow::updateDisplayRules() {
+void DisplayWindow::updateDisplayRules() const {
     if(event->getRules().empty())
         return;
     ui->ER_Rules->setText(QString::fromUtf8(event->getRules()));
 }
 
-void DisplayWindow::updatePauseScreen() {
+void DisplayWindow::updatePauseScreen() const {
     core::Event::roundsType::const_iterator round;
     if(mode == Mode::Preview)
         round= event->getGameRound(roundIndex);
@@ -315,21 +311,21 @@ void DisplayWindow::updatePauseScreen() {
         round= event->getCurrentCGameRound();
     auto [dPath, dDelay]= round->getDiapo();
     if(dPath.empty() || dDelay <= 0 || !exists(dPath)) {
-        QImage img  = loadImage(event->getOrganizerLogoFull());
-        QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+        const QImage img  = loadImage(event->getOrganizerLogoFull());
+        const QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
         setPixMap(ui->EP_Text, name, img);
         return;
     }
     std::vector<path> slides;
     const std::vector<path> extension{".png", ".jpg", ".jpeg", ".svg", ".PNG", ".JPG", ".JPEG", ".SVG"};
     for(const auto& ipath: std::filesystem::directory_iterator(dPath)) {
-        if(std::find(extension.begin(), extension.end(), ipath.path().extension()) == extension.end())
+        if(std::ranges::find(extension, ipath.path().extension()) == extension.end())
             continue;
         slides.push_back(ipath);
     }
     if(slides.empty()) {
-        QImage img  = loadImage(event->getOrganizerLogoFull());
-        QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
+        const QImage img  = loadImage(event->getOrganizerLogoFull());
+        const QString name= QString::fromUtf8(event->getOrganizerLogoFull().string());
         setPixMap(ui->EP_Text, name, img);
         return;
     }
@@ -337,9 +333,9 @@ void DisplayWindow::updatePauseScreen() {
     static core::timePoint tp= core::epoch;
     if(static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(core::clock::now() - tp).count()) / 1000.0 < dDelay)
         return;
-    tp        = core::clock::now();
-    curSlide  = (curSlide + 1) % slides.size();
-    auto slide= loadImage(slides[curSlide]);
+    tp              = core::clock::now();
+    curSlide        = (curSlide + 1) % slides.size();
+    const auto slide= loadImage(slides[curSlide]);
     setPixMap(ui->EP_Text, QString::fromUtf8(slides[curSlide].string()), slide);
 }
 
@@ -361,11 +357,11 @@ void DisplayWindow::updateColors() {
     setPalette(curent);
 }
 
-void DisplayWindow::initializeNumberGrid() {
+void DisplayWindow::initializeNumberGrid() const {
     ui->RR_NumberGrid->setColumnCount(10);
     ui->RR_NumberGrid->setRowCount(9);
-    int px   = std::min(ui->RR_NumberGrid->width() / 10, ui->RR_NumberGrid->height() / 9) / 3;
-    auto font= QFont("Segoe UI", px);
+    const int px= std::min(ui->RR_NumberGrid->width() / 10, ui->RR_NumberGrid->height() / 9) / 3;
+    auto font   = QFont("Segoe UI", px);
     font.setBold(true);
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
@@ -382,13 +378,13 @@ void DisplayWindow::initializeNumberGrid() {
     }
 }
 
-void DisplayWindow::resetGrid() {
+void DisplayWindow::resetGrid() const {
     auto theme= mwd->getTheme();
     QBrush br;
     br.setColor(QColor(0, 0, 0, 0));
     br.setStyle(Qt::BrushStyle::SolidPattern);
-    auto text= QColor(theme.getParam("textColor").toString());
-    QBrush fr{text};
+    const auto text= QColor(theme.getParam("textColor").toString());
+    const QBrush fr{text};
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
             ui->RR_NumberGrid->item(row, col)->setBackground(br);
@@ -399,16 +395,15 @@ void DisplayWindow::resetGrid() {
     ui->RR_NumberGrid->horizontalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->width() / 10);
     ui->RR_NumberGrid->verticalHeader()->setDefaultSectionSize(ui->RR_NumberGrid->height() / 9);
     // taille de police dans la grille
-    double setting_ratio= theme.getParam("gridTextRatio").toDouble();
-    auto baseFont       = font();
-    double baseRatio    = std::min(width() * 1.0, height() * 1.4) * theme.getParam("baseRatio").toDouble();
-    double gridRatio    = baseRatio * setting_ratio;
+    const double setting_ratio= theme.getParam("gridTextRatio").toDouble();
+    auto baseFont             = font();
+    const double baseRatio    = std::min(width() * 1.0, height() * 1.4) * theme.getParam("baseRatio").toDouble();
+    const double gridRatio    = baseRatio * setting_ratio;
     baseFont.setPointSizeF(gridRatio);
     baseFont.setBold(true);
     for(int row= 0; row < 9; ++row) {
         for(int col= 0; col < 10; ++col) {
-            QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col);
-            if(pCell) {
+            if(QTableWidgetItem* pCell= ui->RR_NumberGrid->item(row, col)) {
                 pCell->setFont(baseFont);
             }
         }
@@ -443,8 +438,8 @@ void DisplayWindow::resize() {
     auto baseFont    = font();
     auto baseFontBold= font();
     baseFontBold.setBold(true);
-    double setting_ratio= theme.getParam("baseRatio").toDouble();
-    double baseRatio    = std::min(width() * 1.0, height() * 1.4) * setting_ratio;
+    double setting_ratio  = theme.getParam("baseRatio").toDouble();
+    const double baseRatio= std::min(width() * 1.0, height() * 1.4) * setting_ratio;
     baseFont.setPointSizeF(baseRatio);
     baseFontBold.setPointSizeF(baseRatio);
     setFont(baseFont);
@@ -452,17 +447,16 @@ void DisplayWindow::resize() {
     ui->RR_SubRoundPrice->setFont(baseFont);
     ui->RT_SubRound->setFont(baseFont);
     // reduce size if too many lines
-    QString text= ui->RR_SubRoundPrice->text();
-    auto nbLine = text.split("\n").size();
-    if(nbLine > 4) {
-        double pricesRatio= 4.0 / static_cast<double>(nbLine) * baseRatio;
+    const QString text= ui->RR_SubRoundPrice->text();
+    if(const auto nbLine= text.split("\n").size(); nbLine > 4) {
+        const double pricesRatio= 4.0 / static_cast<double>(nbLine) * baseRatio;
         baseFont.setPointSizeF(pricesRatio);
         ui->RR_SubRoundPrice->setFont(baseFont);
     }
 
     // taille font des titres
-    setting_ratio    = theme.getParam("titleRatio").toDouble();
-    double titleRatio= baseRatio * setting_ratio;
+    setting_ratio          = theme.getParam("titleRatio").toDouble();
+    const double titleRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(titleRatio);
     ui->ET_EventTitle->setFont(baseFont);
     ui->RT_RoundTitle->setFont(baseFont);
@@ -472,13 +466,13 @@ void DisplayWindow::resize() {
     ui->EE_Title->setFont(baseFont);
     ui->ER_Title->setFont(baseFont);
     // taille de textes longs
-    setting_ratio       = theme.getParam("longTextRatio").toDouble();
-    double longTextRatio= baseRatio * setting_ratio;
+    setting_ratio             = theme.getParam("longTextRatio").toDouble();
+    const double longTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(longTextRatio);
     ui->ER_Rules->setFont(baseFont);
     // Taille textes courts
-    setting_ratio        = theme.getParam("shortTextRatio").toDouble();
-    double shortTextRatio= baseRatio * setting_ratio;
+    setting_ratio              = theme.getParam("shortTextRatio").toDouble();
+    const double shortTextRatio= baseRatio * setting_ratio;
     baseFont.setPointSizeF(shortTextRatio);
     ui->EP_Message->setFont(baseFont);
     ui->EE_EndMessage->setFont(baseFont);

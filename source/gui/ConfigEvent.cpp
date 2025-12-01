@@ -5,12 +5,13 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "ConfigEvent.h"
+#include "pch.h"
+
 #include "BaseDialog.h"
+#include "ConfigEvent.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
 #include <QMessageBox>
-#include <fstream>
 
 // Les trucs de QT
 #include "moc_ConfigEvent.cpp"
@@ -52,15 +53,15 @@ void ConfigEvent::actCancel() {
     reject();
 }
 
-void ConfigEvent::actSearchOrgaLogo() {
-    auto path= dialog::openFile(dialog::FileTypes::Images, true);
+void ConfigEvent::actSearchOrgaLogo() const {
+    const auto path= dialog::openFile(dialog::FileTypes::Images, true);
     if(path.empty())
         return;
     ui->OrgaLogo->setText(QString::fromUtf8(path.string()));
 }
 
-void ConfigEvent::actSearchLogo() {
-    auto path= dialog::openFile(dialog::FileTypes::Images, true);
+void ConfigEvent::actSearchLogo() const {
+    const auto path= dialog::openFile(dialog::FileTypes::Images, true);
     if(path.empty())
         return;
     ui->EventLogo->setText(QString::fromUtf8(path.string()));
@@ -71,7 +72,7 @@ void ConfigEvent::setEvent(const core::Event& e) {
     updateDisplay();
 }
 
-void ConfigEvent::updateDisplay() {
+void ConfigEvent::updateDisplay() const {
     ui->EventName->setText(QString::fromUtf8(gameEvent.getName()));
     ui->EventLocation->setText(QString::fromUtf8(gameEvent.getLocation()));
     ui->EventLogo->setText(QString::fromUtf8(gameEvent.getLogo().string()));
@@ -104,7 +105,7 @@ void ConfigEvent::updateDisplay() {
 }
 
 void ConfigEvent::actImportRules() {
-    auto path= dialog::openFile(dialog::FileTypes::Text, true);
+    const auto path= dialog::openFile(dialog::FileTypes::Text, true);
     if(path.empty())
         return;
     std::ifstream file;
@@ -114,8 +115,8 @@ void ConfigEvent::actImportRules() {
     updateDisplay();
 }
 
-void ConfigEvent::actExportRules() {
-    auto path= dialog::openFile(dialog::FileTypes::Text, false);
+void ConfigEvent::actExportRules() const {
+    const auto path= dialog::openFile(dialog::FileTypes::Text, false);
     if(path.empty())
         return;
     std::ofstream file;
@@ -123,6 +124,5 @@ void ConfigEvent::actExportRules() {
     file << gameEvent.getRules();
     file.close();
 }
-
 
 }// namespace evl::gui

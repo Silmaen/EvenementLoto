@@ -8,6 +8,7 @@
 #pragma once
 #include "Serializable.h"
 #include "timeFunctions.h"
+#include <unordered_map>
 
 namespace evl::core {
 
@@ -84,7 +85,7 @@ public:
      * @brief Renvoie le nom du type de sous-partie
      * @return Le nom du type de sous-partie
      */
-    const string getTypeStr() const;
+    string getTypeStr() const;
 
     /**
      * @brief Renvoie le statut de sous-partie.
@@ -96,7 +97,7 @@ public:
      * @brief Renvoie le nom du statut de sous-partie
      * @return Le nom du statut de sous-partie
      */
-    const string getStatusStr() const;
+    string getStatusStr() const;
 
     /**
      * @brief Advance to the next status if possible
@@ -172,13 +173,13 @@ public:
      * @brief Écriture dans un json.
      * @return Le json à remplir
      */
-    json to_json() const override;
+    Json::Value to_json() const override;
 
     /**
      * @brief Lecture depuis un json
      * @param j Le json à lire
      */
-    void from_json(const json& j) override;
+    void from_json(const Json::Value& j) override;
 
     // ---- accès aux timers ----
     /**

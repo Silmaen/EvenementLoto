@@ -5,21 +5,22 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "MainWindow.h"
+#include "pch.h"
+
 #include "About.h"
 #include "BaseDialog.h"
 #include "ConfigEvent.h"
 #include "ConfigGameRounds.h"
 #include "ConfigGeneral.h"
+#include "MainWindow.h"
 #include "WinnerInput.h"
 #include <QFileDialog>
 #include <QScreen>
 #include <QScrollBar>
 #include <core/Logger.h>
-#include <iostream>
+#include <core/StringUtils.h>
 
 // Les trucs de QT
-#include <core/StringUtils.h>
 #include <moc_MainWindow.cpp>
 #include <ui/ui_MainWindow.h>
 
@@ -35,7 +36,7 @@ MainWindow::MainWindow(QWidget* parent):
     // initialise l’ui depuis le fichier ui.
     ui->setupUi(this);
     // initialise la numberGrid
-    auto layout= new QGridLayout(ui->GroupPickManual);
+    const auto layout= new QGridLayout(ui->GroupPickManual);
     numberGrid->setParent(ui->GroupPickManual);
     numberGrid->setObjectName(QString::fromUtf8("numberGrid"));
     layout->addWidget(numberGrid, 0, 0, 1, 1);
@@ -96,8 +97,7 @@ void MainWindow::actNewFile() {
 }
 
 void MainWindow::actLoadFile() {
-    path file= dialog::openFile(dialog::FileTypes::EventSave, true);
-    if(!file.empty()) {
+    if(const path file= dialog::openFile(dialog::FileTypes::EventSave, true); !file.empty()) {
         std::ifstream f;
         f.open(file, std::ios::in | std::ios::binary);
         currentEvent.setBasePath(file);
@@ -124,8 +124,7 @@ void MainWindow::saveFile(const path& where) {
     currentEvent.setBasePath(currentFile.parent_path());
     // copy image file if not in child directory
     if(!currentEvent.getLogo().empty()) {
-        path ori= currentEvent.getLogoFull();
-        if(ori.parent_path() != currentEvent.getBasePath()) {
+        if(path ori= currentEvent.getLogoFull(); ori.parent_path() != currentEvent.getBasePath()) {
             path dest= currentEvent.getBasePath() / ori.filename();
             if(exists(dest))
                 remove(dest);
@@ -134,8 +133,7 @@ void MainWindow::saveFile(const path& where) {
         }
     }
     if(!currentEvent.getOrganizerLogo().empty()) {
-        path ori= currentEvent.getOrganizerLogoFull();
-        if(ori.parent_path() != currentEvent.getBasePath()) {
+        if(path ori= currentEvent.getOrganizerLogoFull(); ori.parent_path() != currentEvent.getBasePath()) {
             path dest= currentEvent.getBasePath() / ori.filename();
             if(exists(dest))
                 remove(dest);
@@ -153,6 +151,10 @@ void MainWindow::actSaveAsFile() {
     path file= dialog::openFile(dialog::FileTypes::EventSave, false);
     if(file.empty())
         return;
+    if(!file.has_extension() || file.extension() != ".lev") {
+        spdlog::warn("Ajout de l'extension .lev au fichier de sauvegarde");
+        file+= ".lev";
+    }
     currentFile= file;
     actSaveFile();
 }
@@ -172,12 +174,11 @@ void MainWindow::actStartEvent() {
 }
 
 void MainWindow::actChangeScreen() {
-    int screenId           = ui->SelectScreen->currentIndex();
-    QList<QScreen*> screens= QApplication::screens();
-    if(screens.size() > 2) {
+    int screenId= ui->SelectScreen->currentIndex();
+    if(QList<QScreen*> screens= QApplication::screens(); screens.size() > 2) {
         int id    = 0;
         int mainId= 0;
-        for(QScreen* scr: screens) {
+        for(const QScreen* scr: screens) {
             if(scr == screen()) {
                 mainId= id;
                 break;
@@ -200,7 +201,7 @@ void MainWindow::actChangeFullScreen() {
     if(displayWindow == nullptr)
         return;
 
-    bool fullScreen= ui->CheckFullScreen->isChecked();
+    const bool fullScreen= ui->CheckFullScreen->isChecked();
     settings.setValue("display/full_screen", fullScreen);
     int screenId           = settings.value("display/screen_id", 0).toInt();
     QList<QScreen*> screens= QApplication::screens();
@@ -208,7 +209,7 @@ void MainWindow::actChangeFullScreen() {
         displayWindow->showNormal();
     } else {
         spdlog::debug("using screen {}", screenId);
-        QRect sizes= screens[screenId]->geometry();
+        const QRect sizes= screens[screenId]->geometry();
         displayWindow->move(sizes.x(), sizes.y());
         displayWindow->showFullScreen();
     }
@@ -235,13 +236,10 @@ void MainWindow::actStartStopRound() {
     timer->stop();
     bool goNext= true;
     if(currentEvent.getStatus() == core::Event::Status::GameRunning) {
-        auto round= currentEvent.getCurrentCGameRound();
-        if(round->getType() != core::GameRound::Type::Pause &&
-           round->getStatus() == core::GameRound::Status::Running) {
-            auto subround= round->getCurrentSubRound();
-            if(subround->getStatus() == core::SubGameRound::Status::Running) {
-                WinnerInput wi(this);
-                if(wi.exec() == QDialog::Accepted)
+        if(const auto round= currentEvent.getCurrentCGameRound(); round->getType() != core::GameRound::Type::Pause &&
+                                                                  round->getStatus() == core::GameRound::Status::Running) {
+            if(const auto subround= round->getCurrentSubRound(); subround->getStatus() == core::SubGameRound::Status::Running) {
+                if(WinnerInput wi(this); wi.exec() == QDialog::Accepted)
                     currentEvent.addWinnerToCurrentRound(wi.getWinner().toStdString());
                 goNext= false;
             }
@@ -254,15 +252,15 @@ void MainWindow::actStartStopRound() {
 }
 
 void MainWindow::actRandomPick() {
-    auto number= rng.pick();
+    const auto number= rng.pick();
     numberGrid->setPushed(number);
     currentEvent.getCurrentGameRound()->addPickedNumber(number);
     updateDisplay();
 }
 
 void MainWindow::actCancelPick() {
-    auto cur       = currentEvent.getCurrentGameRound();
-    uint8_t lastOne= cur->getLastCancelableDraw();
+    const auto cur       = currentEvent.getCurrentGameRound();
+    const uint8_t lastOne= cur->getLastCancelableDraw();
     if(lastOne == 255)
         return;
     numberGrid->resetPushed(lastOne);
@@ -307,7 +305,7 @@ void MainWindow::updateClocks() {
     logUpdateCounter++;
     if(ui->tabWidget->tabText(ui->tabWidget->currentIndex()) == "Log" && logUpdateCounter > 20) {
         logUpdateCounter= 0;
-        std::ifstream file(evl::getLogPath(), std::ios::in);
+        std::ifstream file(getLogPath(), std::ios::in);
         QString text;
         for(string line; getline(file, line);) {
             text+= QString::fromStdString(line) + "\n";
@@ -331,8 +329,7 @@ void MainWindow::updateClocks() {
 
     // event chrono
     core::timePoint start= currentEvent.getStarting();
-    core::timePoint end  = currentEvent.getEnding();
-    if(start != core::epoch && end == core::epoch)
+    if(core::timePoint end= currentEvent.getEnding(); start != core::epoch && end == core::epoch)
         ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
 }
 
@@ -347,8 +344,8 @@ void MainWindow::checkDisplayWindow() {
     ++autoSaveCounter;
     if(autoSaveCounter < 15)
         return;
-    autoSaveCounter= 0;
-    QVariant p     = settings.value("path/data_path", "");
+    autoSaveCounter = 0;
+    const QVariant p= settings.value("path/data_path", "");
     if(p.toString() == "") {
         spdlog::warn("Backup Save: pas de chemin vers les data");
         return;
@@ -384,7 +381,7 @@ void MainWindow::updateDisplay() {
     onUpdate= false;
 }
 
-void MainWindow::updateMenus() {
+void MainWindow::updateMenus() const {
     // ui->menuFile             <- toujours actif, change jamais de texte
     //   ui->actionNewEvent     <- toujours actif, change jamais de texte
     //   ui->actionLoadEvent    <- toujours actif, change jamais de texte
@@ -428,11 +425,9 @@ void MainWindow::updateBottomFrame() {
     if(ui->SelectScreen->count() == 0) {
         updateScreenList();
     }
-    bool fullScreen= settings.value("display/full_screen", true).toBool();
-    if(fullScreen != ui->CheckFullScreen->isChecked())
+    if(const bool fullScreen= settings.value("display/full_screen", true).toBool(); fullScreen != ui->CheckFullScreen->isChecked())
         ui->CheckFullScreen->setChecked(fullScreen);
-    int screenId= settings.value("display/screen_id", 0).toInt();
-    if(screenId != ui->SelectScreen->currentIndex())
+    if(const int screenId= settings.value("display/screen_id", 0).toInt(); screenId != ui->SelectScreen->currentIndex())
         ui->SelectScreen->setCurrentIndex(screenId);
 }
 
@@ -441,14 +436,13 @@ void MainWindow::updateScreenList() {
     QList<QScreen*> screens= QApplication::screens();
     int id                 = 0;
     int mainId             = 0;
-    for(QScreen* scr: screens) {
+    for(const QScreen* scr: screens) {
         if(scr == screen())
             mainId= id;
         ui->SelectScreen->addItem(QString::number(id) + " - " + scr->name());
         ++id;
     }
-    int screenId= settings.value("display/screen_id", 0).toInt();
-    if(screenId >= id || screenId == mainId) {
+    if(int screenId= settings.value("display/screen_id", 0).toInt(); screenId >= id || screenId == mainId) {
         if(screens.size() > 2) {
             screenId= (mainId + 1) % id;
             settings.setValue("display/screen_id", screenId);
@@ -458,16 +452,15 @@ void MainWindow::updateScreenList() {
     }
 }
 
-void MainWindow::updateStats() {
+void MainWindow::updateStats() const {
     if(currentEvent.getStatus() == core::Event::Status::Invalid ||
        currentEvent.getStatus() == core::Event::Status::MissingParties ||
        currentEvent.getStatus() == core::Event::Status::Ready)
         return;
-    auto cur= currentEvent.getCurrentCGameRound();
     // pas de round en courts
-    if(cur == currentEvent.endRounds())
+    if(const auto cur= currentEvent.getCurrentCGameRound(); cur == currentEvent.endRounds())
         return;
-    auto res= currentEvent.getStats();
+    const auto res= currentEvent.getStats();
 
     ui->MostPickNb->setText(QString::number(res.mostPickNb));
     ui->MostPickList->setText(QString::fromStdString(join(res.mostPickList, " ")));
@@ -491,14 +484,14 @@ void MainWindow::updateStats() {
     ui->SubRoundAverageNb->setText(QString::number(res.subRoundAverageNb));
 }
 
-void MainWindow::updateInfoEvent() {
+void MainWindow::updateInfoEvent() const {
     if(currentEvent.isEditable()) {
         ui->EventInfos->setEnabled(false);
         return;
     }
     ui->EventInfos->setEnabled(true);
-    core::timePoint start= currentEvent.getStarting();
-    core::timePoint end  = currentEvent.getEnding();
+    const core::timePoint start= currentEvent.getStarting();
+    const core::timePoint end  = currentEvent.getEnding();
     ui->CurrentDate->setText("");
     ui->StartingHour->setText("");
     ui->EndingHour->setText("");
@@ -517,7 +510,7 @@ void MainWindow::updateInfoEvent() {
     ui->Duration->setText(QString::fromUtf8(core::formatDuration(end - start)));
 }
 
-void MainWindow::updateRadioButtons() {
+void MainWindow::updateRadioButtons() const {
     switch(currentDrawMode) {
     case DrawMode::Both:
         ui->radioBtnPureManual->setChecked(false);
@@ -555,7 +548,7 @@ void MainWindow::updateRadioButtons() {
     }
 }
 
-void MainWindow::updateInfoRound() {
+void MainWindow::updateInfoRound() const {
     // reset all infos
     ui->RoundStartTime->setText("");
     ui->RoundDraws->setText("");
@@ -563,7 +556,7 @@ void MainWindow::updateInfoRound() {
     ui->RoundPhase->setText("");
     ui->RoundPhaseValue->setText("");
     ui->RoundPhasePrise->setText("");
-    auto cur= currentEvent.getCurrentCGameRound();
+    const auto cur= currentEvent.getCurrentCGameRound();
     if(cur == currentEvent.endRounds())
         return;
     if(cur->getStarting() == core::epoch)
@@ -581,7 +574,7 @@ void MainWindow::updateInfoRound() {
     } else {
         QString phase= QString::fromStdString(cur->getStatusStr());
         if(cur->getStatus() == core::GameRound::Status::Running) {
-            auto sub= cur->getCurrentSubRound();
+            const auto sub= cur->getCurrentSubRound();
             phase+= " - " + QString::fromUtf8(sub->getTypeStr()) + " - " + QString::fromUtf8(sub->getStatusStr());
             ui->RoundPhaseValue->setText(QString::number(sub->getValue()) + "€");
             ui->RoundPhasePrise->setText(QString::fromStdString(sub->getPrices()));
@@ -590,7 +583,7 @@ void MainWindow::updateInfoRound() {
     }
 }
 
-void MainWindow::updateDraws() {
+void MainWindow::updateDraws() const {
     if(currentEvent.getStatus() != core::Event::Status::GameRunning) {
         ui->lastNumbersDisplay->setEnabled(false);
         ui->GroupPickManual->setEnabled(false);
@@ -598,8 +591,8 @@ void MainWindow::updateDraws() {
         ui->actionRandomPick->setEnabled(false);
         return;
     }
-    auto cur = currentEvent.getCurrentCGameRound();
-    auto scur= cur->getCurrentSubRound();
+    const auto cur = currentEvent.getCurrentCGameRound();
+    const auto scur= cur->getCurrentSubRound();
     if(cur->getType() == core::GameRound::Type::Pause || cur->getStatus() != core::GameRound::Status::Running || scur->getStatus() != core::SubGameRound::Status::Running) {
         ui->lastNumbersDisplay->setEnabled(false);
         ui->GroupPickManual->setEnabled(false);
@@ -636,7 +629,7 @@ void MainWindow::updateDraws() {
         }
     }
     numberGrid->resetPushed();
-    for(auto draw: draws) {
+    for(const auto draw: draws) {
         numberGrid->setPushed(draw);
     }
     ui->textLastDraw->setText(QString::fromStdString(cur->getDrawStr()));
@@ -662,8 +655,7 @@ void MainWindow::updateCommands() {
         ui->actionDisplayRules->setText("Affichage règlement");
     }
     // update cancel last pick
-    auto cur= currentEvent.getCurrentCGameRound();
-    if(cur != currentEvent.endRounds() && cur->getLastCancelableDraw() != 255) {
+    if(const auto cur= currentEvent.getCurrentCGameRound(); cur != currentEvent.endRounds() && cur->getLastCancelableDraw() != 255) {
         ui->CancelLastPick->setEnabled(true);
         ui->actionCancelLastPick->setEnabled(true);
     }
@@ -685,14 +677,12 @@ void MainWindow::updateStartStopButton() {
         text = "Démarrer première partie";
         break;
     case core::Event::Status::GameRunning: {
-        state     = true;
-        auto round= currentEvent.getCurrentCGameRound();
-        if(round->getType() == core::GameRound::Type::Pause) {
+        state= true;
+        if(const auto round= currentEvent.getCurrentCGameRound(); round->getType() == core::GameRound::Type::Pause) {
             text= "Reprise";
         } else {
             if(round->getStatus() == core::GameRound::Status::PostScreen) {
-                auto nextRound= round + 1;
-                if(nextRound == currentEvent.endRounds()) {
+                if(const auto nextRound= round + 1; nextRound == currentEvent.endRounds()) {
                     text= "Fin de l'événement";
                 } else {
                     if(nextRound->getType() == core::GameRound::Type::Pause) {
@@ -702,7 +692,7 @@ void MainWindow::updateStartStopButton() {
                     }
                 }
             } else {
-                auto subround= round->getCurrentSubRound();
+                const auto subround= round->getCurrentSubRound();
                 if(subround->getStatus() == core::SubGameRound::Status::PreScreen) {
                     text= "Jouer la sous-partie";
                 }
@@ -723,7 +713,7 @@ void MainWindow::updateStartStopButton() {
     ui->actionStartEndGameRound->setText(text);
 }
 
-void MainWindow::actGridPushed(int value) {
+void MainWindow::actGridPushed(const int value) {
     if(onUpdate)
         return;
     currentEvent.getCurrentGameRound()->addPickedNumber(static_cast<uint8_t>(value));

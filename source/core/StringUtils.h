@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string>
+
 namespace evl {
 
 /**
@@ -21,12 +23,12 @@ template<std::ranges::range Iterable>
 std::string join(const Iterable& elements, const std::string& delimiter) {
     std::string result;
     auto it = std::begin(elements);
-    auto end = std::end(elements);
-    if (it == end) return result;
-    result = std::format("{}", *it);
+    auto end= std::end(elements);
+    if(it == end) return result;
+    result= std::format("{}", *it);
     ++it;
-    for (; it != end; ++it) {
-        result += std::format("{}{}", delimiter, *it);
+    for(; it != end; ++it) {
+        result+= std::format("{}{}", delimiter, *it);
     }
     return result;
 }

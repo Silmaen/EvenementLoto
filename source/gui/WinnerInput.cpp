@@ -5,6 +5,7 @@
  * Copyright © 2022 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
 
 #include "WinnerInput.h"
 

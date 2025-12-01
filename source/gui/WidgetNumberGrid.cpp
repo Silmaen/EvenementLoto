@@ -5,6 +5,8 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
+
 #include "WidgetNumberGrid.h"
 
 // Les trucs de QT
@@ -293,14 +295,14 @@ void WidgetNumberGrid::slot90() {
     setValue(90);
 }
 
-void WidgetNumberGrid::setValue(int value) {
+void WidgetNumberGrid::setValue(const int value) {
     setPushed(value);
     emit buttonPushed(value);
 }
 
 void buttonPushed(int) {} /*---UNCOVER---*/
 
-QPushButton* WidgetNumberGrid::getButton(int idx) {
+QPushButton* WidgetNumberGrid::getButton(const int idx) const {
     switch(idx) {
     case 1: return ui->pushButton_01;
     case 2: return ui->pushButton_02;
@@ -396,7 +398,7 @@ QPushButton* WidgetNumberGrid::getButton(int idx) {
     return nullptr;
 }
 
-void WidgetNumberGrid::setPushed(int index) {
+void WidgetNumberGrid::setPushed(const int index) const {
     QPushButton* a= getButton(index);
     if(a == nullptr)
         return;
@@ -405,20 +407,22 @@ void WidgetNumberGrid::setPushed(int index) {
     a->setFlat(true);
 }
 
-void WidgetNumberGrid::resetPushed(int idx) {
-    QPushButton* a= getButton(idx);
+void WidgetNumberGrid::resetPushed(const int index) const {
+    QPushButton* a= getButton(index);
+    if(a == nullptr)
+        return;
     a->setChecked(false);
     a->setEnabled(true);
     a->setFlat(false);
 }
 
-void WidgetNumberGrid::resetPushed() {
+void WidgetNumberGrid::resetPushed() const {
     for(uint8_t i= 1; i <= 90; ++i) {
         resetPushed(i);
     }
 }
 
-uint8_t WidgetNumberGrid::getNumberPushed() {
+uint8_t WidgetNumberGrid::getNumberPushed() const {
     uint8_t count= 0;
     for(uint8_t i= 1; i <= 90; ++i) {
         count+= getButton(i)->isFlat();

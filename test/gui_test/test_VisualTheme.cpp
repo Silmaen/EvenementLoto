@@ -6,14 +6,13 @@
  * All modification must get authorization from the author.
  */
 
-#include "external/json.h"
 #include "gui/VisualTheme.h"
 #include "test_GuiHelpers.h"
 #include <fstream>
 #include <gtest/gtest.h>
+#include <json/json.h>
 
 namespace fs= std::filesystem;
-using json  = nlohmann::json;
 using namespace evl::gui;
 
 TEST(gui_VisualTheme, base) {
@@ -76,7 +75,16 @@ TEST(gui_VisualTheme, ImportJSON) {
     fs::create_directories(tmp);
     fs::path file= tmp / "test.json";
 
-    json j= {{"theme", {{"backgroundColor", "#F0F0F0"}, {"fadeNumbers", true}, {"fadeNumbersAmount", 3}, {"baseRatio", 0.04}, {"gridTextRatio", 0.85}, {"longTextRatio", 0.6}, {"name", "titi"}, {"shortTextRatio", 1.4}, {"titleRatio", 2.0}}}};
+    Json::Value j;
+    j["theme"]["backgroundColor"]  = "#F0F0F0";
+    j["theme"]["fadeNumbers"]      = true;
+    j["theme"]["fadeNumbersAmount"]= 3;
+    j["theme"]["baseRatio"]        = 0.04;
+    j["theme"]["gridTextRatio"]    = 0.85;
+    j["theme"]["longTextRatio"]    = 0.6;
+    j["theme"]["name"]             = "titi";
+    j["theme"]["shortTextRatio"]   = 1.4;
+    j["theme"]["titleRatio"]       = 2.;
     std::ofstream outFile(file, std::ios::out);
     outFile << j;
     outFile.close();

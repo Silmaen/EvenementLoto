@@ -5,10 +5,11 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
+
 #include "Event.h"
-#include <fstream>
-#include <spdlog/spdlog.h>
 #include "StringUtils.h"
+#include <spdlog/spdlog.h>
 
 namespace evl::core {
 
@@ -31,99 +32,101 @@ string Event::getStatusStr() const {
 }
 
 // ---- Serialisation ----
-void Event::read(std::istream& is, int) {
+void Event::read(std::istream& bs, int) {
     uint16_t saveVersion;
-    is.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
+    bs.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
     spdlog::debug("Version des données du stream: {}, version courante: {}", saveVersion, currentSaveVersion);
     if(saveVersion > currentSaveVersion) return;// incompatible
-    is.read(reinterpret_cast<char*>(&status), sizeof(status));
+    bs.read(reinterpret_cast<char*>(&status), sizeof(status));
     sizeType l, i;
-    is.read(reinterpret_cast<char*>(&l), sizeof(l));
+    bs.read(reinterpret_cast<char*>(&l), sizeof(l));
     organizerName.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(organizerName[i]), charSize);
+    for(i= 0; i < l; ++i) bs.read(&organizerName[i], charSize);
     string temp;
-    is.read(reinterpret_cast<char*>(&l), sizeof(l));
+    bs.read(reinterpret_cast<char*>(&l), sizeof(l));
     temp.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(temp[i]), charSize);
+    for(i= 0; i < l; ++i) bs.read(&temp[i], charSize);
     organizerLogo= temp;
-    is.read(reinterpret_cast<char*>(&l), sizeof(l));
+    bs.read(reinterpret_cast<char*>(&l), sizeof(l));
     name.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(name[i]), charSize);
-    is.read(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.read(&name[i], charSize);
+    bs.read(reinterpret_cast<char*>(&l), sizeof(l));
     temp.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(temp[i]), charSize);
+    for(i= 0; i < l; ++i) bs.read(&temp[i], charSize);
     logo= temp;
-    is.read(reinterpret_cast<char*>(&l), sizeof(l));
+    bs.read(reinterpret_cast<char*>(&l), sizeof(l));
     location.resize(l);
-    for(i= 0; i < l; ++i) is.read(&(location[i]), charSize);
+    for(i= 0; i < l; ++i) bs.read(&location[i], charSize);
     // version 2
     if(saveVersion > 1) {
-        is.read(reinterpret_cast<char*>(&l), sizeof(l));
+        bs.read(reinterpret_cast<char*>(&l), sizeof(l));
         rules.resize(l);
-        for(i= 0; i < l; ++i) is.read(&(rules[i]), charSize);
+        for(i= 0; i < l; ++i) bs.read(&rules[i], charSize);
     }
     // version 3
-    if(saveVersion > 2 && saveVersion < 4) {                  //----UNCOVER----
-        string srules;                                        //----UNCOVER----
-        is.read(reinterpret_cast<char*>(&l), sizeof(l));      //----UNCOVER----
-        srules.resize(l);                                     //----UNCOVER----
-        for(i= 0; i < l; ++i) is.read(&(srules[i]), charSize);//----UNCOVER----
-    }                                                         //----UNCOVER----
+    if(saveVersion > 2 && saveVersion < 4) {                //----UNCOVER----
+        string srules;                                      //----UNCOVER----
+        bs.read(reinterpret_cast<char*>(&l), sizeof(l));    //----UNCOVER----
+        srules.resize(l);                                   //----UNCOVER----
+        for(i= 0; i < l; ++i) bs.read(&srules[i], charSize);//----UNCOVER----
+    }//----UNCOVER----
     // version 1
-    roundsType::size_type lv, iv;
-    is.read(reinterpret_cast<char*>(&lv), sizeof(lv));
+    roundsType::size_type lv;
+    bs.read(reinterpret_cast<char*>(&lv), sizeof(lv));
     gameRounds.resize(lv);
-    for(iv= 0; iv < lv; ++iv) gameRounds[iv].read(is, saveVersion);
+    for(roundsType::size_type iv= 0; iv < lv; ++iv) gameRounds[iv].read(bs, saveVersion);
     spdlog::info("Event lu et contenant {} parties", lv);
-    is.read(reinterpret_cast<char*>(&start), sizeof(start));
-    is.read(reinterpret_cast<char*>(&end), sizeof(end));
+    bs.read(reinterpret_cast<char*>(&start), sizeof(start));
+    bs.read(reinterpret_cast<char*>(&end), sizeof(end));
     spdlog::info("Event in state: {}", getStateString());
 }
 
-void Event::write(std::ostream& os) const {
-    os.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
-    os.write(reinterpret_cast<const char*>(&status), sizeof(status));
+void Event::write(std::ostream& bs) const {
+    bs.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
+    bs.write(reinterpret_cast<const char*>(&status), sizeof(status));
     sizeType l, i;
     l= organizerName.size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(organizerName[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&organizerName[i], charSize);
     l= organizerLogo.string().size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(organizerLogo.string()[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&organizerLogo.string()[i], charSize);
     l= name.size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(name[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&name[i], charSize);
     l= logo.string().size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(logo.string()[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&logo.string()[i], charSize);
     l= location.size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(location[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&location[i], charSize);
     // version >= 2
     l= rules.size();
-    os.write(reinterpret_cast<char*>(&l), sizeof(l));
-    for(i= 0; i < l; ++i) os.write(&(rules[i]), charSize);
+    bs.write(reinterpret_cast<char*>(&l), sizeof(l));
+    for(i= 0; i < l; ++i) bs.write(&rules[i], charSize);
     // version >= 1
-    roundsType::size_type lv, iv;
+    roundsType::size_type lv;
     lv= gameRounds.size();
-    os.write(reinterpret_cast<char*>(&lv), sizeof(lv));
-    for(iv= 0; iv < lv; ++iv) gameRounds[iv].write(os);
+    bs.write(reinterpret_cast<char*>(&lv), sizeof(lv));
+    for(roundsType::size_type iv= 0; iv < lv; ++iv) gameRounds[iv].write(bs);
 
-    os.write(reinterpret_cast<const char*>(&start), sizeof(start));
-    os.write(reinterpret_cast<const char*>(&end), sizeof(end));
+    bs.write(reinterpret_cast<const char*>(&start), sizeof(start));
+    bs.write(reinterpret_cast<const char*>(&end), sizeof(end));
 }
 
-json Event::to_json() const {
-    nlohmann::json sub;
+Json::Value Event::to_json() const {
+    Json::Value sub;
     for(auto& game: gameRounds) {
-        sub.push_back(game.to_json());
+        sub.append(game.to_json());
     }
-    return json{{"rounds", sub}};
+    Json::Value result;
+    result["rounds"]= sub;
+    return result;
 }
 
-void Event::from_json(const json& j) {
+void Event::from_json(const Json::Value& j) {
     gameRounds.clear();
-    for(auto& jj: j.at("rounds")) {
+    for(auto& jj: j.get("rounds", Json::Value::null)) {
         gameRounds.emplace_back().from_json(jj);
     }
 }
@@ -138,7 +141,7 @@ void Event::exportJSON(const path& file) const {
 void Event::importJSON(const path& file) {
     std::ifstream fileRead;
     fileRead.open(file, std::ios::in | std::ios::binary);
-    json j;
+    Json::Value j;
     fileRead >> j;
     from_json(j);
     fileRead.close();
@@ -206,8 +209,8 @@ void Event::setOrganizerLogo(const path& _logo) {
 }
 
 void Event::setBasePath(const path& p) {
-    path tLogo   = getLogoFull();
-    path tOrgLogo= getOrganizerLogoFull();
+    const path tLogo   = getLogoFull();
+    const path tOrgLogo= getOrganizerLogoFull();
     if(is_directory(p))
         basePath= p;
     else
@@ -250,11 +253,11 @@ void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
 }
 
 Event::roundsType::const_iterator Event::getCurrentCGameRound() const {
-    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
+    return std::ranges::find_if(gameRounds, [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
 }
 
 Event::roundsType::iterator Event::getCurrentGameRound() {
-    return std::find_if(gameRounds.begin(), gameRounds.end(), [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
+    return std::ranges::find_if(gameRounds, [](const GameRound& gr) { return gr.getStatus() != GameRound::Status::Done; });
 }
 
 Event::roundsType::iterator Event::getGameRound(const uint32_t& idx) {
@@ -262,7 +265,7 @@ Event::roundsType::iterator Event::getGameRound(const uint32_t& idx) {
 }
 
 int Event::getCurrentGameRoundIndex() const {
-    uint64_t i= static_cast<uint64_t>(getCurrentCGameRound() - gameRounds.begin());
+    const uint64_t i= static_cast<uint64_t>(getCurrentCGameRound() - gameRounds.begin());
     if(i >= gameRounds.size())
         return -1;
     return static_cast<int>(i);
@@ -271,12 +274,12 @@ int Event::getCurrentGameRoundIndex() const {
 // ----- Action sur le flow -----
 
 void Event::nextState() {
-    auto statusSave= status;
-    changed        = false;
-    auto sub       = getCurrentGameRound();
+    const auto statusSave= status;
+    changed              = false;
+    const auto sub       = getCurrentGameRound();
     switch(status) {
     case Status::Invalid:
-        checkValidConfig();// rien à faire si c'est invalide!
+        checkValidConfig();// rien à faire si c'est invalide !
         break;
     case Status::MissingParties:
         checkValidConfig();// rien à faire si c'est invalide!
@@ -321,7 +324,7 @@ void Event::nextState() {
 string Event::getStateString() const {
     string result= std::format("Event {}", getStatusStr());
     if(status == Status::GameRunning) {
-        auto sub= getCurrentCGameRound();
+        const auto sub= getCurrentCGameRound();
         result+= std::format(" - {}", sub->getStateString());
     }
     return result;
@@ -330,7 +333,7 @@ string Event::getStateString() const {
 void Event::addWinnerToCurrentRound(const std::string& win) {
     if(status != Status::GameRunning)
         return;
-    auto round= getCurrentGameRound();
+    const auto round= getCurrentGameRound();
     round->addWinner(win);
     if(round->isFinished()) {
         nextState();
@@ -352,7 +355,7 @@ void Event::restoreStatus() {
     status= previousStatus;
 }
 
-Statistics Event::getStats(bool withoutChild) const {
+Statistics Event::getStats(const bool withoutChild) const {
     Statistics stat;
     for(const auto& round: gameRounds) {
         if(round.getType() == GameRound::Type::Pause)

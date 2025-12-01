@@ -55,7 +55,7 @@ public:
     /**
      * @brief Initialise l’affichage de tous les éléments non dynamiques.
      */
-    void initializeDisplay();
+    void initializeDisplay() const;
 
     /**
      * @brief Redimensionnement de la grille
@@ -65,47 +65,47 @@ public:
     /**
      * @brief Modes de fonctionnement
      */
-    enum struct Mode {
-        Game, /// in game
-        Preview /// in preview
+    enum struct Mode : uint8_t {
+        Game,  /// in game
+        Preview/// in preview
     };
-    void setMode(const Mode& newMode){
-        mode = newMode;
+    void setMode(const Mode& newMode) {
+        mode= newMode;
     }
-    void setRoundIndex(uint32_t rIndex, uint32_t srIndex){
-        spdlog::trace("setting round {} sub {}",rIndex,srIndex);
-        roundIndex = rIndex;
-        subRoundIndex = srIndex;
+    void setRoundIndex(uint32_t rIndex, uint32_t srIndex) {
+        spdlog::trace("setting round {} sub {}", rIndex, srIndex);
+        roundIndex   = rIndex;
+        subRoundIndex= srIndex;
     }
 
 private:
     /**
      * @brief Mise à jour de l’affichage de la page de titre.
      */
-    void updateEventTitlePage();
+    void updateEventTitlePage() const;
 
     /**
      * @brief Mise à jour de l’affichage de la page de titre du round.
      */
-    void updateRoundTitlePage();
+    void updateRoundTitlePage() const;
 
     /**
      * @brief Mise à jour de l’affichage de la page de partie.
      */
-    void updateRoundRunning();
+    void updateRoundRunning() const;
 
     /**
      * @brief Mise à jour de l’affichage de la page des règles de l’événement.
      */
-    void updateDisplayRules();
+    void updateDisplayRules() const;
 
-    void updatePauseScreen();
+    void updatePauseScreen() const;
     void updateRoundEndingPage();
 
     /**
      * @brief Initialisation des numéros dans la grille.
      */
-    void initializeNumberGrid();
+    void initializeNumberGrid() const;
 
     /**
      * @brief Mise à jour les couleurs des fenêtres
@@ -115,9 +115,9 @@ private:
     /**
      * @brief Remise à zéro de l'affichage de la grille
      */
-    void resetGrid();
+    void resetGrid() const;
 
-    enum struct Page {
+    enum struct Page : uint8_t {
         MainTitle,
         EventStarting,
         PricesDisplay,
@@ -142,9 +142,9 @@ private:
     /// Lien vers la MainWindow
     MainWindow* mwd= nullptr;
 
-    Mode mode = Mode::Game;
-    uint32_t roundIndex = 0;
-    uint32_t subRoundIndex = 0;
+    Mode mode             = Mode::Game;
+    uint32_t roundIndex   = 0;
+    uint32_t subRoundIndex= 0;
 };
 
 }// namespace evl::gui

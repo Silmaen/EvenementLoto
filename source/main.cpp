@@ -14,8 +14,8 @@
 using namespace evl::gui;
 using namespace std::filesystem;
 
-int main(int argc, char* argv[]) {
-    QApplication app(argc, argv);
+auto main(int argc, char* argv[]) -> int {
+    const QApplication app(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription(QCoreApplication::applicationName());
     parser.addHelpOption();
@@ -29,6 +29,7 @@ int main(int argc, char* argv[]) {
     evl::startSpdlog();
     spdlog::info("---------------------------------------------------------------------------------------");
     spdlog::info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION, evl::EVL_AUTHOR_STR);
+    spdlog::info("Chemin d'exécution : {}", evl::baseExecPath.string());
     MainWindow window;
     window.syncSettings();
     window.show();

@@ -5,13 +5,12 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
 
-#include "ConfigGeneral.h"
 #include "BaseDialog.h"
+#include "ConfigGeneral.h"
 #include "MainWindow.h"
 #include "baseDefinitions.h"
-#include <fstream>
-#include <iostream>
 
 // Les trucs de QT
 #include "moc_ConfigGeneral.cpp"
@@ -21,10 +20,10 @@ namespace evl::gui {
 
 // color button utility
 
-QColor getButtonColor(QPushButton* btn) {
+QColor getButtonColor(const QPushButton* btn) {
     return btn->palette().color(QPalette::Button);
 }
-QString getButtonColorName(QPushButton* btn) {
+QString getButtonColorName(const QPushButton* btn) {
     return btn->palette().color(QPalette::Button).name();
 }
 void setButtonColor(QPushButton* btn, const QColor& col) {
@@ -41,8 +40,6 @@ void setButtonColor(QPushButton* btn, const QString& name) {
     setButtonColor(btn, QColor(name));
 }
 
-using json= nlohmann::json;
-
 ConfigGeneral::ConfigGeneral(MainWindow* parent):
     QDialog(parent),
     ui(new Ui::ConfigGeneral), mwd(parent) {
@@ -53,7 +50,7 @@ ConfigGeneral::~ConfigGeneral() {
     delete ui;
 }
 
-void ConfigGeneral::SaveFile() {
+void ConfigGeneral::SaveFile() const {
     if(mwd != nullptr) {
         mwd->getSettings().setValue(settings::dataPathKey, ui->DataLocation->text());
         mwd->getTheme().setParam("name", ui->editThemeName->text());
@@ -81,7 +78,7 @@ void ConfigGeneral::actOk() {
     accept();
 }
 
-void ConfigGeneral::actApply() {
+void ConfigGeneral::actApply() const {
     SaveFile();
 }
 
@@ -91,70 +88,70 @@ void ConfigGeneral::actCancel() {
     reject();
 }
 
-void ConfigGeneral::actSearchFolder() {
-    auto path= dialog::openFile(dialog::FileTypes::Folder, true);
+void ConfigGeneral::actSearchFolder() const {
+    const auto path= dialog::openFile(dialog::FileTypes::Folder, true);
     if(path.empty())
         return;
     ui->DataLocation->setText(QString::fromUtf8(path.string()));
 }
-void ConfigGeneral::actResetTheme() {
+void ConfigGeneral::actResetTheme() const {
     preExec();
 }
 
-void ConfigGeneral::actRestoreTheme() {
+void ConfigGeneral::actRestoreTheme() const {
     mwd->getTheme().resetFactory();
     preExec();
 }
 
-void ConfigGeneral::actImportTheme() {
-    auto path= dialog::openFile(dialog::FileTypes::ThemeFile, true);
+void ConfigGeneral::actImportTheme() const {
+    const auto path= dialog::openFile(dialog::FileTypes::ThemeFile, true);
     if(path.empty())
         return;
     mwd->getTheme().importJSON(path);
     preExec();
 }
 
-void ConfigGeneral::actExportTheme() {
-    auto path= dialog::openFile(dialog::FileTypes::ThemeFile, false);
+void ConfigGeneral::actExportTheme() const {
+    const auto path= dialog::openFile(dialog::FileTypes::ThemeFile, false);
     if(path.empty())
         return;
     mwd->getTheme().exportJSON(path);
 }
 
-void ConfigGeneral::actBackgroundColorChange() {
-    QColor base    = getButtonColor(ui->buttonBackgroundColor);
-    QColor newColor= dialog::colorSelection(base);
+void ConfigGeneral::actBackgroundColorChange() const {
+    const QColor base    = getButtonColor(ui->buttonBackgroundColor);
+    const QColor newColor= dialog::colorSelection(base);
     setButtonColor(ui->buttonBackgroundColor, newColor);
 }
 
-void ConfigGeneral::actGridBackgroundColorChange() {
-    QColor base    = getButtonColor(ui->buttonGridBackgroundColor);
-    QColor newColor= dialog::colorSelection(base);
+void ConfigGeneral::actGridBackgroundColorChange() const {
+    const QColor base    = getButtonColor(ui->buttonGridBackgroundColor);
+    const QColor newColor= dialog::colorSelection(base);
     setButtonColor(ui->buttonGridBackgroundColor, newColor);
 }
 
-void ConfigGeneral::actSelectedNumbersColorChange() {
-    QColor base    = getButtonColor(ui->buttonSelectedNumberColor);
-    QColor newColor= dialog::colorSelection(base);
+void ConfigGeneral::actSelectedNumbersColorChange() const {
+    const QColor base    = getButtonColor(ui->buttonSelectedNumberColor);
+    const QColor newColor= dialog::colorSelection(base);
     setButtonColor(ui->buttonSelectedNumberColor, newColor);
 }
 
-void ConfigGeneral::actTextColorChange() {
-    QColor base    = getButtonColor(ui->buttonTextColor);
-    QColor newColor= dialog::colorSelection(base);
+void ConfigGeneral::actTextColorChange() const {
+    const QColor base    = getButtonColor(ui->buttonTextColor);
+    const QColor newColor= dialog::colorSelection(base);
     setButtonColor(ui->buttonTextColor, newColor);
 }
 
-void ConfigGeneral::actFadeActivationChange() {
+void ConfigGeneral::actFadeActivationChange() const {
     ui->spinFadeAmount->setEnabled(ui->checkFadeNumbers->isChecked());
     ui->spinFadeStrength->setEnabled(ui->checkFadeNumbers->isChecked());
 }
 
-void ConfigGeneral::actTruncatePriceChange() {
+void ConfigGeneral::actTruncatePriceChange() const {
     ui->spinTruncatePriceLines->setEnabled(ui->checkTruncatePrice->isChecked());
 }
 
-void ConfigGeneral::preExec() {
+void ConfigGeneral::preExec() const {
     if(mwd != nullptr) {
         ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
         ui->editThemeName->setText(mwd->getTheme().getParam("name").toString());
