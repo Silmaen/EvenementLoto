@@ -12,8 +12,8 @@
 
 namespace evl::core {
 
-RandomNumberGenerator::RandomNumberGenerator(const bool debug) {
-	if (debug) {
+RandomNumberGenerator::RandomNumberGenerator(const bool iDebug) {
+	if (iDebug) {
 		//NOLINTBEGIN
 		std::srand(1234);
 		//NOLINTEND
@@ -21,25 +21,25 @@ RandomNumberGenerator::RandomNumberGenerator(const bool debug) {
 		std::srand(static_cast<uint32_t>(std::chrono::steady_clock::now().time_since_epoch().count()));
 }
 
-auto RandomNumberGenerator::addPick(const uint8_t& num) -> bool {
-	if (std::ranges::find(alreadyPicked, num) != alreadyPicked.end())
+auto RandomNumberGenerator::addPick(const uint8_t& iNumber) -> bool {
+	if (std::ranges::find(m_alreadyPicked, iNumber) != m_alreadyPicked.end())
 		return false;
-	alreadyPicked.push_back(num);
+	m_alreadyPicked.push_back(iNumber);
 	return true;
 }
 
 auto RandomNumberGenerator::pick() -> uint8_t {
-	if (alreadyPicked.size() >= 90)
+	if (m_alreadyPicked.size() >= 90)
 		return 255;
 	auto n = static_cast<uint8_t>(std::rand() % 90 + 1);
-	while (std::ranges::find(alreadyPicked, n) != alreadyPicked.end()) n = static_cast<uint8_t>(std::rand() % 90 + 1);
-	alreadyPicked.push_back(n);
+	while (std::ranges::find(m_alreadyPicked, n) != m_alreadyPicked.end()) n = static_cast<uint8_t>(std::rand() % 90 + 1);
+	m_alreadyPicked.push_back(n);
 	return n;
 }
 
 void RandomNumberGenerator::popNum() {
-	if (!alreadyPicked.empty())
-		alreadyPicked.pop_back();
+	if (!m_alreadyPicked.empty())
+		m_alreadyPicked.pop_back();
 }
 
 }// namespace evl::core

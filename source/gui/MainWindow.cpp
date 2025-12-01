@@ -311,15 +311,15 @@ void MainWindow::updateClocks() {
 	checkDisplayWindow();
 	if (cur == currentEvent.endRounds())// pas de round en cours
 		return;
-	if (cur->getEnding() != core::epoch)// round déjà fini, pas de mise à jour
+	if (cur->getEnding() != core::g_epoch)// round déjà fini, pas de mise à jour
 		return;
-	if (cur->getStarting() == core::epoch)// round pas commencé, pas de mise à jour
+	if (cur->getStarting() == core::g_epoch)// round pas commencé, pas de mise à jour
 		return;
 	ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(core::clock::now() - cur->getStarting())));
 
 	// event chrono
-	core::timePoint start = currentEvent.getStarting();
-	if (core::timePoint end = currentEvent.getEnding(); start != core::epoch && end == core::epoch)
+	core::time_point start = currentEvent.getStarting();
+	if (core::time_point end = currentEvent.getEnding(); start != core::g_epoch && end == core::g_epoch)
 		ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
 }
 
@@ -482,19 +482,19 @@ void MainWindow::updateInfoEvent() const {
 		return;
 	}
 	ui->EventInfos->setEnabled(true);
-	const core::timePoint start = currentEvent.getStarting();
-	const core::timePoint end = currentEvent.getEnding();
+	const core::time_point start = currentEvent.getStarting();
+	const core::time_point end = currentEvent.getEnding();
 	ui->CurrentDate->setText("");
 	ui->StartingHour->setText("");
 	ui->EndingHour->setText("");
 	ui->Duration->setText("");
 	ui->Progression->setRange(0, static_cast<int>(currentEvent.sizeRounds()));
 	ui->Progression->setValue(currentEvent.getCurrentGameRoundIndex() + 1);
-	if (start == core::epoch)
+	if (start == core::g_epoch)
 		return;
 	ui->CurrentDate->setText(QString::fromUtf8(core::formatCalendar(start)));
 	ui->StartingHour->setText(QString::fromUtf8(core::formatClockNoSecond(start)));
-	if (end == core::epoch) {
+	if (end == core::g_epoch) {
 		ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
 		return;
 	}
@@ -551,10 +551,10 @@ void MainWindow::updateInfoRound() const {
 	const auto cur = currentEvent.getCurrentCGameRound();
 	if (cur == currentEvent.endRounds())
 		return;
-	if (cur->getStarting() == core::epoch)
+	if (cur->getStarting() == core::g_epoch)
 		return;
 	ui->RoundStartTime->setText(QString::fromUtf8(core::formatClock(cur->getStarting())));
-	if (cur->getStarting() == core::epoch) {
+	if (cur->getStarting() == core::g_epoch) {
 		ui->RoundDraws->setText("0");
 	} else {
 		ui->RoundDraws->setText(QString::number(cur->drawsCount()));

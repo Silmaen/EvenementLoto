@@ -22,21 +22,21 @@ class RandomNumberGenerator {
 public:
 	/**
 	 * @brief Constructeur de base.
-	 * @param debug Si mis à vrai, utilise une seed déterministe.
+	 * @param iDebug Si mis à vrai, utilise une seed déterministe.
 	 */
-	explicit RandomNumberGenerator(bool debug = false);
+	explicit RandomNumberGenerator(bool iDebug = false);
 
 	/**
 	 * @brief Remet à zéro la liste des numéros déjà tiré.
 	 */
-	void resetPick() { alreadyPicked.clear(); }
+	void resetPick() { m_alreadyPicked.clear(); }
 
 	/**
 	 * @brief Ajoute manuellement un numéro à la liste des numéros déjà tirés.
-	 * @param num Le numéro qu'il faut ajouter.
+	 * @param iNumber Le numéro qu'il faut ajouter.
 	 * @return False si le numéro est déjà dans la liste.
 	 */
-	auto addPick(const uint8_t& num) -> bool;
+	auto addPick(const uint8_t& iNumber) -> bool;
 
 	/**
 	 * @brief Tire au sort un numéro non déjà tiré.
@@ -48,7 +48,7 @@ public:
 	 * @brief Renvoie la liste des numéros tirés.
 	 * @return La liste des numéros tirés.
 	 */
-	[[nodiscard]] auto getPicked() const -> const std::vector<uint8_t>& { return alreadyPicked; }
+	[[nodiscard]] auto getPicked() const -> const std::vector<uint8_t>& { return m_alreadyPicked; }
 
 	/**
 	 * @brief Retire le dernier numéro tiré de la liste.
@@ -57,7 +57,7 @@ public:
 
 private:
 	/// Liste des numéros déjà tirer.
-	std::vector<uint8_t> alreadyPicked;
+	std::vector<uint8_t> m_alreadyPicked;
 };
 
 }// namespace evl::core

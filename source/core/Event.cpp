@@ -12,259 +12,290 @@
 
 namespace evl::core {
 
-const std::unordered_map<Event::Status, string> Event::StatusConvert = {
-		{Status::Invalid, "invalide"},
-		{Status::MissingParties, "manque les parties"},
-		{Status::Ready, "prêt"},
-		{Status::EventStarting, "démarré"},
-		{Status::GameRunning, "en cours"},
-		{Status::DisplayRules, "en affichage des règles"},
-		{Status::EventEnding, "finalisation"},
-		{Status::Finished, "fini"},
+namespace {
+
+const std::unordered_map<Event::Status, const char*> g_statusConvert = {
+		{Event::Status::Invalid, "invalide"},
+		{Event::Status::MissingParties, "manque les parties"},
+		{Event::Status::Ready, "prêt"},
+		{Event::Status::EventStarting, "démarré"},
+		{Event::Status::GameRunning, "en cours"},
+		{Event::Status::DisplayRules, "en affichage des règles"},
+		{Event::Status::EventEnding, "finalisation"},
+		{Event::Status::Finished, "fini"},
 };
 
-auto Event::getStatusStr() const -> string {
-	if (StatusConvert.contains(status)) {
-		return StatusConvert.at(status);
-	}
-	return "inconnu";
-}
+}// namespace
+
+auto Event::getStatusStr() const -> string { return g_statusConvert.at(m_status); }
 
 // ---- Serialisation ----
-void Event::read(std::istream& bs, int) {
-	uint16_t saveVersion = 0;
-	bs.read(reinterpret_cast<char*>(&saveVersion), sizeof(uint16_t));
-	spdlog::debug("Version des données du stream: {}, version courante: {}", saveVersion, currentSaveVersion);
-	if (saveVersion > currentSaveVersion)
+void Event::read(std::istream& iBs, int) {
+	uint16_t save_version = 0;
+	iBs.read(reinterpret_cast<char*>(&save_version), sizeof(uint16_t));
+	spdlog::debug("Version des données du stream: {}, version courante: {}", save_version, currentSaveVersion);
+	if (save_version > currentSaveVersion)
 		return;// incompatible
-	bs.read(reinterpret_cast<char*>(&status), sizeof(status));
+	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
 	sizeType l = 0;
 	sizeType i = 0;
-	bs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	organizerName.resize(l);
-	for (i = 0; i < l; ++i) bs.read(&organizerName[i], charSize);
+	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
+	m_organizerName.resize(l);
+	for (i = 0; i < l; ++i) iBs.read(&m_organizerName[i], charSize);
 	string temp;
-	bs.read(reinterpret_cast<char*>(&l), sizeof(l));
+	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	temp.resize(l);
-	for (i = 0; i < l; ++i) bs.read(&temp[i], charSize);
-	organizerLogo = temp;
-	bs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	name.resize(l);
-	for (i = 0; i < l; ++i) bs.read(&name[i], charSize);
-	bs.read(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) iBs.read(&temp[i], charSize);
+	m_organizerLogo = temp;
+	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
+	m_name.resize(l);
+	for (i = 0; i < l; ++i) iBs.read(&m_name[i], charSize);
+	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	temp.resize(l);
-	for (i = 0; i < l; ++i) bs.read(&temp[i], charSize);
-	logo = temp;
-	bs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	location.resize(l);
-	for (i = 0; i < l; ++i) bs.read(&location[i], charSize);
+	for (i = 0; i < l; ++i) iBs.read(&temp[i], charSize);
+	m_logo = temp;
+	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
+	m_location.resize(l);
+	for (i = 0; i < l; ++i) iBs.read(&m_location[i], charSize);
 	// version 2
-	if (saveVersion > 1) {
-		bs.read(reinterpret_cast<char*>(&l), sizeof(l));
-		rules.resize(l);
-		for (i = 0; i < l; ++i) bs.read(&rules[i], charSize);
+	if (save_version > 1) {
+		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
+		m_rules.resize(l);
+		for (i = 0; i < l; ++i) iBs.read(&m_rules[i], charSize);
 	}
 	// version 3
-	if (saveVersion > 2 && saveVersion < 4) {//----UNCOVER----
+	if (save_version > 2 && save_version < 4) {//----UNCOVER----
 		string srules;//----UNCOVER----
-		bs.read(reinterpret_cast<char*>(&l), sizeof(l));//----UNCOVER----
+		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));//----UNCOVER----
 		srules.resize(l);//----UNCOVER----
-		for (i = 0; i < l; ++i) bs.read(&srules[i], charSize);//----UNCOVER----
+		for (i = 0; i < l; ++i) iBs.read(&srules[i], charSize);//----UNCOVER----
 	}//----UNCOVER----
 	// version 1
-	roundsType::size_type lv = 0;
-	bs.read(reinterpret_cast<char*>(&lv), sizeof(lv));
-	gameRounds.resize(lv);
-	for (roundsType::size_type iv = 0; iv < lv; ++iv) gameRounds[iv].read(bs, saveVersion);
+	rounds_type::size_type lv = 0;
+	iBs.read(reinterpret_cast<char*>(&lv), sizeof(lv));
+	m_gameRounds.resize(lv);
+	for (rounds_type::size_type iv = 0; iv < lv; ++iv) m_gameRounds[iv].read(iBs, save_version);
 	spdlog::info("Event lu et contenant {} parties", lv);
-	bs.read(reinterpret_cast<char*>(&start), sizeof(start));
-	bs.read(reinterpret_cast<char*>(&end), sizeof(end));
+	iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
+	iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
 	spdlog::info("Event in state: {}", getStateString());
 }
 
-void Event::write(std::ostream& bs) const {
-	bs.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
-	bs.write(reinterpret_cast<const char*>(&status), sizeof(status));
+void Event::write(std::ostream& oBs) const {
+	oBs.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
+	oBs.write(reinterpret_cast<const char*>(&m_status), sizeof(m_status));
 	sizeType l = 0;
 	sizeType i = 0;
-	l = organizerName.size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&organizerName[i], charSize);
-	l = organizerLogo.string().size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&organizerLogo.string()[i], charSize);
-	l = name.size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&name[i], charSize);
-	l = logo.string().size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&logo.string()[i], charSize);
-	l = location.size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&location[i], charSize);
+	l = m_organizerName.size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_organizerName[i], charSize);
+	l = m_organizerLogo.string().size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_organizerLogo.string()[i], charSize);
+	l = m_name.size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_name[i], charSize);
+	l = m_logo.string().size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_logo.string()[i], charSize);
+	l = m_location.size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_location[i], charSize);
 	// version >= 2
-	l = rules.size();
-	bs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) bs.write(&rules[i], charSize);
+	l = m_rules.size();
+	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
+	for (i = 0; i < l; ++i) oBs.write(&m_rules[i], charSize);
 	// version >= 1
-	roundsType::size_type lv = 0;
-	lv = gameRounds.size();
-	bs.write(reinterpret_cast<char*>(&lv), sizeof(lv));
-	for (roundsType::size_type iv = 0; iv < lv; ++iv) gameRounds[iv].write(bs);
+	rounds_type::size_type lv = 0;
+	lv = m_gameRounds.size();
+	oBs.write(reinterpret_cast<char*>(&lv), sizeof(lv));
+	for (rounds_type::size_type iv = 0; iv < lv; ++iv) m_gameRounds[iv].write(oBs);
 
-	bs.write(reinterpret_cast<const char*>(&start), sizeof(start));
-	bs.write(reinterpret_cast<const char*>(&end), sizeof(end));
+	oBs.write(reinterpret_cast<const char*>(&m_start), sizeof(m_start));
+	oBs.write(reinterpret_cast<const char*>(&m_end), sizeof(m_end));
 }
 
-auto Event::to_json() const -> Json::Value {
+auto Event::toJson() const -> Json::Value {
 	Json::Value sub;
-	for (const auto& game: gameRounds) { sub.append(game.to_json()); }
+	for (const auto& game: m_gameRounds) { sub.append(game.toJson()); }
 	Json::Value result;
 	result["rounds"] = sub;
 	return result;
 }
 
-void Event::from_json(const Json::Value& j) {
-	gameRounds.clear();
-	for (auto& jj: j.get("rounds", Json::Value::null)) { gameRounds.emplace_back().from_json(jj); }
+void Event::fromJson(const Json::Value& iJson) {
+	m_gameRounds.clear();
+	for (auto& jj: iJson.get("rounds", Json::Value::null)) { m_gameRounds.emplace_back().fromJson(jj); }
 }
 
-void Event::exportJSON(const path& file) const {
-	std::ofstream fileSave;
-	fileSave.open(file, std::ios::out | std::ios::binary);
-	fileSave << std::setw(4) << to_json();
-	fileSave.close();
+auto Event::toYaml() const -> YAML::Node {
+	YAML::Node node;
+	YAML::Node roundsNode;
+	for (const auto& game: m_gameRounds) { roundsNode.push_back(game.toYaml()); }
+	node["rounds"] = roundsNode;
+	return node;
 }
 
-void Event::importJSON(const path& file) {
-	std::ifstream fileRead;
-	fileRead.open(file, std::ios::in | std::ios::binary);
+void Event::fromYaml(const YAML::Node& iNode) {
+	m_gameRounds.clear();
+	for (const auto& jj: iNode["rounds"]) {
+		GameRound gr;
+		gr.fromYaml(jj);
+		m_gameRounds.push_back(gr);
+	}
+}
+
+void Event::exportJSON(const path& iFile) const {
+	std::ofstream file_save;
+	file_save.open(iFile, std::ios::out | std::ios::binary);
+	file_save << std::setw(4) << toJson();
+	file_save.close();
+}
+
+void Event::importJSON(const path& iFile) {
+	std::ifstream file_read;
+	file_read.open(iFile, std::ios::in | std::ios::binary);
 	Json::Value j;
-	fileRead >> j;
-	from_json(j);
-	fileRead.close();
+	file_read >> j;
+	fromJson(j);
+	file_read.close();
+}
+
+void Event::exportYaml(const path& iFile) const {
+	YAML::Emitter out;
+	out << toYaml();
+	std::ofstream fileOut(iFile);
+	fileOut << out.c_str();
+	fileOut.close();
+}
+
+void Event::importYaml(const path& iFile) {
+	const YAML::Node data = YAML::LoadFile(iFile.string());
+	fromYaml(data);
 }
 
 void Event::checkValidConfig() {
-	if (organizerName.empty() || name.empty()) {
-		status = Status::Invalid;
-		previousStatus = status;
+	if (m_organizerName.empty() || m_name.empty()) {
+		m_status = Status::Invalid;
+		m_previousStatus = m_status;
 		return;
 	}
-	if (gameRounds.empty()) {
-		status = Status::MissingParties;
-		previousStatus = status;
+	if (m_gameRounds.empty()) {
+		m_status = Status::MissingParties;
+		m_previousStatus = m_status;
 		return;
 	}
-	status = Status::Ready;
-	previousStatus = status;
+	m_status = Status::Ready;
+	m_previousStatus = m_status;
 }
 
 auto Event::isEditable() const -> bool {
-	return status == Status::Invalid || status == Status::MissingParties || status == Status::Ready;
+	return m_status == Status::Invalid || m_status == Status::MissingParties || m_status == Status::Ready;
 }
 
 // ---- manipulation des Données propres ----
-void Event::setOrganizerName(const std::string& _name) {
+void Event::setOrganizerName(const std::string& iName) {
 	if (!isEditable())
 		return;
-	organizerName = _name;
+	m_organizerName = iName;
 	checkValidConfig();
 }
 
-void Event::setName(const std::string& _name) {
+void Event::setName(const std::string& iName) {
 	if (!isEditable())
 		return;
-	name = _name;
+	m_name = iName;
 	checkValidConfig();
 }
 
-void Event::setLocation(const std::string& _location) {
+void Event::setLocation(const std::string& iLocation) {
 	if (!isEditable())
 		return;
-	location = _location;
+	m_location = iLocation;
 	checkValidConfig();
 }
 
-void Event::setLogo(const path& _logo) {
+void Event::setLogo(const path& iLogo) {
 	if (!isEditable())
 		return;
-	if (_logo.empty() || _logo.is_relative() || basePath.empty())
-		logo = _logo;
+	if (iLogo.empty() || iLogo.is_relative() || m_basePath.empty())
+		m_logo = iLogo;
 	else
-		logo = relative(_logo, basePath);
+		m_logo = relative(iLogo, m_basePath);
 	checkValidConfig();
 }
 
-void Event::setOrganizerLogo(const path& _logo) {
+void Event::setOrganizerLogo(const path& iLogo) {
 	if (!isEditable())
 		return;
-	if (_logo.empty() || _logo.is_relative() || basePath.empty())
-		organizerLogo = _logo;
+	if (iLogo.empty() || iLogo.is_relative() || m_basePath.empty())
+		m_organizerLogo = iLogo;
 	else
-		organizerLogo = relative(_logo, basePath);
+		m_organizerLogo = relative(iLogo, m_basePath);
 	checkValidConfig();
 }
 
-void Event::setBasePath(const path& p) {
-	const path tLogo = getLogoFull();
-	const path tOrgLogo = getOrganizerLogoFull();
-	if (is_directory(p))
-		basePath = p;
+void Event::setBasePath(const path& iBasePath) {
+	const path t_logo = getLogoFull();
+	const path t_org_logo = getOrganizerLogoFull();
+	if (is_directory(iBasePath))
+		m_basePath = iBasePath;
 	else
-		basePath = p.parent_path();
-	if (tLogo.empty() || tLogo.is_relative() || basePath.empty())
-		logo = tLogo;
+		m_basePath = iBasePath.parent_path();
+	if (t_logo.empty() || t_logo.is_relative() || m_basePath.empty())
+		m_logo = t_logo;
 	else
-		logo = relative(tLogo, basePath);
-	if (tOrgLogo.empty() || tOrgLogo.is_relative() || basePath.empty())
-		organizerLogo = tOrgLogo;
+		m_logo = relative(t_logo, m_basePath);
+	if (t_org_logo.empty() || t_org_logo.is_relative() || m_basePath.empty())
+		m_organizerLogo = t_org_logo;
 	else
-		organizerLogo = relative(tOrgLogo, basePath);
+		m_organizerLogo = relative(t_org_logo, m_basePath);
 }
 
-void Event::setRules(const string& newRules) {
+void Event::setRules(const string& iNewRules) {
 	if (!isEditable())
 		return;
-	rules = newRules;
+	m_rules = iNewRules;
 	checkValidConfig();
 }
 
 // ----- Manipulation des rounds ----
-void Event::pushGameRound(const GameRound& round) {
+void Event::pushGameRound(const GameRound& iRound) {
 	if (!isEditable())
 		return;
-	gameRounds.push_back(round);
+	m_gameRounds.push_back(iRound);
 	checkValidConfig();
 }
 
-void Event::deleteRoundByIndex(const uint16_t& idx) {
+void Event::deleteRoundByIndex(const uint16_t& iIndex) {
 	if (!isEditable())
 		return;
-	gameRounds.erase(std::next(gameRounds.begin(), idx));
+	m_gameRounds.erase(std::next(m_gameRounds.begin(), iIndex));
 }
 
-void Event::swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2) {
+void Event::swapRoundByIndex(const uint16_t& iIndex, const uint16_t& iIndex2) {
 	if (!isEditable())
 		return;
-	std::swap(gameRounds[idx], gameRounds[idx2]);
+	std::swap(m_gameRounds[iIndex], m_gameRounds[iIndex2]);
 }
 
-auto Event::getCurrentCGameRound() const -> roundsType::const_iterator {
-	return std::ranges::find_if(gameRounds,
-								[](const GameRound& gr) -> bool { return gr.getStatus() != GameRound::Status::Done; });
+auto Event::getCurrentCGameRound() const -> rounds_type::const_iterator {
+	return std::ranges::find_if(
+			m_gameRounds, [](const GameRound& iGr) -> bool { return iGr.getStatus() != GameRound::Status::Done; });
 }
 
-auto Event::getCurrentGameRound() -> roundsType::iterator {
-	return std::ranges::find_if(gameRounds,
-								[](const GameRound& gr) -> bool { return gr.getStatus() != GameRound::Status::Done; });
+auto Event::getCurrentGameRound() -> rounds_type::iterator {
+	return std::ranges::find_if(
+			m_gameRounds, [](const GameRound& iGr) -> bool { return iGr.getStatus() != GameRound::Status::Done; });
 }
 
-auto Event::getGameRound(const uint32_t& idx) -> roundsType::iterator { return std::next(gameRounds.begin(), idx); }
+auto Event::getGameRound(const uint32_t& iIndex) -> rounds_type::iterator {
+	return std::next(m_gameRounds.begin(), iIndex);
+}
 
 auto Event::getCurrentGameRoundIndex() const -> int {
-	const uint64_t i = static_cast<uint64_t>(getCurrentCGameRound() - gameRounds.begin());
-	if (i >= gameRounds.size())
+	const uint64_t i = static_cast<uint64_t>(getCurrentCGameRound() - m_gameRounds.begin());
+	if (i >= m_gameRounds.size())
 		return -1;
 	return static_cast<int>(i);
 }
@@ -273,46 +304,46 @@ auto Event::getCurrentGameRoundIndex() const -> int {
 
 //NOLINTBEGIN(misc-no-recursion)
 void Event::nextState() {
-	const auto statusSave = status;
-	changed = false;
+	const auto status_save = m_status;
+	m_changed = false;
 	const auto sub = getCurrentGameRound();
-	switch (status) {
+	switch (m_status) {
 		case Status::Invalid:
 		case Status::MissingParties:
 			checkValidConfig();// rien à faire si c'est invalide !
 			break;
 		case Status::Ready:
-			status = Status::EventStarting;
-			start = clock::now();
+			m_status = Status::EventStarting;
+			m_start = clock::now();
 			break;
 		case Status::EventStarting:
-			status = Status::GameRunning;
+			m_status = Status::GameRunning;
 			sub->nextStatus();
 			break;
 		case Status::DisplayRules:
-			status = Status::GameRunning;
+			m_status = Status::GameRunning;
 			break;
 		case Status::GameRunning:
-			if (sub == gameRounds.end()) {
-				status = Status::EventEnding;
+			if (sub == m_gameRounds.end()) {
+				m_status = Status::EventEnding;
 			} else {
 				sub->nextStatus();
 				if (sub->isFinished()) {
-					end = clock::now();
+					m_end = clock::now();
 					nextState();
 				}
-				changed = true;
+				m_changed = true;
 			}
 			break;
 		case Status::EventEnding:
-			status = Status::Finished;
+			m_status = Status::Finished;
 			break;
 		case Status::Finished:
 			break;
 	}
-	if (statusSave != status)
-		changed = true;
-	if (changed)
+	if (status_save != m_status)
+		m_changed = true;
+	if (m_changed)
 		spdlog::info("Event switching to {}", getStateString());
 	else
 		spdlog::info("Event stay in {}", getStateString());
@@ -321,18 +352,18 @@ void Event::nextState() {
 
 auto Event::getStateString() const -> string {
 	string result = std::format("Event {}", getStatusStr());
-	if (status == Status::GameRunning) {
+	if (m_status == Status::GameRunning) {
 		const auto sub = getCurrentCGameRound();
 		result += std::format(" - {}", sub->getStateString());
 	}
 	return result;
 }
 
-void Event::addWinnerToCurrentRound(const std::string& win) {
-	if (status != Status::GameRunning)
+void Event::addWinnerToCurrentRound(const std::string& iWin) {
+	if (m_status != Status::GameRunning)
 		return;
 	const auto round = getCurrentGameRound();
-	round->addWinner(win);
+	round->addWinner(iWin);
 	if (round->isFinished()) {
 		nextState();
 	}
@@ -344,21 +375,21 @@ void Event::displayRules() {
 	changeStatus(Status::DisplayRules);
 }
 
-void Event::changeStatus(const Status& newStatus) {
-	previousStatus = status;
-	status = newStatus;
+void Event::changeStatus(const Status& iNewStatus) {
+	m_previousStatus = m_status;
+	m_status = iNewStatus;
 }
 
-void Event::restoreStatus() { status = previousStatus; }
+void Event::restoreStatus() { m_status = m_previousStatus; }
 
-auto Event::getStats(const bool withoutChild) const -> Statistics {
+auto Event::getStats(const bool iWithoutChild) const -> Statistics {
 	Statistics stat;
-	for (const auto& round: gameRounds) {
+	for (const auto& round: m_gameRounds) {
 		if (round.getType() == GameRound::Type::Pause)
 			continue;
 		if (round.getStatus() == GameRound::Status::Ready)
 			break;
-		if (withoutChild && round.getType() == GameRound::Type::Enfant)
+		if (iWithoutChild && round.getType() == GameRound::Type::Enfant)
 			continue;
 		stat.pushRound(round);
 	}

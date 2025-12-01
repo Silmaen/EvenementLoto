@@ -8,6 +8,7 @@
 #pragma once
 #include "../baseDefine.h"
 #include <json/json.h>
+#include <yaml-cpp/yaml.h>
 
 namespace evl::core {
 
@@ -28,28 +29,40 @@ public:
 
 	/**
 	 * @brief Lecture depuis un stream
-	 * @param bs Le stream d’entrée.
-	 * @param file_version La version du fichier à lire
+	 * @param iBs Le stream d’entrée.
+	 * @param iFileVersion La version du fichier à lire
 	 */
-	virtual void read(std::istream& bs, int file_version) = 0;
+	virtual void read(std::istream& iBs, int iFileVersion) = 0;
 
 	/**
 	 * @brief Écriture dans un stream.
-	 * @param bs Le stream où écrire.
+	 * @param iBs Le stream où écrire.
 	 */
-	virtual void write(std::ostream& bs) const = 0;
+	virtual void write(std::ostream& iBs) const = 0;
 
 	/**
 	 * @brief Écriture dans un json.
 	 * @return Le json à remplir
 	 */
-	[[nodiscard]] virtual auto to_json() const -> Json::Value = 0;
+	[[nodiscard]] virtual auto toJson() const -> Json::Value = 0;
 
 	/**
 	 * @brief Lecture depuis un json
-	 * @param j Le json à lire
+	 * @param iJson Le json à lire
 	 */
-	virtual void from_json(const Json::Value& j) = 0;
+	virtual void fromJson(const Json::Value& iJson) = 0;
+
+	/**
+	 * @brief Écriture dans un YAML node.
+	 * @return Le YAML node à remplir
+	 */
+	[[nodiscard]] virtual auto toYaml() const -> YAML::Node = 0;
+
+	/**
+	 * @brief Lecture depuis un YAML node
+	 * @param iNode Le YAML node à lire
+	 */
+	virtual void fromYaml(const YAML::Node& iNode) = 0;
 };
 
 }// namespace evl::core

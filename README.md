@@ -42,7 +42,7 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 
 ### Compilateur
 
-Le programme a été correctement compilé avec:
+Le programme a été correctement compilé avec :
 
 * windows
     * gcc 13 (mingw)
@@ -58,6 +58,15 @@ Le programme a été correctement compilé avec:
 
 * Documentation
     * [ ] Écrire les pages d’aide
+* Affichage
+    * [ ] Affichage sur l'écran présentateur de la liste des lots lot de la phase d'annonce
+* moteur de jeu
+    * [ ] Résultat
+        * [ ] Génération du rapport de fin d'événement
+        * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
+    * [ ] Gestion des multiples gagnants
+        * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
+    * [ ] Permettre de passer l'étape de saisi du gagnant
 
 ### Version 0.4 (In development)
 
@@ -68,7 +77,6 @@ Le programme a été correctement compilé avec:
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
     * [ ] Refonte de l'affichage en ImGui, suppression de QT.
-    * [ ] Affichage sur l'écran présentateur de la liste des lots lot de la phase d'annonce
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
     * [ ] Amélioration du rendu des boutons de numéro sur la grille du présentateur
         * [ ] Plus grand police d'écriture
@@ -76,18 +84,11 @@ Le programme a été correctement compilé avec:
 * moteur de jeu
     * [ ] Données
         * [ ] édition de lots sous forme de liste d’articles
-    * [ ] Permettre de passer l'étape de saisi du gagnant
-    * [ ] Gestion des multiples gagnants
-        * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
-    * [ ] Résultat
-        * [ ] Génération du rapport de fin d'événement
-        * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
     * [ ] Flexibilité en jeu
         * [ ] permettre de réorganiser les parties non entamées
         * [ ] permettre l'édition de parties non entamée
-
 * Sauvegarde et restauration
-    * [X] mettre à jour les import/export json
+    * [X] mettre à jour les import json
     * [ ] Permettre l'import/export au format YAML
 
 ### Version 0.3.1 (Released 26 november 2023)
@@ -107,14 +108,12 @@ Le programme a été correctement compilé avec:
     * [X] améliorer la lisibilité les derniers numéros tirés
     * [X] Police par défaut en gras pour les numéros de la grille
 * moteur de jeu
-    * [ ] Données
+    * [X] Données
         * [X] ajout de la valeur de lot
         * [X] correction du mouvement de curseur lors de la rédaction des lots
     * [X] ajout de stats
         * [X] de sorties des numéros
         * [X] de temps de parties
-    * [ ] Résultat
-        * [ ] Génération du rapport de fin d'événement
 * Compilation
     * [X] Test compilation Linux
         * [X] Ubuntu 22.04

@@ -15,11 +15,11 @@ namespace evl::core {
 /**
  * @brief Classe décrivant un événement.
  */
-class Event : public Serializable {
+class Event final : public Serializable {
 public:
 	// ---- définition des types ----
 	/// Le type de la liste des rounds
-	using roundsType = std::vector<GameRound>;
+	using rounds_type = std::vector<GameRound>;
 	/**
 	 * @brief Liste des statuts possibles.
 	 */
@@ -33,7 +33,6 @@ public:
 		EventEnding,///< Écran de fin d’événement
 		Finished///< Est totalement fini
 	};
-	static const std::unordered_map<Status, string> StatusConvert;
 	/**
 	 * @brief Renvoie une chaine contenant le statut.
 	 * @return Le statut.
@@ -43,175 +42,199 @@ public:
 	// ---- Serialisation ----
 	/**
 	 * @brief Lecture depuis un stream
-	 * @param bs Le stream d’entrée.
-	 * @param file_version La version du fichier à lire
+	 * @param iBs Le stream d’entrée.
+	 * @param iFileVersion La version du fichier à lire
 	 */
-	void read(std::istream& bs, int file_version) override;
+	void read(std::istream& iBs, int iFileVersion) override;
 
 	/**
 	 * @brief Écriture dans un stream.
-	 * @param bs Le stream où écrire.
+	 * @param oBs Le stream où écrire.
 	 */
-	void write(std::ostream& bs) const override;
+	void write(std::ostream& oBs) const override;
 
 	/**
 	 * @brief Écriture dans un json.
 	 * @return Le json à remplir
 	 */
-	[[nodiscard]] auto to_json() const -> Json::Value override;
+	[[nodiscard]] auto toJson() const -> Json::Value override;
 
 	/**
 	 * @brief Lecture depuis un json
-	 * @param j Le json à lire
+	 * @param iJson Le json à lire
 	 */
-	void from_json(const Json::Value& j) override;
+	void fromJson(const Json::Value& iJson) override;
+
+	/**
+	 * @brief Écriture dans un YAML node.
+	 * @return Le YAML node à remplir
+	 */
+	[[nodiscard]] auto toYaml() const -> YAML::Node override;
+
+	/**
+	 * @brief Lecture depuis un YAML node
+	 * @param iNode Le YAML node à lire
+	 */
+	void fromYaml(const YAML::Node& iNode) override;
 
 	/**
 	 * @brief Export des parties au format JSON
-	 * @param file Le fichier où exporter
+	 * @param iFile Le fichier où exporter
 	 */
-	void exportJSON(const path& file) const;
+	void exportJSON(const path& iFile) const;
 
 	/**
 	 * @brief Import des parties au format JSON
-	 * @param file Le fichier à importer
+	 * @param iFile Le fichier à importer
 	 */
-	void importJSON(const path& file);
+	void importJSON(const path& iFile);
+
+	/**
+	 * @brief Export des parties au format YAML
+	 * @param iFile Le fichier où exporter
+	 */
+	void exportYaml(const path& iFile) const;
+
+	/**
+	 * @brief Import des parties au format YAML
+	 * @param iFile Le fichier à importer
+	 */
+	void importYaml(const path& iFile);
 
 	// ---- manipulation du statut ----
 	/**
 	 * @brief Accès au statut de l’événement.
 	 * @return Le statut de l’événement.
 	 */
-	[[nodiscard]] auto getStatus() const -> const Status& { return status; }
+	[[nodiscard]] auto getStatus() const -> const Status& { return m_status; }
 
 	// ---- manipulation des Données propres ----
 	/**
 	 * @brief Accès au nom de l’organisateur
 	 * @return Le nom de l’organisateur
 	 */
-	[[nodiscard]] auto getOrganizerName() const -> const string& { return organizerName; }
+	[[nodiscard]] auto getOrganizerName() const -> const string& { return m_organizerName; }
 
 	/**
 	 * @brief Definition du nom de l’organisateur.
-	 * @param name Le nom de l’organisateur.
+	 * @param iName Le nom de l’organisateur.
 	 */
-	void setOrganizerName(const string& name);
+	void setOrganizerName(const string& iName);
 
 	/**
 	 * @brief Accès au nom de l’événement
 	 * @return Le nom de l’événement
 	 */
-	[[nodiscard]] auto getName() const -> const string& { return name; }
+	[[nodiscard]] auto getName() const -> const string& { return m_name; }
 
 	/**
 	 * @brief Definition du nom de l’événement.
-	 * @param name Le nom de l’événement.
+	 * @param iName Le nom de l’événement.
 	 */
-	void setName(const string& name);
+	void setName(const string& iName);
 
 	/**
 	 * @brief Accès au lieu de l’événement
 	 * @return Le lieu de l’événement
 	 */
-	[[nodiscard]] auto getLocation() const -> const string& { return location; }
+	[[nodiscard]] auto getLocation() const -> const string& { return m_location; }
 
 	/**
 	 * @brief Definition du lieu de l’événement.
-	 * @param location Le lieu de l’événement.
+	 * @param iLocation Le lieu de l’événement.
 	 */
-	void setLocation(const std::string& location);
+	void setLocation(const std::string& iLocation);
 
 	/**
 	 * @brief Accès au logo de l’organisateur
 	 * @return Le logo de l’organisateur
 	 */
-	[[nodiscard]] auto getOrganizerLogo() const -> const path& { return organizerLogo; }
+	[[nodiscard]] auto getOrganizerLogo() const -> const path& { return m_organizerLogo; }
 
 	/**
 	 * @brief Accès au chemin complet vers le log de l’organisateur
 	 * @return Chemin complet vers le log de l’organisateur
 	 */
 	[[nodiscard]] auto getOrganizerLogoFull() const -> path {
-		if (organizerLogo.empty())
-			return organizerLogo;
+		if (m_organizerLogo.empty())
+			return m_organizerLogo;
 		return getBasePath() / getOrganizerLogo();
 	}
 	/**
 	 * @brief Definition du logo de l’organisateur.
-	 * @param logo Le logo de l’organisateur.
+	 * @param iLogo Le logo de l’organisateur.
 	 */
-	void setOrganizerLogo(const path& logo);
+	void setOrganizerLogo(const path& iLogo);
 
 	/**
 	 * @brief Accès au logo de l’événement
 	 * @return Le logo de l’événement
 	 */
-	[[nodiscard]] auto getLogo() const -> const path& { return logo; }
+	[[nodiscard]] auto getLogo() const -> const path& { return m_logo; }
 
 	/**
 	 * @brief Accès au chemin complet vers le logo de l’événement
 	 * @return Chemin complet vers le logo de l’événement
 	 */
 	[[nodiscard]] auto getLogoFull() const -> path {
-		if (logo.empty())
-			return logo;
+		if (m_logo.empty())
+			return m_logo;
 		return getBasePath() / getLogo();
 	}
 
 	/**
 	 * @brief Definition du logo de l’événement.
-	 * @param logo Le logo de l’événement.
+	 * @param iLogo Le logo de l’événement.
 	 */
-	void setLogo(const path& logo);
+	void setLogo(const path& iLogo);
 
 	/**
 	 * @brief Accès aux règles de l’événement
 	 * @return Les règles.
 	 */
-	[[nodiscard]] auto getRules() const -> const string& { return rules; }
+	[[nodiscard]] auto getRules() const -> const string& { return m_rules; }
 
 	/**
 	 * @brief Définit les règles de l’événement.
-	 * @param newRules Les règles.
+	 * @param iNewRules Les règles.
 	 */
-	void setRules(const string& newRules);
+	void setRules(const string& iNewRules);
 
 	// ----- Manipulation des rounds ----
 	/**
 	 * @brief Renvoie l’itérateur constant de début de parties.
 	 * @return L’itérateur constant de début de parties.
 	 */
-	[[nodiscard]] auto beginRounds() const -> roundsType::const_iterator { return gameRounds.cbegin(); }
+	[[nodiscard]] auto beginRounds() const -> rounds_type::const_iterator { return m_gameRounds.cbegin(); }
 	/**
 	 * @brief Renvoie l’itérateur de fin de parties.
 	 * @return L’itérateur de fin de parties.
 	 */
-	[[nodiscard]] auto endRounds() const -> roundsType::const_iterator { return gameRounds.cend(); }
+	[[nodiscard]] auto endRounds() const -> rounds_type::const_iterator { return m_gameRounds.cend(); }
 
 	/**
 	 * @brief Renvoie le nombre de parties.
 	 * @return Le nombre de parties.
 	 */
-	[[nodiscard]] auto sizeRounds() const -> roundsType::size_type { return gameRounds.size(); }
+	[[nodiscard]] auto sizeRounds() const -> rounds_type::size_type { return m_gameRounds.size(); }
 	/**
 	 * @brief Renvoie un itérateur vers la partie à l’index donné
-	 * @param idx L’index de la partie
+	 * @param iIndex L’index de la partie
 	 * @return La partie
 	 */
-	auto getGameRound(const uint32_t& idx) -> roundsType::iterator;
+	auto getGameRound(const uint32_t& iIndex) -> rounds_type::iterator;
 
 	/**
 	 * @brief Cherche la première partie non terminée de la liste.
 	 * @return La première partie non terminée de la liste.
 	 */
-	[[nodiscard]] auto getCurrentCGameRound() const -> roundsType::const_iterator;
+	[[nodiscard]] auto getCurrentCGameRound() const -> rounds_type::const_iterator;
 
 	/**
 	 * @brief Cherche la première partie non terminée de la liste.
 	 * @return La première partie non terminée de la liste.
 	 */
-	auto getCurrentGameRound() -> roundsType::iterator;
+	auto getCurrentGameRound() -> rounds_type::iterator;
 	/**
 	 * @brief Renvoie l’index de la partie courante
 	 * @return Index de la partie courante
@@ -220,22 +243,22 @@ public:
 
 	/**
 	 * @brief Ajoute une partie au jeu
-	 * @param round La partie qu'il faut ajouter.
+	 * @param iRound La partie qu'il faut ajouter.
 	 */
-	void pushGameRound(const GameRound& round);
+	void pushGameRound(const GameRound& iRound);
 
 	/**
 	 * @brief Supprime un round basé sur son index
-	 * @param idx L’index du round à supprimer.
+	 * @param iIndex L’index du round à supprimer.
 	 */
-	void deleteRoundByIndex(const uint16_t& idx);
+	void deleteRoundByIndex(const uint16_t& iIndex);
 
 	/**
 	 * @brief Interverti deux rounds
-	 * @param idx Indice du premier round à échanger.
-	 * @param idx2 Indice du second round à échanger.
+	 * @param iIndex Indice du premier round à échanger.
+	 * @param iIndex2 Indice du second round à échanger.
 	 */
-	void swapRoundByIndex(const uint16_t& idx, const uint16_t& idx2);
+	void swapRoundByIndex(const uint16_t& iIndex, const uint16_t& iIndex2);
 
 	// ----- Flow de l'événement -----
 
@@ -251,15 +274,15 @@ public:
 	[[nodiscard]] auto getStateString() const -> string;
 
 	auto checkStateChanged() -> bool {
-		const bool ch = changed;
-		changed = false;
+		const bool ch = m_changed;
+		m_changed = false;
 		return ch;
 	}
 	/**
 	 * @brief Termine la partie en cours.
-	 * @param win Le numéro de la grille à ajouter
+	 * @param iWin Le numéro de la grille à ajouter
 	 */
-	void addWinnerToCurrentRound(const std::string& win);
+	void addWinnerToCurrentRound(const std::string& iWin);
 
 	/**
 	 * @brief Passe l’événement en mode d’affichage des règles.
@@ -278,13 +301,13 @@ public:
 	 * @brief Accès à la date de départ
 	 * @return La date de départ
 	 */
-	[[nodiscard]] auto getStarting() const -> const timePoint& { return start; }
+	[[nodiscard]] auto getStarting() const -> const time_point& { return m_start; }
 
 	/**
 	 * @brief Accès à la date de fin
 	 * @return La date de fin
 	 */
-	[[nodiscard]] auto getEnding() const -> const timePoint& { return end; }
+	[[nodiscard]] auto getEnding() const -> const time_point& { return m_end; }
 
 	// ---- accès au chemin ----
 
@@ -292,64 +315,64 @@ public:
 	 * @brief Récupération du chemin de base vers l’événement
 	 * @return Le chemin de base de l’événement
 	 */
-	[[nodiscard]] auto getBasePath() const -> const path& { return basePath; }
+	[[nodiscard]] auto getBasePath() const -> const path& { return m_basePath; }
 
 	/**
 	 * @brief Definition du chemin de base vers l’événement
-	 * @param p Le chemin vers l’événement
+	 * @param iBasePath Le chemin vers l’événement
 	 */
-	void setBasePath(const path& p);
+	void setBasePath(const path& iBasePath);
 
 	/**
 	 * @brief Renvoie le nombre de tirages et la liste des numéros les moins tirés
 	 * @return Les statistiques
 	 */
-	[[nodiscard]] auto getStats(bool withoutChild = true) const -> Statistics;
+	[[nodiscard]] auto getStats(bool iWithoutChild = true) const -> Statistics;
 
 #ifdef EVL_DEBUG
 	/**
 	 * @brief define invalide Status for testing purpose
 	 */
-	void invalidStatus() { status = Status::Invalid; }
+	void invalidStatus() { m_status = Status::Invalid; }
 	/**
 	 * @brief define invalide Status for testing purpose
 	 */
-	void restoreStatusDbg() { status = Status::Ready; }
+	void restoreStatusDbg() { m_status = Status::Ready; }
 #endif
 private:
 	/// Le statut de l’événement
-	Status status = Status::Invalid;
+	Status m_status = Status::Invalid;
 	/// Le précédent statut (pour pouvoir annuler)
-	Status previousStatus = Status::Invalid;
+	Status m_previousStatus = Status::Invalid;
 
 	/// Le nom de l’organisateur (requit pour validité)
-	string organizerName;
+	string m_organizerName;
 	/// Logo de l’organisateur.
-	path organizerLogo;
+	path m_organizerLogo;
 	/// Nom de l’événement. (requit pour validité)
-	string name;
+	string m_name;
 	/// Logo de l’événement.
-	path logo;
+	path m_logo;
 	/// Lieu de l’événement.
-	string location;
+	string m_location;
 
 	/// Les règles de l’événement
-	string rules;
+	string m_rules;
 
 	/// Liste des parties de l’événement.
-	roundsType gameRounds;
+	rounds_type m_gameRounds;
 
 	/// La date et heure de début de l’événement
-	timePoint start;
+	time_point m_start;
 
 	/// La date et heure de début de l’événement
-	timePoint end;
+	time_point m_end;
 
 	/// Le chemin de base de l’événement
-	path basePath;
+	path m_basePath;
 
 	/// status change
-	bool changed = false;
+	bool m_changed = false;
 
 	/**
 	 * @brief Si l’événement est en phase d’édition, met à jour son statuT.
@@ -358,9 +381,9 @@ private:
 
 	/**
 	 * @brief Bascule à un nouveau statut et sauvegarde le précédent statut
-	 * @param newStatus Le nouveau statut à adopter
+	 * @param iNewStatus Le nouveau statut à adopter
 	 */
-	void changeStatus(const Status& newStatus);
+	void changeStatus(const Status& iNewStatus);
 
 	/**
 	 * @brief Remet l’événement au statut précédent

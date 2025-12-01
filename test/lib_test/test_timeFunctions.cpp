@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 TEST(timeFunction, timePoint) {
-	constexpr evl::core::timePoint t = evl::core::epoch;
+	constexpr evl::core::time_point t = evl::core::g_epoch;
 	EXPECT_TRUE(t.time_since_epoch().count() == 0);
 	EXPECT_STREQ(evl::core::formatCalendar(t).c_str(), "01 January 1970");
 

@@ -15,8 +15,8 @@ using namespace evl::core;
 
 TEST(GameRound, Invalid) {
 	GameRound gr{GameRound::Type::Inverse};
-	EXPECT_EQ(gr.getStarting(), epoch);
-	EXPECT_EQ(gr.getEnding(), epoch);
+	EXPECT_EQ(gr.getStarting(), g_epoch);
+	EXPECT_EQ(gr.getEnding(), g_epoch);
 	EXPECT_STREQ(gr.getStatusStr().c_str(), "prêt");
 	EXPECT_STREQ(gr.getTypeStr().c_str(), "Inverse");
 #ifdef EVL_DEBUG
@@ -29,15 +29,15 @@ TEST(GameRound, Invalid) {
 
 TEST(GameRound, Id) {
 	GameRound gr{GameRound::Type::Enfant};
-	EXPECT_EQ(gr.getID(), 0);
-	gr.setID(665);
-	EXPECT_EQ(gr.getID(), 665);
+	EXPECT_EQ(gr.getId(), 0);
+	gr.setId(665);
+	EXPECT_EQ(gr.getId(), 665);
 }
 
 TEST(GameRound, Name) {
 	GameRound gr;
 	EXPECT_STREQ(gr.getName().c_str(), "Partie");
-	gr.setID(665);
+	gr.setId(665);
 	gr.setType(GameRound::Type::Inverse);
 	EXPECT_STREQ(gr.getName().c_str(), "Partie 665 Inverse");
 }
