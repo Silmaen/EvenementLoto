@@ -203,8 +203,8 @@ void DisplayWindow::updateEventTitlePage() const {
 }
 
 void DisplayWindow::updateRoundTitlePage() const {
-	core::Event::roundsType::const_iterator round;
-	core::GameRound::subRoundsType::const_iterator subRound;
+	core::Event::rounds_type::const_iterator round;
+	core::GameRound::sub_rounds_type::const_iterator subRound;
 	if(mode == Mode::Preview) {
 		round   = event->getGameRound(roundIndex);
 		subRound= round->getSubRound(subRoundIndex);
@@ -304,7 +304,7 @@ void DisplayWindow::updateDisplayRules() const {
 }
 
 void DisplayWindow::updatePauseScreen() const {
-	core::Event::roundsType::const_iterator round;
+	core::Event::rounds_type::const_iterator round;
 	if(mode == Mode::Preview)
 		round= event->getGameRound(roundIndex);
 	else
@@ -330,7 +330,7 @@ void DisplayWindow::updatePauseScreen() const {
 		return;
 	}
 	static size_t curSlide   = 0;
-	static core::timePoint tp= core::epoch;
+	static core::time_point tp= core::g_epoch;
 	if(static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(core::clock::now() - tp).count()) / 1000.0 < dDelay)
 		return;
 	tp			  = core::clock::now();

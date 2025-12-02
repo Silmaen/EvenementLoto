@@ -14,64 +14,65 @@ namespace evl::core {
 /// Le type d'horloge
 using clock = std::chrono::system_clock;
 /// Définition d’un point dans le temps.
-using timePoint = clock::time_point;
+using time_point = clock::time_point;
 /// Définition d’une durée, la différence entre deux points du temps.
 using duration = std::chrono::duration<double>;
 
 /// Point de référence dans le temps.
-constexpr timePoint epoch{};
+constexpr time_point g_epoch{};
 
 /**
  * @brief Tronque le temp ou la durée à la seconde près.
  * @tparam T Template pour pouvoir appliquer cette fonction à une durée ou un point de temps.
- * @param t L'objet qu'il faut tronquer.
+ * @param iTimePoint L'objet qu'il faut tronquer.
  * @return Le temps tronqué.
  */
 template<class T>
-constexpr auto floorMinutes(const T& t) -> T {
-	return std::chrono::floor<std::chrono::minutes>(t);
+constexpr auto floorMinutes(const T& iTimePoint) -> T {
+	return std::chrono::floor<std::chrono::minutes>(iTimePoint);
 }
-constexpr auto getSeconds(const timePoint& t) -> uint32_t {
-	return static_cast<uint32_t>(std::chrono::duration_cast<std::chrono::seconds>(t - floorMinutes(t)).count());
+constexpr auto getSeconds(const time_point& iTimePoint) -> uint32_t {
+	return static_cast<uint32_t>(
+			std::chrono::duration_cast<std::chrono::seconds>(iTimePoint - floorMinutes(iTimePoint)).count());
 }
 
 /**
  * @brief Formatage d’un point dans le temps comme date du calendrier
- * @param t Le point dans le temps
+ * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
  */
-inline auto formatCalendar(const timePoint& t) -> string {
-	auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+inline auto formatCalendar(const time_point& iTimePoint) -> string {
+	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
 	return std::format("{:%d %B %Y}", local);
 }
 
 /**
  * @brief Formatage d’un point dans le temps comme heure d’horloge
- * @param t Le point dans le temps
+ * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
-inline auto formatClock(const timePoint& t) -> string {
-	auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
-	return std::format("{:%R}:{:02d}", local, getSeconds(t));
+inline auto formatClock(const time_point& iTimePoint) -> string {
+	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
+	return std::format("{:%R}:{:02d}", local, getSeconds(iTimePoint));
 }
 
 /**
  * @brief Formatage d’un point dans le temps comme heure d’horloge sans les secondes
- * @param t Le point dans le temps
+ * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
  */
-inline auto formatClockNoSecond(const timePoint& t) -> string {
-	auto local = std::chrono::zoned_time{std::chrono::current_zone(), t};
+inline auto formatClockNoSecond(const time_point& iTimePoint) -> string {
+	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
 	return std::format("{:%R}", local);
 }
 
 /**
  * @brief Formatage d’une durée
- * @param d La durée qu'il faut formater.
+ * @param iDuration La durée qu'il faut formater.
  * @return Une chaine de caractères formatant la durée
  */
-inline auto formatDuration(const duration& d) -> string {
-	int32_t s = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(d).count());
+inline auto formatDuration(const duration& iDuration) -> string {
+	int32_t s = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(iDuration).count());
 	int32_t m = s / 60 % 60;
 	int32_t h = s / 3600;
 	s = s % 60;

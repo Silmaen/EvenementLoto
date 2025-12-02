@@ -24,6 +24,10 @@ find_package(jsoncpp REQUIRED)
 message(STATUS "Found jsoncpp")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC jsoncpp_static)
 
+# YAML
+find_package(yaml-cpp REQUIRED)
+message(STATUS "Found yaml-cpp")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC yaml-cpp::yaml-cpp)
 
 #spdlog
 find_package(spdlog REQUIRED)

@@ -111,7 +111,7 @@ void ConfigGameRounds::actChangeRoundNumber(int) {
 	const int cur = ui->listGameRound->currentRow();
 	if (cur < 0)
 		return;
-	gameEvent.getGameRound(static_cast<uint16_t>(cur))->setID(ui->spinRoundNumber->value());
+	gameEvent.getGameRound(static_cast<uint16_t>(cur))->setId(ui->spinRoundNumber->value());
 	updateDisplay();
 }
 
@@ -273,7 +273,7 @@ void ConfigGameRounds::updateDisplayEdits() {
 		ui->GameRoundTypes->addItems(getRoundTypes());
 		const auto round = gameEvent.getGameRound(static_cast<uint16_t>(cur));
 		ui->GameRoundTypes->setCurrentIndex(static_cast<int>(round->getType()));
-		ui->spinRoundNumber->setValue(round->getID());
+		ui->spinRoundNumber->setValue(round->getId());
 		const int scur = ui->listSubRound->currentRow();
 		ui->listSubRound->clear();
 		int idx = 1;

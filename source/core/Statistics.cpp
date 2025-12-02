@@ -11,27 +11,27 @@
 
 namespace evl::core {
 
-void Statistics::pushRound(const GameRound& round) {
+void Statistics::pushRound(const GameRound& iRound) {
 	// update round (only if done)
-	if (round.getStatus() == GameRound::Status::Done) {
-		const duration dur = round.getEnding() - round.getStarting();
+	if (iRound.getStatus() == GameRound::Status::Done) {
+		const duration dur = iRound.getEnding() - iRound.getStarting();
 		if (dur > roundLongest)
 			roundLongest = dur;
 		if (dur < roundShortest)
 			roundShortest = dur;
-		roundAverage = (roundAverage * nbRounds + dur) / (nbRounds + 1);
-		const int nbDraw = static_cast<int>(round.drawsCount());
+		roundAverage = (roundAverage * m_nbRounds + dur) / (m_nbRounds + 1);
+		const int nbDraw = static_cast<int>(iRound.drawsCount());
 		if (nbDraw > roundMostNb)
 			roundMostNb = nbDraw;
 		if (nbDraw < roundLessNb || roundLessNb == 0)
 			roundLessNb = nbDraw;
-		roundAverageNb = (roundAverageNb * nbRounds + nbDraw) / (nbRounds + 1);
-		++nbRounds;
+		roundAverageNb = (roundAverageNb * m_nbRounds + nbDraw) / (m_nbRounds + 1);
+		++m_nbRounds;
 	}
 	if (roundShortest == duration::max())
 		roundShortest = duration::zero();
 	// update subrounds
-	for (auto sub = round.beginSubRound(); sub != round.endSubRound(); ++sub) {
+	for (auto sub = iRound.beginSubRound(); sub != iRound.endSubRound(); ++sub) {
 		if (sub->getStatus() != SubGameRound::Status::Done)
 			break;
 		const duration dur = sub->getEnding() - sub->getStarting();
@@ -39,27 +39,27 @@ void Statistics::pushRound(const GameRound& round) {
 			subRoundLongest = dur;
 		if (dur < subRoundShortest)
 			subRoundShortest = dur;
-		subRoundAverage = (subRoundAverage * nbSubRounds + dur) / (nbSubRounds + 1);
+		subRoundAverage = (subRoundAverage * m_nbSubRounds + dur) / (m_nbSubRounds + 1);
 		const int nbDraw = static_cast<int>(sub->getDraws().size());
 		if (nbDraw > subRoundMostNb)
 			subRoundMostNb = nbDraw;
 		if (nbDraw < subRoundLessNb || subRoundLessNb == 0)
 			subRoundLessNb = nbDraw;
-		subRoundAverageNb = (subRoundAverageNb * nbSubRounds + nbDraw) / (nbSubRounds + 1);
-		++nbSubRounds;
+		subRoundAverageNb = (subRoundAverageNb * m_nbSubRounds + nbDraw) / (m_nbSubRounds + 1);
+		++m_nbSubRounds;
 	}
 	if (subRoundShortest == duration::max())
 		subRoundShortest = duration::zero();
 	// update tirages
-	if (pickCounts.size() != 90)
-		pickCounts.resize(90);
-	for (const auto draw: round.getAllDraws()) pickCounts[draw - 1]++;
-	lessPickNb = *std::ranges::min_element(pickCounts);
-	mostPickNb = *std::ranges::max_element(pickCounts);
+	if (m_pickCounts.size() != 90)
+		m_pickCounts.resize(90);
+	for (const auto draw: iRound.getAllDraws()) m_pickCounts[draw - 1]++;
+	lessPickNb = *std::ranges::min_element(m_pickCounts);
+	mostPickNb = *std::ranges::max_element(m_pickCounts);
 	lessPickList.clear();
 	mostPickList.clear();
 	uint8_t idx = 1;
-	for (const auto& p: pickCounts) {
+	for (const auto& p: m_pickCounts) {
 		if (std::cmp_equal(p, lessPickNb))
 			lessPickList.push_back(idx);
 		if (std::cmp_equal(p, mostPickNb))

@@ -44,15 +44,15 @@ public:
 	 */
 	~Statistics() = default;
 
-	void pushRound(const GameRound& round);
+	void pushRound(const GameRound& iRound);
 
-	using pickList = std::vector<uint8_t>;
+	using pick_list = std::vector<uint8_t>;
 
 	int lessPickNb = 0;
-	pickList lessPickList;
+	pick_list lessPickList;
 
 	int mostPickNb = 0;
-	pickList mostPickList;
+	pick_list mostPickList;
 
 	int roundLessNb = 0;
 	int roundMostNb = 0;
@@ -70,9 +70,9 @@ public:
 	duration subRoundAverage = duration::zero();
 
 private:
-	int nbRounds = 0;
-	int nbSubRounds = 0;
-	pickList pickCounts;
+	int m_nbRounds = 0;
+	int m_nbSubRounds = 0;
+	pick_list m_pickCounts;
 };
 
 }// namespace evl::core

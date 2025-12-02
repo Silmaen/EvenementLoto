@@ -10,7 +10,6 @@
 #include "Serializable.h"
 #include "SubGameRound.h"
 #include <numeric>
-#include <unordered_map>
 #include <vector>
 
 namespace evl::core {
@@ -18,12 +17,12 @@ namespace evl::core {
 /**
  * @brief Classe définissant une partie.
  */
-class GameRound : public Serializable {
+class GameRound final : public Serializable {
 public:
 	// ---- définition des types ----
 	/// Le type utilisé pour représenter la liste des tirages.
-	using drawsType = std::vector<uint8_t>;
-	using subRoundsType = std::vector<SubGameRound>;
+	using draws_type = std::vector<uint8_t>;
+	using sub_rounds_type = std::vector<SubGameRound>;
 	/**
 	 * @brief Liste des types de parties connus.
 	 */
@@ -38,7 +37,6 @@ public:
 		Inverse,///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
 		Pause,///< Une fausse 'partie' pour matérialiser une pause.
 	};
-	static const std::unordered_map<Type, string> TypeConvert;
 
 	/**
 	 * @brief Les status possibles de la partie
@@ -50,14 +48,13 @@ public:
 		PostScreen,///< La partie est en affichage de fin.
 		Done///< La partie est finie
 	};
-	static const std::unordered_map<Status, string> StatusConvert;
 
 	// --- constructeurs ----
 	/**
 	 * @brief Constructeur
-	 * @param t Le type de partie
+	 * @param iType Le type de partie
 	 */
-	explicit GameRound(const Type& t = Type::OneTwoQuineFullCard);
+	explicit GameRound(const Type& iType = Type::OneTwoQuineFullCard);
 
 	// ---- manipulation du type de partie ----
 	/**
@@ -70,13 +67,13 @@ public:
 	 * @brief Renvoie le type de partie.
 	 * @return Le type de partie
 	 */
-	[[nodiscard]] auto getType() const -> const Type& { return type; }
+	[[nodiscard]] auto getType() const -> const Type& { return m_type; }
 
 	/**
 	 * @brief Définit le type de partie
-	 * @param t Type de partie
+	 * @param iType Type de partie
 	 */
-	void setType(const Type& t);
+	void setType(const Type& iType);
 
 	// ---- manipulation du statut ----
 	/**
@@ -89,27 +86,27 @@ public:
 	 * @brief Renvoie le type de partie.
 	 * @return Le type de partie
 	 */
-	[[nodiscard]] auto getStatus() const -> const Status& { return status; }
+	[[nodiscard]] auto getStatus() const -> const Status& { return m_status; }
 
 	/**
 	 * @brief Renvoie si le round est fini
 	 * @return True si le round est fini
 	 */
-	[[nodiscard]] auto isFinished() const -> bool { return status == Status::Done; }
+	[[nodiscard]] auto isFinished() const -> bool { return m_status == Status::Done; }
 #ifdef EVL_DEBUG
 	/**
 	 * @brief define invalide Status for testing purpose
 	 */
 	void invalidStatus() {
-		status = Status::Invalid;
-		type = Type::Invalid;
+		m_status = Status::Invalid;
+		m_type = Type::Invalid;
 	}
 	/**
 	 * @brief define invalide Status for testing purpose
 	 */
 	void restoreStatus() {
-		status = Status::Ready;
-		type = Type::OneTwoQuineFullCard;
+		m_status = Status::Ready;
+		m_type = Type::OneTwoQuineFullCard;
 	}
 #endif
 
@@ -127,9 +124,9 @@ public:
 
 	/**
 	 * @brief Ajoute le numéro dans la liste des numéros tirés
-	 * @param num Numéro à ajouter
+	 * @param iNumber Numéro à ajouter
 	 */
-	void addPickedNumber(const uint8_t& num);
+	void addPickedNumber(const uint8_t& iNumber);
 
 	/**
 	 * @brief Supprime le dernier tirage.
@@ -138,9 +135,9 @@ public:
 
 	/**
 	 * @brief donne un gagnant
-	 * @param win Le nom du gagnant
+	 * @param iWinner Le nom du gagnant
 	 */
-	void addWinner(const std::string& win);
+	void addWinner(const std::string& iWinner);
 
 	/**
 	 * @brief Renvoie la liste des gagnants de sous-partie
@@ -151,41 +148,53 @@ public:
 	// ---- Serialisation ----
 	/**
 	 * @brief Lecture depuis un stream
-	 * @param bs Le stream d’entrée.
-	 * @param file_version La version du fichier à lire
+	 * @param iBs Le stream d’entrée.
+	 * @param iFileVersion La version du fichier à lire
 	 */
-	void read(std::istream& bs, int file_version) override;
+	void read(std::istream& iBs, int iFileVersion) override;
 
 	/**
 	 * @brief Écriture dans un stream.
-	 * @param bs Le stream où écrire.
+	 * @param iBs Le stream où écrire.
 	 */
-	void write(std::ostream& bs) const override;
+	void write(std::ostream& iBs) const override;
 
 	/**
 	 * @brief Écriture dans un json.
 	 * @return Le json à remplir
 	 */
-	[[nodiscard]] auto to_json() const -> Json::Value override;
+	[[nodiscard]] auto toJson() const -> Json::Value override;
 
 	/**
 	 * @brief Lecture depuis un json
-	 * @param j Le json à lire
+	 * @param iJson Le json à lire
 	 */
-	void from_json(const Json::Value& j) override;
+	void fromJson(const Json::Value& iJson) override;
+
+	/**
+	 * @brief Écriture dans un YAML node.
+	 * @return Le YAML node à remplir
+	 */
+	[[nodiscard]] auto toYaml() const -> YAML::Node override;
+
+	/**
+	 * @brief Lecture depuis un YAML node
+	 * @param iNode Le YAML node à lire
+	 */
+	void fromYaml(const YAML::Node& iNode) override;
 
 	// ---- accès aux timers ----
 	/**
 	 * @brief Accès à la date de départ
 	 * @return La date de départ
 	 */
-	[[nodiscard]] auto getStarting() const -> const timePoint& { return start; }
+	[[nodiscard]] auto getStarting() const -> const time_point& { return m_start; }
 
 	/**
 	 * @brief Accès à la date de fin
 	 * @return La date de fin
 	 */
-	[[nodiscard]] auto getEnding() const -> const timePoint& { return end; }
+	[[nodiscard]] auto getEnding() const -> const time_point& { return m_end; }
 
 	// ---- accès aux sub rounds (lecture seule) ----
 	/**
@@ -197,44 +206,44 @@ public:
 	 * @brief Accès à la sous-partie courante l’interface
 	 * @return Itérateur constant sur la sous-partie courante
 	 */
-	[[nodiscard]] auto getCurrentSubRound() const -> subRoundsType::const_iterator;
+	[[nodiscard]] auto getCurrentSubRound() const -> sub_rounds_type::const_iterator;
 	/**
 	 * @brief Accès à la sous-partie courante
 	 * @return Itérateur constant sur la sous-partie courante
 	 */
-	auto getSubRound(uint32_t index) -> subRoundsType::iterator;
+	auto getSubRound(uint32_t iIndex) -> sub_rounds_type::iterator;
 	/**
 	 * @brief Accès à la sous-partie courante
 	 * @return Itérateur constant sur la sous-partie courante
 	 */
-	[[nodiscard]] auto getSubRound(uint32_t index) const -> subRoundsType::const_iterator;
+	[[nodiscard]] auto getSubRound(uint32_t iIndex) const -> sub_rounds_type::const_iterator;
 	/**
 	 * @brief Renvoie un itérateur constant sur le début de la liste des subround.
 	 * @return Itérateur constant sur le début de la liste des subround.
 	 */
-	[[nodiscard]] auto beginSubRound() const -> subRoundsType::const_iterator { return subGames.cbegin(); }
+	[[nodiscard]] auto beginSubRound() const -> sub_rounds_type::const_iterator { return m_subGames.cbegin(); }
 	/**
 	 * @brief Renvoie un itérateur constant sur la fin de la liste des subround.
 	 * @return Itérateur constant sur la fin de la liste des subround.
 	 */
-	[[nodiscard]] auto endSubRound() const -> subRoundsType::const_iterator { return subGames.cend(); }
+	[[nodiscard]] auto endSubRound() const -> sub_rounds_type::const_iterator { return m_subGames.cend(); }
 	/**
 	 * @brief Renvoie la taille de la liste des subround.
 	 * @return La taille de la fin de la liste des subround.
 	 */
-	[[nodiscard]] auto sizeSubRound() const -> subRoundsType::size_type { return subGames.size(); }
+	[[nodiscard]] auto sizeSubRound() const -> sub_rounds_type::size_type { return m_subGames.size(); }
 
 	/**
 	 * @brief Défini le numéro de partie
-	 * @param id Le numéro de partie
+	 * @param iId Le numéro de partie
 	 */
-	void setID(const int id) { Id = id; }
+	void setId(const int iId) { m_id = iId; }
 
 	/**
 	 * @brief Renvoie le numéro d'affichage de la partie
 	 * @return Le numéro d'affichage
 	 */
-	[[nodiscard]] auto getID() const -> const int& { return Id; }
+	[[nodiscard]] auto getId() const -> const int& { return m_id; }
 
 	/**
 	 * @brief Affichage de nom spécial
@@ -253,20 +262,22 @@ public:
 	 * @brief Renvoie la liste complète des tirages
 	 * @return Liste des tirages
 	 */
-	[[nodiscard]] auto getAllDraws() const -> drawsType;
+	[[nodiscard]] auto getAllDraws() const -> draws_type;
 
 	/**
 	 * @brief Renvoie si des tirages sont présents
 	 * @return true si aucun tirage
 	 */
-	[[nodiscard]] auto emptyDraws() const -> bool { return subGames.empty() || subGames.front().getDraws().empty(); }
+	[[nodiscard]] auto emptyDraws() const -> bool {
+		return m_subGames.empty() || m_subGames.front().getDraws().empty();
+	}
 
 	/**
 	 * @brief Renvoie le dernier numéro tiré qui est annulable (255 sinon)
 	 * @return Dernier numéro tiré
 	 */
 	[[nodiscard]] auto getLastCancelableDraw() const -> uint8_t {
-		if (status != Status::Running)
+		if (m_status != Status::Running)
 			return 255;
 		if (emptyDraws())
 			return 255;
@@ -279,13 +290,13 @@ public:
 	 * @brief Renvoie le nombre total de tirages.
 	 * @return Le nombre de tirages.
 	 */
-	[[nodiscard]] auto drawsCount() const -> drawsType::size_type {
+	[[nodiscard]] auto drawsCount() const -> draws_type::size_type {
 		return std::accumulate(
-				subGames.begin(), subGames.end(), 0ULL,
-				[](drawsType::size_type accu, const auto& item) -> auto { return accu + item.getDraws().size(); });
+				m_subGames.begin(), m_subGames.end(), 0ULL,
+				[](draws_type::size_type iAccu, const auto& iItem) -> auto { return iAccu + iItem.getDraws().size(); });
 	}
 
-	void setDiapo(const string& path, double delai);
+	void setDiapo(const string& iPath, double iDelai);
 
 	[[nodiscard]] auto getDiapo() const -> std::tuple<path, double>;
 
@@ -294,40 +305,40 @@ public:
 	 * @return true if there is a diaporama
 	 */
 	[[nodiscard]] auto hasDiapo() const -> bool {
-		return type == Type::Pause && (!diapoPath.empty() || diapoDelay > 0);
+		return m_type == Type::Pause && (!m_diapoPath.empty() || m_diapoDelay > 0);
 	}
 
 private:
 	/// Le numéro de la partie (à ne pas afficher si négatif)
-	int Id = 0;
+	int m_id = 0;
 
 	/// Le type de partie.
-	Type type = Type::OneTwoQuineFullCard;
+	Type m_type = Type::OneTwoQuineFullCard;
 
 	/// Le type actuel de la partie.
-	Status status = Status::Ready;
+	Status m_status = Status::Ready;
 
 	/// La date et heure de début de partie
-	timePoint start;
+	time_point m_start;
 
 	/// La date et heure de début de partie
-	timePoint end;
+	time_point m_end;
 
 	/// La liste des
-	subRoundsType subGames;
+	sub_rounds_type m_subGames;
 
 	/// Diaporama Path (only in pause)
-	path diapoPath;
+	path m_diapoPath;
 
 	/// Diaporama delay (only in pause)
-	double diapoDelay = 0;
+	double m_diapoDelay = 0;
 	// ---------------- private functions ----------------
 
 	/**
 	 * @brief Accès à la sous-partie courante
 	 * @return Pointeur vers la sous-partie courante
 	 */
-	auto getCurrentSubRound() -> subRoundsType::iterator;
+	auto getCurrentSubRound() -> sub_rounds_type::iterator;
 
 	/**
 	 * @brief Determine si la partie peut être éditée.
