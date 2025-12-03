@@ -17,53 +17,83 @@ if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
         target_precompile_headers(${CMAKE_PROJECT_NAME}_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
     endif ()
 endif ()
+set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES FOLDER "core_libs")
 
 # ----==== third party ====----
 # json
 find_package(jsoncpp REQUIRED)
-message(STATUS "Found jsoncpp")
+message(STATUS "Found jsoncpp: ${jsoncpp_DIR} (found version: ${jsoncpp_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC jsoncpp_static)
 
 # YAML
 find_package(yaml-cpp REQUIRED)
-message(STATUS "Found yaml-cpp")
+message(STATUS "Found yaml-cpp: ${yaml-cpp_DIR} (found version: ${yaml-cpp_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC yaml-cpp::yaml-cpp)
 
 #spdlog
 find_package(spdlog REQUIRED)
-message(STATUS "Found spdlog")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog)
-#target_compile_definitions(${CMAKE_PROJECT_NAME}_lib PUBLIC SPDLOG_FMT_EXTERNAL)
+message(STATUS "Found spdlog: ${spdlog_DIR} (found version: ${spdlog_VERSION})")
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE spdlog::spdlog)
 
 #magic enum
 find_package(magic_enum REQUIRED)
-message(STATUS "Found magic_enum")
+message(STATUS "Found magic_enum: ${magic_enum_DIR} (found version: ${magic_enum_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC magic_enum::magic_enum)
 #
-# ----====  UI Library ====----
+# ----====  UI Libraries ====----
 #
 #  QT dependency
 #
 include(../cmake/qt.cmake)
 #
-#  UI lib
+#  QT UI lib
 #
 file(GLOB_RECURSE
-        SRCS_UI
-        ${CMAKE_CURRENT_SOURCE_DIR}/gui/*
+        SRCS_UI_QT
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui_qt/*
 )
-add_library(${CMAKE_PROJECT_NAME}_ui ${SRCS_UI})
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui
+add_library(${CMAKE_PROJECT_NAME}_ui_qt ${SRCS_UI_QT})
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui_qt
         ${CMAKE_PROJECT_NAME}_lib
 )
 # precompiled headers
 if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
     if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
-        target_precompile_headers(${CMAKE_PROJECT_NAME}_ui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
+        target_precompile_headers(${CMAKE_PROJECT_NAME}_ui_qt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
     endif ()
 endif ()
-qt_attach_to_target(${CMAKE_PROJECT_NAME}_ui)
-#  UI Library
+set_target_properties(${CMAKE_PROJECT_NAME}_ui_qt PROPERTIES FOLDER "core_libs")
+qt_attach_to_target(${CMAKE_PROJECT_NAME}_ui_qt)
+#  QT UI Library
+#
+
+#
+#  ImGUI UI lib
+#
+file(GLOB_RECURSE
+        SRCS_UI_IMGUI
+        ${CMAKE_CURRENT_SOURCE_DIR}/gui_imgui/*
+)
+add_library(${CMAKE_PROJECT_NAME}_ui_imgui ${SRCS_UI_IMGUI})
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PUBLIC
+        ${CMAKE_PROJECT_NAME}_lib
+)
+# precompiled headers
+if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
+    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
+        target_precompile_headers(${CMAKE_PROJECT_NAME}_ui_imgui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
+    endif ()
+endif ()
+set_target_properties(${CMAKE_PROJECT_NAME}_ui_imgui PROPERTIES FOLDER "core_libs")
+
+find_package(ImGui REQUIRED)
+message(STATUS "Found ImGui: ${ImGui_DIR} (found version: ${ImGui_VERSION})")
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE imgui::imgui)
+
+find_package(glfw3 REQUIRED)
+message(STATUS "Found glfw3: ${glfw3_DIR} (found version: ${glfw3_VERSION})")
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE glfw)
+#  ImGUI UI Library
 #
 
 #
@@ -83,7 +113,8 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 endif ()
 target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_PROJECT_NAME}_lib
-        ${CMAKE_PROJECT_NAME}_ui
+        ${CMAKE_PROJECT_NAME}_ui_qt
+        ${CMAKE_PROJECT_NAME}_ui_imgui
 )
 if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)

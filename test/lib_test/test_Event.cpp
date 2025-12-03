@@ -4,13 +4,11 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "../TestMainHelper.h"
+
 #include "core/Event.h"
 
-#include <filesystem>
 #include <fstream>
-#include <gtest/gtest.h>
-
-namespace fs = std::filesystem;
 
 using namespace evl::core;
 
@@ -135,7 +133,7 @@ TEST(Event, Serialize) {
 	evt.pushGameRound(GameRound());
 
 	const fs::path tmp = fs::temp_directory_path() / "test";
-	fs::create_directories(tmp);
+	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
 	std::ofstream fileSave;
@@ -146,11 +144,11 @@ TEST(Event, Serialize) {
 	Event evt2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	evt2.read(fileRead, evl::currentSaveVersion);
+	evt2.read(fileRead, evl::g_currentSaveVersion);
 	fileRead.close();
 
 	EXPECT_EQ(evt2.getName(), evt.getName());
-	fs::remove_all(tmp);
+	remove_all(tmp);
 }
 
 TEST(Event, JSONSerialize) {
@@ -174,7 +172,7 @@ TEST(Event, JSONSerialize) {
 	sub->define(sub->getType(), "un massage vibrant\nune queue de pie");
 
 	const fs::path tmp = fs::temp_directory_path() / "test";
-	fs::create_directories(tmp);
+	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
 	evt.exportJSON(file);
@@ -184,7 +182,7 @@ TEST(Event, JSONSerialize) {
 
 	EXPECT_STREQ(evt2.getGameRound(1)->getSubRound(1)->getPrices().c_str(),
 				 "un bon pour un tour à l’urinoir\nun colonel");
-	fs::remove_all(tmp);
+	remove_all(tmp);
 }
 
 TEST(Event, basePath) {
@@ -219,7 +217,7 @@ TEST(Event, YamlSerialize) {
 	sub->define(sub->getType(), "un massage vibrant\nune queue de pie");
 
 	const fs::path tmp = fs::temp_directory_path() / "test";
-	fs::create_directories(tmp);
+	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
 	evt.exportYaml(file);

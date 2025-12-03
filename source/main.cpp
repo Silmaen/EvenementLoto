@@ -5,37 +5,57 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
-#include "gui/MainWindow.h"
-#include "gui/baseDefinitions.h"
+
+#include "gui_imgui/Application.h"
+#include "gui_qt/MainWindow.h"
+#include "gui_qt/baseDefinitions.h"
 #include <QApplication>
 #include <QCommandLineParser>
-#include <core/Logger.h>
+#include <core/Log.h>
 
 using namespace evl::gui;
 using namespace std::filesystem;
 
-auto main(int argc, char* argv[]) -> int {
-	const QApplication app(argc, argv);
-	QCommandLineParser parser;
-	parser.setApplicationDescription(QCoreApplication::applicationName());
-	parser.addHelpOption();
-	parser.addVersionOption();
-	parser.process(app);
-	evl::baseExecPath= absolute(path(argv[0])).parent_path();
-	QCoreApplication::setOrganizationName(QString::fromStdString(evl::EVL_AUTHOR_STR));
-	QCoreApplication::setApplicationName(QString::fromStdString(evl::EVL_APP));
-	QCoreApplication::setApplicationVersion(QString::fromStdString(evl::EVL_VERSION));
-	evl::resetLogFile();
-	evl::startSpdlog();
-	spdlog::info("---------------------------------------------------------------------------------------");
-	spdlog::info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION, evl::EVL_AUTHOR_STR);
-	spdlog::info("Chemin d'exécution : {}", evl::baseExecPath.string());
-	MainWindow window;
-	window.syncSettings();
-	window.show();
-	auto ret= app.exec();
-	spdlog::info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
-	spdlog::info("---------------------------------------------------------------------------------------");
-	spdlog::shutdown();
+auto main(int iArgc, char* iArgv[]) -> int {
+#ifdef EVL_DEBUG
+	evl::Log::init(evl::Log::Level::Trace);
+#else
+	evl::Log::init(evl::Log::Level::Info);
+#endif
+	evl::g_baseExecPath = absolute(path(iArgv[0])).parent_path();
+	log_info("---------------------------------------------------------------------------------------")
+			log_info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION,
+					 evl::EVL_AUTHOR_STR) log_info("Chemin d'exécution : {}", evl::g_baseExecPath.string()) int ret = 0;
+	if (exists(evl::g_baseExecPath / "config.yaml")) {
+		// TODO: load config from config file
+		evl::g_useImGui = true;
+	}
+	if (evl::g_useImGui) {
+		log_info("Utilisation de l'interface ImGui")
+				// Startup
+				auto app = evl::gui_imgui::createApplication(iArgc, iArgv);
+		// Runtime
+		app->run();
+		// Shutdown
+		app.reset();
+	} else {
+		log_info("Utilisation de l'interface Qt") const QApplication app(iArgc, iArgv);
+		QCommandLineParser parser;
+		parser.setApplicationDescription(QCoreApplication::applicationName());
+		parser.addHelpOption();
+		parser.addVersionOption();
+		parser.process(app);
+		QCoreApplication::setOrganizationName(QString::fromStdString(evl::EVL_AUTHOR_STR));
+		QCoreApplication::setApplicationName(QString::fromStdString(evl::EVL_APP));
+		QCoreApplication::setApplicationVersion(QString::fromStdString(evl::EVL_VERSION));
+		MainWindow window;
+		window.syncSettings();
+		window.show();
+		ret = app.exec();
+	}
+	log_info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret)
+			log_info("---------------------------------------------------------------------------------------")
+			// Destroy the logger
+			evl::Log::invalidate();
 	return ret;
 }

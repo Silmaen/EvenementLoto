@@ -41,7 +41,7 @@ constexpr auto getSeconds(const time_point& iTimePoint) -> uint32_t {
  * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme date du calendrier
  */
-inline auto formatCalendar(const time_point& iTimePoint) -> string {
+inline auto formatCalendar(const time_point& iTimePoint) -> std::string {
 	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
 	return std::format("{:%d %B %Y}", local);
 }
@@ -51,7 +51,7 @@ inline auto formatCalendar(const time_point& iTimePoint) -> string {
  * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge
  */
-inline auto formatClock(const time_point& iTimePoint) -> string {
+inline auto formatClock(const time_point& iTimePoint) -> std::string {
 	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
 	return std::format("{:%R}:{:02d}", local, getSeconds(iTimePoint));
 }
@@ -61,7 +61,7 @@ inline auto formatClock(const time_point& iTimePoint) -> string {
  * @param iTimePoint Le point dans le temps
  * @return Une chaine de caractères formatant le point dans le temps comme heure d’horloge sans les secondes
  */
-inline auto formatClockNoSecond(const time_point& iTimePoint) -> string {
+inline auto formatClockNoSecond(const time_point& iTimePoint) -> std::string {
 	auto local = std::chrono::zoned_time{std::chrono::current_zone(), iTimePoint};
 	return std::format("{:%R}", local);
 }
@@ -71,7 +71,7 @@ inline auto formatClockNoSecond(const time_point& iTimePoint) -> string {
  * @param iDuration La durée qu'il faut formater.
  * @return Une chaine de caractères formatant la durée
  */
-inline auto formatDuration(const duration& iDuration) -> string {
+inline auto formatDuration(const duration& iDuration) -> std::string {
 	int32_t s = static_cast<int32_t>(std::chrono::duration_cast<std::chrono::seconds>(iDuration).count());
 	int32_t m = s / 60 % 60;
 	int32_t h = s / 3600;

@@ -4,21 +4,20 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "../TestMainHelper.h"
+
 #include "core/SubGameRound.h"
 
-#include <filesystem>
 #include <fstream>
-#include <gtest/gtest.h>
 
-namespace fs = std::filesystem;
 using namespace evl::core;
 
 TEST(SubGameRound, types) {
-	SubGameRound const partie(SubGameRound::Type::OneQuine, "");
+	const SubGameRound partie(SubGameRound::Type::OneQuine, "");
 	EXPECT_STREQ(partie.getTypeStr().c_str(), "simple quine");
-	SubGameRound const partie2(SubGameRound::Type::FullCard, "");
+	const SubGameRound partie2(SubGameRound::Type::FullCard, "");
 	EXPECT_STREQ(partie2.getTypeStr().c_str(), "carton plein");
-	SubGameRound const partie3(SubGameRound::Type::Inverse, "");
+	const SubGameRound partie3(SubGameRound::Type::Inverse, "");
 	EXPECT_STREQ(partie3.getTypeStr().c_str(), "inverse");
 	SubGameRound partie4(SubGameRound::Type::Invalid, "une moto");
 	EXPECT_STREQ(partie4.getTypeStr().c_str(), "inconnu");
@@ -65,7 +64,7 @@ TEST(SubGameRound, serialize) {
 	partie.setWinner("mr X");
 	EXPECT_TRUE(partie.isFinished());
 	const fs::path tmp = fs::temp_directory_path() / "test";
-	fs::create_directories(tmp);
+	create_directories(tmp);
 	const fs::path file = tmp / "testSubGameRound.sdeg";
 
 	std::ofstream fileSave;
@@ -76,7 +75,7 @@ TEST(SubGameRound, serialize) {
 	SubGameRound partie2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	partie2.read(fileRead, evl::currentSaveVersion);
+	partie2.read(fileRead, evl::g_currentSaveVersion);
 	fileRead.close();
 
 	EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);
@@ -84,5 +83,5 @@ TEST(SubGameRound, serialize) {
 	EXPECT_STREQ(partie2.getWinner().c_str(), "mr X");
 	EXPECT_STREQ(partie2.getPrices().c_str(), "une moto");
 	EXPECT_NEAR(partie2.getValue(), 152.12, 0.001);
-	fs::remove_all(tmp);
+	remove_all(tmp);
 }

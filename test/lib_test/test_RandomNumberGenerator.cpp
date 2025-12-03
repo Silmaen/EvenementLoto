@@ -4,8 +4,9 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "../TestMainHelper.h"
+
 #include "core/RandomNumberGenerator.h"
-#include <gtest/gtest.h>
 
 using namespace evl::core;
 

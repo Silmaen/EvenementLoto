@@ -46,7 +46,8 @@ public:
 	 * @param iPrices Le(s) lot(s) pour cette partie
 	 * @param iValue La valeur du lot
 	 */
-	explicit SubGameRound(const Type& iType = Type::OneQuine, const string& iPrices = "", const double iValue = 0) {
+	explicit SubGameRound(const Type& iType = Type::OneQuine, const std::string& iPrices = "",
+						  const double iValue = 0) {
 		define(iType, iPrices, iValue);
 	}
 
@@ -56,7 +57,7 @@ public:
 	 * @param iPrices Le(s) lot(s) pour cette partie
 	 * @param iValue La valeur des lots
 	 */
-	void define(const Type& iType, const string& iPrices = "", const double iValue = 0) {
+	void define(const Type& iType, const std::string& iPrices = "", const double iValue = 0) {
 		m_type = iType;
 		m_prices = iPrices;
 		m_pricesValue = iValue;
@@ -67,7 +68,7 @@ public:
 	 * @brief Renvoie les lots de cette partie.
 	 * @return Les lots.
 	 */
-	[[nodiscard]] auto getPrices() const -> const string& { return m_prices; }
+	[[nodiscard]] auto getPrices() const -> const std::string& { return m_prices; }
 
 	/**
 	 * @brief Renvoie la valeur du lot à gagner.
@@ -85,7 +86,7 @@ public:
 	 * @brief Renvoie le nom du type de sous-partie
 	 * @return Le nom du type de sous-partie
 	 */
-	[[nodiscard]] auto getTypeStr() const -> string;
+	[[nodiscard]] auto getTypeStr() const -> std::string;
 
 	/**
 	 * @brief Renvoie le statut de sous-partie.
@@ -97,7 +98,7 @@ public:
 	 * @brief Renvoie le nom du statut de sous-partie
 	 * @return Le nom du statut de sous-partie
 	 */
-	[[nodiscard]] auto getStatusStr() const -> string;
+	[[nodiscard]] auto getStatusStr() const -> std::string;
 
 	/**
 	 * @brief Advance to the next status if possible
@@ -143,13 +144,13 @@ public:
 	 * @brief Renvoie le numéro de la grille gagnante.
 	 * @return Le numéro de la grille gagnante.
 	 */
-	[[nodiscard]] auto getWinner() const -> const string& { return m_winner; }
+	[[nodiscard]] auto getWinner() const -> const std::string& { return m_winner; }
 
 	/**
 	 * @brief Défini le numéro du gagnant
 	 * @param iWinner Le numéro de la grille gagnante
 	 */
-	void setWinner(const string& iWinner) {
+	void setWinner(const std::string& iWinner) {
 		if (m_status == Status::Running) {
 			m_winner = iWinner;
 			nextStatus();
@@ -229,9 +230,9 @@ private:
 	/// La valeur du lot
 	double m_pricesValue = 0;
 	/// La liste des prix pour cette sous-partie
-	string m_prices;
+	std::string m_prices;
 	/// Le nom du gagnant
-	string m_winner;
+	std::string m_winner;
 	/// La liste des numéros tirés.
 	draws_type m_draws;
 	/// La date et heure de début de partie

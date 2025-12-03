@@ -8,7 +8,8 @@
 #include "pch.h"
 
 #include "Event.h"
-#include <spdlog/spdlog.h>
+
+#include "Log.h"
 
 namespace evl::core {
 
@@ -27,84 +28,84 @@ const std::unordered_map<Event::Status, const char*> g_statusConvert = {
 
 }// namespace
 
-auto Event::getStatusStr() const -> string { return g_statusConvert.at(m_status); }
+auto Event::getStatusStr() const -> std::string { return g_statusConvert.at(m_status); }
 
 // ---- Serialisation ----
 void Event::read(std::istream& iBs, int) {
 	uint16_t save_version = 0;
 	iBs.read(reinterpret_cast<char*>(&save_version), sizeof(uint16_t));
-	spdlog::debug("Version des données du stream: {}, version courante: {}", save_version, currentSaveVersion);
-	if (save_version > currentSaveVersion)
+	log_debug("Version des données du stream: {}, version courante: {}", save_version, g_currentSaveVersion);
+	if (save_version > g_currentSaveVersion)
 		return;// incompatible
 	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
-	sizeType l = 0;
-	sizeType i = 0;
+	std::string::size_type l = 0;
+	std::string::size_type i = 0;
 	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	m_organizerName.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_organizerName[i], charSize);
-	string temp;
+	for (i = 0; i < l; ++i) iBs.read(&m_organizerName[i], sizeof(std::string::value_type));
+	std::string temp;
 	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	temp.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&temp[i], charSize);
+	for (i = 0; i < l; ++i) iBs.read(&temp[i], sizeof(std::string::value_type));
 	m_organizerLogo = temp;
 	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	m_name.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_name[i], charSize);
+	for (i = 0; i < l; ++i) iBs.read(&m_name[i], sizeof(std::string::value_type));
 	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	temp.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&temp[i], charSize);
+	for (i = 0; i < l; ++i) iBs.read(&temp[i], sizeof(std::string::value_type));
 	m_logo = temp;
 	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 	m_location.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_location[i], charSize);
+	for (i = 0; i < l; ++i) iBs.read(&m_location[i], sizeof(std::string::value_type));
 	// version 2
 	if (save_version > 1) {
 		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
 		m_rules.resize(l);
-		for (i = 0; i < l; ++i) iBs.read(&m_rules[i], charSize);
+		for (i = 0; i < l; ++i) iBs.read(&m_rules[i], sizeof(std::string::value_type));
 	}
 	// version 3
 	if (save_version > 2 && save_version < 4) {//----UNCOVER----
-		string srules;//----UNCOVER----
+		std::string srules;//----UNCOVER----
 		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));//----UNCOVER----
 		srules.resize(l);//----UNCOVER----
-		for (i = 0; i < l; ++i) iBs.read(&srules[i], charSize);//----UNCOVER----
+		for (i = 0; i < l; ++i) iBs.read(&srules[i], sizeof(std::string::value_type));//----UNCOVER----
 	}//----UNCOVER----
 	// version 1
 	rounds_type::size_type lv = 0;
 	iBs.read(reinterpret_cast<char*>(&lv), sizeof(lv));
 	m_gameRounds.resize(lv);
 	for (rounds_type::size_type iv = 0; iv < lv; ++iv) m_gameRounds[iv].read(iBs, save_version);
-	spdlog::info("Event lu et contenant {} parties", lv);
+	log_info("Event lu et contenant {} parties", lv);
 	iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
 	iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
-	spdlog::info("Event in state: {}", getStateString());
+	log_info("Event in state: {}", getStateString());
 }
 
 void Event::write(std::ostream& oBs) const {
-	oBs.write(reinterpret_cast<const char*>(&currentSaveVersion), sizeof(uint16_t));
+	oBs.write(reinterpret_cast<const char*>(&g_currentSaveVersion), sizeof(uint16_t));
 	oBs.write(reinterpret_cast<const char*>(&m_status), sizeof(m_status));
-	sizeType l = 0;
-	sizeType i = 0;
+	std::string::size_type l = 0;
+	std::string::size_type i = 0;
 	l = m_organizerName.size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_organizerName[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_organizerName[i], sizeof(std::string::value_type));
 	l = m_organizerLogo.string().size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_organizerLogo.string()[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_organizerLogo.string()[i], sizeof(std::string::value_type));
 	l = m_name.size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_name[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_name[i], sizeof(std::string::value_type));
 	l = m_logo.string().size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_logo.string()[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_logo.string()[i], sizeof(std::string::value_type));
 	l = m_location.size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_location[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_location[i], sizeof(std::string::value_type));
 	// version >= 2
 	l = m_rules.size();
 	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_rules[i], charSize);
+	for (i = 0; i < l; ++i) oBs.write(&m_rules[i], sizeof(std::string::value_type));
 	// version >= 1
 	rounds_type::size_type lv = 0;
 	lv = m_gameRounds.size();
@@ -145,14 +146,14 @@ void Event::fromYaml(const YAML::Node& iNode) {
 	}
 }
 
-void Event::exportJSON(const path& iFile) const {
+void Event::exportJSON(const std::filesystem::path& iFile) const {
 	std::ofstream file_save;
 	file_save.open(iFile, std::ios::out | std::ios::binary);
 	file_save << std::setw(4) << toJson();
 	file_save.close();
 }
 
-void Event::importJSON(const path& iFile) {
+void Event::importJSON(const std::filesystem::path& iFile) {
 	std::ifstream file_read;
 	file_read.open(iFile, std::ios::in | std::ios::binary);
 	Json::Value j;
@@ -161,7 +162,7 @@ void Event::importJSON(const path& iFile) {
 	file_read.close();
 }
 
-void Event::exportYaml(const path& iFile) const {
+void Event::exportYaml(const std::filesystem::path& iFile) const {
 	YAML::Emitter out;
 	out << toYaml();
 	std::ofstream fileOut(iFile);
@@ -169,7 +170,7 @@ void Event::exportYaml(const path& iFile) const {
 	fileOut.close();
 }
 
-void Event::importYaml(const path& iFile) {
+void Event::importYaml(const std::filesystem::path& iFile) {
 	const YAML::Node data = YAML::LoadFile(iFile.string());
 	fromYaml(data);
 }
@@ -215,7 +216,7 @@ void Event::setLocation(const std::string& iLocation) {
 	checkValidConfig();
 }
 
-void Event::setLogo(const path& iLogo) {
+void Event::setLogo(const std::filesystem::path& iLogo) {
 	if (!isEditable())
 		return;
 	if (iLogo.empty() || iLogo.is_relative() || m_basePath.empty())
@@ -225,7 +226,7 @@ void Event::setLogo(const path& iLogo) {
 	checkValidConfig();
 }
 
-void Event::setOrganizerLogo(const path& iLogo) {
+void Event::setOrganizerLogo(const std::filesystem::path& iLogo) {
 	if (!isEditable())
 		return;
 	if (iLogo.empty() || iLogo.is_relative() || m_basePath.empty())
@@ -235,9 +236,9 @@ void Event::setOrganizerLogo(const path& iLogo) {
 	checkValidConfig();
 }
 
-void Event::setBasePath(const path& iBasePath) {
-	const path t_logo = getLogoFull();
-	const path t_org_logo = getOrganizerLogoFull();
+void Event::setBasePath(const std::filesystem::path& iBasePath) {
+	const std::filesystem::path t_logo = getLogoFull();
+	const std::filesystem::path t_org_logo = getOrganizerLogoFull();
 	if (is_directory(iBasePath))
 		m_basePath = iBasePath;
 	else
@@ -252,7 +253,7 @@ void Event::setBasePath(const path& iBasePath) {
 		m_organizerLogo = relative(t_org_logo, m_basePath);
 }
 
-void Event::setRules(const string& iNewRules) {
+void Event::setRules(const std::string& iNewRules) {
 	if (!isEditable())
 		return;
 	m_rules = iNewRules;
@@ -344,14 +345,14 @@ void Event::nextState() {
 	if (status_save != m_status)
 		m_changed = true;
 	if (m_changed)
-		spdlog::info("Event switching to {}", getStateString());
+		log_info("Event switching to {}", getStateString());
 	else
-		spdlog::info("Event stay in {}", getStateString());
+		log_info("Event stay in {}", getStateString());
 }
 //NOLINTEND(misc-no-recursion)
 
-auto Event::getStateString() const -> string {
-	string result = std::format("Event {}", getStatusStr());
+auto Event::getStateString() const -> std::string {
+	std::string result = std::format("Event {}", getStatusStr());
 	if (m_status == Status::GameRunning) {
 		const auto sub = getCurrentCGameRound();
 		result += std::format(" - {}", sub->getStateString());
