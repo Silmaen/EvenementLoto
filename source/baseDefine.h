@@ -16,15 +16,6 @@
  */
 namespace evl {
 
-/// Version des sauvegardes.
-constexpr uint16_t g_currentSaveVersion = 6;
-
-/// Variable qui va contenir le chemin vers ce programme
-static std::filesystem::path g_baseExecPath;
-
-/// Indique si on utilise ImGui ou Qt pour l'interface.
-static bool g_useImGui = false;
-
 #ifndef EVL_AUTHOR
 #define EVL_AUTHOR "Damien Lachouette"
 #endif

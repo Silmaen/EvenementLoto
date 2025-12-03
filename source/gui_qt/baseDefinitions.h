@@ -10,6 +10,7 @@
 #include "../baseDefine.h"
 #include <QCoreApplication>
 #include <QString>
+#include <core/utilities.h>
 
 /**
  * @brief Namespace des fonctions d’affichage.
@@ -23,7 +24,7 @@ inline std::filesystem::path iniFile = "config.ini";
  * @brief Construit le chemin vers le fichier de configuration initiale
  * @return Le chemin complet vers le fichier de configuration.
  */
-inline auto getIniFile() -> std::filesystem::path { return g_baseExecPath / iniFile; }
+inline auto getIniFile() -> std::filesystem::path { return core::getExecPath() / iniFile; }
 
 // forward declarations
 class MainWindow;

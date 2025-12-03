@@ -9,4 +9,4 @@
 #include "gui_qt/baseDefinitions.h"
 #include <gtest/gtest.h>
 
-TEST(baseDefinitions, configfile) { EXPECT_EQ(evl::gui::getIniFile(), evl::gui::iniFile); }
+TEST(baseDefinitions, configfile) { EXPECT_EQ(evl::gui::getIniFile().filename(), evl::gui::iniFile); }

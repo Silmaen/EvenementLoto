@@ -9,6 +9,7 @@
 #pragma once
 
 #include "core/Log.h"
+#include "core/utilities.h"
 #include <filesystem>
 #include <gtest/gtest.h>
 

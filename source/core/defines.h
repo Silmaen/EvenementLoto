@@ -13,13 +13,13 @@
 #if defined(__clang__) && defined(_MSC_VER)
 #define EVL_COMPILER clang_cl
 #define EVL_COMPILER_CLANG_CL
-#elif defined(__clang__)
+#elifdef __clang__
 #define EVL_COMPILER clang
 #define EVL_COMPILER_CLANG
-#elif defined(_MSC_VER)
+#elifdef _MSC_VER
 #define EVL_COMPILER msvc
 #define EVL_COMPILER_MSVC
-#elif defined(__GNUC__)
+#elifdef __GNUC__
 #define EVL_COMPILER gcc
 #define EVL_COMPILER_GCC
 #else
@@ -39,7 +39,7 @@
 #define EVL_DO_PRAGMA(arg)
 #endif
 
-#if defined(EVL_COMPILER_CLANG)
+#ifdef EVL_COMPILER_CLANG
 #define EVL_DIAG_POP EVL_DO_PRAGMA(clang diagnostic pop)
 #define EVL_DIAG_PUSH EVL_DO_PRAGMA(clang diagnostic push)
 #define EVL_DIAG_DISABLE_CLANG(diag) EVL_DO_PRAGMA(clang diagnostic ignored diag)
@@ -86,7 +86,7 @@
 #define EVL_DIAG_DISABLE_GCC(diag)
 #define EVL_DIAG_DISABLE_CLANG_CL(diag)
 #define EVL_DIAG_DISABLE_MSVC(diag)
-#elif defined(EVL_COMPILER_GCC)
+#elifdef EVL_COMPILER_GCC
 #define EVL_DIAG_POP EVL_DO_PRAGMA(GCC diagnostic pop)
 #define EVL_DIAG_PUSH EVL_DO_PRAGMA(GCC diagnostic push)
 #define EVL_DIAG_DISABLE_CLANG(diag)
@@ -101,7 +101,7 @@
 #define EVL_DIAG_DISABLE_GCC(diag) EVL_DO_PRAGMA(GCC diagnostic ignored diag)
 #define EVL_DIAG_DISABLE_CLANG_CL(diag)
 #define EVL_DIAG_DISABLE_MSVC(diag)
-#elif defined(EVL_COMPILER_CLANG_CL)
+#elifdef EVL_COMPILER_CLANG_CL
 #define EVL_DIAG_POP
 #define EVL_DIAG_PUSH
 #define EVL_DIAG_DISABLE_CLANG(diag)
@@ -116,7 +116,7 @@
 #define EVL_DIAG_DISABLE_CLANG22(diag)
 #define EVL_DIAG_DISABLE_CLANG23(diag)
 #define EVL_DIAG_DISABLE_MSVC(diag)
-#elif defined(EVL_COMPILER_MSVC)
+#elifdef EVL_COMPILER_MSVC
 #define EVL_DIAG_POP EVL_DO_PRAGMA(warning(pop))
 #define EVL_DIAG_PUSH EVL_DO_PRAGMA(warning(push))
 #define EVL_DIAG_DISABLE_CLANG(diag)

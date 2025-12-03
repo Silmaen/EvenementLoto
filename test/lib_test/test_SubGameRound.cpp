@@ -8,6 +8,7 @@
 
 #include "core/SubGameRound.h"
 
+#include <core/utilities.h>
 #include <fstream>
 
 using namespace evl::core;
@@ -75,7 +76,7 @@ TEST(SubGameRound, serialize) {
 	SubGameRound partie2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	partie2.read(fileRead, evl::g_currentSaveVersion);
+	partie2.read(fileRead, getSaveVersion());
 	fileRead.close();
 
 	EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);

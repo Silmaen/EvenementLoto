@@ -9,8 +9,11 @@
 
 auto main(int iArgc, char** iArgv) -> int {
 	evl::Log::init(g_logLv);
+	evl::core::initializeUtilities(iArgc, iArgv);
+	evl::core::mergeDefaultSettings();
 	::testing::InitGoogleTest(&iArgc, iArgv);
 	const auto ret = RUN_ALL_TESTS();
+	evl::core::leaveSettings();
 	evl::Log::invalidate();
 	return ret;
 }

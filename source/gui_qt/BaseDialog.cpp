@@ -19,7 +19,7 @@ std::filesystem::path openFile(const FileTypes& type, const bool exist) {
 	QSettings settings;
 	QString lastDir = settings.value("dialog/last_dir", "").toString();
 	if (lastDir.isEmpty()) {
-		lastDir = settings.value("path/data_path", QString::fromStdString(g_baseExecPath.string())).toString();
+		lastDir = settings.value("path/data_path", QString::fromStdString(core::getExecPath().string())).toString();
 	}
 	QFileDialog dia;
 	if (exist) {

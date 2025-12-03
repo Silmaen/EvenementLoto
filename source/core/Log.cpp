@@ -12,6 +12,7 @@
 
 #include "baseDefine.h"
 #include "external/spdlog.h"
+#include "utilities.h"
 EVL_DIAG_PUSH
 EVL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 EVL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
@@ -46,7 +47,7 @@ std::shared_ptr<spdlog::logger> g_logger;
 
 }// namespace
 
-auto getLogPath() -> std::filesystem::path { return g_baseExecPath / "exec.log"; }
+auto getLogPath() -> std::filesystem::path { return core::getExecPath() / "exec.log"; }
 
 Log::Level Log::m_verbosity = Level::Trace;
 

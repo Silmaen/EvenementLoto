@@ -10,6 +10,7 @@
 #include "Event.h"
 
 #include "Log.h"
+#include "utilities.h"
 
 namespace evl::core {
 
@@ -34,8 +35,8 @@ auto Event::getStatusStr() const -> std::string { return g_statusConvert.at(m_st
 void Event::read(std::istream& iBs, int) {
 	uint16_t save_version = 0;
 	iBs.read(reinterpret_cast<char*>(&save_version), sizeof(uint16_t));
-	log_debug("Version des données du stream: {}, version courante: {}", save_version, g_currentSaveVersion);
-	if (save_version > g_currentSaveVersion)
+	log_debug("Version des données du stream: {}, version courante: {}", save_version, getSaveVersion());
+	if (save_version > getSaveVersion())
 		return;// incompatible
 	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
 	std::string::size_type l = 0;
@@ -83,7 +84,8 @@ void Event::read(std::istream& iBs, int) {
 }
 
 void Event::write(std::ostream& oBs) const {
-	oBs.write(reinterpret_cast<const char*>(&g_currentSaveVersion), sizeof(uint16_t));
+	const auto vers = getSaveVersion();
+	oBs.write(reinterpret_cast<const char*>(&vers), sizeof(uint16_t));
 	oBs.write(reinterpret_cast<const char*>(&m_status), sizeof(m_status));
 	std::string::size_type l = 0;
 	std::string::size_type i = 0;

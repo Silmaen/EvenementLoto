@@ -8,6 +8,7 @@
 
 #include "core/GameRound.h"
 
+#include <core/utilities.h>
 #include <fstream>
 
 namespace fs = std::filesystem;
@@ -197,7 +198,7 @@ TEST(GameRound, serialize) {
 	GameRound gr2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	gr2.read(fileRead, evl::g_currentSaveVersion);
+	gr2.read(fileRead, getSaveVersion());
 	fileRead.close();
 
 	EXPECT_EQ(gr2.getType(), GameRound::Type::Enfant);

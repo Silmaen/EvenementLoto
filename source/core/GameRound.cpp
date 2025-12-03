@@ -11,6 +11,7 @@
 
 #include "Log.h"
 #include "StringUtils.h"
+#include "utilities.h"
 
 namespace evl::core {
 
@@ -153,7 +154,7 @@ void GameRound::addWinner(const std::string& iWinner) {
 
 // ---- Serialisation ----
 void GameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, g_currentSaveVersion))
+	if (std::cmp_greater(iFileVersion, getSaveVersion()))
 		return;
 	if (iFileVersion < 3)//----UNCOVER----
 		m_id = 0;//----UNCOVER----

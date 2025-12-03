@@ -8,6 +8,7 @@
 
 #include "core/Event.h"
 
+#include <core/utilities.h>
 #include <fstream>
 
 using namespace evl::core;
@@ -144,7 +145,7 @@ TEST(Event, Serialize) {
 	Event evt2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	evt2.read(fileRead, evl::g_currentSaveVersion);
+	evt2.read(fileRead, getSaveVersion());
 	fileRead.close();
 
 	EXPECT_EQ(evt2.getName(), evt.getName());

@@ -10,6 +10,7 @@
 #include "SubGameRound.h"
 
 #include "Log.h"
+#include "utilities.h"
 
 #include <utility>
 
@@ -73,7 +74,7 @@ void SubGameRound::nextStatus() {
 }
 
 void SubGameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, g_currentSaveVersion))
+	if (std::cmp_greater(iFileVersion, getSaveVersion()))
 		return;
 	iBs.read(reinterpret_cast<char*>(&m_type), sizeof(Type));
 	if (iFileVersion >= 4) {
