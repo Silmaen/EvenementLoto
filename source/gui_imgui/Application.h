@@ -7,13 +7,15 @@
  */
 
 #pragma once
+#include "Window.h"
+#include <core/Event.h>
 
 namespace evl::gui_imgui {
 
 /**
  * @brief Class Application.
  */
-class Application {
+class Application final {
 public:
 	/**
 	 * @brief Default constructor.
@@ -22,30 +24,76 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	virtual ~Application();
+	~Application();
+
+	Application(const Application&) = delete;
+	Application(Application&&) = delete;
+	auto operator=(const Application&) -> Application& = delete;
+	auto operator=(Application&&) -> Application& = delete;
+
 	/**
-	 * @brief Default copy constructor.
+	 * @brief Access to Application instance.
+	 * @return Single instance of application.
 	 */
-	Application(const Application&) = default;
+	static auto get() -> Application& { return *m_instance; }
+
 	/**
-	 * @brief Default move constructor.
+	 * @brief Only check for app existence.
+	 * @return True if application is instanced.
 	 */
-	Application(Application&&) = default;
+	static auto instanced() -> bool { return m_instance != nullptr; }
+
 	/**
-	 * @brief Default copy affectation operator.
+	 * @brief Request the application to terminate.
 	 */
-	auto operator=(const Application&) -> Application& = default;
+	void close();
+
 	/**
-	 * @brief Default move affectation operator.
+	 * @brief Request the application to terminate.
 	 */
-	auto operator=(Application&&) -> Application& = default;
+	static void invalidate();
 
 	/**
 	 * @brief Run the application.
 	 */
 	void run();
 
+	/**
+	 * @brief State of the application.
+	 */
+	enum struct State : uint8_t {
+		Created,/// Application just created.
+		Running,/// Application is running.
+		Stopped,/// Application Stopped.
+		Error/// Application in error.
+	};
+
+	/**
+	 * @brief Get the application's state.
+	 * @return The current application's state.
+	 */
+	[[nodiscard]] auto getState() const -> const State& { return m_state; }
+
+	/**
+	 * @brief Report an error and stop the application.
+	 * @param[in] iErrorMessage The error message.
+	 */
+	void reportError(const std::string& iErrorMessage);
+
+	/**
+	 * @brief Report that all windows have been closed.
+	 */
+	void reportClose();
+
 private:
+	/// The event being managed.
+	core::Event m_event;
+	/// The application Instance.
+	static Application* m_instance;
+	/// The current state of the application.
+	State m_state = State::Created;
+	/// The list of windows.
+	std::vector<std::shared_ptr<Window>> m_windows;
 };
 
 auto createApplication(int iArgc, char* iArgv[]) -> std::shared_ptr<Application>;

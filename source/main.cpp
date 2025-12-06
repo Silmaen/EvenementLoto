@@ -27,13 +27,20 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	evl::core::initializeUtilities(iArgc, iArgv);
 	evl::core::loadSettings();
 	evl::core::mergeDefaultSettings();
-	evl::g_baseExecPath = absolute(path(iArgv[0])).parent_path();
+	const auto settings = evl::core::getSettings();
+	if (!settings->getValue<std::string>("general/log_level", "").empty()) {
+		const auto loglevel = settings->getValue<std::string>("general/log_level", 	std::string(magic_enum::enum_name(evl::Log::getVerbosityLevel())));
+		if (const auto val = magic_enum::enum_cast<evl::Log::Level>(loglevel); val.has_value()) {
+			evl::Log::setVerbosityLevel(val.value());
+		}
+	}
+	settings->setValue("general/log_level",std::string(magic_enum::enum_name(evl::Log::getVerbosityLevel())));
 	log_info("---------------------------------------------------------------------------------------");
 	log_info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION,
 			 evl::EVL_AUTHOR_STR);
-	log_info("Chemin d'exécution : {}", evl::g_baseExecPath.string());
+	log_info("Chemin d'exécution : {}", evl::core::getExecPath().string());
 	int ret = 0;
-	auto settings = evl::core::getSettings();
+
 	if (settings->getValue<bool>("general/use_imgui", false)) {
 		log_info("Utilisation de l'interface ImGui");
 		// Startup

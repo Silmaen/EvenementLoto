@@ -66,33 +66,42 @@ public:
 	 * @brief Log a message for the core.
 	 * @tparam Args Template parameters for format arguments.
 	 * @param iLevel Verbosity level.
+	 * @param iFile The file name of the log call.
+	 * @param iLine The line number of the log call.
 	 * @param iFmt Format string.
 	 * @param iArgs Format arguments.
 	 */
 	template<typename... Args>
-	static void log(const Level& iLevel, std::format_string<Args...> iFmt, Args&&... iArgs) {
-		log(iLevel, std::format(iFmt, std::forward<Args>(iArgs)...));
+	static void log(const Level& iLevel, const char* iFile, int iLine, std::format_string<Args...> iFmt, Args&&... iArgs) {
+		log(iLevel,iFile,iLine, std::format(iFmt, std::forward<Args>(iArgs)...));
 	}
 
 	/**
 	 * @brief Log a message for the core.
 	 * @param iLevel Verbosity level.
+	 * @param iFile The file name of the log call.
+	 * @param iLine The line number of the log call.
 	 * @param iMsg Message to log.
 	 */
-	static void log(const Level& iLevel, const std::string_view& iMsg);
+	static void log(const Level& iLevel, const char* iFile, int iLine, const std::string_view& iMsg);
 
 private:
 	/// The level of verbosity.
 	static Level m_verbosity;
+
+	/**
+	 * @brief Define the log pattern according to the verbosity.
+	 */
+	static void setPattern();
 };
 
 
 }// namespace evl
 
-#define log_trace(...) ::evl::Log::log(::evl::Log::Level::Trace, __VA_ARGS__)
-#define log_debug(...) ::evl::Log::log(::evl::Log::Level::Debug, __VA_ARGS__)
-#define log_info(...) ::evl::Log::log(::evl::Log::Level::Info, __VA_ARGS__)
-#define log_warn(...) ::evl::Log::log(::evl::Log::Level::Warning, __VA_ARGS__)
-#define log_warning(...) ::evl::Log::log(::evl::Log::Level::Warning, __VA_ARGS__)
-#define log_error(...) ::evl::Log::log(::evl::Log::Level::Error, __VA_ARGS__)
-#define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical, __VA_ARGS__)
+#define log_trace(...) ::evl::Log::log(::evl::Log::Level::Trace,__FILE__, __LINE__, __VA_ARGS__)
+#define log_debug(...) ::evl::Log::log(::evl::Log::Level::Debug,__FILE__, __LINE__, __VA_ARGS__)
+#define log_info(...) ::evl::Log::log(::evl::Log::Level::Info,__FILE__, __LINE__, __VA_ARGS__)
+#define log_warn(...) ::evl::Log::log(::evl::Log::Level::Warning,__FILE__, __LINE__, __VA_ARGS__)
+#define log_warning(...) ::evl::Log::log(::evl::Log::Level::Warning,__FILE__, __LINE__, __VA_ARGS__)
+#define log_error(...) ::evl::Log::log(::evl::Log::Level::Error,__FILE__, __LINE__, __VA_ARGS__)
+#define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical,__FILE__, __LINE__, __VA_ARGS__)
