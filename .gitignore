@@ -31,7 +31,6 @@
 *.out
 *.app
 
-.idea
 output*
 documentation/build
 CMakeUserPresets.json

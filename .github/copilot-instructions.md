@@ -19,13 +19,11 @@
 
 - Prefer `const` for immutable variables
 - Initialize variables at declaration
-- Use `shared<T>` instead of `std::shared_ptr<T>`
-- Use `mkShared<T>()` instead of `std::make_shared<T>()`
 - Use early returns to reduce nesting
 - Use trailing return type syntax for non-void functions
 
 ## Error Handling
 
-- Use `OWL_CORE_ERROR` for errors
-- Use `OWL_CORE_WARN` for warnings
-- Use `OWL_CORE_INFO` for info messages
+- Use `EVL_ERROR` for errors
+- Use `EVL_WARN` for warnings
+- Use `EVL_INFO` for info messages
