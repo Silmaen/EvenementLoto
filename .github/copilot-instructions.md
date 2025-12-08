@@ -24,6 +24,11 @@
 
 ## Error Handling
 
-- Use `EVL_ERROR` for errors
-- Use `EVL_WARN` for warnings
-- Use `EVL_INFO` for info messages
+- Use `log_error` for errors
+- Use `log_warn` for warnings
+- Use `log_info` for info messages
+
+## Function Documentation
+
+- Use Doxygen style comments
+- Include brief description, parameters, and return values

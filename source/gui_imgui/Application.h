@@ -1,14 +1,19 @@
 /**
  * @file Application.h
  * @author Silmaen
- * @date 02/12/2025
+ * @date 07/12/2025
  * Copyright © 2025 All rights reserved.
  * All modification must get authorization from the author.
  */
 
 #pragma once
-#include "Window.h"
-#include <core/Event.h>
+
+#include "MainWindow.h"
+#include "views/View.h"
+
+#include <array>
+#include <list>
+#include <memory>
 
 namespace evl::gui_imgui {
 
@@ -24,7 +29,7 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	~Application();
+	virtual ~Application();
 
 	Application(const Application&) = delete;
 	Application(Application&&) = delete;
@@ -44,56 +49,67 @@ public:
 	static auto instanced() -> bool { return m_instance != nullptr; }
 
 	/**
-	 * @brief Request the application to terminate.
+	 * @brief Application states.
 	 */
-	void close();
-
-	/**
-	 * @brief Request the application to terminate.
-	 */
-	static void invalidate();
-
-	/**
-	 * @brief Run the application.
-	 */
-	void run();
-
-	/**
-	 * @brief State of the application.
-	 */
-	enum struct State : uint8_t {
-		Created,/// Application just created.
-		Running,/// Application is running.
-		Stopped,/// Application Stopped.
-		Error/// Application in error.
+	enum class State : uint8_t {
+		Created,///< The application is created.
+		Running,///< The application is running.
+		Waiting,///< The application is waiting.
+		Closed,///< The application is closed.
+		Error,///< The application is in error state.
 	};
 
 	/**
-	 * @brief Get the application's state.
-	 * @return The current application's state.
+	 * @brief Get the application state.
+	 * @return The current state.
 	 */
-	[[nodiscard]] auto getState() const -> const State& { return m_state; }
+	[[nodiscard]]
+	auto getState() const -> const State& {
+		return m_state;
+	}
+
+	void run();
 
 	/**
-	 * @brief Report an error and stop the application.
-	 * @param[in] iErrorMessage The error message.
+	 * @brief Request Error report.
+	 * @param[in] iMessage The error message.
 	 */
-	void reportError(const std::string& iErrorMessage);
+	void reportError(const std::string& iMessage);
+
+	void setWaiting() {
+		if (m_state == State::Running)
+			m_state = State::Waiting;
+	}
+	void setRunning() {
+		if (m_state == State::Waiting)
+			m_state = State::Running;
+	}
 
 	/**
-	 * @brief Report that all windows have been closed.
+	 * @brief Get the application theme.
+	 * @return The current theme.
 	 */
-	void reportClose();
+	[[nodiscard]] auto getTheme() const -> const Theme&;
+	/**
+	 * @brief Set the application theme.
+	 * @param[in] iTheme The new theme.
+	 */
+	void setTheme(const Theme& iTheme);
 
 private:
-	/// The event being managed.
-	core::Event m_event;
 	/// The application Instance.
 	static Application* m_instance;
-	/// The current state of the application.
+	/// The application state.
 	State m_state = State::Created;
-	/// The list of windows.
-	std::vector<std::shared_ptr<Window>> m_windows;
+	/// The main window.
+	MainWindow m_mainWindow;
+	//// The views list.
+	std::list<std::shared_ptr<views::View>> m_views;
+	/// The clear color.
+	const math::vec4 m_clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
+
+	/// The application theme.
+	Theme m_theme;
 };
 
 auto createApplication(int iArgc, char* iArgv[]) -> std::shared_ptr<Application>;

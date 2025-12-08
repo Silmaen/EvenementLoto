@@ -9,6 +9,8 @@
 
 #include "Settings.h"
 #include "core/Log.h"
+#include "core/maths/vectors.h"
+
 #include <fstream>
 #include <yaml-cpp/yaml.h>
 
@@ -22,7 +24,6 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 	try {
 		const YAML::Node root = YAML::LoadFile(iPath.string());
 
-		// Recursive lambda to flatten YAML hierarchy
 		std::function<void(const YAML::Node&, const std::string&)> flattenNode;
 		flattenNode = [&](const YAML::Node& iNode, const std::string& iPrefix) -> void {
 			if (iNode.IsMap()) {
@@ -32,8 +33,22 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 													: std::format("{}/{}", iPrefix, pair.first.as<std::string>());
 					flattenNode(pair.second, key);
 				}
+			} else if (iNode.IsSequence()) {
+				// Handle vectors
+				if (const size_t size = iNode.size(); size >= 2 && size <= 4) {
+					try {
+						if (size == 2) {
+							m_data[iPrefix] = math::vec2{iNode[0].as<float>(), iNode[1].as<float>()};
+						} else if (size == 3) {
+							m_data[iPrefix] =
+									math::vec3{iNode[0].as<float>(), iNode[1].as<float>(), iNode[2].as<float>()};
+						} else if (size == 4) {
+							m_data[iPrefix] = math::vec4{iNode[0].as<float>(), iNode[1].as<float>(),
+														 iNode[2].as<float>(), iNode[3].as<float>()};
+						}
+					} catch (...) { log_warn("Failed to parse vector at key '{}'", iPrefix); }
+				}
 			} else if (iNode.IsScalar()) {
-				// Try to parse as different types
 				try {
 					m_data[iPrefix] = iNode.as<bool>();
 				} catch (...) {
@@ -41,8 +56,12 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 						m_data[iPrefix] = iNode.as<int>();
 					} catch (...) {
 						try {
-							m_data[iPrefix] = iNode.as<double>();
-						} catch (...) { m_data[iPrefix] = iNode.as<std::string>(); }
+							m_data[iPrefix] = iNode.as<float>();
+						} catch (...) {
+							try {
+								m_data[iPrefix] = iNode.as<double>();
+							} catch (...) { m_data[iPrefix] = iNode.as<std::string>(); }
+						}
 					}
 				}
 			}
@@ -54,7 +73,6 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 }
 
 void Settings::toFile(const std::filesystem::path& iPath) const {
-	// Group keys by hierarchy
 	std::map<std::string, std::map<std::string, std::any>> hierarchy;
 
 	for (const auto& [key, value]: m_data) {
@@ -65,7 +83,6 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 			const std::string finalKey = key.substr(lastSlash + 1);
 			hierarchy[prefix][finalKey] = value;
 
-			// Add intermediate levels
 			std::string currentPrefix;
 			size_t pos = 0;
 			while ((pos = prefix.find('/', pos)) != std::string::npos) {
@@ -74,14 +91,13 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 						prefix.substr(currentPrefix.empty() ? 0 : currentPrefix.length() + 1,
 									  pos - (currentPrefix.empty() ? 0 : currentPrefix.length() + 1));
 				if (!hierarchy[parentPrefix].contains(levelKey)) {
-					hierarchy[parentPrefix][levelKey] = std::any{};// Empty placeholder
+					hierarchy[parentPrefix][levelKey] = std::any{};
 				}
 
 				currentPrefix = prefix.substr(0, pos);
 				++pos;
 			}
 
-			// Add final intermediate level
 			const std::string parentPrefix = currentPrefix;
 			if (const std::string levelKey = prefix.substr(currentPrefix.empty() ? 0 : currentPrefix.length() + 1);
 				!hierarchy[parentPrefix].contains(levelKey)) {
@@ -90,7 +106,6 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 		}
 	}
 
-	// Build YAML output
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 
@@ -100,8 +115,6 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 			out << YAML::Key << key;
 
 			const std::string fullKey = iPrefix.empty() ? key : std::format("{}/{}", iPrefix, key);
-
-			// Check if this key has children by looking in m_data
 			const std::string childPrefix = std::format("{}/", fullKey);
 			const bool hasChildren = std::ranges::any_of(
 					m_data, [&childPrefix](const auto& iPair) -> bool { return iPair.first.starts_with(childPrefix); });
@@ -116,6 +129,13 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 					out << std::any_cast<bool>(value);
 				} else if (value.type() == typeid(int)) {
 					out << std::any_cast<int>(value);
+				} else if (value.type() == typeid(float)) {
+					const auto fValue = std::any_cast<float>(value);
+					std::string formatted = std::format("{}", fValue);
+					if (!formatted.contains('.') && !formatted.contains('e')) {
+						formatted = std::format("{}.0", formatted);
+					}
+					out << formatted;
 				} else if (value.type() == typeid(double)) {
 					const auto dValue = std::any_cast<double>(value);
 					std::string formatted = std::format("{}", dValue);
@@ -125,6 +145,15 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 					out << formatted;
 				} else if (value.type() == typeid(std::string)) {
 					out << std::any_cast<std::string>(value);
+				} else if (value.type() == typeid(math::vec2)) {
+					const auto vec = std::any_cast<math::vec2>(value);
+					out << YAML::Flow << YAML::BeginSeq << vec.x() << vec.y() << YAML::EndSeq;
+				} else if (value.type() == typeid(math::vec3)) {
+					const auto vec = std::any_cast<math::vec3>(value);
+					out << YAML::Flow << YAML::BeginSeq << vec.x() << vec.y() << vec.z() << YAML::EndSeq;
+				} else if (value.type() == typeid(math::vec4)) {
+					const auto vec = std::any_cast<math::vec4>(value);
+					out << YAML::Flow << YAML::BeginSeq << vec.x() << vec.y() << vec.z() << vec.w() << YAML::EndSeq;
 				}
 			}
 		}

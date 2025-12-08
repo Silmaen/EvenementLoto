@@ -64,6 +64,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
             -Wno-global-constructors
+            -Wno-unused-macros
     )
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 17)
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
@@ -148,3 +149,4 @@ else ()
 endif ()
 
 include(cmake/DocumentationConfig.cmake)
+include(cmake/Vulkan.cmake)

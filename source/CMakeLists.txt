@@ -95,7 +95,7 @@ message(STATUS "Found glfw3: ${glfw3_DIR} (found version: ${glfw3_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE glfw)
 #  ImGUI UI Library
 #
-
+target_link_vulkan(${CMAKE_PROJECT_NAME}_ui_imgui PUBLIC)
 #
 # ----==== Main Executable ====----
 #

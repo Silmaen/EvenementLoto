@@ -21,6 +21,9 @@ packages:
   spdlog:
     version: 1.16.0
     kind: "static"
+  vulkan_sdk:
+    version: 1.4.328
+    kind: "shared"
   yaml-cpp:
     version: 0.8.0
     kind: "static"

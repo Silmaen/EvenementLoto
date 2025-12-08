@@ -1,103 +1,81 @@
 /**
  * @file Application.cpp
  * @author Silmaen
- * @date 02/12/2025
+ * @date 07/12/2025
  * Copyright © 2025 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
 
 #include "Application.h"
 
-#include "MainWindow.h"
-
-#include <GLFW/glfw3.h>
-#include <core/Log.h>
-#include <imgui.h>
+#include "baseDefine.h"
+#include "core/Log.h"
+#include "core/utilities.h"
+// #include "views/DemoView.h"
+// #include "views/FirstView.h"
+// #include "views/SecondView.h"
 
 
 namespace evl::gui_imgui {
-namespace {
-	/**
-	 * @brief GLFW error callback.
-	 * @param iError The error code.
-	 * @param iDescription The error description.
-	 */
-	void glfwErrorCallback(int iError, const char* iDescription) { log_error("GLFW Error ({}): {}", iError, iDescription); }
-}// namespace
 
 Application* Application::m_instance = nullptr;
 
 Application::Application() {
-	if (m_instance != nullptr) {
-		log_error("Application instance already exists!");
-		return;
-	}
-	log_debug("Creating Application instance");
+	log_info("Starting application.");
 	m_instance = this;
-	// initialize glfw
-	log_debug("Initializing GLFW for ImGui window");
-	if (const auto init = glfwInit(); init == GLFW_FALSE) {
-		log_error("Could not initialize GLFW ({}): {}", init, glfwGetError(nullptr));
-		reportError("");
-	}
-	glfwSetErrorCallback(glfwErrorCallback);
-
-	// create the main window
-	log_debug("Creating main window");
-	m_windows.push_back(std::make_shared<MainWindow>(MainWindow::Parameters{.title = "Evenement Loto (ImGui Version)",
-																			.width = 1044,
-																			.height = 1068,
-																			.iconPath = "",
-																			.showOnCreate = true}));
-
-	if (m_state != State::Error)
-		m_state = State::Running;
+	m_mainWindow.init({.title = std::format("Application Loto ({})", EVL_VERSION), .size = {800, 600}, .iconPath = ""});
+	if (m_state == State::Error)
+		return;
+	// Create views
+	//const auto scdV = std::make_shared<views::SecondView>();
+	//scdV->hide();
+	//const auto dmoV = std::make_shared<views::DemoView>();
+	//m_views.push_back(std::make_shared<views::FirstView>(dmoV->visibility(), scdV->visibility(), m_clear_color));
+	//m_views.push_back(scdV);
+	//m_views.push_back(dmoV);
+	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
+	setTheme(m_theme);
+	m_state = State::Running;
 }
 
 Application::~Application() {
-	log_debug("Destroying Application instance");
-	for (const auto& window: m_windows) { window->close(); }
-	m_windows.clear();
-	log_debug("Terminating GLFW for ImGui window");
-	glfwTerminate();
-	m_instance = nullptr;
-	log_debug("Application instance destroyed");
+	log_info("Shutting down application.");
+	// Cleanup
+	m_mainWindow.close();
 }
-
-void Application::close() { m_state = State::Stopped; }
-
-void Application::invalidate() { m_instance = nullptr; }
 
 void Application::run() {
-	log_info("Starting Application main loop");
-	while (m_state == State::Running) {
-		// main loop
-		glfwPollEvents();
-		// check if all windows are closed
-		std::erase_if(m_windows, [](const std::shared_ptr<Window>& iWindow) -> bool { return !iWindow->isAlive(); });
-		if (m_windows.empty()) {
-			log_info("All windows are closed, exiting main loop");
-			m_state = State::Stopped;
-			break;
+	// Main loop
+	while (m_state == State::Running || m_state == State::Waiting) {
+		if (m_mainWindow.shouldClose()) {
+			m_state = State::Closed;
+			continue;
 		}
-		// render and update all windows
-		for (const auto& window: m_windows)
-			window->onRender();
-		for (const auto& window: m_windows)
-			window->onUpdate();
+		m_mainWindow.newFrame();
+		if (m_state != State::Running)
+			continue;
+		for (const auto& view: m_views) { view->update(); }
+		m_mainWindow.render(m_theme.windowBackground);
 	}
-	log_info("Exiting Application main loop");
 }
-
-void Application::reportClose() { m_state = State::Stopped; }
 
 void Application::reportError(const std::string& iMessage) {
 	log_error("Application reported error: {}", iMessage);
 	m_state = State::Error;
 }
 
+auto Application::getTheme() const -> const Theme& { return m_theme; }
+
+void Application::setTheme(const Theme& iTheme) {
+	m_theme = iTheme;
+	m_mainWindow.setTheme(m_theme);
+	core::getSettings()->include(m_theme.saveToSettings(), "theme");
+}
+
 auto createApplication([[maybe_unused]] int iArgc, [[maybe_unused]] char* iArgv[]) -> std::shared_ptr<Application> {
 	return std::make_shared<Application>();
 }
+
 
 }// namespace evl::gui_imgui
