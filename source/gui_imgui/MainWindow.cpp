@@ -26,6 +26,10 @@
 #include "gui_imgui//fonts/Roboto-Italic.embed"
 //#include "core/fonts/Roboto-Regular.embed"// not used here
 
+#include "event/AppEvent.h"
+#include "event/KeyEvent.h"
+#include "event/MouseEvent.h"
+
 namespace evl::gui_imgui {
 
 namespace {
@@ -66,81 +70,92 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		return;
 	}
 
-	std::vector<const char*> extensions;
+	// Setup renderer
 	{
-		uint32_t extensions_count = 0;
-		const char* const* glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-		extensions.reserve(extensions_count);
-		for (uint32_t i = 0; i < extensions_count; i++) extensions.push_back(glfw_extensions[i]);
+		std::vector<const char*> extensions;
+		{
+			uint32_t extensions_count = 0;
+			const char* const* glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+			extensions.reserve(extensions_count);
+			for (uint32_t i = 0; i < extensions_count; i++) extensions.push_back(glfw_extensions[i]);
+		}
+		g_vkContext = std::make_shared<vulkan::VulkanContext>(extensions);
+		g_MainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
+
+		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool] =
+				g_vkContext->getVkData();
+		VkSurfaceKHR surface = nullptr;
+
+		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
+		vulkan::VulkanContext::checkVkResult(err);
+		// Create Framebuffers
+		int w = 0;
+		int h = 0;
+		glfwGetFramebufferSize(window, &w, &h);
+		g_MainWindowData->Surface = surface;
+		setupVulkanWindow(w, h);
 	}
-	g_vkContext = std::make_shared<vulkan::VulkanContext>(extensions);
-	g_MainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
-
-	const auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool] =
-			g_vkContext->getVkData();
-	VkSurfaceKHR surface = nullptr;
-
-	const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
-	vulkan::VulkanContext::checkVkResult(err);
-	// Create Framebuffers
-	int w = 0;
-	int h = 0;
-	glfwGetFramebufferSize(window, &w, &h);
-	g_MainWindowData->Surface = surface;
-	setupVulkanWindow(w, h);
 
 	// Setup Dear ImGui context
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;// Enable Gamepad Controls
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport
-	io.ConfigViewportsNoDecoration = true;
-	io.ConfigViewportsNoAutoMerge = false;
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;// Enable Gamepad Controls
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport
+		io.ConfigViewportsNoDecoration = true;
+		io.ConfigViewportsNoAutoMerge = false;
 
-	// Setup scaling
-	ImGuiStyle& style = ImGui::GetStyle();
-	style.ScaleAllSizes(
-			main_scale);// Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
-	style.FontScaleDpi =
-			main_scale;// Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+		// Setup scaling
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.ScaleAllSizes(
+				main_scale);// Bake a fixed style scale. (until we have a solution for dynamic style scaling, changing this requires resetting Style + calling this again)
+		style.FontScaleDpi =
+				main_scale;// Set initial font scale. (using io.ConfigDpiScaleFonts=true makes this unnecessary. We leave both here for documentation purpose)
+	}
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForVulkan(window, true);
-	ImGui_ImplVulkan_InitInfo init_info = {.ApiVersion = VK_API_VERSION_1_4,
-										   .Instance = instance,
-										   .PhysicalDevice = physicalDevice,
-										   .Device = device,
-										   .QueueFamily = queueFamily,
-										   .Queue = queue,
-										   .DescriptorPool = descriptorPool,
-										   .DescriptorPoolSize = 0,
-										   .MinImageCount = m_minImageCount,
-										   .ImageCount = g_MainWindowData->ImageCount,
-										   .PipelineCache = pipelineCache,
-										   .PipelineInfoMain = {.RenderPass = g_MainWindowData->RenderPass,
-																.Subpass = 0,
-																.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+	{
+		ImGui_ImplGlfw_InitForVulkan(window, true);
+		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool] =
+				g_vkContext->getVkData();
+		ImGui_ImplVulkan_InitInfo init_info = {.ApiVersion = VK_API_VERSION_1_4,
+											   .Instance = instance,
+											   .PhysicalDevice = physicalDevice,
+											   .Device = device,
+											   .QueueFamily = queueFamily,
+											   .Queue = queue,
+											   .DescriptorPool = descriptorPool,
+											   .DescriptorPoolSize = 0,
+											   .MinImageCount = m_minImageCount,
+											   .ImageCount = g_MainWindowData->ImageCount,
+											   .PipelineCache = pipelineCache,
+											   .PipelineInfoMain = {.RenderPass = g_MainWindowData->RenderPass,
+																	.Subpass = 0,
+																	.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
 #ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
-																.PipelineRenderingCreateInfo = {},
+																	.PipelineRenderingCreateInfo = {},
 #endif
-																.SwapChainImageUsage = {}},
-										   .PipelineInfoForViewports = {},
-										   .UseDynamicRendering = false,
-										   .Allocator = allocator,
-										   .CheckVkResultFn = vulkan::VulkanContext::checkVkResult,
-										   .MinAllocationSize = 0,
-										   .CustomShaderVertCreateInfo = {},
-										   .CustomShaderFragCreateInfo = {}};
-	ImGui_ImplVulkan_Init(&init_info);
+																	.SwapChainImageUsage = {}},
+											   .PipelineInfoForViewports = {},
+											   .UseDynamicRendering = false,
+											   .Allocator = allocator,
+											   .CheckVkResultFn = vulkan::VulkanContext::checkVkResult,
+											   .MinAllocationSize = 0,
+											   .CustomShaderVertCreateInfo = {},
+											   .CustomShaderFragCreateInfo = {}};
+		ImGui_ImplVulkan_Init(&init_info);
+	}
 	if (Application::get().getState() == Application::State::Error)
 		return;
 
 	setTheme({});
+
+	setCallbacks();
 }
 
-void MainWindow::setupVulkanWindow(const int width, const int height) {
+void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
 	const auto vkData = g_vkContext->getVkData();
 
 	// Check for WSI support
@@ -175,8 +190,8 @@ void MainWindow::setupVulkanWindow(const int width, const int height) {
 	// Create SwapChain, RenderPass, Framebuffer, etc.
 	assert(m_minImageCount >= 2);
 	ImGui_ImplVulkanH_CreateOrResizeWindow(vkData.instance, vkData.physicalDevice, vkData.device,
-										   g_MainWindowData.get(), vkData.queueFamily, vkData.allocator, width, height,
-										   m_minImageCount, 0);
+										   g_MainWindowData.get(), vkData.queueFamily, vkData.allocator, iWidth,
+										   iHeight, m_minImageCount, 0);
 	m_windowSetupDone = true;
 }
 
@@ -186,6 +201,83 @@ void MainWindow::cleanupVulkanWindow() {
 	const auto vkData = g_vkContext->getVkData();
 	ImGui_ImplVulkanH_DestroyWindow(vkData.instance, vkData.device, g_MainWindowData.get(), vkData.allocator);
 	m_windowSetupDone = false;
+}
+
+void MainWindow::setCallbacks() {
+	auto* window = static_cast<GLFWwindow*>(m_window);
+	glfwSetWindowUserPointer(window, &m_windowData);
+	glfwSetWindowSizeCallback(window, [](GLFWwindow* iWindow, const int iWidth, const int iHeight) -> void {
+		auto* const data = static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow));
+		data->size.x() = static_cast<uint32_t>(iWidth);
+		data->size.y() = static_cast<uint32_t>(iHeight);
+
+		event::WindowResizeEvent event(data->size);
+		data->eventCallback(event);
+	});
+	glfwSetWindowCloseCallback(window, [](GLFWwindow* iWindow) -> void {
+		event::WindowCloseEvent event;
+		static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+	});
+	glfwSetKeyCallback(
+			window,
+			[](GLFWwindow* iWindow, const int iKey, [[maybe_unused]] int iScancode, const int iAction,
+			   [[maybe_unused]] int iMods) -> void {
+				const auto cKey = static_cast<KeyCode>(iKey);
+				switch (iAction) {
+					case GLFW_PRESS:
+						{
+							event::KeyPressedEvent event(cKey, 0u);
+							static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+							break;
+						}
+					case GLFW_RELEASE:
+						{
+							event::KeyReleasedEvent event(cKey);
+							static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+							break;
+						}
+					case GLFW_REPEAT:
+						{
+							event::KeyPressedEvent event(cKey, 1u);
+							static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+							break;
+						}
+					default:
+						break;
+				}
+			});
+	glfwSetCharCallback(window, [](GLFWwindow* iWindow, const unsigned int iKeycode) -> void {
+		event::KeyTypedEvent event(static_cast<KeyCode>(iKeycode));
+		static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+	});
+	glfwSetMouseButtonCallback(
+			window,
+			[](GLFWwindow* iWindow, const int iButton, const int iAction, [[maybe_unused]] const int iMods) -> void {
+				switch (iAction) {
+					case GLFW_PRESS:
+						{
+							event::MouseButtonPressedEvent event(static_cast<MouseCode>(iButton));
+							static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+							break;
+						}
+					case GLFW_RELEASE:
+						{
+							event::MouseButtonReleasedEvent event(static_cast<MouseCode>(iButton));
+							static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+							break;
+						}
+					default:
+						break;
+				}
+			});
+	glfwSetScrollCallback(window, [](GLFWwindow* iWindow, const double iXOffset, const double iYOffset) -> void {
+		event::MouseScrolledEvent event(static_cast<float>(iXOffset), static_cast<float>(iYOffset));
+		static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+	});
+	glfwSetCursorPosCallback(window, [](GLFWwindow* iWindow, const double iX, const double iY) -> void {
+		event::MouseMovedEvent event(static_cast<float>(iX), static_cast<float>(iY));
+		static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
+	});
 }
 
 void MainWindow::close() {
@@ -209,7 +301,6 @@ auto MainWindow::shouldClose() const -> bool {
 	auto* window = static_cast<GLFWwindow*>(m_window);
 	return glfwWindowShouldClose(window) != 0;
 }
-
 
 void MainWindow::newFrame() {
 	// Poll and handle events (inputs, window resize, etc.)
@@ -249,7 +340,6 @@ void MainWindow::newFrame() {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 }
-
 
 void MainWindow::render(const math::vec4& iClearColor) {
 	// Rendering
@@ -399,6 +489,65 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+}
+
+auto MainWindow::isKeyPressed(const KeyCode& iKeycode) const -> bool {
+	auto* window = static_cast<GLFWwindow*>(m_window);
+	const int state = glfwGetKey(window, static_cast<int>(iKeycode));
+	return state == GLFW_PRESS || state == GLFW_REPEAT;
+}
+
+auto MainWindow::getModifiers() const -> Modifiers {
+	return Modifiers{
+			.ctrl = isKeyPressed(KeyCode::LeftControl) || isKeyPressed(KeyCode::RightControl),
+			.shift = isKeyPressed(KeyCode::LeftShift) || isKeyPressed(KeyCode::RightShift),
+			.alt = isKeyPressed(KeyCode::LeftAlt) || isKeyPressed(KeyCode::RightAlt),
+			.altGr = isKeyPressed(KeyCode::RightAlt),
+	};
+}
+
+
+void MainWindow::onEvent(event::Event& ioEvent) {
+	// Send event to ImGui
+	std::unordered_map<event::Type, int> keyMap = {
+			{event::Type::KeyPressed, GLFW_PRESS},
+			{event::Type::KeyReleased, GLFW_RELEASE},
+			{event::Type::KeyTyped, GLFW_REPEAT},
+	};
+	if (ioEvent.isInCategory(event::Category::Keyboard)) {
+		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window),
+								   static_cast<int>(dynamic_cast<event::KeyEvent&>(ioEvent).getKeyCode()), 0,
+								   keyMap[ioEvent.getType()], 0);
+		ioEvent.handled |= true;
+		return;
+	}
+	std::unordered_map<event::Type, int> mouseButtonMap = {
+			{event::Type::MouseButtonPressed, GLFW_PRESS},
+			{event::Type::MouseButtonReleased, GLFW_RELEASE},
+	};
+	if (ioEvent.isInCategory(event::Category::Mouse)) {
+		if (ioEvent.getType() == event::Type::MouseMoved) {
+			const auto& e = dynamic_cast<event::MouseMovedEvent&>(ioEvent);
+			ImGui_ImplGlfw_CursorPosCallback(static_cast<GLFWwindow*>(m_window), static_cast<double>(e.getX()),
+											 static_cast<double>(e.getY()));
+			ioEvent.handled |= true;
+			return;
+		}
+		if (ioEvent.getType() == event::Type::MouseScrolled) {
+			const auto& e = dynamic_cast<event::MouseScrolledEvent&>(ioEvent);
+			ImGui_ImplGlfw_ScrollCallback(static_cast<GLFWwindow*>(m_window), static_cast<double>(e.getXOff()),
+										  static_cast<double>(e.getYOff()));
+			ioEvent.handled |= true;
+			return;
+		}
+		if (mouseButtonMap.contains(ioEvent.getType())) {
+			const auto& e = dynamic_cast<event::MouseButtonEvent&>(ioEvent);
+			ImGui_ImplGlfw_MouseButtonCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(e.getMouseButton()),
+											   mouseButtonMap[ioEvent.getType()], 0);
+			ioEvent.handled |= true;
+			return;
+		}
 	}
 }
 

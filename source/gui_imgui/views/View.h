@@ -7,6 +7,10 @@
  */
 
 #pragma once
+#include "gui_imgui/event/Event.h"
+
+
+#include <string>
 
 namespace evl::gui_imgui::views {
 
@@ -58,6 +62,18 @@ public:
 	 * @return Reference to visibility flag.
 	 */
 	auto visibility() -> bool& { return m_show_windows; }
+
+	/**
+	 * @brief Get the view name.
+	 * @return The view name.
+	 */
+	[[nodiscard]] virtual auto getName() const -> std::string = 0;
+
+	/**
+	 * @brief Event handler.
+	 * @param[in,out] ioEvent The Event to react.
+	 */
+	virtual void onEvent([[maybe_unused]] event::Event& ioEvent) {}
 
 private:
 	/// Show windows flag.

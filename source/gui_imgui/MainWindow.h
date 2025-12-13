@@ -11,6 +11,9 @@
 #include "Theme.h"
 
 #include "core/maths/vectors.h"
+#include "event/Event.h"
+#include "event/KeyCodes.h"
+
 #include <array>
 
 namespace evl::gui_imgui {
@@ -32,6 +35,8 @@ struct MainWindowOptions {
  */
 class MainWindow final {
 public:
+	/// Call back function's type.
+	using event_callback = std::function<void(event::Event&)>;
 	/**
 	 * @brief Default constructor.
 	 */
@@ -79,6 +84,31 @@ public:
 	 */
 	void setTheme(const Theme& iTheme);
 
+	/**
+	 * @brief Define the Event Callback function.
+	 * @param iCallback The new callback function.
+	 */
+	void setEventCallback(const event_callback& iCallback) { m_windowData.eventCallback = iCallback; }
+
+	/**
+	 * @brief Check if a key is pressed.
+	 * @param iKeycode The key code to check.
+	 * @return True if the key is pressed.
+	 */
+	[[nodiscard]] auto isKeyPressed(const KeyCode& iKeycode) const -> bool;
+
+	/**
+	 * @brief Get the current modifiers.
+	 * @return The current modifiers.
+	 */
+	[[nodiscard]] auto getModifiers() const -> Modifiers;
+
+	/**
+	 * @brief Event handler.
+	 * @param[in,out] ioEvent The Event to react.
+	 */
+	void onEvent(event::Event& ioEvent);
+
 private:
 	/// Window options.
 	MainWindowOptions m_options{};
@@ -95,9 +125,23 @@ private:
 	/// Vulkan window setup done flag.
 	bool m_windowSetupDone = false;
 	/// Setup Vulkan window.
-	void setupVulkanWindow(int width, int height);
+	void setupVulkanWindow(int iWidth, int iHeight);
 	/// Cleanup Vulkan window.
 	void cleanupVulkanWindow();
+	/// Set callbacks.
+	void setCallbacks();
+	/**
+	 * @brief Window's data.
+	 */
+	struct WindowData {
+		/// Window's size.
+		math::vec2ui size;
+		/// Event Call back.
+		event_callback eventCallback;
+	};
+
+	/// The Window's data.
+	WindowData m_windowData{};
 };
 
 }// namespace evl::gui_imgui

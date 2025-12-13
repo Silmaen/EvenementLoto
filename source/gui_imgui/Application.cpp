@@ -9,12 +9,13 @@
 
 #include "Application.h"
 
+#include "actions/FileActions.h"
+#include "actions/SettingsActions.h"
 #include "baseDefine.h"
 #include "core/Log.h"
 #include "core/utilities.h"
-// #include "views/DemoView.h"
-// #include "views/FirstView.h"
-// #include "views/SecondView.h"
+#include "event/AppEvent.h"
+#include "views/MenuBar.h"
 
 
 namespace evl::gui_imgui {
@@ -28,14 +29,27 @@ Application::Application() {
 	if (m_state == State::Error)
 		return;
 	// Create views
-	//const auto scdV = std::make_shared<views::SecondView>();
-	//scdV->hide();
-	//const auto dmoV = std::make_shared<views::DemoView>();
-	//m_views.push_back(std::make_shared<views::FirstView>(dmoV->visibility(), scdV->visibility(), m_clear_color));
-	//m_views.push_back(scdV);
-	//m_views.push_back(dmoV);
+	m_views.push_back(std::make_shared<views::MenuBar>());
+
+	// Create actions
+	m_actions.push_back(std::make_shared<actions::NewFileAction>());
+	m_actions.push_back(std::make_shared<actions::LoadFileAction>());
+	m_actions.push_back(std::make_shared<actions::SaveFileAction>());
+	m_actions.push_back(std::make_shared<actions::SaveAsFileAction>());
+	m_actions.push_back(std::make_shared<actions::StartGameAction>());
+	m_actions.push_back(std::make_shared<actions::StopGameAction>());
+	m_actions.push_back(std::make_shared<actions::PreferencesAction>());
+	m_actions.push_back(std::make_shared<actions::EventSettingsAction>());
+	m_actions.push_back(std::make_shared<actions::GameSettingsAction>());
+	m_actions.push_back(std::make_shared<actions::ThemeSettingsAction>());
+	m_actions.push_back(std::make_shared<actions::QuitAction>());
+	m_actions.back()->setShortcut({KeyCode::A, {.ctrl = true}});
+
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);
+
+	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
+
 	m_state = State::Running;
 }
 
@@ -77,5 +91,33 @@ auto createApplication([[maybe_unused]] int iArgc, [[maybe_unused]] char* iArgv[
 	return std::make_shared<Application>();
 }
 
+void Application::requestClose() { m_state = State::Closed; }
 
+void Application::onEvent(event::Event& ioEvent) {
+	event::EventDispatcher dispatcher(ioEvent);
+	dispatcher.dispatch<event::WindowCloseEvent>([this]<typename T>(T&&) -> auto {
+		requestClose();
+		return true;
+	});
+	dispatcher.dispatch<event::WindowResizeEvent>([]<typename T>(T&&) -> auto {
+		log_trace("Resize Event");
+		return true;
+	});
+	// does any action handle the event?
+	for (const auto& action: m_actions) {
+		if (ioEvent.handled)
+			return;
+		action->onEvent(ioEvent);
+	}
+	// does any view handle the event?
+	for (const auto& view: m_views) {
+		if (ioEvent.handled)
+			return;
+		view->onEvent(ioEvent);
+	}
+	m_mainWindow.onEvent(ioEvent);
+}
+
+auto Application::isKeyPressed(const KeyCode& iKeycode) const -> bool { return m_mainWindow.isKeyPressed(iKeycode); }
+auto Application::getModifiers() const -> Modifiers { return m_mainWindow.getModifiers(); }
 }// namespace evl::gui_imgui

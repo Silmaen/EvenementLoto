@@ -9,9 +9,10 @@
 #pragma once
 
 #include "MainWindow.h"
+#include "actions/Action.h"
+#include "event/KeyCodes.h"
 #include "views/View.h"
 
-#include <array>
 #include <list>
 #include <memory>
 
@@ -96,6 +97,56 @@ public:
 	 */
 	void setTheme(const Theme& iTheme);
 
+	/**
+	 * @brief Request application close.
+	 */
+	void requestClose();
+
+	/**
+	 * @brief Get a view by name.
+	 * @param iName The view name.
+	 * @return The view pointer or nullptr if not found.
+	 */
+	[[nodiscard]] auto getView(const std::string& iName) const -> std::shared_ptr<views::View> {
+		for (const auto& view: m_views) {
+			if (view->getName() == iName)
+				return view;
+		}
+		return nullptr;
+	}
+
+	/**
+	 * @brief Get an action by name.
+	 * @param iName The action name.
+	 * @return The action pointer or nullptr if not found.
+	 */
+	[[nodiscard]] auto getAction(const std::string& iName) const -> std::shared_ptr<actions::Action> {
+		for (const auto& action: m_actions) {
+			if (action->getName() == iName)
+				return action;
+		}
+		return nullptr;
+	}
+
+	/**
+	 * @brief Event handler.
+	 * @param[in,out] ioEvent The Event to react.
+	 */
+	void onEvent(event::Event& ioEvent);
+
+	/**
+	 * @brief Keyboard pressed check.
+	 * @param[in] iKeycode The Key to check.
+	 * @return True if pressed.
+	 */
+	[[nodiscard]] auto isKeyPressed(const KeyCode& iKeycode) const -> bool;
+
+	/**
+	 * @brief Get the current modifiers.
+	 * @return The current modifiers.
+	 */
+	[[nodiscard]] auto getModifiers() const -> Modifiers;
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
@@ -105,6 +156,8 @@ private:
 	MainWindow m_mainWindow;
 	//// The views list.
 	std::list<std::shared_ptr<views::View>> m_views;
+	/// The actions list.
+	std::list<std::shared_ptr<actions::Action>> m_actions;
 	/// The clear color.
 	const math::vec4 m_clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
 
