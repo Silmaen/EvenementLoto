@@ -15,10 +15,10 @@
 
 namespace evl::gui {
 
-WidgetNumberGrid::WidgetNumberGrid(QWidget* parent) : QWidget(parent), ui(new Ui::WidgetNumberGrid) {
-	ui->setupUi(this);
+WidgetNumberGrid::WidgetNumberGrid(QWidget* iParent) : QWidget(iParent), m_ui(new Ui::WidgetNumberGrid) {
+	m_ui->setupUi(this);
 }
-WidgetNumberGrid::~WidgetNumberGrid() { delete ui; }
+WidgetNumberGrid::~WidgetNumberGrid() { delete m_ui; }
 
 void WidgetNumberGrid::slot1() { setValue(1); }
 void WidgetNumberGrid::slot2() { setValue(2); }
@@ -111,201 +111,203 @@ void WidgetNumberGrid::slot88() { setValue(88); }
 void WidgetNumberGrid::slot89() { setValue(89); }
 void WidgetNumberGrid::slot90() { setValue(90); }
 
-void WidgetNumberGrid::setValue(const int value) {
-	setPushed(value);
-	emit buttonPushed(value);
+void WidgetNumberGrid::setValue(const int iValue) {
+	setPushed(iValue);
+	emit buttonPushed(iValue);
 }
 
 void buttonPushed(int) {} /*---UNCOVER---*/
 
-QPushButton* WidgetNumberGrid::getButton(const int idx) const {
-	switch (idx) {
+auto WidgetNumberGrid::getButton(const int iIdx) const -> QPushButton* {
+	switch (iIdx) {
 		case 1:
-			return ui->pushButton_01;
+			return m_ui->pushButton_01;
 		case 2:
-			return ui->pushButton_02;
+			return m_ui->pushButton_02;
 		case 3:
-			return ui->pushButton_03;
+			return m_ui->pushButton_03;
 		case 4:
-			return ui->pushButton_04;
+			return m_ui->pushButton_04;
 		case 5:
-			return ui->pushButton_05;
+			return m_ui->pushButton_05;
 		case 6:
-			return ui->pushButton_06;
+			return m_ui->pushButton_06;
 		case 7:
-			return ui->pushButton_07;
+			return m_ui->pushButton_07;
 		case 8:
-			return ui->pushButton_08;
+			return m_ui->pushButton_08;
 		case 9:
-			return ui->pushButton_09;
+			return m_ui->pushButton_09;
 		case 10:
-			return ui->pushButton_10;
+			return m_ui->pushButton_10;
 		case 11:
-			return ui->pushButton_11;
+			return m_ui->pushButton_11;
 		case 12:
-			return ui->pushButton_12;
+			return m_ui->pushButton_12;
 		case 13:
-			return ui->pushButton_13;
+			return m_ui->pushButton_13;
 		case 14:
-			return ui->pushButton_14;
+			return m_ui->pushButton_14;
 		case 15:
-			return ui->pushButton_15;
+			return m_ui->pushButton_15;
 		case 16:
-			return ui->pushButton_16;
+			return m_ui->pushButton_16;
 		case 17:
-			return ui->pushButton_17;
+			return m_ui->pushButton_17;
 		case 18:
-			return ui->pushButton_18;
+			return m_ui->pushButton_18;
 		case 19:
-			return ui->pushButton_19;
+			return m_ui->pushButton_19;
 		case 20:
-			return ui->pushButton_20;
+			return m_ui->pushButton_20;
 		case 21:
-			return ui->pushButton_21;
+			return m_ui->pushButton_21;
 		case 22:
-			return ui->pushButton_22;
+			return m_ui->pushButton_22;
 		case 23:
-			return ui->pushButton_23;
+			return m_ui->pushButton_23;
 		case 24:
-			return ui->pushButton_24;
+			return m_ui->pushButton_24;
 		case 25:
-			return ui->pushButton_25;
+			return m_ui->pushButton_25;
 		case 26:
-			return ui->pushButton_26;
+			return m_ui->pushButton_26;
 		case 27:
-			return ui->pushButton_27;
+			return m_ui->pushButton_27;
 		case 28:
-			return ui->pushButton_28;
+			return m_ui->pushButton_28;
 		case 29:
-			return ui->pushButton_29;
+			return m_ui->pushButton_29;
 		case 30:
-			return ui->pushButton_30;
+			return m_ui->pushButton_30;
 		case 31:
-			return ui->pushButton_31;
+			return m_ui->pushButton_31;
 		case 32:
-			return ui->pushButton_32;
+			return m_ui->pushButton_32;
 		case 33:
-			return ui->pushButton_33;
+			return m_ui->pushButton_33;
 		case 34:
-			return ui->pushButton_34;
+			return m_ui->pushButton_34;
 		case 35:
-			return ui->pushButton_35;
+			return m_ui->pushButton_35;
 		case 36:
-			return ui->pushButton_36;
+			return m_ui->pushButton_36;
 		case 37:
-			return ui->pushButton_37;
+			return m_ui->pushButton_37;
 		case 38:
-			return ui->pushButton_38;
+			return m_ui->pushButton_38;
 		case 39:
-			return ui->pushButton_39;
+			return m_ui->pushButton_39;
 		case 40:
-			return ui->pushButton_40;
+			return m_ui->pushButton_40;
 		case 41:
-			return ui->pushButton_41;
+			return m_ui->pushButton_41;
 		case 42:
-			return ui->pushButton_42;
+			return m_ui->pushButton_42;
 		case 43:
-			return ui->pushButton_43;
+			return m_ui->pushButton_43;
 		case 44:
-			return ui->pushButton_44;
+			return m_ui->pushButton_44;
 		case 45:
-			return ui->pushButton_45;
+			return m_ui->pushButton_45;
 		case 46:
-			return ui->pushButton_46;
+			return m_ui->pushButton_46;
 		case 47:
-			return ui->pushButton_47;
+			return m_ui->pushButton_47;
 		case 48:
-			return ui->pushButton_48;
+			return m_ui->pushButton_48;
 		case 49:
-			return ui->pushButton_49;
+			return m_ui->pushButton_49;
 		case 50:
-			return ui->pushButton_50;
+			return m_ui->pushButton_50;
 		case 51:
-			return ui->pushButton_51;
+			return m_ui->pushButton_51;
 		case 52:
-			return ui->pushButton_52;
+			return m_ui->pushButton_52;
 		case 53:
-			return ui->pushButton_53;
+			return m_ui->pushButton_53;
 		case 54:
-			return ui->pushButton_54;
+			return m_ui->pushButton_54;
 		case 55:
-			return ui->pushButton_55;
+			return m_ui->pushButton_55;
 		case 56:
-			return ui->pushButton_56;
+			return m_ui->pushButton_56;
 		case 57:
-			return ui->pushButton_57;
+			return m_ui->pushButton_57;
 		case 58:
-			return ui->pushButton_58;
+			return m_ui->pushButton_58;
 		case 59:
-			return ui->pushButton_59;
+			return m_ui->pushButton_59;
 		case 60:
-			return ui->pushButton_60;
+			return m_ui->pushButton_60;
 		case 61:
-			return ui->pushButton_61;
+			return m_ui->pushButton_61;
 		case 62:
-			return ui->pushButton_62;
+			return m_ui->pushButton_62;
 		case 63:
-			return ui->pushButton_63;
+			return m_ui->pushButton_63;
 		case 64:
-			return ui->pushButton_64;
+			return m_ui->pushButton_64;
 		case 65:
-			return ui->pushButton_65;
+			return m_ui->pushButton_65;
 		case 66:
-			return ui->pushButton_66;
+			return m_ui->pushButton_66;
 		case 67:
-			return ui->pushButton_67;
+			return m_ui->pushButton_67;
 		case 68:
-			return ui->pushButton_68;
+			return m_ui->pushButton_68;
 		case 69:
-			return ui->pushButton_69;
+			return m_ui->pushButton_69;
 		case 70:
-			return ui->pushButton_70;
+			return m_ui->pushButton_70;
 		case 71:
-			return ui->pushButton_71;
+			return m_ui->pushButton_71;
 		case 72:
-			return ui->pushButton_72;
+			return m_ui->pushButton_72;
 		case 73:
-			return ui->pushButton_73;
+			return m_ui->pushButton_73;
 		case 74:
-			return ui->pushButton_74;
+			return m_ui->pushButton_74;
 		case 75:
-			return ui->pushButton_75;
+			return m_ui->pushButton_75;
 		case 76:
-			return ui->pushButton_76;
+			return m_ui->pushButton_76;
 		case 77:
-			return ui->pushButton_77;
+			return m_ui->pushButton_77;
 		case 78:
-			return ui->pushButton_78;
+			return m_ui->pushButton_78;
 		case 79:
-			return ui->pushButton_79;
+			return m_ui->pushButton_79;
 		case 80:
-			return ui->pushButton_80;
+			return m_ui->pushButton_80;
 		case 81:
-			return ui->pushButton_81;
+			return m_ui->pushButton_81;
 		case 82:
-			return ui->pushButton_82;
+			return m_ui->pushButton_82;
 		case 83:
-			return ui->pushButton_83;
+			return m_ui->pushButton_83;
 		case 84:
-			return ui->pushButton_84;
+			return m_ui->pushButton_84;
 		case 85:
-			return ui->pushButton_85;
+			return m_ui->pushButton_85;
 		case 86:
-			return ui->pushButton_86;
+			return m_ui->pushButton_86;
 		case 87:
-			return ui->pushButton_87;
+			return m_ui->pushButton_87;
 		case 88:
-			return ui->pushButton_88;
+			return m_ui->pushButton_88;
 		case 89:
-			return ui->pushButton_89;
+			return m_ui->pushButton_89;
 		case 90:
-			return ui->pushButton_90;
+			return m_ui->pushButton_90;
+		default:
+			break;
 	}
 	return nullptr;
 }
 
-void WidgetNumberGrid::setPushed(const int index) const {
-	QPushButton* a = getButton(index);
+void WidgetNumberGrid::setPushed(const int iNdex) const {
+	QPushButton* a = getButton(iNdex);
 	if (a == nullptr)
 		return;
 	a->setEnabled(false);
@@ -313,8 +315,8 @@ void WidgetNumberGrid::setPushed(const int index) const {
 	a->setFlat(true);
 }
 
-void WidgetNumberGrid::resetPushed(const int index) const {
-	QPushButton* a = getButton(index);
+void WidgetNumberGrid::resetPushed(const int iNdex) const {
+	QPushButton* a = getButton(iNdex);
 	if (a == nullptr)
 		return;
 	a->setChecked(false);
@@ -326,9 +328,9 @@ void WidgetNumberGrid::resetPushed() const {
 	for (uint8_t i = 1; i <= 90; ++i) { resetPushed(i); }
 }
 
-uint8_t WidgetNumberGrid::getNumberPushed() const {
+auto WidgetNumberGrid::getNumberPushed() const -> uint8_t {
 	uint8_t count = 0;
-	for (uint8_t i = 1; i <= 90; ++i) { count += getButton(i)->isFlat(); }
+	for (uint8_t i = 1; i <= 90; ++i) { count += static_cast<int>(getButton(i)->isFlat()); }
 	return count;
 }
 

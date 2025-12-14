@@ -37,7 +37,7 @@ public:
 	 * @brief Constructor with shortcut.
 	 * @param[in] iShortcut The action shortcut.
 	 */
-	explicit Action(KeyCombination&& iShortcut) : m_shortcut(std::move(iShortcut)) {}
+	explicit Action(const KeyCombination& iShortcut) : m_shortcut(iShortcut) {}
 
 	/**
 	 * @brief Check if this action is enabled.

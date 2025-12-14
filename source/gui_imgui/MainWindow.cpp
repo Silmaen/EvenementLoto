@@ -509,46 +509,44 @@ auto MainWindow::getModifiers() const -> Modifiers {
 
 
 void MainWindow::onEvent(event::Event& ioEvent) {
-	// Send event to ImGui
-	std::unordered_map<event::Type, int> keyMap = {
-			{event::Type::KeyPressed, GLFW_PRESS},
-			{event::Type::KeyReleased, GLFW_RELEASE},
-			{event::Type::KeyTyped, GLFW_REPEAT},
-	};
-	if (ioEvent.isInCategory(event::Category::Keyboard)) {
-		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window),
-								   static_cast<int>(dynamic_cast<event::KeyEvent&>(ioEvent).getKeyCode()), 0,
-								   keyMap[ioEvent.getType()], 0);
-		ioEvent.handled |= true;
-		return;
-	}
-	std::unordered_map<event::Type, int> mouseButtonMap = {
-			{event::Type::MouseButtonPressed, GLFW_PRESS},
-			{event::Type::MouseButtonReleased, GLFW_RELEASE},
-	};
-	if (ioEvent.isInCategory(event::Category::Mouse)) {
-		if (ioEvent.getType() == event::Type::MouseMoved) {
-			const auto& e = dynamic_cast<event::MouseMovedEvent&>(ioEvent);
-			ImGui_ImplGlfw_CursorPosCallback(static_cast<GLFWwindow*>(m_window), static_cast<double>(e.getX()),
-											 static_cast<double>(e.getY()));
-			ioEvent.handled |= true;
-			return;
-		}
-		if (ioEvent.getType() == event::Type::MouseScrolled) {
-			const auto& e = dynamic_cast<event::MouseScrolledEvent&>(ioEvent);
-			ImGui_ImplGlfw_ScrollCallback(static_cast<GLFWwindow*>(m_window), static_cast<double>(e.getXOff()),
-										  static_cast<double>(e.getYOff()));
-			ioEvent.handled |= true;
-			return;
-		}
-		if (mouseButtonMap.contains(ioEvent.getType())) {
-			const auto& e = dynamic_cast<event::MouseButtonEvent&>(ioEvent);
-			ImGui_ImplGlfw_MouseButtonCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(e.getMouseButton()),
-											   mouseButtonMap[ioEvent.getType()], 0);
-			ioEvent.handled |= true;
-			return;
-		}
-	}
+	event::EventDispatcher dispatcher(ioEvent);
+	dispatcher.dispatch<event::KeyPressedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(ioInternalEvent.getKeyCode()),
+								   0, GLFW_PRESS, 0);
+		return true;
+	});
+	dispatcher.dispatch<event::KeyReleasedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(ioInternalEvent.getKeyCode()),
+								   0, GLFW_RELEASE, 0);
+		return true;
+	});
+	dispatcher.dispatch<event::KeyTypedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(ioInternalEvent.getKeyCode()),
+								   0, GLFW_REPEAT, 0);
+		return true;
+	});
+	dispatcher.dispatch<event::MouseMovedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_CursorPosCallback(static_cast<GLFWwindow*>(m_window),
+										 static_cast<double>(ioInternalEvent.getX()),
+										 static_cast<double>(ioInternalEvent.getY()));
+		return true;
+	});
+	dispatcher.dispatch<event::MouseScrolledEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_ScrollCallback(static_cast<GLFWwindow*>(m_window),
+									  static_cast<double>(ioInternalEvent.getXOff()),
+									  static_cast<double>(ioInternalEvent.getYOff()));
+		return true;
+	});
+	dispatcher.dispatch<event::MouseButtonPressedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_MouseButtonCallback(static_cast<GLFWwindow*>(m_window),
+										   static_cast<int>(ioInternalEvent.getMouseButton()), GLFW_PRESS, 0);
+		return true;
+	});
+	dispatcher.dispatch<event::MouseButtonReleasedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
+		ImGui_ImplGlfw_MouseButtonCallback(static_cast<GLFWwindow*>(m_window),
+										   static_cast<int>(ioInternalEvent.getMouseButton()), GLFW_RELEASE, 0);
+		return true;
+	});
 }
 
 }// namespace evl::gui_imgui

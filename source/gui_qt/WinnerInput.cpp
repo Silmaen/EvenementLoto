@@ -19,6 +19,6 @@ WinnerInput::WinnerInput(QWidget* parent) : QDialog(parent), ui(new Ui::WinnerIn
 
 WinnerInput::~WinnerInput() { delete ui; }
 
-QString WinnerInput::getWinner() const { return ui->EditWinner->text(); }
+auto WinnerInput::getWinner() const -> QString { return ui->EditWinner->text(); }
 
 }// namespace evl::gui

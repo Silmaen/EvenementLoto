@@ -95,11 +95,11 @@ void Application::requestClose() { m_state = State::Closed; }
 
 void Application::onEvent(event::Event& ioEvent) {
 	event::EventDispatcher dispatcher(ioEvent);
-	dispatcher.dispatch<event::WindowCloseEvent>([this]<typename T>(T&&) -> auto {
+	dispatcher.dispatch<event::WindowCloseEvent>([this]<typename T>(const T&) -> auto {
 		requestClose();
 		return true;
 	});
-	dispatcher.dispatch<event::WindowResizeEvent>([]<typename T>(T&&) -> auto {
+	dispatcher.dispatch<event::WindowResizeEvent>([]<typename T>(const T&) -> auto {
 		log_trace("Resize Event");
 		return true;
 	});

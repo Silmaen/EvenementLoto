@@ -11,10 +11,12 @@
 
 using namespace evl::gui;
 
+//NOLINTBEGIN(cppcoreguidelines-owning-memory)
 TEST(gui_MainWindow, base) {
 	test::initialize();
-	MainWindow* main = new MainWindow;
+	auto* main = new MainWindow;
 	EXPECT_STREQ(main->getSettings().applicationName().toStdString().c_str(), "");
 	delete main;
 	test::finalize();
 }
+//NOLINTEND(cppcoreguidelines-owning-memory)

@@ -51,7 +51,7 @@ void VisualTheme::importJSON(const std::filesystem::path& file) {
 	inFile.close();
 	for (auto& s_key: j["theme"].getMemberNames()) {
 		auto& val = j["theme"][s_key];
-		if (QString key = QString::fromUtf8(s_key); themeDefaults.contains(key)) {
+		if (const QString key = QString::fromUtf8(s_key); themeDefaults.contains(key)) {
 			if (themeDefaults.at(key).metaType() == QMetaType(QMetaType::Int))
 				parameters[key] = val.asInt();
 			else if (themeDefaults.at(key).metaType() == QMetaType(QMetaType::Double))
@@ -70,7 +70,7 @@ void VisualTheme::setFromSettings() {
 		return;
 	for (const auto& [key, val]: themeDefaults) {
 		// conservation du type
-		QVariant v(settings->value("theme/" + key, val));
+		const QVariant v(settings->value("theme/" + key, val));
 		if (val.metaType() == QMetaType(QMetaType::Int))
 			parameters[key] = v.toInt();
 		else if (val.metaType() == QMetaType(QMetaType::Double))
@@ -91,20 +91,20 @@ void VisualTheme::writeInSettings() {
 	toUpdate = true;
 }
 
-const QVariant& VisualTheme::getParam(const QString& key) {
-	if (themeDefaults.contains(key)) {
+auto VisualTheme::getParam(const QString& iKey) -> const QVariant& {
+	if (themeDefaults.contains(iKey)) {
 		toUpdate = false;
-		return parameters.at(key);
+		return parameters.at(iKey);
 	}
 	return nullVariant;
 }
 
-void VisualTheme::setParam(const QString& key, const QVariant& value) {
-	if (!themeDefaults.contains(key))
+void VisualTheme::setParam(const QString& iKey, const QVariant& iValue) {
+	if (!themeDefaults.contains(iKey))
 		return;
-	if (themeDefaults.at(key).typeId() != value.typeId())
+	if (themeDefaults.at(iKey).typeId() != iValue.typeId())
 		return;
-	parameters[key] = value;
+	parameters[iKey] = iValue;
 	toUpdate = true;
 }
 

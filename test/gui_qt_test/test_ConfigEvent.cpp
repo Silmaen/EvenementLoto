@@ -28,7 +28,7 @@ TEST(gui_ConfigEvent, ControlButtons) {
 	evt.setLocation("ici");
 	evt.setLogo("ttt");
 	evt.setOrganizerLogo("ttt");
-	evl::core::GameRound gr;
+	const evl::core::GameRound gr;
 	evt.pushGameRound(gr);
 	a.setEvent(evt);
 	a.actOk();

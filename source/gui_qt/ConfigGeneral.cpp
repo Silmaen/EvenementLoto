@@ -20,38 +20,28 @@ namespace evl::gui {
 
 // color button utility
 
-QColor getButtonColor(const QPushButton* btn) {
-	return btn->palette().color(QPalette::Button);
-}
-QString getButtonColorName(const QPushButton* btn) {
-	return btn->palette().color(QPalette::Button).name();
-}
-void setButtonColor(QPushButton* btn, const QColor& col) {
-	auto palette= btn->palette();
-	palette.setColor(QPalette::Button, col);
-	if(col.lightness() < 100)
+auto getButtonColor(const QPushButton* iBtn) -> QColor { return iBtn->palette().color(QPalette::Button); }
+auto getButtonColorName(const QPushButton* iBtn) -> QString { return iBtn->palette().color(QPalette::Button).name(); }
+void setButtonColor(QPushButton* iBtn, const QColor& iCol) {
+	auto palette = iBtn->palette();
+	palette.setColor(QPalette::Button, iCol);
+	if (iCol.lightness() < 100)
 		palette.setColor(QPalette::ButtonText, QColor(255, 255, 255));
 	else
 		palette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
-	btn->setPalette(palette);
-	btn->setText(col.name());
+	iBtn->setPalette(palette);
+	iBtn->setText(iCol.name());
 }
-void setButtonColor(QPushButton* btn, const QString& name) {
-	setButtonColor(btn, QColor(name));
-}
+void setButtonColor(QPushButton* iBtn, const QString& iName) { setButtonColor(iBtn, QColor(iName)); }
 
-ConfigGeneral::ConfigGeneral(MainWindow* parent):
-	QDialog(parent),
-	ui(new Ui::ConfigGeneral), mwd(parent) {
+ConfigGeneral::ConfigGeneral(MainWindow* iParent) : QDialog(iParent), ui(new Ui::ConfigGeneral), mwd(iParent) {
 	ui->setupUi(this);
 }
 
-ConfigGeneral::~ConfigGeneral() {
-	delete ui;
-}
+ConfigGeneral::~ConfigGeneral() { delete ui; }
 
 void ConfigGeneral::SaveFile() const {
-	if(mwd != nullptr) {
+	if (mwd != nullptr) {
 		mwd->getSettings().setValue(settings::dataPathKey, ui->DataLocation->text());
 		mwd->getTheme().setParam("name", ui->editThemeName->text());
 		mwd->getTheme().setParam("baseRatio", ui->spinMainScale->value());
@@ -78,25 +68,21 @@ void ConfigGeneral::actOk() {
 	accept();
 }
 
-void ConfigGeneral::actApply() const {
-	SaveFile();
-}
+void ConfigGeneral::actApply() const { SaveFile(); }
 
 void ConfigGeneral::actCancel() {
-	if(mwd)
+	if (mwd != nullptr)
 		mwd->getTheme().setFromSettings();
 	reject();
 }
 
 void ConfigGeneral::actSearchFolder() const {
-	const auto path= dialog::openFile(dialog::FileTypes::Folder, true);
-	if(path.empty())
+	const auto path = openFile(dialog::FileTypes::Folder, true);
+	if (path.empty())
 		return;
 	ui->DataLocation->setText(QString::fromUtf8(path.string()));
 }
-void ConfigGeneral::actResetTheme() const {
-	preExec();
-}
+void ConfigGeneral::actResetTheme() const { preExec(); }
 
 void ConfigGeneral::actRestoreTheme() const {
 	mwd->getTheme().resetFactory();
@@ -104,41 +90,41 @@ void ConfigGeneral::actRestoreTheme() const {
 }
 
 void ConfigGeneral::actImportTheme() const {
-	const auto path= dialog::openFile(dialog::FileTypes::ThemeFile, true);
-	if(path.empty())
+	const auto path = openFile(dialog::FileTypes::ThemeFile, true);
+	if (path.empty())
 		return;
 	mwd->getTheme().importJSON(path);
 	preExec();
 }
 
 void ConfigGeneral::actExportTheme() const {
-	const auto path= dialog::openFile(dialog::FileTypes::ThemeFile, false);
-	if(path.empty())
+	const auto path = openFile(dialog::FileTypes::ThemeFile, false);
+	if (path.empty())
 		return;
 	mwd->getTheme().exportJSON(path);
 }
 
 void ConfigGeneral::actBackgroundColorChange() const {
-	const QColor base	= getButtonColor(ui->buttonBackgroundColor);
-	const QColor newColor= dialog::colorSelection(base);
+	const QColor base = getButtonColor(ui->buttonBackgroundColor);
+	const QColor newColor = dialog::colorSelection(base);
 	setButtonColor(ui->buttonBackgroundColor, newColor);
 }
 
 void ConfigGeneral::actGridBackgroundColorChange() const {
-	const QColor base	= getButtonColor(ui->buttonGridBackgroundColor);
-	const QColor newColor= dialog::colorSelection(base);
+	const QColor base = getButtonColor(ui->buttonGridBackgroundColor);
+	const QColor newColor = dialog::colorSelection(base);
 	setButtonColor(ui->buttonGridBackgroundColor, newColor);
 }
 
 void ConfigGeneral::actSelectedNumbersColorChange() const {
-	const QColor base	= getButtonColor(ui->buttonSelectedNumberColor);
-	const QColor newColor= dialog::colorSelection(base);
+	const QColor base = getButtonColor(ui->buttonSelectedNumberColor);
+	const QColor newColor = dialog::colorSelection(base);
 	setButtonColor(ui->buttonSelectedNumberColor, newColor);
 }
 
 void ConfigGeneral::actTextColorChange() const {
-	const QColor base	= getButtonColor(ui->buttonTextColor);
-	const QColor newColor= dialog::colorSelection(base);
+	const QColor base = getButtonColor(ui->buttonTextColor);
+	const QColor newColor = dialog::colorSelection(base);
 	setButtonColor(ui->buttonTextColor, newColor);
 }
 
@@ -152,8 +138,9 @@ void ConfigGeneral::actTruncatePriceChange() const {
 }
 
 void ConfigGeneral::preExec() const {
-	if(mwd != nullptr) {
-		ui->DataLocation->setText(mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
+	if (mwd != nullptr) {
+		ui->DataLocation->setText(
+				mwd->getSettings().value(settings::dataPathKey, settings::dataPathDefault).toString());
 		ui->editThemeName->setText(mwd->getTheme().getParam("name").toString());
 		ui->spinMainScale->setValue(mwd->getTheme().getParam("baseRatio").toDouble());
 		ui->spinTitleScale->setValue(mwd->getTheme().getParam("titleRatio").toDouble());

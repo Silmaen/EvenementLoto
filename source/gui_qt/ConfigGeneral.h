@@ -29,9 +29,9 @@ class ConfigGeneral : public QDialog {
 public:
 	/**
 	 * @brief Constructeur.
-	 * @param parent Le widget Parent.
+	 * @param iParent Le widget Parent.
 	 */
-	explicit ConfigGeneral(MainWindow* parent = nullptr);
+	explicit ConfigGeneral(MainWindow* iParent = nullptr);
 
 	/**
 	 * @brief Destructeur.

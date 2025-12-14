@@ -18,8 +18,10 @@
 
 namespace evl::gui {
 
-static bool in_update_loop = false;
-static bool in_update_prices = false;
+namespace {
+bool in_update_loop = false;
+bool in_update_prices = false;
+}// namespace
 
 ConfigGameRounds::ConfigGameRounds(MainWindow* parent)
 	: QDialog(parent), ui(new Ui::ConfigGameRounds), _parent(parent) {
@@ -31,8 +33,8 @@ ConfigGameRounds::ConfigGameRounds(MainWindow* parent)
 
 ConfigGameRounds::~ConfigGameRounds() {
 	delete ui;
-	if (displayPreview != nullptr)
-		delete displayPreview;
+	delete displayPreview;
+	displayPreview = nullptr;
 }
 
 void ConfigGameRounds::actOk() {
@@ -168,19 +170,21 @@ void ConfigGameRounds::actFindDiapo() const {
 // -----------------
 
 void ConfigGameRounds::actTogglePreview() {
+	// NOLINTBEGIN(cppcoreguidelines-owning-memory)
 	if (ui->checkPreVisu->isChecked()) {
 		displayPreview = new DisplayWindow(&gameEvent, _parent);
 	} else {
 		delete displayPreview;
 		displayPreview = nullptr;
 	}
+	// NOLINTEND(cppcoreguidelines-owning-memory)
 	actTogglePreviewFullScreen();
 }
 
 void ConfigGameRounds::actTogglePreviewFullScreen() {
 	if (displayPreview == nullptr)
 		return;
-	if (QList<QScreen*> screens = QApplication::screens();
+	if (const QList<QScreen*> screens = QApplication::screens();
 		screens.size() < 2 || !ui->checkFullScreenPreVisu->isChecked()) {
 		displayPreview->showNormal();
 	} else {
@@ -303,7 +307,7 @@ void ConfigGameRounds::updateDisplayPhase() {
 	const auto round = gameEvent.getGameRound(static_cast<uint16_t>(cur));
 	if (round->getType() == core::GameRound::Type::Pause) {
 		ui->PhaseConfiguration->setCurrentIndex(1);
-		if (displayPreview) {
+		if (displayPreview != nullptr) {
 			displayPreview->setMode(DisplayWindow::Mode::Preview);
 			if (cur < 0)
 				displayPreview->setRoundIndex(0, 0);
@@ -327,7 +331,7 @@ void ConfigGameRounds::updateDisplayPhase() {
 		return;
 	}
 	const int scur = ui->listSubRound->currentRow();
-	if (displayPreview) {
+	if (displayPreview != nullptr) {
 		displayPreview->setMode(DisplayWindow::Mode::Preview);
 		const uint32_t ccur = cur > 0 ? static_cast<uint32_t>(cur) : 0;
 		const uint32_t sccur = scur > 0 ? static_cast<uint32_t>(scur) : 0;

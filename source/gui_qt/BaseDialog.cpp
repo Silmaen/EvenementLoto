@@ -15,32 +15,32 @@
 
 namespace evl::gui::dialog {
 
-std::filesystem::path openFile(const FileTypes& type, const bool exist) {
+auto openFile(const FileTypes& iType, const bool iExist) -> std::filesystem::path {
 	QSettings settings;
 	QString lastDir = settings.value("dialog/last_dir", "").toString();
 	if (lastDir.isEmpty()) {
 		lastDir = settings.value("path/data_path", QString::fromStdString(core::getExecPath().string())).toString();
 	}
 	QFileDialog dia;
-	if (exist) {
+	if (iExist) {
 		dia.setAcceptMode(QFileDialog::AcceptOpen);
 		dia.setFileMode(QFileDialog::ExistingFile);
-		if (type == FileTypes::Folder)
+		if (iType == FileTypes::Folder)
 			dia.setFileMode(QFileDialog::Directory);
 	} else {
 		dia.setAcceptMode(QFileDialog::AcceptSave);
 		dia.setFileMode(QFileDialog::AnyFile);
 	}
 	dia.setDirectory(lastDir);
-	if (type == FileTypes::EventSave)
+	if (iType == FileTypes::EventSave)
 		dia.setNameFilter("fichier événement (*.lev)");
-	else if (type == FileTypes::JSON)
+	else if (iType == FileTypes::JSON)
 		dia.setNameFilter("fichier json de partie (*.json)");
-	else if (type == FileTypes::Text)
+	else if (iType == FileTypes::Text)
 		dia.setNameFilters({"fichier texte brut (*.txt)", "fichier markdown (*.md)"});
-	else if (type == FileTypes::ThemeFile)
+	else if (iType == FileTypes::ThemeFile)
 		dia.setNameFilters({"fichier theme (*.lth)", "fichier json (*.json)"});
-	else if (type == FileTypes::Images)
+	else if (iType == FileTypes::Images)
 		dia.setNameFilters({
 				"Toutes les images supportées (*.png *.jpg *.jpeg *.bmp *.svg)",
 				"Fichiers portable network graphics (*.png)",
@@ -48,7 +48,7 @@ std::filesystem::path openFile(const FileTypes& type, const bool exist) {
 				"Fichiers bitmap (*.bmp)",
 				"Fichiers scalar vector Graphic (*.svg)",
 		});
-	if (dia.exec()) {
+	if (dia.exec() == QDialog::Accepted) {
 		const QString selectedFile = dia.selectedFiles()[0];
 		settings.setValue("dialog/last_dir", QFileInfo(selectedFile).absolutePath());
 		return std::filesystem::path{dia.selectedFiles()[0].toStdString()};
@@ -56,24 +56,22 @@ std::filesystem::path openFile(const FileTypes& type, const bool exist) {
 	return std::filesystem::path{};
 }
 
-bool question(const QString& title, const QString& question, const QString& add) {
+auto question(const QString& iTitle, const QString& iQuestion, const QString& iAdd) -> bool {
 	QMessageBox message;
 	message.setIcon(QMessageBox::Question);
-	message.setWindowTitle(title);
-	message.setText(question);
-	message.setInformativeText(add);
+	message.setWindowTitle(iTitle);
+	message.setText(iQuestion);
+	message.setInformativeText(iAdd);
 	message.setStandardButtons(QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No);
-	if (message.exec() == QMessageBox::StandardButton::Yes)
-		return true;
-	return false;
+	return message.exec() == QMessageBox::StandardButton::Yes;
 }
 
-QColor colorSelection(const QColor& color) {
+auto colorSelection(const QColor& iColor) -> QColor {
 	QColorDialog box;
-	box.setCurrentColor(color);
+	box.setCurrentColor(iColor);
 	if (box.exec() == QColorDialog::Accepted)
 		return box.selectedColor();
-	return color;
+	return iColor;
 }
 
 }// namespace evl::gui::dialog

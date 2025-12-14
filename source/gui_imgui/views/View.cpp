@@ -16,7 +16,7 @@ View::View() = default;
 View::~View() = default;
 
 void View::update() {
-	if (m_show_windows) {
+	if (m_showWindows) {
 		onUpdate();
 	}
 }

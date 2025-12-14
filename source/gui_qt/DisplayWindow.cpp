@@ -240,21 +240,21 @@ void DisplayWindow::updateRoundRunning() const {
 	text.setRedF(1.0f - text.redF());
 	text.setGreenF(1.0f - text.greenF());
 	text.setBlueF(1.0f - text.blueF());
-	QBrush fr{text};
+	const QBrush fr{text};
 	const auto draws = round->getAllDraws();
-	for (unsigned char draw: std::ranges::reverse_view(draws)) {
+	for (const unsigned char draw: std::ranges::reverse_view(draws)) {
 		br.setColor(color);
 		if (mwd->getTheme().getParam("fadeNumbers").toBool() &&
 			i < mwd->getTheme().getParam("fadeNumbersAmount").toInt()) {
-			if (int strength = mwd->getTheme().getParam("fadeNumbersStrength").toInt(); strength < 0) {
+			if (const int strength = mwd->getTheme().getParam("fadeNumbersStrength").toInt(); strength < 0) {
 				color = color.darker(100 - strength);
 			} else {
 				color = color.lighter(100 + strength);
 			}
 		}
 		++i;
-		int row = (draw - 1) / 10;
-		int col = (draw - 1) % 10;
+		const int row = (draw - 1) / 10;
+		const int col = (draw - 1) % 10;
 		ui->RR_NumberGrid->item(row, col)->setBackground(br);
 		ui->RR_NumberGrid->item(row, col)->setForeground(fr);
 	}
@@ -268,17 +268,17 @@ void DisplayWindow::updateRoundRunning() const {
 	if (subRound->getValue() < 0.01) {
 		ui->RR_SubRoundValue->setVisible(false);
 	} else {
-		QString value = "Valeur du lot: \n" + QString::number(subRound->getValue()) + "€";
+		const QString value = "Valeur du lot: \n" + QString::number(subRound->getValue()) + "€";
 		ui->RR_SubRoundValue->setVisible(true);
 		ui->RR_SubRoundValue->setText(value);
 	}
-	if (QString gain = QString::fromUtf8(subRound->getPrices()); gain.isEmpty()) {
+	if (const QString gain = QString::fromUtf8(subRound->getPrices()); gain.isEmpty()) {
 		ui->RR_SubRoundPrice->setVisible(false);
 	} else {
 		ui->RR_SubRoundPrice->setVisible(true);
 		if (mwd->getTheme().getParam("truncatePrice").toBool()) {
 			auto gains = gain.split("\n");
-			if (int maxLine = mwd->getTheme().getParam("truncatePriceLines").toInt(); gains.size() <= maxLine) {
+			if (const int maxLine = mwd->getTheme().getParam("truncatePriceLines").toInt(); gains.size() <= maxLine) {
 				ui->RR_SubRoundPrice->setText(gain);
 			} else {
 				QString s = gains[0];
@@ -362,10 +362,12 @@ void DisplayWindow::initializeNumberGrid() const {
 	for (int row = 0; row < 9; ++row) {
 		for (int col = 0; col < 10; ++col) {
 			QTableWidgetItem* pCell = ui->RR_NumberGrid->item(row, col);
-			if (!pCell) {
+			// NOLINTBEGIN(cppcoreguidelines-owning-memory)
+			if (pCell == nullptr) {
 				pCell = new QTableWidgetItem;
 				ui->RR_NumberGrid->setItem(row, col, pCell);
 			}
+			// NOLINTEND(cppcoreguidelines-owning-memory)
 			pCell->setFlags(Qt::ItemFlag::ItemIsEnabled);
 			pCell->setText(QString::number(10 * row + col + 1));
 			pCell->setTextAlignment(Qt::AlignCenter);

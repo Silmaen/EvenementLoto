@@ -41,16 +41,16 @@ public:
 	/**
 	 * @brief Show the view.
 	 */
-	void show() { m_show_windows = true; }
+	void show() { m_showWindows = true; }
 	/**
 	 * @brief Hide the view.
 	 */
-	void hide() { m_show_windows = false; }
+	void hide() { m_showWindows = false; }
 	/**
 	 * @brief Check if the view is visible.
 	 * @return True if visible.
 	 */
-	[[nodiscard]] auto isVisible() const -> bool { return m_show_windows; }
+	[[nodiscard]] auto isVisible() const -> bool { return m_showWindows; }
 
 	/**
 	 * @brief The update function to implement in derived classes.
@@ -61,7 +61,7 @@ public:
 	 * @brief Access to visibility flag.
 	 * @return Reference to visibility flag.
 	 */
-	auto visibility() -> bool& { return m_show_windows; }
+	auto visibility() -> bool& { return m_showWindows; }
 
 	/**
 	 * @brief Get the view name.
@@ -77,7 +77,7 @@ public:
 
 private:
 	/// Show windows flag.
-	bool m_show_windows = true;
+	bool m_showWindows = true;
 };
 
 }// namespace evl::gui_imgui::views

@@ -7,6 +7,7 @@
  */
 
 #pragma once
+#include <filesystem>
 #include <format>
 
 namespace evl {
@@ -72,8 +73,9 @@ public:
 	 * @param iArgs Format arguments.
 	 */
 	template<typename... Args>
-	static void log(const Level& iLevel, const char* iFile, int iLine, std::format_string<Args...> iFmt, Args&&... iArgs) {
-		log(iLevel,iFile,iLine, std::format(iFmt, std::forward<Args>(iArgs)...));
+	static void log(const Level& iLevel, const char* iFile, int iLine, std::format_string<Args...> iFmt,
+					Args&&... iArgs) {
+		log(iLevel, iFile, iLine, std::format(iFmt, std::forward<Args>(iArgs)...));
 	}
 
 	/**
@@ -98,10 +100,10 @@ private:
 
 }// namespace evl
 
-#define log_trace(...) ::evl::Log::log(::evl::Log::Level::Trace,__FILE__, __LINE__, __VA_ARGS__)
-#define log_debug(...) ::evl::Log::log(::evl::Log::Level::Debug,__FILE__, __LINE__, __VA_ARGS__)
-#define log_info(...) ::evl::Log::log(::evl::Log::Level::Info,__FILE__, __LINE__, __VA_ARGS__)
-#define log_warn(...) ::evl::Log::log(::evl::Log::Level::Warning,__FILE__, __LINE__, __VA_ARGS__)
-#define log_warning(...) ::evl::Log::log(::evl::Log::Level::Warning,__FILE__, __LINE__, __VA_ARGS__)
-#define log_error(...) ::evl::Log::log(::evl::Log::Level::Error,__FILE__, __LINE__, __VA_ARGS__)
-#define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical,__FILE__, __LINE__, __VA_ARGS__)
+#define log_trace(...) ::evl::Log::log(::evl::Log::Level::Trace, __FILE__, __LINE__, __VA_ARGS__)
+#define log_debug(...) ::evl::Log::log(::evl::Log::Level::Debug, __FILE__, __LINE__, __VA_ARGS__)
+#define log_info(...) ::evl::Log::log(::evl::Log::Level::Info, __FILE__, __LINE__, __VA_ARGS__)
+#define log_warn(...) ::evl::Log::log(::evl::Log::Level::Warning, __FILE__, __LINE__, __VA_ARGS__)
+#define log_warning(...) ::evl::Log::log(::evl::Log::Level::Warning, __FILE__, __LINE__, __VA_ARGS__)
+#define log_error(...) ::evl::Log::log(::evl::Log::Level::Error, __FILE__, __LINE__, __VA_ARGS__)
+#define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical, __FILE__, __LINE__, __VA_ARGS__)

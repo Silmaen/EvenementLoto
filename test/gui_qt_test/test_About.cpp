@@ -13,7 +13,7 @@ using namespace evl::gui;
 
 TEST(gui_About, base) {
 	test::initialize();
-	About a;
+	const About a;
 	EXPECT_TRUE(a.isEnabled());
 	test::finalize();
 }

@@ -1,7 +1,7 @@
 # Generated from CLion Inspection settings
 ---
 WarningsAsErrors: '*'
-HeaderFilterRegex: '.*(\.h|\.hpp)$'
+HeaderFilterRegex: '^(?!.*\/test\/).*\.h(pp)?$'
 HeaderFileExtensions: [ 'h', 'hpp' ]
 ImplementationFileExtensions: [ 'cpp' ]
 FormatStyle: 'file'
@@ -20,9 +20,11 @@ Checks: '*,
   -openmp-*,
   -zircon-*,
   -bugprone-easily-swappable-parameters,
+  -bugprone-suspicious-include,
   -cert-err58-cpp,
   -cert-msc30-c,
   -cert-msc50-cpp,
+  -clang-analyzer-optin.core.EnumCastOutOfRange,
   -concurrency-mt-unsafe,
   -cppcoreguidelines-avoid-c-arrays,
   -cppcoreguidelines-avoid-const-or-ref-data-members,
@@ -52,6 +54,7 @@ Checks: '*,
   -readability-braces-around-statements,
   -readability-identifier-length,
   -readability-math-missing-parentheses,
+  -readability-redundant-access-specifiers,
   -readability-uppercase-literal-suffix,
   -*magic-numbers,
   -*named-parameter,

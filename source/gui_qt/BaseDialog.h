@@ -28,26 +28,26 @@ enum struct FileTypes : uint8_t {
 
 /**
  * @brief Ouverture d’une fenêtre de dialogue pour l’ouverture de fichier
- * @param type Le type de contenu à filter.
- * @param exist Si le fichier doit déjà exister (mode ouverture)
+ * @param iType Le type de contenu à filter.
+ * @param iExist Si le fichier doit déjà exister (mode ouverture)
  * @return Le chemin, vide si échec ou annulation.
  */
-std::filesystem::path openFile(const FileTypes& type = FileTypes::EventSave, bool exist = false);
+std::filesystem::path openFile(const FileTypes& iType = FileTypes::EventSave, bool iExist = false);
 
 /**
  * @brief Ouvre une fenêtre de dialogue posant une question oui ou non
- * @param title Le titre de la fenêtre
- * @param question Le texte de la question.
- * @param add Le texte additionnel.
+ * @param iTitle Le titre de la fenêtre
+ * @param iQuestion Le texte de la question.
+ * @param iAdd Le texte additionnel.
  * @return La réponse à la question
  */
-bool question(const QString& title, const QString& question, const QString& add = "");
+bool question(const QString& iTitle, const QString& iQuestion, const QString& iAdd = "");
 
 /**
  * @brief Ouvre un menu de selection de couleur
- * @param color La couleur initialement sélectionnée.
+ * @param iColor La couleur initialement sélectionnée.
  * @return La couleur finalement sélectionnée.
  */
-QColor colorSelection(const QColor& color);
+QColor colorSelection(const QColor& iColor);
 
 }// namespace evl::gui::dialog

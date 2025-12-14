@@ -24,30 +24,35 @@ namespace evl::gui {
 /**
  * @brief Classe D’affichage de la boite de dialogue d’à propos.
  */
-class WidgetNumberGrid: public QWidget {
+class WidgetNumberGrid final : public QWidget {
 	Q_OBJECT
 public:
 	/**
 	 * @brief Constructeur.
-	 * @param parent Le widget Parent.
+	 * @param iParent Le widget Parent.
 	 */
-	explicit WidgetNumberGrid(QWidget* parent= nullptr);
+	explicit WidgetNumberGrid(QWidget* iParent = nullptr);
 
 	/**
 	 * @brief Destructeur.
 	 */
 	~WidgetNumberGrid() override;
 
+	WidgetNumberGrid(const WidgetNumberGrid&) = delete;
+	WidgetNumberGrid(WidgetNumberGrid&&) = delete;
+	auto operator=(const WidgetNumberGrid&) -> WidgetNumberGrid& = delete;
+	auto operator=(WidgetNumberGrid&&) -> WidgetNumberGrid& = delete;
+
 	/**
 	 * @brief Defini comme appuyé le bouton
-	 * @param index lLe bouton
+	 * @param iNdex lLe bouton
 	 */
-	void setPushed(int index) const;
+	void setPushed(int iNdex) const;
 	/**
 	 * @brief Remet à zéro le bouton
-	 * @param index Le bouton
+	 * @param iNdex Le bouton
 	 */
-	void resetPushed(int index) const;
+	void resetPushed(int iNdex) const;
 	/**
 	 * @brief Remet à zéro tous les boutons
 	 */
@@ -57,7 +62,7 @@ public:
 	 * @brief Compte le nombre de boutons poussés
 	 * @return Le nombre.
 	 */
-	uint8_t getNumberPushed() const;
+	[[nodiscard]] auto getNumberPushed() const -> uint8_t;
 
 public slots:
 
@@ -425,24 +430,24 @@ public slots:
 signals:
 	/**
 	 * @brief Signal de bouton appuyé
-	 * @param Value Quel bouton
+	 * @param iValue Quel bouton
 	 */
-	void buttonPushed(int Value);
+	void buttonPushed(int iValue);
 
 private:
 	/**
 	 * @brief Définition de valeur de bouton
-	 * @param value Quelle valeur
+	 * @param iValue Quelle valeur
 	 */
-	void setValue(int value);
+	void setValue(int iValue);
 	/**
 	 * @brief Accès à un bouton
-	 * @param idx Index du bouton
+	 * @param iIdx Index du bouton
 	 * @return Pointeur sur le bouton
 	 */
-	QPushButton* getButton(int idx) const;
+	[[nodiscard]] auto getButton(int iIdx) const -> QPushButton*;
 	/// Lien vers la page UI.
-	Ui::WidgetNumberGrid* ui;
+	Ui::WidgetNumberGrid* m_ui;
 };
 
 }// namespace evl::gui

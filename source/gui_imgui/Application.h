@@ -30,7 +30,7 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	virtual ~Application();
+	~Application();
 
 	Application(const Application&) = delete;
 	Application(Application&&) = delete;
@@ -159,7 +159,7 @@ private:
 	/// The actions list.
 	std::list<std::shared_ptr<actions::Action>> m_actions;
 	/// The clear color.
-	const math::vec4 m_clear_color = {0.45f, 0.55f, 0.60f, 1.00f};
+	const math::vec4 m_clearColor = {0.45f, 0.55f, 0.60f, 1.00f};
 
 	/// The application theme.
 	Theme m_theme;

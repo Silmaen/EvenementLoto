@@ -33,7 +33,9 @@ MainWindow::MainWindow(QWidget* parent)
 	// initialise l’ui depuis le fichier ui.
 	ui->setupUi(this);
 	// initialise la numberGrid
-	const auto layout = new QGridLayout(ui->GroupPickManual);
+	//NOLINTBEGIN(cppcoreguidelines-owning-memory)
+	auto* layout = new QGridLayout(ui->GroupPickManual);
+	//NOLINTEND(cppcoreguidelines-owning-memory)
 	numberGrid->setParent(ui->GroupPickManual);
 	numberGrid->setObjectName(QString::fromUtf8("numberGrid"));
 	layout->addWidget(numberGrid, 0, 0, 1, 1);
@@ -48,17 +50,18 @@ MainWindow::~MainWindow() {
 	delete ui;
 	delete timer;
 	delete numberGrid;
-	if (displayWindow != nullptr)
-		delete displayWindow;
+	delete displayWindow;
+	displayWindow = nullptr;
 }
 
 void MainWindow::actShowAbout() {
-	evl::gui::About AboutWindow(this);
+	About AboutWindow(this);
 	AboutWindow.setModal(true);
 	AboutWindow.exec();
 }
-
+// NOLINTBEGIN(readability-convert-member-functions-to-static)
 void MainWindow::actShowHelp() { showNotImplemented("aide"); }
+// NOLINTEND(readability-convert-member-functions-to-static)
 
 void MainWindow::actShowGlobalParameters() {
 	ConfigGeneral cfg(this);
@@ -103,6 +106,7 @@ void MainWindow::actLoadFile() {
 	updateDisplay();
 }
 
+//NOLINTBEGIN(misc-no-recursion)
 void MainWindow::actSaveFile() {
 	if (currentEvent.getStatus() == core::Event::Status::Invalid)
 		return;
@@ -112,6 +116,7 @@ void MainWindow::actSaveFile() {
 	}
 	saveFile(currentFile);
 }
+//NOLINTEND(misc-no-recursion)
 
 void MainWindow::saveFile(const std::filesystem::path& where) {
 	std::ofstream f;
@@ -119,8 +124,9 @@ void MainWindow::saveFile(const std::filesystem::path& where) {
 	currentEvent.setBasePath(currentFile.parent_path());
 	// copy image file if not in child directory
 	if (!currentEvent.getLogo().empty()) {
-		if (std::filesystem::path ori = currentEvent.getLogoFull(); ori.parent_path() != currentEvent.getBasePath()) {
-			std::filesystem::path dest = currentEvent.getBasePath() / ori.filename();
+		if (const std::filesystem::path ori = currentEvent.getLogoFull();
+			ori.parent_path() != currentEvent.getBasePath()) {
+			const std::filesystem::path dest = currentEvent.getBasePath() / ori.filename();
 			if (exists(dest))
 				remove(dest);
 			copy_file(ori, dest);
@@ -128,9 +134,9 @@ void MainWindow::saveFile(const std::filesystem::path& where) {
 		}
 	}
 	if (!currentEvent.getOrganizerLogo().empty()) {
-		if (std::filesystem::path ori = currentEvent.getOrganizerLogoFull();
+		if (const std::filesystem::path ori = currentEvent.getOrganizerLogoFull();
 			ori.parent_path() != currentEvent.getBasePath()) {
-			std::filesystem::path dest = currentEvent.getBasePath() / ori.filename();
+			const std::filesystem::path dest = currentEvent.getBasePath() / ori.filename();
 			if (exists(dest))
 				remove(dest);
 			copy_file(ori, dest);
@@ -141,10 +147,11 @@ void MainWindow::saveFile(const std::filesystem::path& where) {
 	f.close();
 }
 
+// NOLINTBEGIN(misc-no-recursion)
 void MainWindow::actSaveAsFile() {
 	if (currentEvent.getStatus() == core::Event::Status::Invalid)
 		return;
-	std::filesystem::path file = dialog::openFile(dialog::FileTypes::EventSave, false);
+	std::filesystem::path file = openFile(dialog::FileTypes::EventSave, false);
 	if (file.empty())
 		return;
 	if (!file.has_extension() || file.extension() != ".lev") {
@@ -154,6 +161,7 @@ void MainWindow::actSaveAsFile() {
 	currentFile = file;
 	actSaveFile();
 }
+// NOLINTEND(misc-no-recursion)
 
 void MainWindow::actStartEvent() {
 	if (currentEvent.getStatus() == core::Event::Status::Ready) {
@@ -165,13 +173,15 @@ void MainWindow::actStartEvent() {
 	}
 	updateDisplay();
 	timer->start();
+	//NOLINTBEGIN(cppcoreguidelines-owning-memory)
 	displayWindow = new DisplayWindow(&currentEvent, this);
+	//NOLINTEND(cppcoreguidelines-owning-memory)
 	actChangeFullScreen();
 }
 
 void MainWindow::actChangeScreen() {
 	int screenId = ui->SelectScreen->currentIndex();
-	if (QList<QScreen*> screens = QApplication::screens(); screens.size() > 2) {
+	if (const QList<QScreen*> screens = QApplication::screens(); screens.size() > 2) {
 		int id = 0;
 		int mainId = 0;
 		for (const QScreen* scr: screens) {
@@ -182,7 +192,7 @@ void MainWindow::actChangeScreen() {
 			++id;
 		}
 		if (screenId == mainId) {
-			screenId = (mainId + 1) % screens.size();
+			screenId = (mainId + 1) % static_cast<int>(screens.size());
 		}
 		settings.setValue("display/screen_id", screenId);
 		log_trace("setting screen {}", screenId);
@@ -319,8 +329,8 @@ void MainWindow::updateClocks() {
 	ui->RoundDuration->setText(QString::fromStdString(core::formatDuration(core::clock::now() - cur->getStarting())));
 
 	// event chrono
-	core::time_point start = currentEvent.getStarting();
-	if (core::time_point end = currentEvent.getEnding(); start != core::g_epoch && end == core::g_epoch)
+	const core::time_point start = currentEvent.getStarting();
+	if (const core::time_point end = currentEvent.getEnding(); start != core::g_epoch && end == core::g_epoch)
 		ui->Duration->setText(QString::fromUtf8(core::formatDuration(core::clock::now() - start)));
 }
 
@@ -426,7 +436,7 @@ void MainWindow::updateBottomFrame() {
 
 void MainWindow::updateScreenList() {
 	ui->SelectScreen->clear();
-	QList<QScreen*> screens = QApplication::screens();
+	const QList<QScreen*> screens = QApplication::screens();
 	int id = 0;
 	int mainId = 0;
 	for (const QScreen* scr: screens) {

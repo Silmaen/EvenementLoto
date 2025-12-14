@@ -25,7 +25,7 @@ TEST(gui_ConfigGameRounds, saveFile) {
 	evl::core::Event evt;
 	evt.setName("toto");
 	evt.setOrganizerName("bob");
-	evl::core::GameRound grd;
+	const evl::core::GameRound grd;
 	evt.pushGameRound(grd);// add invalid game round
 	gr.setEvent(evt);
 	gr.actCancel();

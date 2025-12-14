@@ -39,7 +39,7 @@ class About;
  */
 void showNotImplemented(const QString& from);
 
-auto loadImage(const std::filesystem::path& from) -> QImage;
+auto loadImage(const std::filesystem::path& iFrom) -> QImage;
 
 /// Namespace regroupant les clés des paramètres.
 namespace settings {

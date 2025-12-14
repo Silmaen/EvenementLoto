@@ -23,9 +23,9 @@ void showNotImplemented(const QString& from) {
 	message.exec();
 }
 
-QImage loadImage(const std::filesystem::path& from) {
-	const QString imgName(QString::fromUtf8(from.string()));
-	if (from.extension() == ".svg") {
+auto loadImage(const std::filesystem::path& iFrom) -> QImage {
+	const QString imgName(QString::fromUtf8(iFrom.string()));
+	if (iFrom.extension() == ".svg") {
 		QSvgRenderer renderer(imgName);
 		const double ratio = renderer.viewBoxF().height() / renderer.viewBoxF().width();
 		QImage img(1920, static_cast<int>(1920 * ratio), QImage::Format_ARGB32);

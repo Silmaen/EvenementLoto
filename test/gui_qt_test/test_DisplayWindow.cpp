@@ -52,7 +52,7 @@ TEST(gui_DisplayWindow, updateDisplay_eventTitle_logo) {
 	event.setName("toto");
 	event.setOrganizerName("titi");
 	event.setLocation("ici");
-	std::filesystem::path dataPath = std::filesystem::current_path().parent_path().parent_path() / "data";
+	const std::filesystem::path dataPath = std::filesystem::current_path().parent_path().parent_path() / "data";
 	event.setLogo(dataPath / "logo_sou.png");
 	event.setOrganizerLogo(dataPath / "logo_sou.png");
 	a.updateDisplay();

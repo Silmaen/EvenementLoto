@@ -9,6 +9,7 @@
 #pragma once
 #include "../baseDefine.h"
 #include <QSettings>
+#include <filesystem>
 #include <unordered_map>
 
 namespace evl::gui {
@@ -73,18 +74,18 @@ public:
 
 	/**
 	 * @brief Accède à un paramètre.
-	 * @param key Le nom du paramètre.
+	 * @param iKey Le nom du paramètre.
 	 * @return Sa valeur si celui-ci existe (un QVariant vide sinon).
 	 */
-	const QVariant& getParam(const QString& key);
+	const QVariant& getParam(const QString& iKey);
 
 	/**
 	 * @brief Définition d’un paramètre
 	 * Ne défini un paramètre que si celui-ci existe dans la liste des défauts et si le type de valeur correspond bien
-	 * @param key Le nom du paramètre.
-	 * @param value La valeur du paramètre.
+	 * @param iKey Le nom du paramètre.
+	 * @param iValue La valeur du paramètre.
 	 */
-	void setParam(const QString& key, const QVariant& value);
+	void setParam(const QString& iKey, const QVariant& iValue);
 
 	/**
 	 * @brief Si le thème a été modifié, mais pas encore lu

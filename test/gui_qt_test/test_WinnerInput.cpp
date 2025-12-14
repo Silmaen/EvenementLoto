@@ -13,7 +13,7 @@ using namespace evl::gui;
 
 TEST(gui_WinnerInput, base) {
 	test::initialize();
-	WinnerInput a;
+	const WinnerInput a;
 	EXPECT_TRUE(a.isEnabled());
 	EXPECT_STREQ(a.getWinner().toStdString().c_str(), "");
 	test::finalize();
