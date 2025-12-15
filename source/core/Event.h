@@ -9,6 +9,7 @@
 #include "GameRound.h"
 #include "Serializable.h"
 #include "Statistics.h"
+#include <filesystem>
 
 namespace evl::core {
 
@@ -37,7 +38,7 @@ public:
 	 * @brief Renvoie une chaine contenant le statut.
 	 * @return Le statut.
 	 */
-	[[nodiscard]] auto getStatusStr() const -> string;
+	[[nodiscard]] auto getStatusStr() const -> std::string;
 
 	// ---- Serialisation ----
 	/**
@@ -81,25 +82,25 @@ public:
 	 * @brief Export des parties au format JSON
 	 * @param iFile Le fichier où exporter
 	 */
-	void exportJSON(const path& iFile) const;
+	void exportJSON(const std::filesystem::path& iFile) const;
 
 	/**
 	 * @brief Import des parties au format JSON
 	 * @param iFile Le fichier à importer
 	 */
-	void importJSON(const path& iFile);
+	void importJSON(const std::filesystem::path& iFile);
 
 	/**
 	 * @brief Export des parties au format YAML
 	 * @param iFile Le fichier où exporter
 	 */
-	void exportYaml(const path& iFile) const;
+	void exportYaml(const std::filesystem::path& iFile) const;
 
 	/**
 	 * @brief Import des parties au format YAML
 	 * @param iFile Le fichier à importer
 	 */
-	void importYaml(const path& iFile);
+	void importYaml(const std::filesystem::path& iFile);
 
 	// ---- manipulation du statut ----
 	/**
@@ -113,31 +114,31 @@ public:
 	 * @brief Accès au nom de l’organisateur
 	 * @return Le nom de l’organisateur
 	 */
-	[[nodiscard]] auto getOrganizerName() const -> const string& { return m_organizerName; }
+	[[nodiscard]] auto getOrganizerName() const -> const std::string& { return m_organizerName; }
 
 	/**
 	 * @brief Definition du nom de l’organisateur.
 	 * @param iName Le nom de l’organisateur.
 	 */
-	void setOrganizerName(const string& iName);
+	void setOrganizerName(const std::string& iName);
 
 	/**
 	 * @brief Accès au nom de l’événement
 	 * @return Le nom de l’événement
 	 */
-	[[nodiscard]] auto getName() const -> const string& { return m_name; }
+	[[nodiscard]] auto getName() const -> const std::string& { return m_name; }
 
 	/**
 	 * @brief Definition du nom de l’événement.
 	 * @param iName Le nom de l’événement.
 	 */
-	void setName(const string& iName);
+	void setName(const std::string& iName);
 
 	/**
 	 * @brief Accès au lieu de l’événement
 	 * @return Le lieu de l’événement
 	 */
-	[[nodiscard]] auto getLocation() const -> const string& { return m_location; }
+	[[nodiscard]] auto getLocation() const -> const std::string& { return m_location; }
 
 	/**
 	 * @brief Definition du lieu de l’événement.
@@ -149,13 +150,13 @@ public:
 	 * @brief Accès au logo de l’organisateur
 	 * @return Le logo de l’organisateur
 	 */
-	[[nodiscard]] auto getOrganizerLogo() const -> const path& { return m_organizerLogo; }
+	[[nodiscard]] auto getOrganizerLogo() const -> const std::filesystem::path& { return m_organizerLogo; }
 
 	/**
 	 * @brief Accès au chemin complet vers le log de l’organisateur
 	 * @return Chemin complet vers le log de l’organisateur
 	 */
-	[[nodiscard]] auto getOrganizerLogoFull() const -> path {
+	[[nodiscard]] auto getOrganizerLogoFull() const -> std::filesystem::path {
 		if (m_organizerLogo.empty())
 			return m_organizerLogo;
 		return getBasePath() / getOrganizerLogo();
@@ -164,19 +165,19 @@ public:
 	 * @brief Definition du logo de l’organisateur.
 	 * @param iLogo Le logo de l’organisateur.
 	 */
-	void setOrganizerLogo(const path& iLogo);
+	void setOrganizerLogo(const std::filesystem::path& iLogo);
 
 	/**
 	 * @brief Accès au logo de l’événement
 	 * @return Le logo de l’événement
 	 */
-	[[nodiscard]] auto getLogo() const -> const path& { return m_logo; }
+	[[nodiscard]] auto getLogo() const -> const std::filesystem::path& { return m_logo; }
 
 	/**
 	 * @brief Accès au chemin complet vers le logo de l’événement
 	 * @return Chemin complet vers le logo de l’événement
 	 */
-	[[nodiscard]] auto getLogoFull() const -> path {
+	[[nodiscard]] auto getLogoFull() const -> std::filesystem::path {
 		if (m_logo.empty())
 			return m_logo;
 		return getBasePath() / getLogo();
@@ -186,19 +187,19 @@ public:
 	 * @brief Definition du logo de l’événement.
 	 * @param iLogo Le logo de l’événement.
 	 */
-	void setLogo(const path& iLogo);
+	void setLogo(const std::filesystem::path& iLogo);
 
 	/**
 	 * @brief Accès aux règles de l’événement
 	 * @return Les règles.
 	 */
-	[[nodiscard]] auto getRules() const -> const string& { return m_rules; }
+	[[nodiscard]] auto getRules() const -> const std::string& { return m_rules; }
 
 	/**
 	 * @brief Définit les règles de l’événement.
 	 * @param iNewRules Les règles.
 	 */
-	void setRules(const string& iNewRules);
+	void setRules(const std::string& iNewRules);
 
 	// ----- Manipulation des rounds ----
 	/**
@@ -271,7 +272,7 @@ public:
 	 * @brief Renvoie une chaine de caractère décrivant l'état courant
 	 * @return L'état courant
 	 */
-	[[nodiscard]] auto getStateString() const -> string;
+	[[nodiscard]] auto getStateString() const -> std::string;
 
 	auto checkStateChanged() -> bool {
 		const bool ch = m_changed;
@@ -315,13 +316,13 @@ public:
 	 * @brief Récupération du chemin de base vers l’événement
 	 * @return Le chemin de base de l’événement
 	 */
-	[[nodiscard]] auto getBasePath() const -> const path& { return m_basePath; }
+	[[nodiscard]] auto getBasePath() const -> const std::filesystem::path& { return m_basePath; }
 
 	/**
 	 * @brief Definition du chemin de base vers l’événement
 	 * @param iBasePath Le chemin vers l’événement
 	 */
-	void setBasePath(const path& iBasePath);
+	void setBasePath(const std::filesystem::path& iBasePath);
 
 	/**
 	 * @brief Renvoie le nombre de tirages et la liste des numéros les moins tirés
@@ -346,18 +347,18 @@ private:
 	Status m_previousStatus = Status::Invalid;
 
 	/// Le nom de l’organisateur (requit pour validité)
-	string m_organizerName;
+	std::string m_organizerName;
 	/// Logo de l’organisateur.
-	path m_organizerLogo;
+	std::filesystem::path m_organizerLogo;
 	/// Nom de l’événement. (requit pour validité)
-	string m_name;
+	std::string m_name;
 	/// Logo de l’événement.
-	path m_logo;
+	std::filesystem::path m_logo;
 	/// Lieu de l’événement.
-	string m_location;
+	std::string m_location;
 
 	/// Les règles de l’événement
-	string m_rules;
+	std::string m_rules;
 
 	/// Liste des parties de l’événement.
 	rounds_type m_gameRounds;
@@ -369,7 +370,7 @@ private:
 	time_point m_end;
 
 	/// Le chemin de base de l’événement
-	path m_basePath;
+	std::filesystem::path m_basePath;
 
 	/// status change
 	bool m_changed = false;

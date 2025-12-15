@@ -4,17 +4,26 @@ remote:
   # If newer remote package exists, download it? (implies 'pull')
   pull-newer: true
 packages:
-  spdlog:
-    version: 1.16.0
-    kind: "static"
-  magic_enum:
-    version: 0.9.7
-  jsoncpp:
-    version: 1.9.6
-    kind: "static"
+  glfw:
+    version: 3.4.0
+    kind: "shared"
   googletest:
     version: 1.17.0
     kind: "static"
+  imgui:
+    version: 1.92.4-docking
+    kind: "shared"
+  jsoncpp:
+    version: 1.9.6
+    kind: "static"
+  magic_enum:
+    version: 0.9.7
+  spdlog:
+    version: 1.16.0
+    kind: "static"
+  vulkan_sdk:
+    version: 1.4.328
+    kind: "shared"
   yaml-cpp:
     version: 0.8.0
     kind: "static"

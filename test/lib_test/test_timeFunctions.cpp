@@ -5,9 +5,9 @@
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "../TestMainHelper.h"
 
 #include "core/timeFunctions.h"
-#include <gtest/gtest.h>
 
 TEST(timeFunction, timePoint) {
 	constexpr evl::core::time_point t = evl::core::g_epoch;

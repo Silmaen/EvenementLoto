@@ -64,6 +64,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-used-but-marked-unused
             -Wno-exit-time-destructors
             -Wno-global-constructors
+            -Wno-unused-macros
     )
     if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 17)
         target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
@@ -77,6 +78,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     endif ()
     set(${PROJECT_PREFIX}_COMPILER_CLANG ON)
     set(${PROJECT_PREFIX}_COMPILER_STR "clang")
+    target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE -Wno-enum-constexpr-conversion)
 else ()
     message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif ()
@@ -148,3 +150,4 @@ else ()
 endif ()
 
 include(cmake/DocumentationConfig.cmake)
+include(cmake/Vulkan.cmake)

@@ -4,11 +4,12 @@
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
+#include "../TestMainHelper.h"
+
 #include "core/GameRound.h"
 
-#include <filesystem>
+#include <core/utilities.h>
 #include <fstream>
-#include <gtest/gtest.h>
 
 namespace fs = std::filesystem;
 using namespace evl::core;
@@ -186,7 +187,7 @@ TEST(GameRound, serialize) {
 	gr.nextStatus();
 	gr.addPickedNumber(55);
 	const fs::path tmp = fs::temp_directory_path() / "test";
-	fs::create_directories(tmp);
+	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
 	std::ofstream fileSave;
@@ -197,11 +198,11 @@ TEST(GameRound, serialize) {
 	GameRound gr2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	gr2.read(fileRead, evl::currentSaveVersion);
+	gr2.read(fileRead, getSaveVersion());
 	fileRead.close();
 
 	EXPECT_EQ(gr2.getType(), GameRound::Type::Enfant);
-	fs::remove_all(tmp);
+	remove_all(tmp);
 }
 
 TEST(GameRound, TypeNormal) {

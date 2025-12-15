@@ -9,6 +9,7 @@
 
 #include "Serializable.h"
 #include "SubGameRound.h"
+#include <filesystem>
 #include <numeric>
 #include <vector>
 
@@ -61,7 +62,7 @@ public:
 	 * @brief Renvoie une chaine contenant le type de partie.
 	 * @return Le type de partie.
 	 */
-	[[nodiscard]] auto getTypeStr() const -> string;
+	[[nodiscard]] auto getTypeStr() const -> std::string;
 
 	/**
 	 * @brief Renvoie le type de partie.
@@ -80,7 +81,7 @@ public:
 	 * @brief Renvoie une chaine contenant le type de partie.
 	 * @return Le type de partie.
 	 */
-	[[nodiscard]] auto getStatusStr() const -> string;
+	[[nodiscard]] auto getStatusStr() const -> std::string;
 
 	/**
 	 * @brief Renvoie le type de partie.
@@ -120,7 +121,7 @@ public:
 	 * @brief Renvoie une chaine de caractère décrivant l'état courant
 	 * @return L'état courant
 	 */
-	[[nodiscard]] auto getStateString() const -> string;
+	[[nodiscard]] auto getStateString() const -> std::string;
 
 	/**
 	 * @brief Ajoute le numéro dans la liste des numéros tirés
@@ -143,7 +144,7 @@ public:
 	 * @brief Renvoie la liste des gagnants de sous-partie
 	 * @return Les gagnants
 	 */
-	[[nodiscard]] auto getWinnerStr() const -> string;
+	[[nodiscard]] auto getWinnerStr() const -> std::string;
 
 	// ---- Serialisation ----
 	/**
@@ -249,14 +250,14 @@ public:
 	 * @brief Affichage de nom spécial
 	 * @return Nom du round
 	 */
-	[[nodiscard]] auto getName() const -> string;
+	[[nodiscard]] auto getName() const -> std::string;
 
 	// ----------- Draws management -----------------
 	/**
 	 * @brief Renvoie les tirages sous forme de chaine de caractère
 	 * @return Les tirages
 	 */
-	[[nodiscard]] auto getDrawStr() const -> string;
+	[[nodiscard]] auto getDrawStr() const -> std::string;
 
 	/**
 	 * @brief Renvoie la liste complète des tirages
@@ -296,9 +297,9 @@ public:
 				[](draws_type::size_type iAccu, const auto& iItem) -> auto { return iAccu + iItem.getDraws().size(); });
 	}
 
-	void setDiapo(const string& iPath, double iDelai);
+	void setDiapo(const std::string& iPath, double iDelai);
 
-	[[nodiscard]] auto getDiapo() const -> std::tuple<path, double>;
+	[[nodiscard]] auto getDiapo() const -> std::tuple<std::filesystem::path, double>;
 
 	/**
 	 * @brief Check if the round has diaporama
@@ -328,7 +329,7 @@ private:
 	sub_rounds_type m_subGames;
 
 	/// Diaporama Path (only in pause)
-	path m_diapoPath;
+	std::filesystem::path m_diapoPath;
 
 	/// Diaporama delay (only in pause)
 	double m_diapoDelay = 0;
