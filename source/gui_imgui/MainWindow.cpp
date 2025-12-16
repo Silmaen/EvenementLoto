@@ -34,7 +34,6 @@ namespace evl::gui_imgui {
 
 namespace {
 
-std::shared_ptr<vulkan::VulkanContext> g_vkContext;
 std::shared_ptr<ImGui_ImplVulkanH_Window> g_MainWindowData;
 
 void glfw_error_callback(int iError, const char* iDescription) { log_error("GLFW Error %d: %s", iError, iDescription); }
@@ -79,11 +78,13 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 			extensions.reserve(extensions_count);
 			for (uint32_t i = 0; i < extensions_count; i++) extensions.push_back(glfw_extensions[i]);
 		}
-		g_vkContext = std::make_shared<vulkan::VulkanContext>(extensions);
+
+		auto& vkContext = vulkan::VulkanContext::get();
+		vkContext.init(extensions);
 		g_MainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
 
-		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool] =
-				g_vkContext->getVkData();
+		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool,
+			  commandPool] = vkContext.getVkData();
 		VkSurfaceKHR surface = nullptr;
 
 		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
@@ -118,8 +119,8 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 	// Setup Platform/Renderer backends
 	{
 		ImGui_ImplGlfw_InitForVulkan(window, true);
-		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool] =
-				g_vkContext->getVkData();
+		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool,
+			  commandPool] = vulkan::VulkanContext::get().getVkData();
 		ImGui_ImplVulkan_InitInfo init_info = {.ApiVersion = VK_API_VERSION_1_4,
 											   .Instance = instance,
 											   .PhysicalDevice = physicalDevice,
@@ -156,7 +157,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 }
 
 void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
-	const auto vkData = g_vkContext->getVkData();
+	const auto vkData = vulkan::VulkanContext::get().getVkData();
 
 	// Check for WSI support
 	VkBool32 res = 0;
@@ -198,7 +199,7 @@ void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
 void MainWindow::cleanupVulkanWindow() {
 	if (!m_windowSetupDone)
 		return;
-	const auto vkData = g_vkContext->getVkData();
+	const auto vkData = vulkan::VulkanContext::get().getVkData();
 	ImGui_ImplVulkanH_DestroyWindow(vkData.instance, vkData.device, g_MainWindowData.get(), vkData.allocator);
 	m_windowSetupDone = false;
 }
@@ -281,7 +282,7 @@ void MainWindow::setCallbacks() {
 }
 
 void MainWindow::close() {
-	const auto vkData = g_vkContext->getVkData();
+	const auto vkData = vulkan::VulkanContext::get().getVkData();
 	const auto err = vkDeviceWaitIdle(vkData.device);
 	vulkan::VulkanContext::checkVkResult(err);
 	ImGui_ImplVulkan_Shutdown();
@@ -290,7 +291,7 @@ void MainWindow::close() {
 
 	cleanupVulkanWindow();
 	g_MainWindowData.reset();
-	g_vkContext.reset();
+	vulkan::VulkanContext::get().reset();
 
 	auto* window = static_cast<GLFWwindow*>(m_window);
 	glfwDestroyWindow(window);
@@ -310,7 +311,7 @@ void MainWindow::newFrame() {
 	// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 	glfwPollEvents();
 	auto* window = static_cast<GLFWwindow*>(m_window);
-	const auto vkData = g_vkContext->getVkData();
+	const auto vkData = vulkan::VulkanContext::get().getVkData();
 
 	// Resize swap chain?
 	int fb_width = 0;
@@ -357,7 +358,7 @@ void MainWindow::render(const math::vec4& iClearColor) {
 		g_MainWindowData->ClearValue.color.float32[1] = iClearColor.g() * iClearColor.a();
 		g_MainWindowData->ClearValue.color.float32[2] = iClearColor.b() * iClearColor.a();
 		g_MainWindowData->ClearValue.color.float32[3] = iClearColor.a();
-		g_vkContext->frameRender(g_MainWindowData.get(), draw_data, m_swapChainRebuild);
+		vulkan::VulkanContext::get().frameRender(g_MainWindowData.get(), draw_data, m_swapChainRebuild);
 	}
 }
 

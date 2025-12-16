@@ -10,12 +10,12 @@
 #include "SettingsActions.h"
 
 namespace evl::gui_imgui::actions {
-PreferencesAction::PreferencesAction() = default;
+PreferencesAction::PreferencesAction() { setIconName("adjust"); }
 PreferencesAction::~PreferencesAction() = default;
-EventSettingsAction::EventSettingsAction() = default;
+EventSettingsAction::EventSettingsAction() { setIconName("details"); }
 EventSettingsAction::~EventSettingsAction() = default;
-GameSettingsAction::GameSettingsAction() = default;
+GameSettingsAction::GameSettingsAction() { setIconName("services"); }
 GameSettingsAction::~GameSettingsAction() = default;
-ThemeSettingsAction::ThemeSettingsAction() = default;
+ThemeSettingsAction::ThemeSettingsAction() { setIconName("windows-10-personalization"); }
 ThemeSettingsAction::~ThemeSettingsAction() = default;
 }// namespace evl::gui_imgui::actions

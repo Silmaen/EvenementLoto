@@ -16,6 +16,8 @@
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "views/MenuBar.h"
+#include "views/StatusBar.h"
+#include "views/ToolBar.h"
 
 
 namespace evl::gui_imgui {
@@ -30,6 +32,8 @@ Application::Application() {
 		return;
 	// Create views
 	m_views.push_back(std::make_shared<views::MenuBar>());
+	m_views.push_back(std::make_shared<views::ToolBar>());
+	m_views.push_back(std::make_shared<views::StatusBar>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -50,6 +54,12 @@ Application::Application() {
 
 	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
 
+	const auto resourcePath = core::getExecPath() / "resources";
+	if (const auto texturePath = resourcePath / "darkicons"; exists(texturePath) && is_directory(texturePath))
+		m_textureLibrary.loadFolder(texturePath);
+	else
+		log_warn("Texture path '{}' does not exist or is not a directory.", texturePath.string());
+
 	m_state = State::Running;
 }
 
@@ -66,6 +76,7 @@ void Application::run() {
 			m_state = State::Closed;
 			continue;
 		}
+		checkActionEnable();
 		m_mainWindow.newFrame();
 		if (m_state != State::Running)
 			continue;
@@ -119,5 +130,33 @@ void Application::onEvent(event::Event& ioEvent) {
 }
 
 auto Application::isKeyPressed(const KeyCode& iKeycode) const -> bool { return m_mainWindow.isKeyPressed(iKeycode); }
+
 auto Application::getModifiers() const -> Modifiers { return m_mainWindow.getModifiers(); }
+
+void Application::checkActionEnable() const {
+	const auto status = m_currentEvent.getStatus();
+	if (status == core::Event::Status::Invalid || status == core::Event::Status::MissingParties) {
+		getAction("save_file_as")->disable();
+		getAction("save_file")->disable();
+	} else {
+		getAction("save_file")->enable();
+		getAction("save_file_as")->enable();
+	}
+	if (status == core::Event::Status::Ready) {
+		getAction("start_game")->enable();
+	} else {
+		getAction("start_game")->disable();
+	}
+	if (status == core::Event::Status::Finished) {
+		getAction("stop_game")->enable();
+	} else {
+		getAction("stop_game")->disable();
+	}
+	if (status == core::Event::Status::Invalid) {
+		getAction("game_settings")->disable();
+	} else {
+		getAction("game_settings")->enable();
+	}
+}
+
 }// namespace evl::gui_imgui

@@ -94,12 +94,32 @@ public:
 	 */
 	void setShortcut(const KeyCombination& iShortcut) { m_shortcut = iShortcut; }
 
+	/**
+	 * @brief Get the icon name.
+	 * @return The icon name.
+	 */
+	[[nodiscard]] auto getIconName() const -> std::string { return m_iconName; }
+	/**
+	 * @brief Check if the action has an icon.
+	 * @return true if the action has an icon.
+	 */
+	[[nodiscard]]
+	auto hasIcon() const -> bool {
+		return !m_iconName.empty();
+	}
+	/**
+	 * @brief Set the icon name.
+	 * @param iIconName The new icon name.
+	 */
+	void setIconName(const std::string& iIconName) { m_iconName = iIconName; }
+
 private:
 	/// if the action is enabled
 	bool m_enabled = true;
 	/// The action shortcut
 	KeyCombination m_shortcut;
-
+	/// Icon name
+	std::string m_iconName;
 	/**
 	 * @brief Callback function to check if the activation is possible.
 	 * @return true if activation is possible

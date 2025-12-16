@@ -31,6 +31,8 @@ struct VkData {
 	VkPipelineCache pipelineCache = VK_NULL_HANDLE;
 	/// Descriptor pool.
 	VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+	/// Command pool for temporary operations.
+	VkCommandPool commandPool = VK_NULL_HANDLE;
 #ifdef MVI_DEBUG
 #define APP_USE_VULKAN_DEBUG_REPORT
 	/// Debug report callback.
@@ -38,4 +40,4 @@ struct VkData {
 #endif
 };
 
-}// namespace mvi::core::vulkan
+}// namespace evl::gui_imgui::vulkan
