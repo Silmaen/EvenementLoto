@@ -12,7 +12,9 @@
 #include "actions/Action.h"
 #include "event/KeyCodes.h"
 #include "views/View.h"
+#include "vulkan/TextureLibrary.h"
 
+#include <core/Event.h>
 #include <list>
 #include <memory>
 
@@ -147,6 +149,36 @@ public:
 	 */
 	[[nodiscard]] auto getModifiers() const -> Modifiers;
 
+	/**
+	 * @brief Access to the current Event
+	 * @return The current Event.
+	 */
+	auto getCurrentEvent() -> core::Event& { return m_currentEvent; }
+
+	/**
+	 * @brief Access to the current file.
+	 * @return The current file.
+	 */
+	auto getCurrentFile() -> std::filesystem::path { return m_currentFile; }
+	/**
+	 * @brief Draw mode of the number.
+	 */
+	enum struct DrawMode : uint8_t {
+		Both,///< Both manual and using internal RNG.
+		PickOnly,///< Using the internal RNG.
+		ManualOnly///< Manual picking (external)
+	};
+	/**
+	 * @brief Access to the draw mode.
+	 * @return The draw mode.
+	 */
+	auto getDrawMode() -> DrawMode& { return m_currentDrawMode; }
+	/**
+	 * @brief Access to the texture library.
+	 * @return The texture library.
+	 */
+	auto getTextureLibrary() -> vulkan::TextureLibrary& { return m_textureLibrary; }
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
@@ -161,8 +193,23 @@ private:
 	/// The clear color.
 	const math::vec4 m_clearColor = {0.45f, 0.55f, 0.60f, 1.00f};
 
+	/// The texture library.
+	vulkan::TextureLibrary m_textureLibrary;
+
 	/// The application theme.
 	Theme m_theme;
+
+	/// The current event.
+	core::Event m_currentEvent{};
+	/// The current file.
+	std::filesystem::path m_currentFile{};
+	/// The current draw mode.
+	DrawMode m_currentDrawMode = DrawMode::Both;
+
+	/**
+	 * @brief check the enablement of the actions.
+	 */
+	void checkActionEnable() const;
 };
 
 auto createApplication(int iArgc, char* iArgv[]) -> std::shared_ptr<Application>;

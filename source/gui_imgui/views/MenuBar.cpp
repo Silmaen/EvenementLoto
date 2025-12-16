@@ -23,6 +23,15 @@ void defineMenuItem(const std::string& iLabel, const std::string& iActionName) {
 		log_warn("Action '{}' not found ({}).", iLabel, iActionName);
 		ImGui::MenuItem(iLabel.c_str(), "", false, false);
 	} else {
+		if (action->hasIcon()) {
+			const auto& texLib = Application::get().getTextureLibrary();
+
+			if (const uint64_t texId = texLib.getTextureId(action->getIconName()); texId != 0) {
+				constexpr ImVec2 iconSize = {16.0f, 16.0f};
+				ImGui::Image(texId, iconSize);
+				ImGui::SameLine();
+			}
+		}
 		if (ImGui::MenuItem(iLabel.c_str(), action->getShortcut().c_str(), false, action->isEnabled())) {
 			action->execute();
 		}

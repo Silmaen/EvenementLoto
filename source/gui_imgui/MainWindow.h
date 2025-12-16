@@ -14,8 +14,6 @@
 #include "event/Event.h"
 #include "event/KeyCodes.h"
 
-#include <array>
-
 namespace evl::gui_imgui {
 
 /**

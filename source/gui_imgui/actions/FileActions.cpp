@@ -13,17 +13,17 @@
 
 namespace evl::gui_imgui::actions {
 
-NewFileAction::NewFileAction() = default;
+NewFileAction::NewFileAction() { setIconName("new-file"); }
 NewFileAction::~NewFileAction() = default;
-LoadFileAction::LoadFileAction() = default;
+LoadFileAction::LoadFileAction() { setIconName("folder_open"); }
 LoadFileAction::~LoadFileAction() = default;
-SaveFileAction::SaveFileAction() = default;
+SaveFileAction::SaveFileAction() { setIconName("save"); }
 SaveFileAction::~SaveFileAction() = default;
-SaveAsFileAction::SaveAsFileAction() = default;
+SaveAsFileAction::SaveAsFileAction() { setIconName("save-as"); }
 SaveAsFileAction::~SaveAsFileAction() = default;
-StartGameAction::StartGameAction() = default;
+StartGameAction::StartGameAction() { setIconName("toggle-on"); }
 StartGameAction::~StartGameAction() = default;
-StopGameAction::StopGameAction() = default;
+StopGameAction::StopGameAction() { setIconName("toggle-off"); }
 StopGameAction::~StopGameAction() = default;
 
 QuitAction::QuitAction() = default;
