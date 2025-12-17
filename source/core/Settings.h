@@ -18,7 +18,7 @@ namespace evl::core {
 /**
  * @brief Class Settings.
  */
-class Settings {
+class Settings final {
 public:
 	/**
 	 * @brief Default constructor.
@@ -28,7 +28,7 @@ public:
 	/**
 	 * @brief Default destructor.
 	 */
-	virtual ~Settings();
+	~Settings();
 	Settings(const Settings&) = default;
 	Settings(Settings&&) = default;
 	auto operator=(const Settings&) -> Settings& = default;
@@ -58,7 +58,19 @@ public:
 		if (const auto it = m_data.find(iKey); it != m_data.end()) {
 			try {
 				return std::any_cast<T>(it->second);
-			} catch (const std::bad_any_cast&) { return iDefault; }
+			} catch (const std::bad_any_cast&) {
+				// Try conversion between float and double
+				if constexpr (std::is_same_v<T, float>) {
+					try {
+						return static_cast<float>(std::any_cast<double>(it->second));
+					} catch (const std::bad_any_cast&) { return iDefault; }
+				} else if constexpr (std::is_same_v<T, double>) {
+					try {
+						return static_cast<double>(std::any_cast<float>(it->second));
+					} catch (const std::bad_any_cast&) { return iDefault; }
+				}
+				return iDefault;
+			}
 		}
 		return iDefault;
 	}

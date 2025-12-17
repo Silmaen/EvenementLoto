@@ -68,6 +68,14 @@ public:
 		return getTextureId(iName);
 	}
 
+	struct Pixels {
+		std::vector<uint8_t> data;
+		uint32_t width{0};
+		uint32_t height{0};
+		uint32_t channels{0};
+	};
+	auto getRawPixels(const std::string& iName) -> Pixels;
+
 private:
 	/// Texture map.
 	std::unordered_map<std::string, uint64_t> m_textureMap;

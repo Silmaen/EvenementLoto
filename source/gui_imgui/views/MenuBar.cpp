@@ -67,13 +67,9 @@ void MenuBar::onUpdate() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help")) {
-			if (ImGui::MenuItem("About")) {
-				ImGui::OpenPopup("About");
-			}
+			defineMenuItem("A propos", "about");
 			ImGui::Separator();
-			if (ImGui::MenuItem("Aide", "F1")) {
-				// Open documentation
-			}
+			defineMenuItem("Aide", "help");
 			ImGui::EndMenu();
 		}
 		ImGui::EndMainMenuBar();

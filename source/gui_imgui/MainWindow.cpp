@@ -550,4 +550,14 @@ void MainWindow::onEvent(event::Event& ioEvent) {
 	});
 }
 
+void MainWindow::setIcon(const std::string& iIconName) const {
+	auto* glfwWindow = static_cast<GLFWwindow*>(m_window);
+	auto pix = Application::get().getTextureLibrary().getRawPixels(iIconName);
+	GLFWimage img;
+	img.width = static_cast<int>(pix.width);
+	img.height = static_cast<int>(pix.height);
+	img.pixels = pix.data.data();
+	glfwSetWindowIcon(glfwWindow, 1, &img);
+}
+
 }// namespace evl::gui_imgui
