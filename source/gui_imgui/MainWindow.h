@@ -14,6 +14,8 @@
 #include "event/Event.h"
 #include "event/KeyCodes.h"
 
+#include <functional>
+
 namespace evl::gui_imgui {
 
 /**
@@ -101,6 +103,11 @@ public:
 	 */
 	[[nodiscard]] auto getModifiers() const -> Modifiers;
 
+	/**
+	 * @brief Set the window icon.
+	 * @param iIconName The icon file name.
+	 */
+	void setIcon(const std::string& iIconName) const;
 	/**
 	 * @brief Event handler.
 	 * @param[in,out] ioEvent The Event to react.

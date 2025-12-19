@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <cstdint>
+#include <string>
+
 namespace evl::gui_imgui::event {
 
 /**

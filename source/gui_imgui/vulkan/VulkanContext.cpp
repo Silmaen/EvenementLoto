@@ -224,14 +224,28 @@ void transitionImageLayout(const VkData& iVkData, VkImage iImage, const VkImageL
 		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+	} else if (iOldLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+			   iNewLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	} else if (iOldLayout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL &&
+			   iNewLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+		barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+		barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+		sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+		destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 	} else {
-		log_error("Unsupported layout transition");
+		log_error("Unsupported layout transition from {} to {}", magic_enum::enum_name(iOldLayout),
+				  magic_enum::enum_name(iNewLayout));
 	}
 
 	vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, nullptr, 0, nullptr, 1, &barrier);
 
 	endSingleTimeCommands(iVkData, commandBuffer);
 }
+
 
 void copyBufferToImage(const VkData& iVkData, VkBuffer iBuffer, VkImage iImage, const uint32_t iWidth,
 					   const uint32_t iHeight) {
@@ -405,7 +419,7 @@ void VulkanContext::reset() {
 		vkDeviceWaitIdle(m_data.device);
 	}
 
-	for (auto& [image, memory, imageView, sampler, descriptorSet]: m_textures | std::views::values) {
+	for (auto& [image, memory, imageView, sampler, descriptorSet, infos]: m_textures | std::views::values) {
 		if (descriptorSet != VK_NULL_HANDLE)
 			vkFreeDescriptorSets(m_data.device, m_data.descriptorPool, 1, &descriptorSet);
 		if (sampler != VK_NULL_HANDLE)
@@ -550,7 +564,8 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 	wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount;// Now we can use the next set of semaphores
 }
 
-auto VulkanContext::loadImage(const unsigned char* iImageData, const int iWidth, const int iHeight) -> uint64_t {
+auto VulkanContext::loadImage(const unsigned char* iImageData, const uint32_t iWidth, const uint32_t iHeight,
+							  const uint32_t iChannels) -> uint64_t {
 	const VkDeviceSize imageSize = static_cast<VkDeviceSize>(iWidth) * static_cast<VkDeviceSize>(iHeight) * 4;
 
 	VkBuffer stagingBuffer = VK_NULL_HANDLE;
@@ -565,13 +580,12 @@ auto VulkanContext::loadImage(const unsigned char* iImageData, const int iWidth,
 	vkUnmapMemory(m_data.device, stagingBufferMemory);
 
 	TextureData texture{};
-	createImage(m_data, static_cast<uint32_t>(iWidth), static_cast<uint32_t>(iHeight), VK_FORMAT_R8G8B8A8_UNORM,
-				VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-				VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture.image, texture.memory);
+	createImage(m_data, iWidth, iHeight, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
+				VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				texture.image, texture.memory);
 
 	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	copyBufferToImage(m_data, stagingBuffer, texture.image, static_cast<uint32_t>(iWidth),
-					  static_cast<uint32_t>(iHeight));
+	copyBufferToImage(m_data, stagingBuffer, texture.image, iWidth, iHeight);
 	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
 						  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
@@ -584,10 +598,80 @@ auto VulkanContext::loadImage(const unsigned char* iImageData, const int iWidth,
 	texture.descriptorSet =
 			ImGui_ImplVulkan_AddTexture(texture.sampler, texture.imageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+	texture.info.width = iWidth;
+	texture.info.height = iHeight;
+	texture.info.channels = iChannels;
+
 	const auto textureId = reinterpret_cast<uint64_t>(texture.descriptorSet);
 	m_textures[textureId] = texture;
 
 	return textureId;
 }
+
+auto VulkanContext::getImageInfo(const uint64_t iTextureId) const -> ImageInfo {
+	ImageInfo info{};
+	if (const auto it = m_textures.find(iTextureId); it != m_textures.end()) {
+		info = it->second.info;
+	} else {
+		log_error("Texture ID {} not found", iTextureId);
+	}
+	return info;
+}
+
+auto VulkanContext::getImagePixels(const uint64_t iTextureId) const -> std::vector<unsigned char> {
+	std::vector<unsigned char> pixels;
+
+	const auto it = m_textures.find(iTextureId);
+	if (it == m_textures.end()) {
+		log_error("Texture ID {} not found", iTextureId);
+		return pixels;
+	}
+
+	const auto& texture = it->second;
+	const auto info = getImageInfo(iTextureId);
+	const VkDeviceSize imageSize = static_cast<VkDeviceSize>(info.width) * static_cast<VkDeviceSize>(info.height) * 4;
+
+	VkBuffer stagingBuffer = VK_NULL_HANDLE;
+	VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
+
+	createBuffer(m_data, imageSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+				 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer,
+				 stagingBufferMemory);
+
+	VkCommandBuffer commandBuffer = beginSingleTimeCommands(m_data);
+
+	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+						  VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+	const VkBufferImageCopy region{.bufferOffset = 0,
+								   .bufferRowLength = 0,
+								   .bufferImageHeight = 0,
+								   .imageSubresource = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+														.mipLevel = 0,
+														.baseArrayLayer = 0,
+														.layerCount = 1},
+								   .imageOffset = {.x = 0, .y = 0, .z = 0},
+								   .imageExtent = {.width = info.width, .height = info.height, .depth = 1}};
+
+	vkCmdCopyImageToBuffer(commandBuffer, texture.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, 1,
+						   &region);
+
+	endSingleTimeCommands(m_data, commandBuffer);
+
+	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+						  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	pixels.resize(imageSize);
+	void* data = nullptr;
+	vkMapMemory(m_data.device, stagingBufferMemory, 0, imageSize, 0, &data);
+	memcpy(pixels.data(), data, imageSize);
+	vkUnmapMemory(m_data.device, stagingBufferMemory);
+
+	vkDestroyBuffer(m_data.device, stagingBuffer, m_data.allocator);
+	vkFreeMemory(m_data.device, stagingBufferMemory, m_data.allocator);
+
+	return pixels;
+}
+
 
 }// namespace evl::gui_imgui::vulkan

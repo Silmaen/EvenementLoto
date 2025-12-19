@@ -10,12 +10,14 @@
 #include "Application.h"
 
 #include "actions/FileActions.h"
+#include "actions/HelpActions.h"
 #include "actions/SettingsActions.h"
 #include "baseDefine.h"
 #include "core/Log.h"
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "views/MenuBar.h"
+#include "views/Popups.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
 
@@ -27,13 +29,27 @@ Application* Application::m_instance = nullptr;
 Application::Application() {
 	log_info("Starting application.");
 	m_instance = this;
+
 	m_mainWindow.init({.title = std::format("Application Loto ({})", EVL_VERSION), .size = {800, 600}, .iconPath = ""});
 	if (m_state == State::Error)
 		return;
+
+	const auto resourcePath = core::getExecPath() / "resources";
+	if (const auto texturePath = resourcePath / "darkicons"; exists(texturePath) && is_directory(texturePath))
+		m_textureLibrary.loadFolder(texturePath);
+	else
+		log_warn("Texture path '{}' does not exist or is not a directory.", texturePath.string());
+
+	m_mainWindow.setIcon("mainIcon");
+
 	// Create views
 	m_views.push_back(std::make_shared<views::MenuBar>());
 	m_views.push_back(std::make_shared<views::ToolBar>());
 	m_views.push_back(std::make_shared<views::StatusBar>());
+
+	// Create popups
+	m_popups.push_back(std::make_shared<views::PopupAide>());
+	m_popups.push_back(std::make_shared<views::PopupAbout>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -47,18 +63,14 @@ Application::Application() {
 	m_actions.push_back(std::make_shared<actions::GameSettingsAction>());
 	m_actions.push_back(std::make_shared<actions::ThemeSettingsAction>());
 	m_actions.push_back(std::make_shared<actions::QuitAction>());
-	m_actions.back()->setShortcut({KeyCode::A, {.ctrl = true}});
+	m_actions.back()->setShortcut({.key = KeyCode::A, .modifiers = {.ctrl = true}});
+	m_actions.push_back(std::make_shared<actions::HelpAction>());
+	m_actions.push_back(std::make_shared<actions::AboutAction>());
 
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);
 
 	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
-
-	const auto resourcePath = core::getExecPath() / "resources";
-	if (const auto texturePath = resourcePath / "darkicons"; exists(texturePath) && is_directory(texturePath))
-		m_textureLibrary.loadFolder(texturePath);
-	else
-		log_warn("Texture path '{}' does not exist or is not a directory.", texturePath.string());
 
 	m_state = State::Running;
 }
@@ -71,6 +83,7 @@ Application::~Application() {
 
 void Application::run() {
 	// Main loop
+	uint32_t frameCount = 0;
 	while (m_state == State::Running || m_state == State::Waiting) {
 		if (m_mainWindow.shouldClose()) {
 			m_state = State::Closed;
@@ -80,8 +93,14 @@ void Application::run() {
 		m_mainWindow.newFrame();
 		if (m_state != State::Running)
 			continue;
+		for (const auto& popup: m_popups) { popup->update(); }
 		for (const auto& view: m_views) { view->update(); }
 		m_mainWindow.render(m_theme.windowBackground);
+		frameCount++;
+		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
+			log_info("Maximum frame count {} reached, closing application.", m_maxFrame);
+			m_state = State::Closed;
+		}
 	}
 }
 
@@ -119,6 +138,12 @@ void Application::onEvent(event::Event& ioEvent) {
 		if (ioEvent.handled)
 			return;
 		action->onEvent(ioEvent);
+	}
+	// does any popup handle the event?
+	for (const auto& popup: m_popups) {
+		if (ioEvent.handled)
+			return;
+		popup->onEvent(ioEvent);
 	}
 	// does any view handle the event?
 	for (const auto& view: m_views) {

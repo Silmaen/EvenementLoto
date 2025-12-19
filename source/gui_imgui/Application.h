@@ -11,6 +11,7 @@
 #include "MainWindow.h"
 #include "actions/Action.h"
 #include "event/KeyCodes.h"
+#include "views/Popups.h"
 #include "views/View.h"
 #include "vulkan/TextureLibrary.h"
 
@@ -118,6 +119,19 @@ public:
 	}
 
 	/**
+	 * @brief Get a popup by name.
+	 * @param iName The popup name.
+	 * @return The popup pointer or nullptr if not found.
+	 */
+	[[nodiscard]] auto getPopup(const std::string& iName) const -> std::shared_ptr<views::Popup> {
+		for (const auto& popup: m_popups) {
+			if (popup->getName() == iName)
+				return popup;
+		}
+		return nullptr;
+	}
+
+	/**
 	 * @brief Get an action by name.
 	 * @param iName The action name.
 	 * @return The action pointer or nullptr if not found.
@@ -179,6 +193,17 @@ public:
 	 */
 	auto getTextureLibrary() -> vulkan::TextureLibrary& { return m_textureLibrary; }
 
+	/**
+	 * @brief Set the maximum frame count, used for the test system.
+	 * @param iMaxFrame The maximum frame count.
+	 */
+	void setMaxFrame(const uint32_t iMaxFrame) { m_maxFrame = iMaxFrame; }
+	/**
+	 * @brief Get the maximum frame count, used for the test system.
+	 * @return The maximum frame count.
+	 */
+	[[nodiscard]] auto getMaxFrame() const -> uint32_t { return m_maxFrame; }
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
@@ -188,6 +213,8 @@ private:
 	MainWindow m_mainWindow;
 	//// The views list.
 	std::list<std::shared_ptr<views::View>> m_views;
+	/// The popups list.
+	std::list<std::shared_ptr<views::Popup>> m_popups;
 	/// The actions list.
 	std::list<std::shared_ptr<actions::Action>> m_actions;
 	/// The clear color.
@@ -206,12 +233,21 @@ private:
 	/// The current draw mode.
 	DrawMode m_currentDrawMode = DrawMode::Both;
 
+	/// The maximum frame count, used for the test system.
+	uint32_t m_maxFrame = 0;
+
 	/**
 	 * @brief check the enablement of the actions.
 	 */
 	void checkActionEnable() const;
 };
 
+/**
+ * @brief Application factory function.
+ * @param iArgc Argument count.
+ * @param iArgv Argument values.
+ * @return The application instance.
+ */
 auto createApplication(int iArgc, char* iArgv[]) -> std::shared_ptr<Application>;
 
 }// namespace evl::gui_imgui

@@ -41,7 +41,8 @@ void TextureLibrary::loadTexture(const std::string& iName, const std::filesystem
 		return;
 	}
 
-	m_textureMap[iName] = VulkanContext::get().loadImage(imageData, width, height);
+	m_textureMap[iName] =
+			VulkanContext::get().loadImage(imageData, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
 
 	stbi_image_free(imageData);
 	log_trace("Loaded texture: {} from {}", iName, iTexturePath.string());
@@ -71,6 +72,20 @@ void TextureLibrary::loadFolder(const std::filesystem::path& iFolderPath) {
 			}
 		}
 	}
+}
+
+auto TextureLibrary::getRawPixels(const std::string& iName) -> Pixels {
+	Pixels result;
+	if (const auto it = m_textureMap.find(iName); it != m_textureMap.end()) {
+		auto [width, height, channels] = VulkanContext::get().getImageInfo(it->second);
+		result.width = width;
+		result.height = height;
+		result.channels = channels;
+		result.data = VulkanContext::get().getImagePixels(it->second);
+	} else {
+		log_warn("Texture '{}' not found.", iName);
+	}
+	return result;
 }
 
 }// namespace evl::gui_imgui::vulkan

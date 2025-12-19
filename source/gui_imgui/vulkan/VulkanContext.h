@@ -13,6 +13,19 @@
 
 namespace evl::gui_imgui::vulkan {
 
+
+/**
+ * @brief Struct ImageInfo.
+ */
+struct ImageInfo {
+	/// Image width.
+	uint32_t width = 0;
+	/// Image height.
+	uint32_t height = 0;
+	/// Number of channels.
+	uint32_t channels = 4;
+};
+
 /**
  * @brief Struct TextureData.
  */
@@ -27,7 +40,10 @@ struct TextureData {
 	VkSampler sampler = VK_NULL_HANDLE;
 	/// Descriptor set.
 	VkDescriptorSet descriptorSet = VK_NULL_HANDLE;
+	/// Image info.
+	ImageInfo info;
 };
+
 
 /**
  * @brief Class VulkanContext.
@@ -89,10 +105,11 @@ public:
 	 * @param iImageData The image data.
 	 * @param iWidth The image width.
 	 * @param iHeight The image height.
+	 * @param iChannels The number of channels.
 	 * @return The image ID.
 	 */
 	[[nodiscard]]
-	auto loadImage(const unsigned char* iImageData, int iWidth, int iHeight) -> uint64_t;
+	auto loadImage(const unsigned char* iImageData, uint32_t iWidth, uint32_t iHeight, uint32_t iChannels) -> uint64_t;
 
 	/**
 	 * @brief Check if a texture ID is valid.
@@ -103,6 +120,22 @@ public:
 	auto isTextureValid(const uint64_t iTextureId) const -> bool {
 		return m_textures.contains(iTextureId);
 	}
+
+	/**
+	 * @brief Get image information.
+	 * @param iTextureId The texture ID.
+	 * @return The image information.
+	 */
+	[[nodiscard]]
+	auto getImageInfo(uint64_t iTextureId) const -> ImageInfo;
+
+	/**
+	 * @brief Get image pixel data.
+	 * @param iTextureId The texture ID.
+	 * @return The image pixel data.
+	 */
+	[[nodiscard]]
+	auto getImagePixels(uint64_t iTextureId) const -> std::vector<unsigned char>;
 
 private:
 	/**

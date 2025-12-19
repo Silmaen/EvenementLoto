@@ -13,7 +13,11 @@ using namespace evl::gui_imgui;
 TEST(gui_imgui_Application, InstantiateAndRun) {
 	auto app = createApplication(0, nullptr);
 	ASSERT_NE(app, nullptr);
+	app->setMaxFrame(2);// Limit to 2 frames for the test
+	EXPECT_EQ(app->getState(), Application::State::Running);
+	EXPECT_EQ(app->getMaxFrame(), 2);
 	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
 	app.reset();
 	EXPECT_EQ(app, nullptr);
 }

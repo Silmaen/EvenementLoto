@@ -23,9 +23,9 @@ TEST(Settings, instantiate) {
 	EXPECT_TRUE(settings.contains("test_key_int"));
 	EXPECT_EQ(settings.getValue<int>("test_key_int", 0), 100);
 	EXPECT_TRUE(settings.contains("test_key_double"));
-	EXPECT_EQ(settings.getValue<double>("test_key_double", 0), 1.0);
+	EXPECT_NEAR(settings.getValue<double>("test_key_double", 0), 1.0, 1e-6);
 	EXPECT_TRUE(settings.contains("test_key_double2"));
-	EXPECT_EQ(settings.getValue<double>("test_key_double2", 0), 1.00005);
+	EXPECT_NEAR(settings.getValue<double>("test_key_double2", 0), 1.00005, 1e-6);
 	EXPECT_TRUE(settings.contains("test_key_bool"));
 	EXPECT_EQ(settings.getValue<bool>("test_key_bool", false), true);
 	EXPECT_TRUE(settings.contains("test_key_string"));
@@ -68,9 +68,9 @@ TEST(core_Settings, FileOperations) {
 	EXPECT_TRUE(settings.contains("test_key_int"));
 	EXPECT_EQ(settings.getValue<int>("test_key_int", 0), 100);
 	EXPECT_TRUE(settings.contains("test_key_double"));
-	EXPECT_EQ(settings.getValue<double>("test_key_double", 0), 1.0);
+	EXPECT_NEAR(settings.getValue<double>("test_key_double", 0), 1.0, 1e-6);
 	EXPECT_TRUE(settings.contains("test_key_double2"));
-	EXPECT_EQ(settings.getValue<double>("test_key_double2", 0), 1.00005);
+	EXPECT_NEAR(settings.getValue<double>("test_key_double2", 0), 1.00005, 1e-6);
 	EXPECT_TRUE(settings.contains("test_key_bool"));
 	EXPECT_EQ(settings.getValue<bool>("test_key_bool", false), true);
 	EXPECT_TRUE(settings.contains("test_key_string"));
@@ -99,11 +99,11 @@ TEST(core_Settings, HierarchicalKeys) {
 	EXPECT_TRUE(settings.contains("graphics/resolution/height"));
 	EXPECT_EQ(settings.getValue<int>("graphics/resolution/height", 0), 1080);
 	EXPECT_TRUE(settings.contains("audio/volume/master"));
-	EXPECT_EQ(settings.getValue<double>("audio/volume/master", 0.0), 0.8);
+	EXPECT_NEAR(settings.getValue<double>("audio/volume/master", 0.0), 0.8, 1e-6);
 	EXPECT_TRUE(settings.contains("audio/volume/music"));
-	EXPECT_EQ(settings.getValue<double>("audio/volume/music", 0.0), 0.5);
+	EXPECT_NEAR(settings.getValue<double>("audio/volume/music", 0.0), 0.5, 1e-6);
 	EXPECT_TRUE(settings.contains("audio/volume/sfx"));
-	EXPECT_EQ(settings.getValue<double>("audio/volume/sfx", 0.0), 0.7);
+	EXPECT_NEAR(settings.getValue<double>("audio/volume/sfx", 0.0), 0.7, 1e-6);
 
 	// Clean up
 	fs::remove("test_hierarchical_output.yaml");
@@ -150,9 +150,9 @@ TEST(core_Settings, IncludeMissing) {
 	EXPECT_TRUE(newSettings.contains("base/graphics/resolution/height"));
 	EXPECT_EQ(newSettings.getValue<int>("base/graphics/resolution/height", 0), 1080);
 	EXPECT_TRUE(newSettings.contains("base/audio/volume/master"));
-	EXPECT_EQ(newSettings.getValue<double>("base/audio/volume/master", 0.0), 0.8);
+	EXPECT_NEAR(newSettings.getValue<double>("base/audio/volume/master", 0.0), 0.8, 1e-6);
 	EXPECT_TRUE(newSettings.contains("audio/volume/music"));
-	EXPECT_EQ(newSettings.getValue<double>("audio/volume/music", 0.0), 0.5);
+	EXPECT_NEAR(newSettings.getValue<double>("audio/volume/music", 0.0), 0.5, 1e-6);
 }
 
 TEST(core_Settings, Extract) {
@@ -164,11 +164,12 @@ TEST(core_Settings, Extract) {
 	settings.setValue("audio/volume/sfx", 0.7);
 	const Settings audioSettings = settings.extract("audio");
 	EXPECT_TRUE(audioSettings.contains("volume/master"));
-	EXPECT_EQ(audioSettings.getValue<double>("volume/master", 0.0), 0.8);
+	EXPECT_NEAR(audioSettings.getValue<double>("volume/master", 0.0), 0.8, 1e-6);
 	EXPECT_TRUE(audioSettings.contains("volume/music"));
-	EXPECT_EQ(audioSettings.getValue<double>("volume/music", 0.0), 0.5);
+	EXPECT_NEAR(audioSettings.getValue<double>("volume/music", 0.0), 0.5, 1e-6);
 	EXPECT_TRUE(audioSettings.contains("volume/sfx"));
-	EXPECT_EQ(audioSettings.getValue<double>("volume/sfx", 0.0), 0.7);
+	EXPECT_NEAR(audioSettings.getValue<double>("volume/sfx", 0.0), 0.7, 1e-6);
+	EXPECT_NEAR(audioSettings.getValue<float>("volume/sfx", 0.0), 0.7, 1e-6);
 	EXPECT_FALSE(audioSettings.contains("graphics/resolution/width"));
 	EXPECT_FALSE(audioSettings.contains("graphics/resolution/height"));
 }
