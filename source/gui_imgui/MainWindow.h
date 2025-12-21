@@ -114,6 +114,12 @@ public:
 	 */
 	void onEvent(event::Event& ioEvent);
 
+	/**
+	 * @brief Get the native window pointer.
+	 * @return The native window pointer.
+	 */
+	[[nodiscard]] auto getNativeWindow() const -> void* { return m_window; }
+
 private:
 	/// Window options.
 	MainWindowOptions m_options{};

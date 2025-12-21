@@ -45,7 +45,7 @@ void TextureLibrary::loadTexture(const std::string& iName, const std::filesystem
 			VulkanContext::get().loadImage(imageData, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
 
 	stbi_image_free(imageData);
-	log_trace("Loaded texture: {} from {}", iName, iTexturePath.string());
+	//log_trace("Loaded texture: {} from {}", iName, iTexturePath.string());
 }
 
 

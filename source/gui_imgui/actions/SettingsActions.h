@@ -29,7 +29,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Preferences action executed."); }
+	void onExecute() override;
 };
 /**
  * @brief Class EventSettingsAction.
@@ -48,7 +48,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Event settings action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -68,7 +68,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Game settings action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -88,7 +88,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Theme settings action executed."); }
+	void onExecute() override;
 };
 
 }// namespace evl::gui_imgui::actions

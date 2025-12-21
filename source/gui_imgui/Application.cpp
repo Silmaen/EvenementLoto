@@ -16,8 +16,9 @@
 #include "core/Log.h"
 #include "core/utilities.h"
 #include "event/AppEvent.h"
+#include "views/ConfigPopups.h"
+#include "views/HelpPopups.h"
 #include "views/MenuBar.h"
-#include "views/Popups.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
 
@@ -50,6 +51,9 @@ Application::Application() {
 	// Create popups
 	m_popups.push_back(std::make_shared<views::PopupAide>());
 	m_popups.push_back(std::make_shared<views::PopupAbout>());
+	m_popups.push_back(std::make_shared<views::MainConfigPopups>());
+	m_popups.push_back(std::make_shared<views::EventConfigPopups>());
+	m_popups.push_back(std::make_shared<views::GameRoundConfigPopups>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
