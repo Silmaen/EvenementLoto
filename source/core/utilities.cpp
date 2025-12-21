@@ -49,6 +49,9 @@ void mergeDefaultSettings() {
 		if (!g_settings->contains("general/log_level")) {
 			g_settings->setValue("general/log_level", std::string("info"));
 		}
+		if (!g_settings->contains("general/data_location")) {
+			g_settings->setValue("general/data_location", g_baseExecPath / "data");
+		}
 	}
 }
 

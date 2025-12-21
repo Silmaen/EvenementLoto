@@ -18,6 +18,9 @@ packages:
     kind: "static"
   magic_enum:
     version: 0.9.7
+  nfd:
+    version: 1.2.1
+    kind: "static"
   spdlog:
     version: 1.16.0
     kind: "static"

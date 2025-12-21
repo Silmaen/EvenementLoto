@@ -29,7 +29,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("New file action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -49,7 +49,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Load file action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -69,7 +69,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Save file action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -89,7 +89,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("SaveAs file action executed."); }
+	void onExecute() override;
 };
 
 /**
@@ -109,7 +109,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Start game action executed."); }
+	void onExecute() override;
 };
 
 
@@ -130,7 +130,7 @@ private:
 	/**
 	 * @brief Execute the action.
 	 */
-	void onExecute() override { log_trace("Stop game action executed."); }
+	void onExecute() override;
 };
 
 class QuitAction final : public Action {

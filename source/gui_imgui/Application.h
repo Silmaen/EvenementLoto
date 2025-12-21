@@ -204,6 +204,12 @@ public:
 	 */
 	[[nodiscard]] auto getMaxFrame() const -> uint32_t { return m_maxFrame; }
 
+	/**
+	 * @brief Access to the main window.
+	 * @return The main window.
+	 */
+	auto getMainWindow() -> MainWindow& { return m_mainWindow; }
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
