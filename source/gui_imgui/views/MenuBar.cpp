@@ -63,7 +63,6 @@ void MenuBar::onUpdate() {
 			defineMenuItem("General", "preferences");
 			defineMenuItem("Événement", "event_settings");
 			defineMenuItem("Parties", "game_settings");
-			defineMenuItem("Thème", "theme_settings");
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Help")) {

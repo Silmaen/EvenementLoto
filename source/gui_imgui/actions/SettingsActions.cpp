@@ -45,8 +45,4 @@ void GameSettingsAction::onExecute() {
 	}
 }
 
-ThemeSettingsAction::ThemeSettingsAction() { setIconName("windows-10-personalization"); }
-ThemeSettingsAction::~ThemeSettingsAction() = default;
-void ThemeSettingsAction::onExecute() { log_trace("Theme Settings action executed."); }
-
 }// namespace evl::gui_imgui::actions

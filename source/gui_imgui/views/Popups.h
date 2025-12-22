@@ -47,7 +47,12 @@ public:
 	 */
 	[[nodiscard]] virtual auto getPopupTitle() const -> std::string { return getName(); }
 
+protected:
+	/// Function called when the popup is opened.
+	virtual void onOpen() {}
+
 private:
+	/// Flag to indicate if the popup should be opened.
 	bool m_shouldOpen{false};
 };
 

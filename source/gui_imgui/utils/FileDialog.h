@@ -10,6 +10,15 @@
 
 namespace evl::gui_imgui::utils {
 
+const std::string g_gameFilter = "Loto Files|lev";
+const std::string g_imageFilter = "Image Files|png,jpg,jpeg,bmp,tga,gif,svg\n"
+								  "PNG Files|png\n"
+								  "JPG Files|jpg,jpeg\n"
+								  "BMP Files|bmp\n"
+								  "TGA Files|tga\n"
+								  "GIF Files|gif\n"
+								  "SVG Files|svg";
+
 /**
  * @brief Class FileDialog.
  */
