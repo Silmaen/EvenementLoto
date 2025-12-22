@@ -82,7 +82,6 @@ void ToolBar::onUpdate() {
 	defineToolBarItem("Préférences", "preferences");
 	defineToolBarItem("Paramètres Événement", "event_settings");
 	defineToolBarItem("Paramètres Partie", "game_settings");
-	defineToolBarItem("Paramètres Thème", "theme_settings");
 	ImGui::End();
 }
 

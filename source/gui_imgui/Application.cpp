@@ -18,6 +18,7 @@
 #include "event/AppEvent.h"
 #include "views/ConfigPopups.h"
 #include "views/HelpPopups.h"
+#include "views/MainView.h"
 #include "views/MenuBar.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
@@ -47,6 +48,7 @@ Application::Application() {
 	m_views.push_back(std::make_shared<views::MenuBar>());
 	m_views.push_back(std::make_shared<views::ToolBar>());
 	m_views.push_back(std::make_shared<views::StatusBar>());
+	m_views.push_back(std::make_shared<views::MainView>());
 
 	// Create popups
 	m_popups.push_back(std::make_shared<views::PopupAide>());
@@ -65,7 +67,6 @@ Application::Application() {
 	m_actions.push_back(std::make_shared<actions::PreferencesAction>());
 	m_actions.push_back(std::make_shared<actions::EventSettingsAction>());
 	m_actions.push_back(std::make_shared<actions::GameSettingsAction>());
-	m_actions.push_back(std::make_shared<actions::ThemeSettingsAction>());
 	m_actions.push_back(std::make_shared<actions::QuitAction>());
 	m_actions.back()->setShortcut({.key = KeyCode::A, .modifiers = {.ctrl = true}});
 	m_actions.push_back(std::make_shared<actions::HelpAction>());

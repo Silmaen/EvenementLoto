@@ -20,6 +20,7 @@ Popup::~Popup() = default;
 void Popup::onUpdate() {
 	const std::string popupTitle = getPopupTitle();
 	if (m_shouldOpen) {
+		onOpen();
 		ImGui::SetNextWindowSize(ImVec2(700, 600), ImGuiCond_FirstUseEver);
 		ImGui::OpenPopup(popupTitle.c_str());
 		m_shouldOpen = false;

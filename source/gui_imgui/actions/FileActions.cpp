@@ -28,7 +28,7 @@ LoadFileAction::LoadFileAction() { setIconName("folder_open"); }
 LoadFileAction::~LoadFileAction() = default;
 void LoadFileAction::onExecute() {
 	log_trace("Load file action executed.");
-	const auto file = utils::FileDialog::openFile("Loto Files|*.lev");
+	const auto file = utils::FileDialog::openFile(utils::g_gameFilter);
 	if (file.empty() || !exists(file)) {
 		log_trace("Load file action canceled.");
 		return;
@@ -51,7 +51,7 @@ void SaveFileAction::onExecute() {
 	auto& app = Application::get();
 	auto file = app.getCurrentFile();
 	if (file.empty()) {
-		file = utils::FileDialog::saveFile("Loto Files|*.lev");
+		file = utils::FileDialog::saveFile(utils::g_gameFilter);
 		if (file.empty()) {
 			log_trace("Save file action canceled.");
 			return;
@@ -71,7 +71,7 @@ void SaveAsFileAction::onExecute() {
 	log_trace("SaveAs file action executed.");
 	auto& app = Application::get();
 	auto file = app.getCurrentFile();
-	auto newfile = utils::FileDialog::saveFile("Loto Files|*.lev");
+	auto newfile = utils::FileDialog::saveFile(utils::g_gameFilter);
 	if (newfile.empty()) {
 		log_trace("Save file action canceled.");
 		return;

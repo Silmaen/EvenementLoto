@@ -71,24 +71,4 @@ private:
 	void onExecute() override;
 };
 
-/**
- * @brief Class ThemeSettingsAction.
- */
-class ThemeSettingsAction final : public Action {
-public:
-	ThemeSettingsAction();
-	~ThemeSettingsAction() override;
-	ThemeSettingsAction(const ThemeSettingsAction&) = delete;
-	ThemeSettingsAction(ThemeSettingsAction&&) = delete;
-	auto operator=(const ThemeSettingsAction&) -> ThemeSettingsAction& = delete;
-	auto operator=(ThemeSettingsAction&&) -> ThemeSettingsAction& = delete;
-	[[nodiscard]] auto getName() const -> std::string override { return "theme_settings"; }
-
-private:
-	/**
-	 * @brief Execute the action.
-	 */
-	void onExecute() override;
-};
-
 }// namespace evl::gui_imgui::actions

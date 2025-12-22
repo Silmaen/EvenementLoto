@@ -9,6 +9,9 @@
 #pragma once
 
 #include "Popups.h"
+#include "core/Event.h"
+#include "core/maths/vectors.h"
+#include "core/utilities.h"
 
 
 namespace evl::gui_imgui::views {
@@ -49,7 +52,40 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration générale"; }
 
+	/**
+	 * @brief Function called when the popup is opened.
+	 */
+	void onOpen() override;
+
 private:
+	/**
+	 * @brief Structure holding configuration data.
+	 */
+	struct Data {
+		std::filesystem::path dataLocation{core::getExecPath() / "data"};
+		float mainScale{0.020f};
+		float titleScale{2.0f};
+		float shortTextScale{1.4f};
+		float longTextScale{0.6f};
+		float gridTextScale{0.85f};
+		math::vec4 backgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
+		math::vec4 gridBackgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
+		math::vec4 textColor{0.0f, 0.0f, 0.0f, 1.0f};
+		math::vec4 selectedNumberColor{1.0f, 0.44f, 0.0f, 1.0f};
+		bool truncatePrice{false};
+		int truncatePriceLines{3};
+		bool fadeNumbers{true};
+		int fadeAmount{3};
+		int fadeStrength{0};
+	} m_data;
+	/**
+	 * @brief Convert data to settings.
+	 */
+	void dataToSettings();
+	/**
+	 * @brief Convert settings to data.
+	 */
+	void settingsToData();
 };
 
 /**
@@ -88,7 +124,23 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration événement"; }
 
+	/**
+	 * @brief Function called when the popup is opened.
+	 */
+	void onOpen() override;
+
 private:
+	/// The event copy.
+	core::Event m_event;
+
+	/**
+	 * @brief Load data from current event.
+	 */
+	void fromCurrentEvent();
+	/**
+	 * @brief Save data to current event.
+	 */
+	void toCurrentEvent() const;
 };
 
 /**
@@ -127,7 +179,32 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration parties"; }
 
+	/**
+	 * @brief Function called when the popup is opened.
+	 */
+	void onOpen() override;
+
 private:
+	/// The event copy.
+	core::Event m_event;
+
+	void renderFirstColumn();
+	void renderSecondColumn();
+	void renderThirdColumn();
+	void renderResult();
+
+	int m_currentGameRoundType = 0;
+	int m_currentSubRoundType = 0;
+	size_t m_selectedSubRound = 0;
+	size_t m_selectedGameRound = 0;
+	/**
+	 * @brief Load data from current event.
+	 */
+	void fromCurrentEvent();
+	/**
+	 * @brief Save data to current event.
+	 */
+	void toCurrentEvent() const;
 };
 
 }// namespace evl::gui_imgui::views
