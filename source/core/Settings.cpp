@@ -154,6 +154,8 @@ void Settings::toFile(const std::filesystem::path& iPath) const {
 				} else if (value.type() == typeid(math::vec4)) {
 					const auto vec = std::any_cast<math::vec4>(value);
 					out << YAML::Flow << YAML::BeginSeq << vec.x() << vec.y() << vec.z() << vec.w() << YAML::EndSeq;
+				} else {
+					out << "null";
 				}
 			}
 		}

@@ -192,9 +192,11 @@ private:
 	void renderSecondColumn();
 	void renderThirdColumn();
 	void renderResult();
+	void addGameRound();
+	void deleteGameRound();
+	void moveGameRoundUp();
+	void moveGameRoundDown();
 
-	int m_currentGameRoundType = 0;
-	int m_currentSubRoundType = 0;
 	size_t m_selectedSubRound = 0;
 	size_t m_selectedGameRound = 0;
 	/**
