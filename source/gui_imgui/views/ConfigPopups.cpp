@@ -8,6 +8,7 @@
 
 #include "ConfigPopups.h"
 
+#include "core/Log.h"
 #include "core/Settings.h"
 #include "core/maths/vectors.h"
 #include "core/utilities.h"
@@ -70,7 +71,7 @@ void MainConfigPopups::onPopupUpdate() {
 		ImGui::Separator();
 
 		// Personnalisation
-		if (ImGui::BeginChild("Customization", ImVec2(0, 500), ImGuiWindowFlags_AlwaysAutoResize)) {
+		if (ImGui::BeginChild("Customization", ImVec2(0, 500), ImGuiWindowFlags_NoTitleBar)) {
 			ImGui::Text("Personnalisation");
 			ImGui::Separator();
 
@@ -398,12 +399,32 @@ void EventConfigPopups::fromCurrentEvent() {
 	// Load data from current event
 	m_event = Application::get().getCurrentEvent();
 }
+
 void EventConfigPopups::toCurrentEvent() const {
 	// Save data to current event
 	Application::get().getCurrentEvent() = m_event;
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+namespace {
+
+auto getRoundTypes() -> std::string {
+	std::string result;
+	for (const auto& name: magic_enum::enum_values<core::GameRound::Type>()) {
+		if (name == core::GameRound::Type::Invalid)
+			continue;
+		if (!result.empty()) {
+			result += '\0';
+		}
+		const core::GameRound round(name);
+		result += round.getTypeStr();
+	}
+	result += '\0';// Double null terminator for ImGui
+	return result;
+}
+
+}// namespace
 
 GameRoundConfigPopups::GameRoundConfigPopups() = default;
 
@@ -417,93 +438,156 @@ void GameRoundConfigPopups::onOpen() {
 void GameRoundConfigPopups::onPopupUpdate() {
 	// Variables statiques pour les listes et données
 
+	static float s_edit_ratio = 0.65f;
+	const ImVec2 contentAvail = ImGui::GetContentRegionAvail();
+	const ImGuiStyle& style = ImGui::GetStyle();
+
+	// Splitter sizing
+	constexpr float splitterThickness = 6.0f;
+	constexpr float minEditHeight = 100.0f;
+	constexpr float minResultHeight = 100.0f;
+	float editHeight = contentAvail.y * s_edit_ratio;
+	float resultHeight = contentAvail.y - editHeight - splitterThickness - style.WindowPadding.y;
+
+	// Clamp to minimums
+	if (editHeight < minEditHeight) {
+		editHeight = minEditHeight;
+		resultHeight = contentAvail.y - editHeight - splitterThickness;
+	}
+	if (resultHeight < minResultHeight) {
+		resultHeight = minResultHeight;
+		editHeight = contentAvail.y - resultHeight - splitterThickness;
+	}
+	s_edit_ratio = (contentAvail.y > 0.0f) ? (editHeight / contentAvail.y) : s_edit_ratio;
 
 	// Section d'édition (GroupEdit)
-	if (const float editHeight = ImGui::GetContentRegionAvail().y * 0.65f;
-		ImGui::BeginChild("GroupEdit", ImVec2(0, editHeight), ImGuiChildFlags_None)) {
+	if (ImGui::BeginChild("GroupEdit", ImVec2(0, editHeight), ImGuiChildFlags_None)) {
+		constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchProp |
+											   ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_NoSavedSettings;
 
-		// Trois colonnes : GameRounds, SubRounds, Phase Configuration
-		ImGui::Columns(3, "EditColumns", false);
+		if (ImGui::BeginTable("EditColumnsTable", 3, tableFlags, ImVec2(-1, -1))) {
+			// Optional: set initial stretch weights
+			ImGui::TableSetupColumn("GameRounds", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+			ImGui::TableSetupColumn("SubRounds", ImGuiTableColumnFlags_WidthStretch, 1.1f);
+			ImGui::TableSetupColumn("PhaseConfig", ImGuiTableColumnFlags_WidthStretch, 1.4f);
+			ImGui::TableHeadersRow();
 
-		// Colonne 1: Liste des Parties
-		renderFirstColumn();
-		ImGui::NextColumn();
+			// Column 1
+			// Column 1
+			ImGui::TableNextRow();
+			ImGui::TableSetColumnIndex(0);
+			renderFirstColumn();
 
-		// Colonne 2: Phases de la partie
-		renderSecondColumn();
-		ImGui::NextColumn();
+			// Column 2
+			ImGui::TableSetColumnIndex(1);
+			renderSecondColumn();
 
-		// Colonne 3: Configuration de la phase
-		renderThirdColumn();
+			// Column 3
+			ImGui::TableSetColumnIndex(2);
+			renderThirdColumn();
 
-		ImGui::Columns(1);
+			ImGui::EndTable();
+		}
 	}
 	ImGui::EndChild();
+	// --- Splitter between edit and result sections ---
+	{
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY());
+		const ImVec2 splitterPos = ImGui::GetCursorScreenPos();
+		ImGui::InvisibleButton("##EditResultSplitter", ImVec2(contentAvail.x, splitterThickness));
+		const bool splitterActive = ImGui::IsItemActive();
+		const bool splitterHovered = ImGui::IsItemHovered();
 
+		// Draw splitter handle
+		const ImU32 splitterColor =
+				ImGui::GetColorU32(splitterHovered ? ImGuiCol_SeparatorHovered : ImGuiCol_Separator);
+		ImGui::GetWindowDrawList()->AddRectFilled(
+				splitterPos, ImVec2(splitterPos.x + contentAvail.x, splitterPos.y + splitterThickness), splitterColor);
+
+		// Drag behavior
+		if (splitterActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+			const float delta = ImGui::GetIO().MouseDelta.y;
+			editHeight =
+					std::clamp(editHeight + delta, minEditHeight, contentAvail.y - minResultHeight - splitterThickness);
+			s_edit_ratio = (contentAvail.y > 0.0f) ? (editHeight / contentAvail.y) : s_edit_ratio;
+		}
+	}
 	// Section résultats (GroupResult)
-	renderResult();
-	ImGui::Separator();
-	ImGui::Spacing();
+	if (ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Border)) {
+		renderResult();
+		ImGui::Separator();
+		ImGui::Spacing();
 
-	// Boutons Ok/Appliquer/Annuler/Import/Export
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(5));
-	if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
-		ImGui::CloseCurrentPopup();
+		// Boutons Ok/Appliquer/Annuler/Import/Export
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(3));
+		if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
+			toCurrentEvent();
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
+			toCurrentEvent();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
+			ImGui::CloseCurrentPopup();
+		}
+		/*ImGui::SameLine();
+		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
+			// Action import
+			log_warning("Import not implemented yet.");
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
+			// Action export
+			log_warning("Export not implemented yet.");
+		}*/
 	}
-	ImGui::SameLine();
-	if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
-		// Action apply
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
-		ImGui::CloseCurrentPopup();
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
-		// Action import
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
-		// Action export
-	}
+	ImGui::EndChild();
 }
 
 void GameRoundConfigPopups::fromCurrentEvent() {
 	// Load data from current event
 	m_event = Application::get().getCurrentEvent();
 }
+
 void GameRoundConfigPopups::toCurrentEvent() const {
 	// Save data to current event
 	Application::get().getCurrentEvent() = m_event;
 }
 
 void GameRoundConfigPopups::renderFirstColumn() {
-	static std::vector<std::string> gameRounds;
 	if (ImGui::BeginChild("GroupGameRound", ImVec2(0, 0), ImGuiChildFlags_Border)) {
 		ImGui::Text("Liste des Parties");
 		ImGui::Separator();
 
 		// Boutons de gestion
 		if (ImGui::Button("+##AddRound")) { /* Action add round */
+			addGameRound();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("-##DelRound")) { /* Action delete round */
+			deleteGameRound();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("↑##UpRound")) { /* Action move up */
+		if (ImGui::Button("^##UpRound")) { /* Action move up */
+			moveGameRoundUp();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("↓##DownRound")) { /* Action move down */
+		if (ImGui::Button("v##DownRound")) { /* Action move down */
+			moveGameRoundDown();
 		}
 
 		ImGui::Spacing();
 
 		// Liste des parties
 		if (ImGui::BeginListBox("##GameRoundList", ImVec2(-1, -1))) {
-			for (size_t i = 0; i < gameRounds.size(); ++i) {
-				if (const bool isSelected = m_selectedGameRound == i;
-					ImGui::Selectable(gameRounds[i].c_str(), isSelected)) {
+			for (uint32_t i = 0; i < m_event.sizeRounds(); ++i) {
+				const auto round = m_event.getGameRound(i);
+				const std::string roundLabel = std::format("{} : {}", round->getName(), round->getTypeStr());
+				if (ImGui::Selectable(roundLabel.c_str(), m_selectedGameRound == i)) {
 					m_selectedGameRound = i;
+					log_info("Selected game round {}", i);
 				}
 			}
 			ImGui::EndListBox();
@@ -513,8 +597,7 @@ void GameRoundConfigPopups::renderFirstColumn() {
 }
 
 void GameRoundConfigPopups::renderSecondColumn() {
-	static std::vector<std::string> subRounds;
-	static int roundNumber = 0;
+	const auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
 
 	if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Border)) {
 		ImGui::Text("Phases de la partie");
@@ -522,38 +605,28 @@ void GameRoundConfigPopups::renderSecondColumn() {
 
 		// Type de partie
 		ImGui::Text("Type de partie:");
-		ImGui::SetNextItemWidth(-80);
-		if (ImGui::Combo("##GameRoundTypes", &m_currentGameRoundType, "Normale\0Pause\0")) {
-			/* Action change type */
+		ImGui::SetNextItemWidth(-140);
+		int currentGameRoundType = static_cast<int>(currentRound->getType()) - 1;// skipping display of id 0 == Invalid
+		if (ImGui::Combo("##GameRoundTypes", &currentGameRoundType, getRoundTypes().c_str())) {
+			currentRound->setType(static_cast<core::GameRound::Type>(currentGameRoundType + 1));
 		}
 		ImGui::SameLine();
 		ImGui::Text("N°");
 		ImGui::SameLine();
-		ImGui::SetNextItemWidth(60);
-		ImGui::InputInt("##RoundNumber", &roundNumber);
-
-		ImGui::Spacing();
-
-		// Boutons de gestion
-		if (ImGui::Button("+##AddSubRound")) { /* Action add sub round */
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("-##DelSubRound")) { /* Action delete sub round */
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("↑##UpSubRound")) { /* Action move up */
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("↓##DownSubRound")) { /* Action move down */
+		ImGui::SetNextItemWidth(100);
+		int id = currentRound->getId();
+		if (ImGui::InputInt("##RoundNumber", &id)) {
+			currentRound->setId(id + 1);
 		}
 
 		ImGui::Spacing();
 
 		// Liste des sous-parties
 		if (ImGui::BeginListBox("##SubRoundList", ImVec2(-1, -1))) {
-			for (size_t i = 0; i < subRounds.size(); ++i) {
-				if (const bool isSelected = m_selectedSubRound == i;
-					ImGui::Selectable(subRounds[i].c_str(), isSelected)) {
+			for (size_t i = 0; i < currentRound->sizeSubRound(); ++i) {
+				const auto subRound = currentRound->getSubRound(static_cast<uint32_t>(i));
+				const std::string name = std::format("Phase {} : {}", i, subRound->getTypeStr());
+				if (const bool isSelected = m_selectedSubRound == i; ImGui::Selectable(name.c_str(), isSelected)) {
 					m_selectedSubRound = i;
 				}
 			}
@@ -564,8 +637,7 @@ void GameRoundConfigPopups::renderSecondColumn() {
 }
 
 void GameRoundConfigPopups::renderThirdColumn() {
-	static float priceValue = 0.0f;
-	static char textPrices[4096] = "";
+
 	static bool pauseNothing = true;
 	static bool pauseDiapo = false;
 	static char pauseDiapoFolder[256] = "";
@@ -573,25 +645,40 @@ void GameRoundConfigPopups::renderThirdColumn() {
 	static bool previewEnabled = false;
 	static bool previewFullScreen = true;
 
+	auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
+
 	if (ImGui::BeginChild("GroupPhase", ImVec2(0, 0), ImGuiChildFlags_Border)) {
 		ImGui::Text("Configuration de la phase:");
 		ImGui::Separator();
 
 		// Onglets selon le type
-		if (m_currentGameRoundType == 0) {// Partie normale
+		if (currentRound->getType() != core::GameRound::Type::Pause) {
+			// Partie normale
+			auto subRound = currentRound->getSubRound(static_cast<uint32_t>(m_selectedSubRound));
 			ImGui::Text("Condition de victoire:");
 			ImGui::SetNextItemWidth(-1);
-			ImGui::Combo("##SubRoundTypes", &m_currentSubRoundType,
-						 "Ligne\0Deux lignes\0Carton plein\0Quatre coins\0Croix\0");
+			char subRoundName[256];
+			std::strcpy(subRoundName, subRound->getTypeStr().c_str());
+			ImGui::InputText("##SubRoundName", subRoundName, subRound->getTypeStr().size(),
+							 ImGuiInputTextFlags_ReadOnly);
 
 			ImGui::Spacing();
 			ImGui::Text("Valeur Totale");
 			ImGui::SetNextItemWidth(-1);
-			ImGui::InputFloat("##PriceValue", &priceValue, 0.0f, 0.0f, "%.2f €");
+			auto priceValue = static_cast<float>(subRound->getValue());
+			if (ImGui::InputFloat("##PriceValue", &priceValue, 0.0f, 0.0f, "%.2f €")) {
+				if (priceValue >= 0.0f) {
+					subRound->define(subRound->getType(), subRound->getPrices(), static_cast<double>(priceValue));
+				}
+			}
 
 			ImGui::Spacing();
 			ImGui::Text("Liste des lots:");
-			ImGui::InputTextMultiline("##TextPrices", textPrices, 4096, ImVec2(-1, -80));
+			char textPrices[4096];
+			std::strcpy(textPrices, subRound->getPrices().c_str());
+			if (ImGui::InputTextMultiline("##TextPrices", textPrices, 4096, ImVec2(-1, -80))) {
+				subRound->define(subRound->getType(), textPrices, subRound->getValue());
+			}
 
 		} else {// Pause
 			if (ImGui::RadioButton("Rien", pauseNothing)) {
@@ -633,8 +720,6 @@ void GameRoundConfigPopups::renderThirdColumn() {
 	ImGui::EndChild();
 }
 
-//TODO: refactor to use internal data and actions
-//NOLINTBEGIN(readability-convert-member-functions-to-static)
 void GameRoundConfigPopups::renderResult() {
 	if (const float resultHeight = ImGui::GetContentRegionAvail().y - 50;
 		ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Border)) {
@@ -644,17 +729,31 @@ void GameRoundConfigPopups::renderResult() {
 
 		ImGui::Columns(3, "ResultColumns", false);
 
-		std::string emptyDate = "--";
+		std::string start_date = "--";
+		std::string end_date = "--";
+		std::string duration = "--";
+		std::string num_draws = "--";
+		const auto gr = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
+		if (gr->isFinished()) {
+			start_date = std::format("{}", gr->getStarting());
+			end_date = std::format("{}", gr->getEnding());
+			duration = std::format("{}", gr->getEnding() - gr->getStarting());
+			num_draws = std::format("{}", gr->getAllDraws().size());
+		}
 		// Colonne 1: Dates et durée
 		if (ImGui::BeginChild("ResultDates", ImVec2(0, 0), ImGuiChildFlags_None)) {
 			ImGui::Text("Début:");
-			ImGui::InputText("##StartDate", emptyDate.data(), emptyDate.size(), ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			ImGui::InputText("##StartDate", start_date.data(), start_date.size(), ImGuiInputTextFlags_ReadOnly);
 			ImGui::Text("Fin:");
-			ImGui::InputText("##EndDate", emptyDate.data(), emptyDate.size(), ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			ImGui::InputText("##EndDate", end_date.data(), end_date.size(), ImGuiInputTextFlags_ReadOnly);
 			ImGui::Text("Durée:");
-			ImGui::InputText("##Duration", emptyDate.data(), emptyDate.size(), ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			ImGui::InputText("##Duration", duration.data(), duration.size(), ImGuiInputTextFlags_ReadOnly);
 			ImGui::Text("Nombre de Tirages:");
-			ImGui::InputText("##NumDraws", emptyDate.data(), emptyDate.size(), ImGuiInputTextFlags_ReadOnly);
+			ImGui::SameLine();
+			ImGui::InputText("##NumDraws", num_draws.data(), num_draws.size(), ImGuiInputTextFlags_ReadOnly);
 		}
 		ImGui::EndChild();
 		ImGui::NextColumn();
@@ -662,7 +761,7 @@ void GameRoundConfigPopups::renderResult() {
 		// Colonne 2: Tirages
 		if (ImGui::BeginChild("ResultDraws", ImVec2(0, 0), ImGuiChildFlags_None)) {
 			ImGui::Text("Tirages:");
-			ImGui::InputTextMultiline("##TextDraws", emptyDate.data(), emptyDate.size(), ImVec2(-1, -1),
+			ImGui::InputTextMultiline("##TextDraws", gr->getDrawStr().data(), gr->getDrawStr().size(), ImVec2(-1, -1),
 									  ImGuiInputTextFlags_ReadOnly);
 		}
 		ImGui::EndChild();
@@ -671,8 +770,8 @@ void GameRoundConfigPopups::renderResult() {
 		// Colonne 3: Gagnants
 		if (ImGui::BeginChild("ResultWinners", ImVec2(0, 0), ImGuiChildFlags_None)) {
 			ImGui::Text("Noms des gagnants:");
-			ImGui::InputTextMultiline("##ListWinners", emptyDate.data(), emptyDate.size(), ImVec2(-1, -1),
-									  ImGuiInputTextFlags_ReadOnly);
+			ImGui::InputTextMultiline("##ListWinners", gr->getWinnerStr().data(), gr->getWinnerStr().size(),
+									  ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
 		}
 		ImGui::EndChild();
 
@@ -681,6 +780,36 @@ void GameRoundConfigPopups::renderResult() {
 	ImGui::EndChild();
 	ImGui::Spacing();
 }
-//NOLINTEND(readability-convert-member-functions-to-static)
+
+
+void GameRoundConfigPopups::addGameRound() { m_event.pushGameRound(core::GameRound()); }
+
+void GameRoundConfigPopups::deleteGameRound() {
+	if (m_event.sizeRounds() == 0) {
+		return;
+	}
+	m_event.deleteRoundByIndex(static_cast<uint16_t>(m_selectedGameRound));
+	if (m_selectedGameRound >= m_event.sizeRounds()) {
+		m_selectedGameRound = m_event.sizeRounds() - 1;
+	}
+}
+
+void GameRoundConfigPopups::moveGameRoundUp() {
+	if (m_event.sizeRounds() < 2 || m_selectedGameRound == 0) {
+		return;
+	}
+	m_event.swapRoundByIndex(static_cast<uint16_t>(m_selectedGameRound),
+							 static_cast<uint16_t>(m_selectedGameRound - 1));
+	m_selectedGameRound--;
+}
+
+void GameRoundConfigPopups::moveGameRoundDown() {
+	if (m_event.sizeRounds() < 2 || m_selectedGameRound >= m_event.sizeRounds() - 1) {
+		return;
+	}
+	m_event.swapRoundByIndex(static_cast<uint16_t>(m_selectedGameRound),
+							 static_cast<uint16_t>(m_selectedGameRound + 1));
+	m_selectedGameRound++;
+}
 
 }// namespace evl::gui_imgui::views

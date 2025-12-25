@@ -67,23 +67,33 @@ Le programme a été correctement compilé avec :
     * [ ] Gestion des multiples gagnants
         * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
     * [ ] Permettre de passer l'étape de saisi du gagnant
+    * [ ] Données
+        * [ ] édition de lots sous forme de liste d’articles
+* Contrôle et paramètres
+    * [ ] permettre le choix de la police de caractère
 
 ### Version 0.4 (In development)
 
 * Contrôle et paramètres
-    * [ ] permettre le choix de la police de caractère
     * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
         * [ ] ajouter le réglage de cette valeur
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
     * [ ] Refonte de l'affichage en ImGui, suppression de QT.
+        * [X] Permettre le choix du moteur de rendu (Qt ou ImGui)
+        * [ ] Refaire l'affichage en ImGui
+            * [ ] Fenêtre principale
+            * [X] Fenêtre à propos
+            * [X] Fenêtre d'aide
+            * [X] Fenêtre de configuration générale
+            * [X] Fenêtre de configuration de l'événement
+            * [ ] Fenêtre de configuration des parties
+            * [ ] Fenêtre d'affichage aux joueurs
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
     * [ ] Amélioration du rendu des boutons de numéro sur la grille du présentateur
-        * [ ] Plus grand police d'écriture
+        * [ ] Police d'écriture adaptative
         * [ ] Meilleure différence de contraste entre numéro tiré et non tiré
 * moteur de jeu
-    * [ ] Données
-        * [ ] édition de lots sous forme de liste d’articles
     * [ ] Flexibilité en jeu
         * [ ] permettre de réorganiser les parties non entamées
         * [ ] permettre l'édition de parties non entamée
