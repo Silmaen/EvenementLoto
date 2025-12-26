@@ -92,46 +92,6 @@ private:
 	void onExecute() override;
 };
 
-/**
- * @brief Class StartGameAction.
- */
-class StartGameAction final : public Action {
-public:
-	StartGameAction();
-	~StartGameAction() override;
-	StartGameAction(const StartGameAction&) = delete;
-	StartGameAction(StartGameAction&&) = delete;
-	auto operator=(const StartGameAction&) -> StartGameAction& = delete;
-	auto operator=(StartGameAction&&) -> StartGameAction& = delete;
-	[[nodiscard]] auto getName() const -> std::string override { return "start_game"; }
-
-private:
-	/**
-	 * @brief Execute the action.
-	 */
-	void onExecute() override;
-};
-
-
-/**
- * @brief Class StopGameAction.
- */
-class StopGameAction final : public Action {
-public:
-	StopGameAction();
-	~StopGameAction() override;
-	StopGameAction(const StopGameAction&) = delete;
-	StopGameAction(StopGameAction&&) = delete;
-	auto operator=(const StopGameAction&) -> StopGameAction& = delete;
-	auto operator=(StopGameAction&&) -> StopGameAction& = delete;
-	[[nodiscard]] auto getName() const -> std::string override { return "stop_game"; }
-
-private:
-	/**
-	 * @brief Execute the action.
-	 */
-	void onExecute() override;
-};
 
 class QuitAction final : public Action {
 public:

@@ -5,6 +5,7 @@
  * Copyright © 2025 All rights reserved.
  * All modification must get authorization from the author.
  */
+#include "pch.h"
 
 #include "ConfigPopups.h"
 
@@ -654,11 +655,11 @@ void GameRoundConfigPopups::renderThirdColumn() {
 		// Onglets selon le type
 		if (currentRound->getType() != core::GameRound::Type::Pause) {
 			// Partie normale
-			auto subRound = currentRound->getSubRound(static_cast<uint32_t>(m_selectedSubRound));
+			const auto subRound = currentRound->getSubRound(static_cast<uint32_t>(m_selectedSubRound));
 			ImGui::Text("Condition de victoire:");
 			ImGui::SetNextItemWidth(-1);
 			char subRoundName[256];
-			std::strcpy(subRoundName, subRound->getTypeStr().c_str());
+			std::strncpy(subRoundName, subRound->getTypeStr().c_str(), 256);
 			ImGui::InputText("##SubRoundName", subRoundName, subRound->getTypeStr().size(),
 							 ImGuiInputTextFlags_ReadOnly);
 
@@ -675,7 +676,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			ImGui::Spacing();
 			ImGui::Text("Liste des lots:");
 			char textPrices[4096];
-			std::strcpy(textPrices, subRound->getPrices().c_str());
+			std::strncpy(textPrices, subRound->getPrices().c_str(), 4096);
 			if (ImGui::InputTextMultiline("##TextPrices", textPrices, 4096, ImVec2(-1, -80))) {
 				subRound->define(subRound->getType(), textPrices, subRound->getValue());
 			}

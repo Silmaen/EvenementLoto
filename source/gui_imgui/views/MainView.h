@@ -8,18 +8,19 @@
 
 #pragma once
 #include "View.h"
+#include "core/Event.h"
 
 namespace evl::gui_imgui::views {
 
 /**
  * @brief Class MainView.
  */
-class MainView : public View {
+class MainView final : public View {
 public:
 	/**
 	 * @brief Default constructor.
 	 */
-	MainView();
+	MainView(core::Event&);
 	/**
 	 * @brief Default destructor.
 	 */
@@ -40,10 +41,18 @@ public:
 	[[nodiscard]] auto getName() const -> std::string override { return "tool_bar"; }
 
 private:
-	void renderLeftPanel();
-	void renderRightPanel();
-	void renderStatisticsTab();
-	void renderEventInfo();
+	void renderLeftPanel() const;
+	void renderRightPanel() const;
+	void renderStatisticsTab() const;
+	void renderEventInfo() const;
+	void renderDrawnNumbersTab() const;
+	void renderCommandsTab() const;
+	void renderBottomPanel();
+
+	core::Event& m_currentEvent;
+
+	enum struct DrawMode : uint8_t { Random, Manual, Both };
+	DrawMode m_drawMode = DrawMode::Both;
 };
 
 }// namespace evl::gui_imgui::views

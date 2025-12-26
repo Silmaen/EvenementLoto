@@ -10,6 +10,7 @@
 #include "Application.h"
 
 #include "actions/FileActions.h"
+#include "actions/GameActions.h"
 #include "actions/HelpActions.h"
 #include "actions/SettingsActions.h"
 #include "baseDefine.h"
@@ -48,7 +49,7 @@ Application::Application() {
 	m_views.push_back(std::make_shared<views::MenuBar>());
 	m_views.push_back(std::make_shared<views::ToolBar>());
 	m_views.push_back(std::make_shared<views::StatusBar>());
-	m_views.push_back(std::make_shared<views::MainView>());
+	m_views.push_back(std::make_shared<views::MainView>(m_currentEvent));
 
 	// Create popups
 	m_popups.push_back(std::make_shared<views::PopupAide>());
@@ -71,6 +72,10 @@ Application::Application() {
 	m_actions.back()->setShortcut({.key = KeyCode::A, .modifiers = {.ctrl = true}});
 	m_actions.push_back(std::make_shared<actions::HelpAction>());
 	m_actions.push_back(std::make_shared<actions::AboutAction>());
+	m_actions.push_back(std::make_shared<actions::GameNextActions>());
+	m_actions.push_back(std::make_shared<actions::RandomPickAction>());
+	m_actions.push_back(std::make_shared<actions::CancelPickAction>());
+	m_actions.push_back(std::make_shared<actions::DisplayRulesAction>());
 
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);
@@ -134,10 +139,7 @@ void Application::onEvent(event::Event& ioEvent) {
 		requestClose();
 		return true;
 	});
-	dispatcher.dispatch<event::WindowResizeEvent>([]<typename T>(const T&) -> auto {
-		log_trace("Resize Event");
-		return true;
-	});
+	dispatcher.dispatch<event::WindowResizeEvent>([]<typename T>(const T&) -> auto { return true; });
 	// does any action handle the event?
 	for (const auto& action: m_actions) {
 		if (ioEvent.handled)

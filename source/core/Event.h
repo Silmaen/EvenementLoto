@@ -226,6 +226,15 @@ public:
 	auto getGameRound(const uint32_t& iIndex) -> rounds_type::iterator;
 
 	/**
+	 * @brief Vérifie si la partie courante est la dernière de la liste.
+	 * @return True si la partie courante est la dernière de la liste.
+	 */
+	[[nodiscard]] auto isCurrentGameRoundLast() const -> bool {
+		const auto it = getCurrentCGameRound();
+		return (it != m_gameRounds.cend()) && (std::next(it) == m_gameRounds.cend());
+	}
+
+	/**
 	 * @brief Cherche la première partie non terminée de la liste.
 	 * @return La première partie non terminée de la liste.
 	 */
@@ -241,6 +250,19 @@ public:
 	 * @return Index de la partie courante
 	 */
 	[[nodiscard]] auto getCurrentGameRoundIndex() const -> int;
+
+
+	/**
+	 * @brief Cherche la première partie non terminée de la liste.
+	 * @return La première partie non terminée de la liste.
+	 */
+	[[nodiscard]] auto getNextCGameRound() const -> rounds_type::const_iterator;
+
+	/**
+	 * @brief Cherche la première partie non terminée de la liste.
+	 * @return La première partie non terminée de la liste.
+	 */
+	auto getNextGameRound() -> rounds_type::iterator;
 
 	/**
 	 * @brief Ajoute une partie au jeu
@@ -329,6 +351,18 @@ public:
 	 * @return Les statistiques
 	 */
 	[[nodiscard]] auto getStats(bool iWithoutChild = true) const -> Statistics;
+
+	/**
+	 * @brief Renvoie la progression de l’événement entre 0.0 et 1.0
+	 * @return La progression de l’événement
+	 */
+	[[nodiscard]] auto getProgression() const -> float;
+
+	/**
+	 * @brief Vérifie si l’événement attend un tirage de numéro.
+	 * @return True si l’événement attend un tirage de numéro.
+	 */
+	[[nodiscard]] auto canDraw() const -> bool;
 
 #ifdef EVL_DEBUG
 	/**

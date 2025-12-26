@@ -84,15 +84,6 @@ void SaveAsFileAction::onExecute() {
 	f.close();
 }
 
-StartGameAction::StartGameAction() { setIconName("toggle-on"); }
-StartGameAction::~StartGameAction() = default;
-void StartGameAction::onExecute() { log_trace("Start game action executed."); }
-
-
-StopGameAction::StopGameAction() { setIconName("toggle-off"); }
-StopGameAction::~StopGameAction() = default;
-void StopGameAction::onExecute() { log_trace("Stop game action executed."); }
-
 QuitAction::QuitAction() = default;
 QuitAction::~QuitAction() = default;
 void QuitAction::onExecute() {

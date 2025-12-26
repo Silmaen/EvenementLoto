@@ -11,45 +11,11 @@
 
 #include "core/Log.h"
 #include "gui_imgui/Application.h"
+#include "gui_imgui/utils/Rendering.h"
 
 #include <imgui.h>
 
 namespace evl::gui_imgui::views {
-namespace {
-void defineToolBarItem(const std::string& iLabel, const std::string& iActionName) {
-	if (const auto action = Application::get().getAction(iActionName); action == nullptr) {
-		log_warn("Action '{}' not found ({}).", iLabel, iActionName);
-		ImGui::Button(iLabel.c_str());
-	} else {
-		if (!action->isEnabled()) {
-			ImGui::BeginDisabled();
-		}
-		uint64_t texId = 0;
-		if (action->hasIcon()) {
-			const auto& texLib = Application::get().getTextureLibrary();
-			texId = texLib.getTextureId(action->getIconName());
-		}
-		if (texId != 0) {
-			ImGui::PushID(iActionName.c_str());
-			if (ImGui::ImageButton(std::format("##{}", iLabel).c_str(), texId, {24.0f, 24.0f})) {
-				action->execute();
-			}
-			if (ImGui::IsItemHovered()) {
-				ImGui::SetTooltip("%s", iLabel.c_str());
-			}
-			ImGui::PopID();
-		} else {
-			if (ImGui::Button(iLabel.c_str())) {
-				action->execute();
-			}
-		}
-		if (!action->isEnabled()) {
-			ImGui::EndDisabled();
-		}
-	}
-	ImGui::SameLine();
-}
-}// namespace
 
 ToolBar::ToolBar() = default;
 
@@ -69,19 +35,24 @@ void ToolBar::onUpdate() {
 						 ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings);
 
 	// Buttons in a horizontal line
-	defineToolBarItem("Nouveau", "new_file");
-	defineToolBarItem("Charger", "load_file");
-	defineToolBarItem("Sauver", "save_file");
-	defineToolBarItem("Sauver sous...", "save_file_as");
-	ImGui::Separator();
+	utils::defineActionButtonItem("Nouveau", "new_file");
+	utils::defineActionButtonItem("Charger", "load_file");
+	utils::defineActionButtonItem("Sauver", "save_file");
+	utils::defineActionButtonItem("Sauver sous...", "save_file_as");
 	ImGui::SameLine();
-	defineToolBarItem("Commencer", "start_game");
-	defineToolBarItem("Arrêter", "stop_game");
 	ImGui::Separator();
+	utils::defineActionButtonItem("Commencer", "start_game");
+	utils::defineActionButtonItem("Arrêter", "stop_game");
 	ImGui::SameLine();
-	defineToolBarItem("Préférences", "preferences");
-	defineToolBarItem("Paramètres Événement", "event_settings");
-	defineToolBarItem("Paramètres Partie", "game_settings");
+	ImGui::Separator();
+	utils::defineActionButtonItem("Préférences", "preferences");
+	utils::defineActionButtonItem("Paramètres Événement", "event_settings");
+	utils::defineActionButtonItem("Paramètres Partie", "game_settings");
+	ImGui::SameLine();
+	ImGui::Separator();
+	utils::defineActionButtonItem(utils::getNextStepStr(Application::get().getCurrentEvent()), "game_next_step");
+	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick");
+	utils::defineActionButtonItem("Annuler dernier tirage", "cancel_pick");
 	ImGui::End();
 }
 

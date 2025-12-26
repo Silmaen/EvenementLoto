@@ -10,6 +10,8 @@
 
 #include "MainWindow.h"
 #include "actions/Action.h"
+#include "core/Log.h"
+#include "core/RandomNumberGenerator.h"
 #include "event/KeyCodes.h"
 #include "views/Popups.h"
 #include "views/View.h"
@@ -115,6 +117,7 @@ public:
 			if (view->getName() == iName)
 				return view;
 		}
+		log_warn("View '{}' not found.", iName);
 		return nullptr;
 	}
 
@@ -128,6 +131,7 @@ public:
 			if (popup->getName() == iName)
 				return popup;
 		}
+		log_warn("Popup '{}' not found.", iName);
 		return nullptr;
 	}
 
@@ -141,6 +145,7 @@ public:
 			if (action->getName() == iName)
 				return action;
 		}
+		log_warn("Action '{}' not found.", iName);
 		return nullptr;
 	}
 
@@ -210,6 +215,12 @@ public:
 	 */
 	auto getMainWindow() -> MainWindow& { return m_mainWindow; }
 
+	/**
+	 * @brief Access to the random number generator.
+	 * @return The random number generator.
+	 */
+	auto getRng() -> core::RandomNumberGenerator& { return m_rng; }
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
@@ -238,6 +249,8 @@ private:
 	std::filesystem::path m_currentFile{};
 	/// The current draw mode.
 	DrawMode m_currentDrawMode = DrawMode::Both;
+	/// The random number generator.
+	core::RandomNumberGenerator m_rng;
 
 	/// The maximum frame count, used for the test system.
 	uint32_t m_maxFrame = 0;
