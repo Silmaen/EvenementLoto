@@ -303,6 +303,20 @@ auto Event::getCurrentGameRoundIndex() const -> int {
 	return static_cast<int>(i);
 }
 
+auto Event::getNextCGameRound() const -> rounds_type::const_iterator {
+	const auto it = getCurrentCGameRound();
+	if (it == m_gameRounds.cend())
+		return m_gameRounds.cend();
+	return std::next(it);
+}
+
+auto Event::getNextGameRound() -> rounds_type::iterator {
+	const auto it = getCurrentGameRound();
+	if (it == m_gameRounds.end())
+		return m_gameRounds.end();
+	return std::next(it);
+}
+
 // ----- Action sur le flow -----
 
 //NOLINTBEGIN(misc-no-recursion)
@@ -397,6 +411,40 @@ auto Event::getStats(const bool iWithoutChild) const -> Statistics {
 		stat.pushRound(round);
 	}
 	return stat;
+}
+
+auto Event::getProgression() const -> float {
+	// total number of sub-rounds to play (excluding pauses)
+	uint32_t totalSubRounds = 0;
+	uint32_t completedSubRounds = 0;
+	for (const auto& round: m_gameRounds) {
+		if (round.getType() == GameRound::Type::Pause)
+			continue;
+		for (auto subRound = round.beginSubRound(); subRound != round.endSubRound(); ++subRound) {
+			++totalSubRounds;
+			if (subRound->isFinished())
+				++completedSubRounds;
+		}
+	}
+	if (totalSubRounds == 0)
+		return 0.0f;
+	return static_cast<float>(completedSubRounds) / static_cast<float>(totalSubRounds);
+}
+
+auto Event::canDraw() const -> bool {
+	if (m_status != Status::GameRunning)
+		return false;
+	const auto round = getCurrentCGameRound();
+	if (round == m_gameRounds.end())
+		return false;
+	if (round->getStatus() != GameRound::Status::Running)
+		return false;
+	const auto subRound = round->getCurrentSubRound();
+	if (subRound == round->endSubRound())
+		return false;
+	if (subRound->isFinished())
+		return false;
+	return true;
 }
 
 Serializable::~Serializable() = default;

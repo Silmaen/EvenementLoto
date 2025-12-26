@@ -68,4 +68,28 @@ void Statistics::pushRound(const GameRound& iRound) {
 	}
 }
 
+
+auto Statistics::lessPickStr() const -> std::string {
+	if (lessPickList.empty())
+		return "--";
+	std::string res;
+	for (const auto& num: lessPickList) {
+		if (!res.empty())
+			res += " ";
+		res += std::to_string(num);
+	}
+	return res;
+}
+auto Statistics::mostPickStr() const -> std::string {
+	if (mostPickList.empty())
+		return "--";
+	std::string res;
+	for (const auto& num: mostPickList) {
+		if (!res.empty())
+			res += " ";
+		res += std::to_string(num);
+	}
+	return res;
+}
+
 }// namespace evl::core
