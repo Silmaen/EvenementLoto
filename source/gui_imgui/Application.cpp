@@ -18,6 +18,7 @@
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "views/ConfigPopups.h"
+#include "views/DisplayView.h"
 #include "views/HelpPopups.h"
 #include "views/MainView.h"
 #include "views/MenuBar.h"
@@ -50,6 +51,8 @@ Application::Application() {
 	m_views.push_back(std::make_shared<views::ToolBar>());
 	m_views.push_back(std::make_shared<views::StatusBar>());
 	m_views.push_back(std::make_shared<views::MainView>(m_currentEvent));
+	m_views.push_back(std::make_shared<views::DisplayView>(m_currentEvent));
+	m_views.back()->hide();// hidden at the application start.
 
 	// Create popups
 	m_popups.push_back(std::make_shared<views::PopupAide>());
@@ -103,8 +106,18 @@ void Application::run() {
 		m_mainWindow.newFrame();
 		if (m_state != State::Running)
 			continue;
-		for (const auto& popup: m_popups) { popup->update(); }
+		const auto dview = getView("display_window");
+		if (isDisplayNeeded()) {
+			if (!dview->visibility())
+				log_debug("Show Display view.");
+			dview->show();
+		} else {
+			if (dview->visibility())
+				log_debug("Hide Display view.");
+			dview->hide();
+		}
 		for (const auto& view: m_views) { view->update(); }
+		for (const auto& popup: m_popups) { popup->update(); }
 		m_mainWindow.render(m_theme.windowBackground);
 		frameCount++;
 		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
@@ -188,6 +201,22 @@ void Application::checkActionEnable() const {
 		getAction("game_settings")->disable();
 	} else {
 		getAction("game_settings")->enable();
+	}
+}
+
+auto Application::isDisplayNeeded() const -> bool {
+	const auto status = m_currentEvent.getStatus();
+	return m_displayPreview || status == core::Event::Status::GameRunning ||
+		   status == core::Event::Status::EventStarting || status == core::Event::Status::EventEnding ||
+		   status == core::Event::Status::DisplayRules;
+}
+
+void Application::setDisplayPreview(const bool iDisplay) {
+	m_displayPreview = iDisplay;
+	const auto dv = std::static_pointer_cast<views::DisplayView>(getView("display_window"));
+	dv->setPreviewMode(iDisplay);
+	if (!iDisplay) {
+		dv->setEventToRender(m_currentEvent);
 	}
 }
 

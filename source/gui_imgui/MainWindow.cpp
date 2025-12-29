@@ -352,8 +352,7 @@ void MainWindow::render(const math::vec4& iClearColor) {
 
 	ImDrawData* draw_data = ImGui::GetDrawData();
 
-	if (const bool is_minimized = (draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f);
-		!is_minimized) {
+	if (const bool is_minimized = draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f; !is_minimized) {
 		g_MainWindowData->ClearValue.color.float32[0] = iClearColor.r() * iClearColor.a();
 		g_MainWindowData->ClearValue.color.float32[1] = iClearColor.g() * iClearColor.a();
 		g_MainWindowData->ClearValue.color.float32[2] = iClearColor.b() * iClearColor.a();
@@ -558,6 +557,34 @@ void MainWindow::setIcon(const std::string& iIconName) const {
 	img.height = static_cast<int>(pix.height);
 	img.pixels = pix.data.data();
 	glfwSetWindowIcon(glfwWindow, 1, &img);
+}
+
+auto MainWindow::getMonitorsInfo() const -> std::vector<MonitorInfo> {
+	auto* w = static_cast<GLFWwindow*>(m_window);
+	math::vec2i windowPos;
+	glfwGetWindowPos(w, &windowPos.x(), &windowPos.y());
+	std::vector<MonitorInfo> monitorsInfo;
+	int count = 0;
+	GLFWmonitor* const* monitors = glfwGetMonitors(&count);
+	for (int i = 0; i < count; i++) {
+		MonitorInfo monitorInfo;
+		GLFWmonitor* monitor = monitors[i];
+		monitorInfo.name = glfwGetMonitorName(monitor);
+		glfwGetMonitorPos(monitor, &monitorInfo.position.x(), &monitorInfo.position.y());
+		if (const GLFWvidmode* mode = glfwGetVideoMode(monitor); mode != nullptr) {
+			monitorInfo.size.x() = static_cast<uint32_t>(mode->width);
+			monitorInfo.size.y() = static_cast<uint32_t>(mode->height);
+		}
+		glfwGetMonitorPhysicalSize(monitor, &monitorInfo.physicalSize.x(), &monitorInfo.physicalSize.y());
+		glfwGetMonitorWorkarea(monitor, &monitorInfo.workAreaPosition.x(), &monitorInfo.workAreaPosition.y(),
+							   &monitorInfo.workAreaSize.x(), &monitorInfo.workAreaSize.y());
+		monitorInfo.isMainWindow = monitorInfo.position.x() <= windowPos.x() &&
+								   monitorInfo.position.x() + static_cast<int>(monitorInfo.size.x()) > windowPos.x() &&
+								   monitorInfo.position.y() <= windowPos.y() &&
+								   monitorInfo.position.y() + static_cast<int>(monitorInfo.size.y()) > windowPos.y();
+		monitorsInfo.push_back(monitorInfo);
+	}
+	return monitorsInfo;
 }
 
 }// namespace evl::gui_imgui

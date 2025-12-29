@@ -184,6 +184,11 @@ public:
 	 */
 	void onOpen() override;
 
+	/**
+	 * @brief Function called when the popup is closed.
+	 */
+	void onClose();
+
 private:
 	/// The event copy.
 	core::Event m_event;
