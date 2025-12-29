@@ -9,6 +9,7 @@
 #pragma once
 #include "View.h"
 #include "core/Event.h"
+#include "core/maths/vectors.h"
 
 namespace evl::gui_imgui::views {
 
@@ -53,6 +54,12 @@ private:
 
 	enum struct DrawMode : uint8_t { Random, Manual, Both };
 	DrawMode m_drawMode = DrawMode::Both;
+
+	// internat size variables
+	float m_topBottomSplit = 0.7f;
+	float m_leftRightSplit = 0.7f;
+	math::vec2 m_lastSize = {0.0f, 0.0f};
+	int m_selectedScreen = 0;
 };
 
 }// namespace evl::gui_imgui::views

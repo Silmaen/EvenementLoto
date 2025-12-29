@@ -11,11 +11,46 @@
 
 #include "DisplayView.h"
 #include "gui_imgui/Application.h"
+#include "gui_imgui/utils/Convert.h"
 #include "gui_imgui/utils/Rendering.h"
 
 #include <imgui.h>
 
 namespace evl::gui_imgui::views {
+
+constexpr float g_splitterThickness = 4.0f;
+constexpr float g_statusBarHeight = 25.0f;
+constexpr float g_minLeftPanelWidth = 200.0f;
+constexpr float g_minRightPanelWidth = 320.0f;
+constexpr float g_minTopPanelHeight = 150.0f;
+constexpr float g_minBottomPanelHeight = 200.0f;
+
+constexpr float g_commandSectionHeight = 150.0f;
+
+namespace {
+
+void adaptTextToRegion(const std::string& iText, const math::vec2& iContentSize = {0.0f, 0.0f}) {
+	ImVec2 numberSize;
+	if (iContentSize.x() <= 0.0f || iContentSize.y() <= 0.0f) {
+		numberSize = ImGui::GetContentRegionAvail();
+	} else {
+		numberSize = utils::vec2ToImVec2(iContentSize);
+	}
+	const auto numberTextSize = ImGui::CalcTextSize(iText.c_str());
+	const float scaleX = numberSize.x / numberTextSize.x;
+	const float scaleY = numberSize.y / numberTextSize.y;
+	const float scale = std::min(scaleX, scaleY) * 0.9f;// 80% of the available space
+	if (scale < 0.0f)
+		return;// No need to scale up
+	ImGui::SetWindowFontScale(scale);
+	const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;
+	const float centerY = (numberSize.y - numberTextSize.y * scale) * 0.5f;
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + centerX);
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + centerY);
+}
+
+}// namespace
+
 
 MainView::MainView(core::Event& iEvent) : m_currentEvent{iEvent} {}
 
@@ -28,11 +63,19 @@ void MainView::onUpdate() {
 
 	// Calculate the available space
 	const float toolBarHeight = ImGui::GetFrameHeight() + style.WindowPadding.y * 2;
-	const float statusBarHeight = 25.0f + style.WindowPadding.y;
+	const float statusBarHeight = g_statusBarHeight + style.WindowPadding.y;
 
 	// Position and size for the main view
 	const ImVec2 pos = {viewport->WorkPos.x, viewport->WorkPos.y + toolBarHeight};
 	const ImVec2 size = {viewport->WorkSize.x, viewport->WorkSize.y - toolBarHeight - statusBarHeight};
+	bool resized = false;
+	if (std::abs(size.x - m_lastSize.x()) > .001f || std::abs(size.y - m_lastSize.y()) > .001f) {
+		// Size changed, you can handle it here if needed
+		m_lastSize = utils::imVec2ToVec2(size);
+		resized = true;
+		log_debug("MainView resized to: {} x {}", size.x, size.y);
+	}
+
 
 	ImGui::SetNextWindowPos(pos);
 	ImGui::SetNextWindowSize(size);
@@ -43,25 +86,33 @@ void MainView::onUpdate() {
 
 	if (ImGui::Begin("MainView", nullptr, flags)) {
 		// Initialize splitter positions if needed
-		static float topBottomSplit = 0.85f;
-		static float leftRightSplit = 0.75f;
+		const float minBottom = g_minTopPanelHeight / size.y;
+		const float maxBottom = 1.f - g_minBottomPanelHeight / size.y;
+		const float minLeft = g_minLeftPanelWidth / size.x;
+		const float maxLeft = 1.f - g_minRightPanelWidth / size.x;
+		if (resized) {
+			m_leftRightSplit = maxLeft;
+			m_topBottomSplit = maxBottom;
+			log_debug("MainView splitters reset due to resize: Left-Right {}, Top-Bottom {}", m_leftRightSplit,
+					  m_topBottomSplit);
+		}
 
 		// Top panel
-		const float topPanelHeight = size.y * topBottomSplit;
+		const float topPanelHeight = size.y * m_topBottomSplit;
 		ImGui::BeginChild("TopPanel", {0, topPanelHeight}, ImGuiChildFlags_None, ImGuiWindowFlags_NoScrollbar);
 
 		// Left panel
-		const float leftPanelWidth = size.x * leftRightSplit;
+		const float leftPanelWidth = size.x * m_leftRightSplit;
 		ImGui::BeginChild("LeftPanel", {leftPanelWidth, 0}, ImGuiChildFlags_None, ImGuiWindowFlags_NoResize);
 		renderLeftPanel();
 		ImGui::EndChild();
 
 		// Vertical splitter between left and right
 		ImGui::SameLine();
-		ImGui::Button("##vsplitter", {4.0f, -1});
+		ImGui::Button("##vsplitter", {g_splitterThickness, -1});
 		if (ImGui::IsItemActive()) {
-			leftRightSplit += ImGui::GetIO().MouseDelta.x / size.x;
-			leftRightSplit = std::clamp(leftRightSplit, 0.2f, 0.9f);
+			m_leftRightSplit += ImGui::GetIO().MouseDelta.x / size.x;
+			m_leftRightSplit = std::clamp(m_leftRightSplit, minLeft, maxLeft);
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
@@ -77,10 +128,10 @@ void MainView::onUpdate() {
 		ImGui::EndChild();
 
 		// Horizontal splitter between top and bottom
-		ImGui::Button("##hsplitter", {-1, 4.0f});
+		ImGui::Button("##hsplitter", {-1, g_splitterThickness});
 		if (ImGui::IsItemActive()) {
-			topBottomSplit += ImGui::GetIO().MouseDelta.y / size.y;
-			topBottomSplit = std::clamp(topBottomSplit, 0.2f, 0.9f);
+			m_topBottomSplit += ImGui::GetIO().MouseDelta.y / size.y;
+			m_topBottomSplit = std::clamp(m_topBottomSplit, minBottom, maxBottom);
 		}
 		if (ImGui::IsItemHovered()) {
 			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
@@ -148,7 +199,13 @@ void MainView::renderDrawnNumbersTab() const {
 
 			// Create button
 			const std::string label = std::format("{}", number);
+			const ImVec2 textSize = ImGui::CalcTextSize(label.c_str());
+			const float scaleX = buttonSize.x / textSize.x;
+			const float scaleY = buttonSize.y / textSize.y;
+			const float scale = std::min(scaleX, scaleY) * 0.8f;
+			ImGui::SetWindowFontScale(scale);
 			const bool clicked = ImGui::Button(label.c_str(), buttonSize);
+			ImGui::SetWindowFontScale(1.0f);
 
 			// Pop style
 			if (isDrawn) {
@@ -173,7 +230,7 @@ void MainView::renderRightPanel() const {
 	int prevDrawnNumber = -1;
 	int secondPrevDrawnNumber = -1;
 	int thirdPrevDrawnNumber = -1;
-
+		const ImGuiStyle& style = ImGui::GetStyle();
 	if (m_currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		if (const auto currentRound = m_currentEvent.getCurrentGameRound();
 			currentRound->getStatus() == core::GameRound::Status::Running) {
@@ -191,18 +248,24 @@ void MainView::renderRightPanel() const {
 		}
 	}
 
-	if (ImGui::BeginChild("NumbersDisplay", {0, -ImGui::GetFrameHeightWithSpacing() * 5},
-						  ImGuiWindowFlags_NoTitleBar)) {
+	auto size = ImGui::GetContentRegionAvail();
+	size.y -= 2 * style.WindowPadding.y;
+	size.x -= style.WindowPadding.x;
+
+
+	if (ImGui::BeginChild("NumbersDisplay", {size.x, size.y - g_commandSectionHeight}, ImGuiWindowFlags_NoTitleBar)) {
 		// Current draw
-		if (ImGui::BeginChild("CurrentDraw", {0, 0.75f * ImGui::GetContentRegionAvail().y},
+		if (ImGui::BeginChild("CurrentDraw", {0, 0.70f * ImGui::GetContentRegionAvail().y},
 							  ImGuiWindowFlags_NoResize)) {
 			ImGui::Text("Numéro tiré");
 			ImGui::Separator();
+			adaptTextToRegion("00");
 			if (prevDrawnNumber != -1) {
 				ImGui::Text("%d", prevDrawnNumber);
 			} else {
 				ImGui::Text("--");
 			}
+			ImGui::SetWindowFontScale(1.0f);
 		}
 		ImGui::EndChild();
 
@@ -226,14 +289,16 @@ void MainView::renderRightPanel() const {
 			} else {
 				lastNumbers += "--";
 			}
+			adaptTextToRegion("00 00 00");
 			ImGui::Text("%s", lastNumbers.c_str());
+			ImGui::SetWindowFontScale(1.0f);
 		}
 		ImGui::EndChild();
 	}
 	ImGui::EndChild();
 
 	// Commands section at bottom
-	if (ImGui::BeginChild("Commands", {0, 0}, ImGuiWindowFlags_NoTitleBar)) {
+	if (ImGui::BeginChild("Commands", {size.x, g_commandSectionHeight}, ImGuiWindowFlags_NoTitleBar)) {
 		renderCommandsTab();
 	}
 	ImGui::EndChild();
@@ -411,12 +476,9 @@ void MainView::renderEventInfo() const {
 	ImGui::NextColumn();
 	ImGui::BeginChild("RightColomunEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
 	// Large current time display
-	const ImVec2 textSize = ImGui::CalcTextSize("00:00:00");
-	const float centerX = (ImGui::GetContentRegionAvail().x - textSize.x) * 0.5f;
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + centerX);
-	ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[0]);
+	adaptTextToRegion("00:00:00");
 	ImGui::Text("%s", core::formatClock(core::clock::now()).c_str());
-	ImGui::PopFont();
+	ImGui::SetWindowFontScale(1.0f);
 	ImGui::EndChild();
 	ImGui::Columns(1);
 }
@@ -474,14 +536,13 @@ void MainView::renderBottomPanel() {
 			{
 				const auto infos = Application::get().getMonitorsInfo();
 				const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
-				static int selectedScreen = 0;
 				if (infos.size() == 1)
 					displayView->setFullscreen(false);
 				bool fullscreen = displayView->isFullscreen();
-				ImGui::SetNextItemWidth(400.0f);
+				//ImGui::SetNextItemWidth(400.0f);
 				if (auto [scr_list_name, scr_list_idx] = screenInfoTolist(infos);
-					ImGui::Combo("##ScreenSelect", &selectedScreen, scr_list_name.c_str())) {
-					const size_t monitorIndex = scr_list_idx[static_cast<size_t>(selectedScreen)];
+					ImGui::Combo("##ScreenSelect", &m_selectedScreen, scr_list_name.c_str())) {
+					const size_t monitorIndex = scr_list_idx[static_cast<size_t>(m_selectedScreen)];
 					displayView->setMonitorNumber(monitorIndex);
 					log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
 				}
@@ -502,7 +563,11 @@ void MainView::renderBottomPanel() {
 		if (ImGui::BeginTabItem("Information partie")) {
 			ImGui::BeginChild("RoundInfoContent", {0, 0}, ImGuiChildFlags_None);
 
-			const float groupWidth = ImGui::GetContentRegionAvail().x * 0.25f;
+			const float drawWidth = ImGui::GetContentRegionAvail().x * 0.30f;
+			const float timingWidth = ImGui::GetContentRegionAvail().x * 0.10f;
+			const float roundWidth = ImGui::GetContentRegionAvail().x * 0.15f;
+			const float pricesWidth = ImGui::GetContentRegionAvail().x * 0.45f;
+
 			const auto currentRound = m_currentEvent.getCurrentCGameRound();
 			// Draws group
 			ImGui::BeginGroup();
@@ -514,7 +579,7 @@ void MainView::renderBottomPanel() {
 									  ? 0
 									  : static_cast<uint32_t>(currentRound->drawsCount()));
 			ImGui::Spacing();
-			ImGui::BeginChild("DrawsList", {groupWidth, 0}, ImGuiChildFlags_Border);
+			ImGui::BeginChild("DrawsList", {drawWidth, 0}, ImGuiChildFlags_Border);
 			if (currentRound == m_currentEvent.endRounds() || currentRound->drawsCount() == 0) {
 				ImGui::TextWrapped("Aucun tirage effectué.");
 			} else {
@@ -529,16 +594,23 @@ void MainView::renderBottomPanel() {
 			ImGui::BeginGroup();
 			ImGui::Text("Timing");
 			ImGui::Separator();
-			ImGui::Text("Début:");
-			ImGui::SameLine();
-			ImGui::Text("%s", currentRound == m_currentEvent.endRounds()
-									  ? "--"
-									  : core::formatClockNoSecond(currentRound->getStarting()).c_str());
-			ImGui::Text("Durée:");
-			ImGui::SameLine();
-			ImGui::Text("%s", currentRound == m_currentEvent.endRounds()
-									  ? "--"
-									  : core::formatDuration(core::clock::now() - currentRound->getStarting()).c_str());
+			ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Border);
+			if (currentRound == m_currentEvent.endRounds()) {
+				ImGui::Text("Début:");
+				ImGui::SameLine();
+				ImGui::Text("--");
+				ImGui::Text("Durée:");
+				ImGui::SameLine();
+				ImGui::Text("--");
+			} else {
+				ImGui::Text("Début:");
+				ImGui::SameLine();
+				ImGui::Text("%s", core::formatClockNoSecond(currentRound->getStarting()).c_str());
+				ImGui::Text("Durée:");
+				ImGui::SameLine();
+				ImGui::Text("%s", core::formatDuration(core::clock::now() - currentRound->getStarting()).c_str());
+			}
+			ImGui::EndChild();
 			ImGui::EndGroup();
 
 			ImGui::SameLine();
@@ -547,17 +619,32 @@ void MainView::renderBottomPanel() {
 			ImGui::BeginGroup();
 			ImGui::Text("Partie en cours");
 			ImGui::Separator();
+			ImGui::BeginChild("OngoingRound", {roundWidth, 0}, ImGuiChildFlags_Border);
 			ImGui::Text("Partie:");
 			ImGui::SameLine();
-			ImGui::Text("%s", currentRound == m_currentEvent.endRounds() ? "" : currentRound->getName().c_str());
-			ImGui::Text("Phase:");
-			ImGui::SameLine();
-			ImGui::Text("%s", currentRound == m_currentEvent.endRounds() ? "" : currentRound->getStateString().c_str());
-			ImGui::Text("Valeur:");
-			ImGui::SameLine();
-			ImGui::Text("%f €", currentRound == m_currentEvent.endRounds()
-										? 0
-										: currentRound->getCurrentSubRound()->getValue());
+			if (currentRound == m_currentEvent.endRounds()) {
+				ImGui::Text("");
+				ImGui::Text("Phase:");
+				ImGui::SameLine();
+				ImGui::Text("");
+				ImGui::Text("Valeur:");
+				ImGui::SameLine();
+				ImGui::Text("0 €");
+			} else {
+				ImGui::Text("%s", currentRound->getName().c_str());
+				ImGui::Text("Phase:");
+				ImGui::SameLine();
+				ImGui::Text("%s", currentRound->getStateString().c_str());
+				ImGui::Text("Valeur:");
+				ImGui::SameLine();
+				if (currentRound->getType() == core::GameRound::Type::Pause) {
+					ImGui::Text("N/A");
+				} else {
+					const auto value = std::format("{:.2f} €", currentRound->getCurrentSubRound()->getValue());
+					ImGui::Text("%s", value.c_str());
+				}
+			}
+			ImGui::EndChild();
 			ImGui::EndGroup();
 			ImGui::SameLine();
 
@@ -565,10 +652,14 @@ void MainView::renderBottomPanel() {
 			ImGui::BeginGroup();
 			ImGui::Text("Lots");
 			ImGui::Separator();
-			ImGui::BeginChild("PrizesList", {groupWidth, 0}, ImGuiChildFlags_Border);
-			ImGui::Text("%s", currentRound == m_currentEvent.endRounds()
-									  ? ""
-									  : currentRound->getCurrentSubRound()->getPrices().c_str());
+			ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Border);
+			if (currentRound == m_currentEvent.endRounds()) {
+				ImGui::TextWrapped("");
+			} else if (currentRound->getType() == core::GameRound::Type::Pause) {
+				ImGui::TextWrapped("Pas de lots pour une pause.");
+			} else {
+				ImGui::Text("%s", currentRound->getCurrentSubRound()->getPrices().c_str());
+			}
 			ImGui::EndChild();
 			ImGui::EndGroup();
 

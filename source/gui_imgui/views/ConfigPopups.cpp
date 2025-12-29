@@ -214,7 +214,6 @@ void MainConfigPopups::onPopupUpdate() {
 
 void MainConfigPopups::dataToSettings() {
 	core::Settings settings;
-	settings.setValue("data_location", std::string{m_data.dataLocation});
 	settings.setValue("main_scale", m_data.mainScale);
 	settings.setValue("title_scale", m_data.titleScale);
 	settings.setValue("short_text_scale", m_data.shortTextScale);
@@ -230,13 +229,15 @@ void MainConfigPopups::dataToSettings() {
 	settings.setValue("fade_amount", m_data.fadeAmount);
 	settings.setValue("fade_strength", m_data.fadeStrength);
 	core::getSettings()->include(settings, "gui");
+	core::getSettings()->setValue("general/data_location", std::string{m_data.dataLocation});
 }
 
 void MainConfigPopups::settingsToData() {
 	const auto settings = core::getSettings()->extract("gui");
 	const Data defaults{};
 
-	m_data.dataLocation = settings.getValue<std::string>("data_location", defaults.dataLocation.string());
+	m_data.dataLocation =
+			core::getSettings()->getValue<std::string>("general/data_location", defaults.dataLocation.string());
 	m_data.mainScale = settings.getValue<float>("main_scale", defaults.mainScale);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
 	m_data.shortTextScale = settings.getValue<float>("short_text_scale", defaults.shortTextScale);

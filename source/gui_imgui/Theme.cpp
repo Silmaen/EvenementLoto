@@ -12,7 +12,6 @@
 namespace evl::gui_imgui {
 
 void Theme::loadFromSettings(const core::Settings& iSettings) {
-
 	text = iSettings.getValue("Text", text);
 	windowBackground = iSettings.getValue("WindowBackground", windowBackground);
 	childBackground = iSettings.getValue("ChildBackground", childBackground);
@@ -26,17 +25,17 @@ void Theme::loadFromSettings(const core::Settings& iSettings) {
 	titleBar = iSettings.getValue("TitleBar", titleBar);
 	titleBarActive = iSettings.getValue("TitleBarActive", titleBarActive);
 	titleBarCollapsed = iSettings.getValue("TitleBarCollapsed", titleBarCollapsed);
-	menubarBackground = iSettings.getValue("TitleBarCollapsed", titleBarCollapsed);
+	menubarBackground = iSettings.getValue("MenubarBackground", menubarBackground);
 
 	scrollbarBackground = iSettings.getValue("ScrollbarBackground", scrollbarBackground);
 	scrollbarGrab = iSettings.getValue("ScrollbarGrab", scrollbarGrab);
-	scrollbarGrabHovered = iSettings.getValue("ScrollbarGrabHovered ", scrollbarGrabHovered);
+	scrollbarGrabHovered = iSettings.getValue("ScrollbarGrabHovered", scrollbarGrabHovered);
 	scrollbarGrabActive = iSettings.getValue("ScrollbarGrabActive", scrollbarGrabActive);
 
 	checkMark = iSettings.getValue("CheckMark", checkMark);
 
 	sliderGrab = iSettings.getValue("SliderGrab", sliderGrab);
-	sliderGrabActive = iSettings.getValue("SliderGrabAct", sliderGrabActive);
+	sliderGrabActive = iSettings.getValue("SliderGrabActive", sliderGrabActive);
 
 	button = iSettings.getValue("Button", button);
 	buttonHovered = iSettings.getValue("ButtonHovered", buttonHovered);
@@ -65,8 +64,25 @@ void Theme::loadFromSettings(const core::Settings& iSettings) {
 	dockingPreview = iSettings.getValue("DockingPreview", dockingPreview);
 	dockingEmptyBackground = iSettings.getValue("DockingEmptyBackground", dockingEmptyBackground);
 
-	highlight = iSettings.getValue("Highlight", highlight);
+	plotLines = iSettings.getValue("PlotLines", plotLines);
+	plotLinesHovered = iSettings.getValue("PlotLinesHovered", plotLinesHovered);
+	plotHistogram = iSettings.getValue("PlotHistogram", plotHistogram);
+	plotHistogramHovered = iSettings.getValue("PlotHistogramHovered", plotHistogramHovered);
 
+	tableHeaderBg = iSettings.getValue("TableHeaderBg", tableHeaderBg);
+	tableBorderLight = iSettings.getValue("TableBorderLight", tableBorderLight);
+	tableRowBg = iSettings.getValue("TableRowBg", tableRowBg);
+	tableRowBgAlt = iSettings.getValue("TableRowBgAlt", tableRowBgAlt);
+
+	textSelectedBg = iSettings.getValue("TextSelectedBg", textSelectedBg);
+	dragDropTarget = iSettings.getValue("DragDropTarget", dragDropTarget);
+
+	navHighlight = iSettings.getValue("NavHighlight", navHighlight);
+	navWindowingHighlight = iSettings.getValue("NavWindowingHighlight", navWindowingHighlight);
+	navWindowingDimBg = iSettings.getValue("NavWindowingDimBg", navWindowingDimBg);
+	modalWindowDimBg = iSettings.getValue("ModalWindowDimBg", modalWindowDimBg);
+
+	highlight = iSettings.getValue("Highlight", highlight);
 	propertyField = iSettings.getValue("PropertyField", propertyField);
 
 	windowRounding = iSettings.getValue("WindowRounding", windowRounding);
@@ -79,11 +95,22 @@ void Theme::loadFromSettings(const core::Settings& iSettings) {
 	tabBorder = iSettings.getValue("TabBorder", tabBorder);
 
 	controlsRounding = iSettings.getValue("ControlsRounding", controlsRounding);
-}
 
+	itemSpacing = iSettings.getValue("ItemSpacing", itemSpacing);
+	itemInnerSpacing = iSettings.getValue("ItemInnerSpacing", itemInnerSpacing);
+	cellPadding = iSettings.getValue("CellPadding", cellPadding);
+	framePadding = iSettings.getValue("FramePadding", framePadding);
+	buttonTextAlign = iSettings.getValue("ButtonTextAlign", buttonTextAlign);
+	selectableTextAlign = iSettings.getValue("SelectableTextAlign", selectableTextAlign);
+	displayWindowPadding = iSettings.getValue("DisplayWindowPadding", displayWindowPadding);
+	displaySafeAreaPadding = iSettings.getValue("DisplaySafeAreaPadding", displaySafeAreaPadding);
+
+	mouseCursorScale = iSettings.getValue("MouseCursorScale", mouseCursorScale);
+}
 
 auto Theme::saveToSettings() -> core::Settings {
 	core::Settings settings;
+
 	settings.setValue("Text", text);
 	settings.setValue("WindowBackground", windowBackground);
 	settings.setValue("ChildBackground", childBackground);
@@ -107,7 +134,7 @@ auto Theme::saveToSettings() -> core::Settings {
 	settings.setValue("CheckMark", checkMark);
 
 	settings.setValue("SliderGrab", sliderGrab);
-	settings.setValue("SliderGrabAct", sliderGrabActive);
+	settings.setValue("SliderGrabActive", sliderGrabActive);
 
 	settings.setValue("Button", button);
 	settings.setValue("ButtonHovered", buttonHovered);
@@ -136,18 +163,49 @@ auto Theme::saveToSettings() -> core::Settings {
 	settings.setValue("DockingPreview", dockingPreview);
 	settings.setValue("DockingEmptyBackground", dockingEmptyBackground);
 
-	settings.setValue("Highlight", highlight);
+	settings.setValue("PlotLines", plotLines);
+	settings.setValue("PlotLinesHovered", plotLinesHovered);
+	settings.setValue("PlotHistogram", plotHistogram);
+	settings.setValue("PlotHistogramHovered", plotHistogramHovered);
 
+	settings.setValue("TableHeaderBg", tableHeaderBg);
+	settings.setValue("TableBorderLight", tableBorderLight);
+	settings.setValue("TableRowBg", tableRowBg);
+	settings.setValue("TableRowBgAlt", tableRowBgAlt);
+
+	settings.setValue("TextSelectedBg", textSelectedBg);
+	settings.setValue("DragDropTarget", dragDropTarget);
+
+	settings.setValue("NavHighlight", navHighlight);
+	settings.setValue("NavWindowingHighlight", navWindowingHighlight);
+	settings.setValue("NavWindowingDimBg", navWindowingDimBg);
+	settings.setValue("ModalWindowDimBg", modalWindowDimBg);
+
+	settings.setValue("Highlight", highlight);
 	settings.setValue("PropertyField", propertyField);
 
 	settings.setValue("WindowRounding", windowRounding);
 	settings.setValue("FrameRounding", frameRounding);
 	settings.setValue("FrameBorderSize", frameBorderSize);
 	settings.setValue("IndentSpacing", indentSpacing);
+
 	settings.setValue("TabRounding", tabRounding);
 	settings.setValue("TabOverline", tabOverline);
 	settings.setValue("TabBorder", tabBorder);
+
 	settings.setValue("ControlsRounding", controlsRounding);
+
+	settings.setValue("ItemSpacing", itemSpacing);
+	settings.setValue("ItemInnerSpacing", itemInnerSpacing);
+	settings.setValue("CellPadding", cellPadding);
+	settings.setValue("FramePadding", framePadding);
+	settings.setValue("ButtonTextAlign", buttonTextAlign);
+	settings.setValue("SelectableTextAlign", selectableTextAlign);
+	settings.setValue("DisplayWindowPadding", displayWindowPadding);
+	settings.setValue("DisplaySafeAreaPadding", displaySafeAreaPadding);
+
+	settings.setValue("MouseCursorScale", mouseCursorScale);
+
 	return settings;
 }
 
