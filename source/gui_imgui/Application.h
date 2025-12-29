@@ -178,7 +178,7 @@ public:
 	 * @brief Access to the current file.
 	 * @return The current file.
 	 */
-	auto getCurrentFile() -> std::filesystem::path { return m_currentFile; }
+	auto getCurrentFile() -> std::filesystem::path& { return m_currentFile; }
 	/**
 	 * @brief Draw mode of the number.
 	 */
@@ -221,6 +221,24 @@ public:
 	 */
 	auto getRng() -> core::RandomNumberGenerator& { return m_rng; }
 
+	/**
+	 * @brief Set display preview flag.
+	 * @param iDisplay The display preview flag.
+	 */
+	void setDisplayPreview(bool iDisplay);
+
+	/**
+	 * @brief Get display preview flag.
+	 * @return The display preview flag.
+	 */
+	[[nodiscard]] auto getDisplayPreview() const -> bool { return m_displayPreview; }
+
+	/**
+	 * @brief Get monitor information.
+	 * @return The monitor information.
+	 */
+	[[nodiscard]] auto getMonitorsInfo() const -> std::vector<MonitorInfo> { return m_mainWindow.getMonitorsInfo(); }
+
 private:
 	/// The application Instance.
 	static Application* m_instance;
@@ -255,10 +273,19 @@ private:
 	/// The maximum frame count, used for the test system.
 	uint32_t m_maxFrame = 0;
 
+	/// Display preview flag.
+	bool m_displayPreview = false;
+
 	/**
 	 * @brief check the enablement of the actions.
 	 */
 	void checkActionEnable() const;
+
+	/**
+	 * @brief Check if display is needed.
+	 * @return True if display is needed.
+	 */
+	[[nodiscard]] auto isDisplayNeeded() const -> bool;
 };
 
 /**

@@ -26,6 +26,7 @@ void Popup::onUpdate() {
 		m_shouldOpen = false;
 	}
 	if (ImGui::BeginPopupModal(popupTitle.c_str(), nullptr, ImGuiWindowFlags_None)) {
+		//if (ImGui::BeginPopup(popupTitle.c_str(), ImGuiPopupFlags_None)) {
 		onPopupUpdate();
 		ImGui::SetItemDefaultFocus();
 		ImGui::EndPopup();

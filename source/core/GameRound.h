@@ -309,6 +309,12 @@ public:
 		return m_type == Type::Pause && (!m_diapoPath.empty() || m_diapoDelay > 0);
 	}
 
+	/**
+	 * @brief Accès à la sous-partie courante
+	 * @return Pointeur vers la sous-partie courante
+	 */
+	auto getCurrentSubRound() -> sub_rounds_type::iterator;
+
 private:
 	/// Le numéro de la partie (à ne pas afficher si négatif)
 	int m_id = 0;
@@ -335,11 +341,6 @@ private:
 	double m_diapoDelay = 0;
 	// ---------------- private functions ----------------
 
-	/**
-	 * @brief Accès à la sous-partie courante
-	 * @return Pointeur vers la sous-partie courante
-	 */
-	auto getCurrentSubRound() -> sub_rounds_type::iterator;
 
 	/**
 	 * @brief Determine si la partie peut être éditée.

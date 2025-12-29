@@ -30,6 +30,24 @@ struct MainWindowOptions {
 	std::filesystem::path iconPath;
 };
 
+struct MonitorInfo {
+	/// Monitor name.
+	std::string name;
+	/// Position.
+	math::vec2i position{0, 0};
+	/// Size.
+	math::vec2ui size{0, 0};
+	/// Physical size.
+	math::vec2i physicalSize{0, 0};
+	/// Work area position.
+	math::vec2i workAreaPosition{0, 0};
+	/// Work area size.
+	math::vec2i workAreaSize{0, 0};
+
+	/// Is main window.
+	bool isMainWindow = false;
+};
+
 /**
  * @brief Class MainWindow.
  */
@@ -119,6 +137,12 @@ public:
 	 * @return The native window pointer.
 	 */
 	[[nodiscard]] auto getNativeWindow() const -> void* { return m_window; }
+
+	/**
+	 * @brief Get monitor information.
+	 * @return The monitor information.
+	 */
+	[[nodiscard]] auto getMonitorsInfo() const -> std::vector<MonitorInfo>;
 
 private:
 	/// Window options.

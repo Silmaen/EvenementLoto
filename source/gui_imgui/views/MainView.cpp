@@ -8,6 +8,8 @@
 #include "pch.h"
 
 #include "MainView.h"
+
+#include "DisplayView.h"
 #include "gui_imgui/Application.h"
 #include "gui_imgui/utils/Rendering.h"
 
@@ -419,6 +421,23 @@ void MainView::renderEventInfo() const {
 	ImGui::Columns(1);
 }
 
+namespace {
+
+auto screenInfoTolist(std::vector<MonitorInfo> iInfos) -> std::tuple<std::string, std::unordered_map<size_t, size_t>> {
+	std::string monitor_list;
+	std::unordered_map<size_t, size_t> index_map;
+	size_t a = 0;
+	for (size_t i = 0; i < iInfos.size(); ++i) {
+		if (iInfos[i].isMainWindow)
+			continue;
+		index_map[a++] = i;
+		monitor_list += std::format("Écran {}: {}", i + 1, iInfos[i].name) + '\0';
+	}
+	return {monitor_list, index_map};
+}
+
+}// namespace
+
 void MainView::renderBottomPanel() {
 	// Could be used for notifications or logs in the future
 	if (ImGui::BeginTabBar("MainTabBar")) {
@@ -452,11 +471,29 @@ void MainView::renderBottomPanel() {
 			ImGui::Text("Affichage");
 			ImGui::Separator();
 			ImGui::Text("Selection de l'écran");
-			static int selectedScreen = 0;
-			static bool fullscreen = false;
-			ImGui::SetNextItemWidth(200.0f);
-			ImGui::Combo("##ScreenSelect", &selectedScreen, "Écran 1\0Écran 2\0");
-			ImGui::Checkbox("Plein écran", &fullscreen);
+			{
+				const auto infos = Application::get().getMonitorsInfo();
+				const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
+				static int selectedScreen = 0;
+				if (infos.size() == 1)
+					displayView->setFullscreen(false);
+				bool fullscreen = displayView->isFullscreen();
+				ImGui::SetNextItemWidth(400.0f);
+				if (auto [scr_list_name, scr_list_idx] = screenInfoTolist(infos);
+					ImGui::Combo("##ScreenSelect", &selectedScreen, scr_list_name.c_str())) {
+					const size_t monitorIndex = scr_list_idx[static_cast<size_t>(selectedScreen)];
+					displayView->setMonitorNumber(monitorIndex);
+					log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
+				}
+				if (ImGui::Checkbox("Plein écran", &fullscreen)) {
+					if (infos.size() == 1)
+						fullscreen = false;
+					else {
+						displayView->setFullscreen(fullscreen);
+						log_info("Changement du mode plein écran: {}", fullscreen);
+					}
+				}
+			}
 			ImGui::EndGroup();
 
 			ImGui::EndChild();

@@ -9,6 +9,7 @@
 
 #include "ConfigPopups.h"
 
+#include "DisplayView.h"
 #include "core/Log.h"
 #include "core/Settings.h"
 #include "core/maths/vectors.h"
@@ -436,6 +437,16 @@ void GameRoundConfigPopups::onOpen() {
 	fromCurrentEvent();
 }
 
+void GameRoundConfigPopups::onClose() {
+	// Réinitialisation des sélections
+	log_info("Closing GameRoundConfigPopups, disabling preview display.");
+	auto& app = Application::get();
+	app.setDisplayPreview(false);
+	m_selectedGameRound = 0;
+	m_selectedSubRound = 0;
+	ImGui::CloseCurrentPopup();
+}
+
 void GameRoundConfigPopups::onPopupUpdate() {
 	// Variables statiques pour les listes et données
 
@@ -523,7 +534,7 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(3));
 		if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
 			toCurrentEvent();
-			ImGui::CloseCurrentPopup();
+			onClose();
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
@@ -531,7 +542,7 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
-			ImGui::CloseCurrentPopup();
+			onClose();
 		}
 		/*ImGui::SameLine();
 		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
@@ -616,8 +627,8 @@ void GameRoundConfigPopups::renderSecondColumn() {
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(100);
 		int id = currentRound->getId();
-		if (ImGui::InputInt("##RoundNumber", &id)) {
-			currentRound->setId(id + 1);
+		if (ImGui::InputInt("##RoundNumber", &id, 1, 100, ImGuiInputTextFlags_CharsDecimal)) {
+			currentRound->setId(id);
 		}
 
 		ImGui::Spacing();
@@ -639,14 +650,15 @@ void GameRoundConfigPopups::renderSecondColumn() {
 
 void GameRoundConfigPopups::renderThirdColumn() {
 
+	auto& app = Application::get();
 	static bool pauseNothing = true;
 	static bool pauseDiapo = false;
 	static char pauseDiapoFolder[256] = "";
 	static float pauseDiapoDelay = 5.0f;
-	static bool previewEnabled = false;
+
 	static bool previewFullScreen = true;
 
-	auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
+	const auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
 
 	if (ImGui::BeginChild("GroupPhase", ImVec2(0, 0), ImGuiChildFlags_Border)) {
 		ImGui::Text("Configuration de la phase:");
@@ -714,9 +726,18 @@ void GameRoundConfigPopups::renderThirdColumn() {
 		ImGui::Spacing();
 
 		// Aperçu
-		ImGui::Checkbox("Aperçu", &previewEnabled);
+		bool previewEnabled = app.getDisplayPreview();
+		if (ImGui::Checkbox("Aperçu", &previewEnabled)) {
+			// Toggle preview
+			app.setDisplayPreview(previewEnabled);
+		}
 		ImGui::SameLine();
 		ImGui::Checkbox("Plein écran", &previewFullScreen);
+		if (previewEnabled) {
+			const auto dv = std::static_pointer_cast<views::DisplayView>(app.getView("display_window"));
+			dv->setFullscreen(previewFullScreen);
+			dv->setEventToRender(m_event, m_selectedGameRound, m_selectedSubRound);
+		}
 	}
 	ImGui::EndChild();
 }
@@ -781,7 +802,6 @@ void GameRoundConfigPopups::renderResult() {
 	ImGui::EndChild();
 	ImGui::Spacing();
 }
-
 
 void GameRoundConfigPopups::addGameRound() { m_event.pushGameRound(core::GameRound()); }
 

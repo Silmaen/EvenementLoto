@@ -40,6 +40,8 @@ void LoadFileAction::onExecute() {
 	f.open(file, std::ios::in | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().read(f, 0);
+	app.getCurrentFile() = file;
+	log_info("File '{}' loaded successfully.", file.string());
 	f.close();
 }
 
@@ -50,7 +52,12 @@ void SaveFileAction::onExecute() {
 	log_trace("Save file action executed.");
 	auto& app = Application::get();
 	auto file = app.getCurrentFile();
-	if (file.empty()) {
+	if (file.empty() || !exists(file)) {
+		if (file.empty()) {
+			log_trace("No current file, prompting Save As dialog.");
+		} else {
+			log_trace("Current file '{}' does not exist, prompting Save As dialog.", file.string());
+		}
 		file = utils::FileDialog::saveFile(utils::g_gameFilter);
 		if (file.empty()) {
 			log_trace("Save file action canceled.");
@@ -61,6 +68,7 @@ void SaveFileAction::onExecute() {
 	f.open(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().write(f);
+	log_info("File '{}' saved successfully.", file.string());
 	f.close();
 }
 
@@ -81,6 +89,7 @@ void SaveAsFileAction::onExecute() {
 	f.open(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().write(f);
+	log_info("File '{}' saved successfully.", file.string());
 	f.close();
 }
 
