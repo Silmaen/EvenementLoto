@@ -29,6 +29,7 @@
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
+#include "utils/Convert.h"
 
 namespace evl::gui_imgui {
 
@@ -37,8 +38,6 @@ namespace {
 std::shared_ptr<ImGui_ImplVulkanH_Window> g_MainWindowData;
 
 void glfw_error_callback(int iError, const char* iDescription) { log_error("GLFW Error %d: %s", iError, iDescription); }
-
-auto vec(const math::vec4& iVec) -> ImVec4 { return {iVec.x(), iVec.y(), iVec.z(), iVec.w()}; }
 
 }// namespace
 
@@ -388,82 +387,82 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	// Colors
 
 	// Text 1 2
-	colors[ImGuiCol_Text] = vec(iTheme.text);
+	colors[ImGuiCol_Text] = utils::vec4ToImVec4(iTheme.text);
 	// colors[ImGuiCol_TextDisabled] = vec(iTheme.textDisabled);
 	// Window Background 2 3 4 5
-	colors[ImGuiCol_WindowBg] = vec(iTheme.windowBackground);
-	colors[ImGuiCol_ChildBg] = vec(iTheme.childBackground);
-	colors[ImGuiCol_PopupBg] = vec(iTheme.backgroundPopup);
-	colors[ImGuiCol_Border] = vec(iTheme.border);
-	// colors[ImGuiCol_BorderShadow] = vec(iTheme.border);
+	colors[ImGuiCol_WindowBg] = utils::vec4ToImVec4(iTheme.windowBackground);
+	colors[ImGuiCol_ChildBg] = utils::vec4ToImVec4(iTheme.childBackground);
+	colors[ImGuiCol_PopupBg] = utils::vec4ToImVec4(iTheme.backgroundPopup);
+	colors[ImGuiCol_Border] = utils::vec4ToImVec4(iTheme.border);
+	// colors[ImGuiCol_BorderShadow] = utils::vec4ToImVec4(iTheme.border);
 	// Frame BG 7 8 9
-	colors[ImGuiCol_FrameBg] = vec(iTheme.frameBackground);
-	colors[ImGuiCol_FrameBgHovered] = vec(iTheme.frameBackgroundHovered);
-	colors[ImGuiCol_FrameBgActive] = vec(iTheme.frameBackgroundActive);
+	colors[ImGuiCol_FrameBg] = utils::vec4ToImVec4(iTheme.frameBackground);
+	colors[ImGuiCol_FrameBgHovered] = utils::vec4ToImVec4(iTheme.frameBackgroundHovered);
+	colors[ImGuiCol_FrameBgActive] = utils::vec4ToImVec4(iTheme.frameBackgroundActive);
 	// Title 10 11 12
-	colors[ImGuiCol_TitleBg] = vec(iTheme.titleBar);
-	colors[ImGuiCol_TitleBgActive] = vec(iTheme.titleBarActive);
-	colors[ImGuiCol_TitleBgCollapsed] = vec(iTheme.titleBarCollapsed);
+	colors[ImGuiCol_TitleBg] = utils::vec4ToImVec4(iTheme.titleBar);
+	colors[ImGuiCol_TitleBgActive] = utils::vec4ToImVec4(iTheme.titleBarActive);
+	colors[ImGuiCol_TitleBgCollapsed] = utils::vec4ToImVec4(iTheme.titleBarCollapsed);
 	// Menubar 13
-	colors[ImGuiCol_MenuBarBg] = vec(iTheme.menubarBackground);
+	colors[ImGuiCol_MenuBarBg] = utils::vec4ToImVec4(iTheme.menubarBackground);
 	// Scrollbar 14 15 16 17
-	colors[ImGuiCol_ScrollbarBg] = vec(iTheme.scrollbarBackground);
-	colors[ImGuiCol_ScrollbarGrab] = vec(iTheme.scrollbarGrab);
-	colors[ImGuiCol_ScrollbarGrabHovered] = vec(iTheme.scrollbarGrabHovered);
-	colors[ImGuiCol_ScrollbarGrabActive] = vec(iTheme.scrollbarGrabActive);
+	colors[ImGuiCol_ScrollbarBg] = utils::vec4ToImVec4(iTheme.scrollbarBackground);
+	colors[ImGuiCol_ScrollbarGrab] = utils::vec4ToImVec4(iTheme.scrollbarGrab);
+	colors[ImGuiCol_ScrollbarGrabHovered] = utils::vec4ToImVec4(iTheme.scrollbarGrabHovered);
+	colors[ImGuiCol_ScrollbarGrabActive] = utils::vec4ToImVec4(iTheme.scrollbarGrabActive);
 	// Checkbox 18
-	colors[ImGuiCol_CheckMark] = vec(iTheme.checkMark);
+	colors[ImGuiCol_CheckMark] = utils::vec4ToImVec4(iTheme.checkMark);
 	// Slider 19 20
-	colors[ImGuiCol_SliderGrab] = vec(iTheme.sliderGrab);
-	colors[ImGuiCol_SliderGrabActive] = vec(iTheme.sliderGrabActive);
+	colors[ImGuiCol_SliderGrab] = utils::vec4ToImVec4(iTheme.sliderGrab);
+	colors[ImGuiCol_SliderGrabActive] = utils::vec4ToImVec4(iTheme.sliderGrabActive);
 	// Buttons 21 22 23
-	colors[ImGuiCol_Button] = vec(iTheme.button);
-	colors[ImGuiCol_ButtonHovered] = vec(iTheme.buttonHovered);
-	colors[ImGuiCol_ButtonActive] = vec(iTheme.buttonActive);
+	colors[ImGuiCol_Button] = utils::vec4ToImVec4(iTheme.button);
+	colors[ImGuiCol_ButtonHovered] = utils::vec4ToImVec4(iTheme.buttonHovered);
+	colors[ImGuiCol_ButtonActive] = utils::vec4ToImVec4(iTheme.buttonActive);
 	// Headers 24 25 26
-	colors[ImGuiCol_Header] = vec(iTheme.groupHeader);
-	colors[ImGuiCol_HeaderHovered] = vec(iTheme.groupHeaderHovered);
-	colors[ImGuiCol_HeaderActive] = vec(iTheme.groupHeaderActive);
+	colors[ImGuiCol_Header] = utils::vec4ToImVec4(iTheme.groupHeader);
+	colors[ImGuiCol_HeaderHovered] = utils::vec4ToImVec4(iTheme.groupHeaderHovered);
+	colors[ImGuiCol_HeaderActive] = utils::vec4ToImVec4(iTheme.groupHeaderActive);
 	// Separator 27 28 29
-	colors[ImGuiCol_Separator] = vec(iTheme.separator);
-	colors[ImGuiCol_SeparatorActive] = vec(iTheme.separatorActive);
-	colors[ImGuiCol_SeparatorHovered] = vec(iTheme.separatorHovered);
+	colors[ImGuiCol_Separator] = utils::vec4ToImVec4(iTheme.separator);
+	colors[ImGuiCol_SeparatorActive] = utils::vec4ToImVec4(iTheme.separatorActive);
+	colors[ImGuiCol_SeparatorHovered] = utils::vec4ToImVec4(iTheme.separatorHovered);
 	// Resize Grip 30 31 32
-	colors[ImGuiCol_ResizeGrip] = vec(iTheme.resizeGrip);
-	colors[ImGuiCol_ResizeGripHovered] = vec(iTheme.resizeGripHovered);
-	colors[ImGuiCol_ResizeGripActive] = vec(iTheme.resizeGripActive);
+	colors[ImGuiCol_ResizeGrip] = utils::vec4ToImVec4(iTheme.resizeGrip);
+	colors[ImGuiCol_ResizeGripHovered] = utils::vec4ToImVec4(iTheme.resizeGripHovered);
+	colors[ImGuiCol_ResizeGripActive] = utils::vec4ToImVec4(iTheme.resizeGripActive);
 	// Tabs 33 34 35 36 37 38 39
-	colors[ImGuiCol_TabHovered] = vec(iTheme.tabHovered);
-	colors[ImGuiCol_Tab] = vec(iTheme.tab);
-	colors[ImGuiCol_TabSelected] = vec(iTheme.tabSelected);
-	colors[ImGuiCol_TabSelectedOverline] = vec(iTheme.tabSelectedOverline);
-	colors[ImGuiCol_TabDimmed] = vec(iTheme.tabDimmed);
-	colors[ImGuiCol_TabDimmedSelected] = vec(iTheme.tabDimmedSelected);
-	colors[ImGuiCol_TabDimmedSelectedOverline] = vec(iTheme.tabDimmedSelectedOverline);
+	colors[ImGuiCol_TabHovered] = utils::vec4ToImVec4(iTheme.tabHovered);
+	colors[ImGuiCol_Tab] = utils::vec4ToImVec4(iTheme.tab);
+	colors[ImGuiCol_TabSelected] = utils::vec4ToImVec4(iTheme.tabSelected);
+	colors[ImGuiCol_TabSelectedOverline] = utils::vec4ToImVec4(iTheme.tabSelectedOverline);
+	colors[ImGuiCol_TabDimmed] = utils::vec4ToImVec4(iTheme.tabDimmed);
+	colors[ImGuiCol_TabDimmedSelected] = utils::vec4ToImVec4(iTheme.tabDimmedSelected);
+	colors[ImGuiCol_TabDimmedSelectedOverline] = utils::vec4ToImVec4(iTheme.tabDimmedSelectedOverline);
 	// Docking 40 41
-	colors[ImGuiCol_DockingPreview] = vec(iTheme.dockingPreview);
-	colors[ImGuiCol_DockingEmptyBg] = vec(iTheme.dockingEmptyBackground);
+	colors[ImGuiCol_DockingPreview] = utils::vec4ToImVec4(iTheme.dockingPreview);
+	colors[ImGuiCol_DockingEmptyBg] = utils::vec4ToImVec4(iTheme.dockingEmptyBackground);
 	// PlotLines 42 43 44 44
-	// colors[ImGuiCol_PlotLines] = vec(iTheme.Text);
-	// colors[ImGuiCol_PlotLinesHovered] = vec(iTheme.Text);
-	// colors[ImGuiCol_PlotHistogram] = vec(iTheme.Text);
-	// colors[ImGuiCol_PlotHistogramHovered] = vec(iTheme.Text);
+	colors[ImGuiCol_PlotLines] = utils::vec4ToImVec4(iTheme.plotLines);
+	colors[ImGuiCol_PlotLinesHovered] = utils::vec4ToImVec4(iTheme.plotLinesHovered);
+	colors[ImGuiCol_PlotHistogram] = utils::vec4ToImVec4(iTheme.plotHistogram);
+	colors[ImGuiCol_PlotHistogramHovered] = utils::vec4ToImVec4(iTheme.plotHistogramHovered);
 	/// Tables 46 47 48 49 50
-	colors[ImGuiCol_TableHeaderBg] = vec(iTheme.groupHeader);
-	// colors[ImGuiCol_TableBorderStrong] = vec.(iTheme.Text);
-	colors[ImGuiCol_TableBorderLight] = vec(iTheme.border);
-	// colors[ImGuiCol_TableRowBg] = vec.(iTheme.Text);
-	// colors[ImGuiCol_TableRowBgAlt] = vec.(iTheme.Text);
+	colors[ImGuiCol_TableHeaderBg] = utils::vec4ToImVec4(iTheme.tableHeaderBg);
+	// colors[ImGuiCol_TableBorderStrong] = utils::vec4ToImVec4.(iTheme.Text);
+	colors[ImGuiCol_TableBorderLight] = utils::vec4ToImVec4(iTheme.tableBorderLight);
+	colors[ImGuiCol_TableRowBg] = utils::vec4ToImVec4(iTheme.tableRowBg);
+	colors[ImGuiCol_TableRowBgAlt] = utils::vec4ToImVec4(iTheme.tableRowBgAlt);
 	// Text Selected 51
-	// colors[ImGuiCol_TextSelectedBg] = vec.(iTheme.Text);
+	colors[ImGuiCol_TextSelectedBg] = utils::vec4ToImVec4(iTheme.textSelectedBg);
 	// Drag n DRop 52
-	// colors[ImGuiCol_DragDropTarget] = vec.(iTheme.Text);
+	colors[ImGuiCol_DragDropTarget] = utils::vec4ToImVec4(iTheme.dragDropTarget);
 	// Nav 53 54 55
-	// colors[ImGuiCol_NavHighlight] = vec.(iTheme.Text);
-	// colors[ImGuiCol_NavWindowingHighlight] = vec.(iTheme.Text);
-	// colors[ImGuiCol_NavWindowingDimBg] = vec.(iTheme.Text);
+	colors[ImGuiCol_NavHighlight] = utils::vec4ToImVec4(iTheme.navHighlight);
+	colors[ImGuiCol_NavWindowingHighlight] = utils::vec4ToImVec4(iTheme.navWindowingHighlight);
+	colors[ImGuiCol_NavWindowingDimBg] = utils::vec4ToImVec4(iTheme.navWindowingDimBg);
 	// Modal window 56
-	// colors[ImGuiCol_ModalWindowDimBg] = vec.(iTheme.Text);
+	colors[ImGuiCol_ModalWindowDimBg] = utils::vec4ToImVec4(iTheme.modalWindowDimBg);
 
 	//========================================================
 	// Style
@@ -484,6 +483,16 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	style.IndentSpacing = iTheme.indentSpacing;
 	style.WindowMenuButtonPosition = ImGuiDir_Right;
 	style.ColorButtonPosition = ImGuiDir_Left;
+
+	style.ItemSpacing = utils::vec2ToImVec2(iTheme.itemSpacing);
+	style.ItemInnerSpacing = utils::vec2ToImVec2(iTheme.itemInnerSpacing);
+	style.CellPadding = utils::vec2ToImVec2(iTheme.cellPadding);
+	style.FramePadding = utils::vec2ToImVec2(iTheme.framePadding);
+	style.ButtonTextAlign = utils::vec2ToImVec2(iTheme.buttonTextAlign);
+	style.SelectableTextAlign = utils::vec2ToImVec2(iTheme.selectableTextAlign);
+	style.DisplayWindowPadding = utils::vec2ToImVec2(iTheme.displayWindowPadding);
+	style.DisplaySafeAreaPadding = utils::vec2ToImVec2(iTheme.displaySafeAreaPadding);
+	style.MouseCursorScale = iTheme.mouseCursorScale;
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
 	// windows can look identical to regular ones.
 	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0) {
