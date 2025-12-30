@@ -7,8 +7,10 @@
  */
 
 #pragma once
+#include "timeFunctions.h"
+
 #include <filesystem>
-#include <format>
+#include <mutex>
 
 namespace evl {
 /**
@@ -97,7 +99,6 @@ private:
 	static void setPattern();
 };
 
-
 }// namespace evl
 
 #define log_trace(...) ::evl::Log::log(::evl::Log::Level::Trace, __FILE__, __LINE__, __VA_ARGS__)
@@ -107,3 +108,31 @@ private:
 #define log_warning(...) ::evl::Log::log(::evl::Log::Level::Warning, __FILE__, __LINE__, __VA_ARGS__)
 #define log_error(...) ::evl::Log::log(::evl::Log::Level::Error, __FILE__, __LINE__, __VA_ARGS__)
 #define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical, __FILE__, __LINE__, __VA_ARGS__)
+
+namespace evl::logs {
+
+class LogBuffer {
+public:
+	struct LogEntry {
+		std::string message;
+		Log::Level level;
+		core::clock::time_point timestamp;
+	};
+
+	static auto get() -> LogBuffer& {
+		static LogBuffer instance;
+		return instance;
+	}
+	void addLog(const std::string& iMessage, Log::Level iLevel);
+
+	auto getLogs() const -> const std::vector<LogEntry>&;
+
+	void clear();
+
+private:
+	LogBuffer() = default;
+	mutable std::mutex m_mutex;
+	std::vector<LogEntry> m_logs;
+};
+
+}// namespace evl::logs

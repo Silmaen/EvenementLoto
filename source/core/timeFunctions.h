@@ -7,8 +7,9 @@
  */
 
 #pragma once
-#include "../baseDefine.h"
 #include <chrono>
+#include <format>
+#include <string>
 
 namespace evl::core {
 /// Le type d'horloge

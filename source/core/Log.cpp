@@ -72,7 +72,7 @@ void Log::init(const Level& iLevel) {
 }
 
 void Log::setVerbosityLevel(const Level& iLevel) {
-	if (! initiated())
+	if (!initiated())
 		return;
 	m_verbosity = iLevel;
 	g_logger->set_level(fromLevel(m_verbosity));
@@ -88,9 +88,10 @@ void Log::invalidate() {
 auto Log::initiated() -> bool { return g_logger != nullptr; }
 
 void Log::log(const Level& iLevel, const char* iFile, const int iLine, const std::string_view& iMsg) {
-	if (! initiated())
+	if (!initiated())
 		return;
 	g_logger->log(spdlog::source_loc{iFile, iLine, SPDLOG_FUNCTION}, fromLevel(iLevel), iMsg);
+	logs::LogBuffer::get().addLog(std::string(iMsg), iLevel);
 }
 
 
@@ -99,7 +100,7 @@ void Log::setPattern() {
 	const std::string file_pattern_rls = "[%T.%e] [%l] %v";
 	const std::string console_pattern_dbg = "[\033[38;5;31m%T.%e\033[0m] [%^%l%$] [\033[38;5;240m%s:%#\033[0m] %v";
 	const std::string console_pattern_rls = "[\033[38;5;31m%T.%e\033[0m] [%^%l%$] %v";
-	if (! initiated())
+	if (!initiated())
 		return;
 	if (m_verbosity == Level::Debug || m_verbosity == Level::Trace) {
 		g_logger->sinks()[0]->set_pattern(console_pattern_dbg);
@@ -109,5 +110,24 @@ void Log::setPattern() {
 		g_logger->sinks()[1]->set_pattern(file_pattern_rls);
 	}
 }
+
+namespace logs {
+void LogBuffer::addLog(const std::string& iMessage, Log::Level iLevel) {
+	const std::scoped_lock<std::mutex> lock(m_mutex);
+	m_logs.emplace_back(iMessage, iLevel, core::clock::now());
+	if (m_logs.size() > 1000) {// Limit to 1000 entries
+		m_logs.erase(m_logs.begin());
+	}
+}
+auto LogBuffer::getLogs() const -> const std::vector<LogEntry>& {
+	const std::scoped_lock<std::mutex> lock(m_mutex);
+	return m_logs;
+}
+
+void LogBuffer::clear() {
+	const std::scoped_lock<std::mutex> lock(m_mutex);
+	m_logs.clear();
+}
+}// namespace logs
 
 }// namespace evl
