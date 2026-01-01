@@ -11,6 +11,7 @@
 #include "gui_imgui/Application.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace evl::gui_imgui::views {
 
@@ -23,6 +24,7 @@ void StatusBar::onUpdate() {
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
 	const ImGuiStyle& style = ImGui::GetStyle();
 
+	auto& app = Application::get();
 	// Height of the status bar
 	constexpr float statusBarHeight = 25.0f;
 
@@ -36,13 +38,27 @@ void StatusBar::onUpdate() {
 									   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar |
 									   ImGuiWindowFlags_NoSavedSettings;
 
+	const std::string leftText = std::format("App : {}", magic_enum::enum_name(app.getState()));
+	const std::string centerText = std::format("Event: {}", app.getCurrentEvent().getStateString());
+	const std::string rightText = std::format("Status: {}", magic_enum::enum_name(app.getCurrentEvent().getStatus()));
+	const auto leftSize = ImGui::CalcTextSize(leftText.c_str());
+	const auto centerSize = ImGui::CalcTextSize(centerText.c_str());
+	const auto rightsize = ImGui::CalcTextSize(rightText.c_str());
+	const float rightPos = viewport->WorkSize.x - rightsize.x - style.WindowPadding.x;
+	const float centerPos = (viewport->WorkSize.x - centerSize.x) / 2.0f;
+
 	if (ImGui::Begin("StatusBar", nullptr, flags)) {
 		// Contenu de la status bar (exemple)
-		ImGui::Text("%s", std::format("{}", magic_enum::enum_name(Application::get().getState())).c_str());
-		ImGui::SameLine(viewport->WorkSize.x - 200.0f);
-		ImGui::Text("%s",
-					std::format("Status: {}", magic_enum::enum_name(Application::get().getCurrentEvent().getStatus()))
-							.c_str());
+		ImGui::Text("%s", leftText.c_str());
+		// add separators to position center between en of left text and start of center text
+		ImGui::SameLine((leftSize.x + centerPos) / 2.0f);
+		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+		ImGui::SameLine(centerPos);
+		ImGui::Text("%s", centerText.c_str());
+		ImGui::SameLine((centerPos + centerSize.x + rightPos) / 2.0f);
+		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
+		ImGui::SameLine(rightPos);
+		ImGui::Text("%s", rightText.c_str());
 	}
 	ImGui::End();
 }

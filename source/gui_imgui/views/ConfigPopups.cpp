@@ -45,6 +45,7 @@ void MainConfigPopups::onOpen() { settingsToData(); }
 
 void MainConfigPopups::onPopupUpdate() {
 	// Répertoires par défaut
+	auto style = ImGui::GetStyle();
 	if (ImGui::BeginChild("DefaultDirectories", ImVec2(0, 80), ImGuiWindowFlags_NoTitleBar)) {
 		ImGui::Text("Répertoires par défaut");
 		ImGui::Separator();
@@ -73,7 +74,8 @@ void MainConfigPopups::onPopupUpdate() {
 		ImGui::Separator();
 
 		// Personnalisation
-		if (ImGui::BeginChild("Customization", ImVec2(0, 500), ImGuiWindowFlags_NoTitleBar)) {
+		if (ImGui::BeginChild("Customization", ImVec2(0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight),
+							  ImGuiWindowFlags_NoTitleBar)) {
 			ImGui::Text("Personnalisation");
 			ImGui::Separator();
 
@@ -81,34 +83,34 @@ void MainConfigPopups::onPopupUpdate() {
 			ImGui::SetColumnWidth(1, 250);
 
 			// Échelles
-			ImGui::Text("Facteur d'échelle principal");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##MainScale", &m_data.mainScale, 0.001f, 0.01f, 0.05f, "%.3f");
-			ImGui::NextColumn();
-
 			ImGui::Text("Facteur d'échelle de titre");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 5.0f, "%.1f");
+			ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 10.0f, "%.1f");
 			ImGui::NextColumn();
 
-			ImGui::Text("Facteur d'échelle texte court");
+			ImGui::Text("Echelle texte grille");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##ShortTextScale", &m_data.shortTextScale, 0.1f, 0.2f, 3.0f, "%.1f");
+			ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.1f, 0.3f, 1.5f, "%.1f");
 			ImGui::NextColumn();
 
-			ImGui::Text("Facteur d'échelle texte long");
+			ImGui::Text("Facteur d'échelle prix");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##LongTextScale", &m_data.longTextScale, 0.1f, 0.2f, 3.0f, "%.1f");
+			ImGui::DragFloat("##ValueScale", &m_data.valueScale, 0.1f, 0.5f, 10.0f, "%.1f");
 			ImGui::NextColumn();
 
-			ImGui::Text("Facteur d'échelle de la grille");
+			ImGui::Text("Facteur d'échelle texte lots");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.01f, 0.2f, 2.0f, "%.2f");
+			ImGui::DragFloat("##PriceTextScale", &m_data.priceTextScale, 0.1f, 0.5f, 10.0f, "%.1f");
+			ImGui::NextColumn();
+
+			ImGui::Text("Facteur d'échelle horloges");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			ImGui::DragFloat("##TimeScale", &m_data.timeScale, 0.1f, 0.5f, 2.5f, "%.1f");
 			ImGui::NextColumn();
 
 			ImGui::Separator();
@@ -121,12 +123,36 @@ void MainConfigPopups::onPopupUpdate() {
 							  ImGuiColorEditFlags_NoInputs);
 			ImGui::NextColumn();
 
-			ImGui::Text("Couleur de l'arrière plan de la grille");
+			ImGui::Text("Couleur du texte");
+			ImGui::NextColumn();
+			ImGui::SetNextItemWidth(-1);
+			ImGui::ColorEdit3("##TextColor", reinterpret_cast<float*>(&m_data.textColor), ImGuiColorEditFlags_NoInputs);
+			ImGui::NextColumn();
+
+			ImGui::Separator();
+
+			ImGui::Text("Arrière plan de la grille");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::ColorEdit3("##GridBackgroundColor", reinterpret_cast<float*>(&m_data.gridBackgroundColor),
 							  ImGuiColorEditFlags_NoInputs);
 			ImGui::NextColumn();
+
+			ImGui::Text("Espacement de la grille");
+			ImGui::NextColumn();
+			ImGui::BeginGroup();
+			const float gridSize = (ImGui::GetContentRegionAvail().x - style.ItemSpacing.x) * 0.5f;
+			ImGui::SetNextItemWidth(gridSize);
+			ImGui::DragFloat("##GridSpaceX", &m_data.gridSpace.x(), 0.1f, 0.1f, 10.f, "%.1f");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(gridSize);
+			ImGui::DragFloat("##GridSpaceY", &m_data.gridSpace.y(), 0.1f, 0.1f, 10.f, "%.1f");
+
+			ImGui::EndGroup();
+
+			ImGui::NextColumn();
+
+			ImGui::Separator();
 
 			ImGui::Text("Tronquer lignes de lots");
 			ImGui::NextColumn();
@@ -134,16 +160,10 @@ void MainConfigPopups::onPopupUpdate() {
 			ImGui::Checkbox("##TruncatePrice", &m_data.truncatePrice);
 			ImGui::NextColumn();
 
-			ImGui::Text("Nombre maximum de lignes de lots");
+			ImGui::Text("Max lignes de lots");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::DragInt("##TruncatePriceLines", &m_data.truncatePriceLines, 1.0f, 1, 15);
-			ImGui::NextColumn();
-
-			ImGui::Text("Couleur du texte");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::ColorEdit3("##TextColor", reinterpret_cast<float*>(&m_data.textColor), ImGuiColorEditFlags_NoInputs);
 			ImGui::NextColumn();
 
 			ImGui::Separator();
@@ -156,13 +176,13 @@ void MainConfigPopups::onPopupUpdate() {
 							  ImGuiColorEditFlags_NoInputs);
 			ImGui::NextColumn();
 
-			ImGui::Text("Activation de la fondu de couleur");
+			ImGui::Text("Fondu de couleur");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::Checkbox("##FadeNumbers", &m_data.fadeNumbers);
 			ImGui::NextColumn();
 
-			ImGui::Text("Fondu sur combien de chiffres");
+			ImGui::Text("Nombre de chiffres fondu");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::DragInt("##FadeAmount", &m_data.fadeAmount, 1.0f, 0, 10);
@@ -171,7 +191,7 @@ void MainConfigPopups::onPopupUpdate() {
 			ImGui::Text("Force de la fondue");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
-			ImGui::DragInt("##FadeStrength", &m_data.fadeStrength, 4.0f, -100, 100);
+			ImGui::DragFloat("##FadeStrength", &m_data.fadeStrength, 0.1f, -2, 2, "%.1f");
 			ImGui::NextColumn();
 
 			ImGui::Columns(1);
@@ -214,13 +234,14 @@ void MainConfigPopups::onPopupUpdate() {
 
 void MainConfigPopups::dataToSettings() {
 	core::Settings settings;
-	settings.setValue("main_scale", m_data.mainScale);
 	settings.setValue("title_scale", m_data.titleScale);
-	settings.setValue("short_text_scale", m_data.shortTextScale);
-	settings.setValue("long_text_scale", m_data.longTextScale);
+	settings.setValue("time_scale", m_data.timeScale);
+	settings.setValue("value_scale", m_data.valueScale);
+	settings.setValue("prices_scale", m_data.priceTextScale);
 	settings.setValue("grid_text_scale", m_data.gridTextScale);
 	settings.setValue("background_color", m_data.backgroundColor);
 	settings.setValue("grid_background_color", m_data.gridBackgroundColor);
+	settings.setValue("grid_button_spacing", m_data.gridSpace);
 	settings.setValue("text_color", m_data.textColor);
 	settings.setValue("selected_number_color", m_data.selectedNumberColor);
 	settings.setValue("truncate_price", m_data.truncatePrice);
@@ -238,20 +259,21 @@ void MainConfigPopups::settingsToData() {
 
 	m_data.dataLocation =
 			core::getSettings()->getValue<std::string>("general/data_location", defaults.dataLocation.string());
-	m_data.mainScale = settings.getValue<float>("main_scale", defaults.mainScale);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
-	m_data.shortTextScale = settings.getValue<float>("short_text_scale", defaults.shortTextScale);
-	m_data.longTextScale = settings.getValue<float>("long_text_scale", defaults.longTextScale);
+	m_data.timeScale = settings.getValue<float>("time_scale", defaults.timeScale);
+	m_data.valueScale = settings.getValue<float>("value_scale", defaults.valueScale);
+	m_data.priceTextScale = settings.getValue<float>("prices_scale", defaults.priceTextScale);
 	m_data.gridTextScale = settings.getValue<float>("grid_text_scale", defaults.gridTextScale);
 	m_data.backgroundColor = settings.getValue<math::vec4>("background_color", defaults.backgroundColor);
 	m_data.gridBackgroundColor = settings.getValue<math::vec4>("grid_background_color", defaults.gridBackgroundColor);
+	m_data.gridSpace = settings.getValue<math::vec2>("grid_button_spacing", defaults.gridSpace);
 	m_data.textColor = settings.getValue<math::vec4>("text_color", defaults.textColor);
 	m_data.selectedNumberColor = settings.getValue<math::vec4>("selected_number_color", defaults.selectedNumberColor);
 	m_data.truncatePrice = settings.getValue<bool>("truncate_price", defaults.truncatePrice);
 	m_data.truncatePriceLines = settings.getValue<int>("truncate_price_lines", defaults.truncatePriceLines);
 	m_data.fadeNumbers = settings.getValue<bool>("fade_numbers", defaults.fadeNumbers);
 	m_data.fadeAmount = settings.getValue<int>("fade_amount", defaults.fadeAmount);
-	m_data.fadeStrength = settings.getValue<int>("fade_strength", defaults.fadeStrength);
+	m_data.fadeStrength = settings.getValue<float>("fade_strength", defaults.fadeStrength);
 }
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -359,7 +381,8 @@ void EventConfigPopups::onPopupUpdate() {
 		const float rulesTextHeight = ImGui::GetContentRegionAvail().y - 40;
 		char rules[20000] = "";
 		std::strncpy(rules, m_event.getRules().c_str(), sizeof(rules) - 1);
-		if (ImGui::InputTextMultiline("##Rules", rules, sizeof(rules), ImVec2(-1, rulesTextHeight))) {
+		if (ImGui::InputTextMultiline("##Rules", rules, sizeof(rules), ImVec2(-1, rulesTextHeight),
+									  ImGuiInputTextFlags_WordWrap)) {
 			m_event.setRules(rules);
 		}
 

@@ -27,30 +27,6 @@ constexpr float g_minBottomPanelHeight = 200.0f;
 
 constexpr float g_commandSectionHeight = 150.0f;
 
-namespace {
-
-void adaptTextToRegion(const std::string& iText, const math::vec2& iContentSize = {0.0f, 0.0f}) {
-	ImVec2 numberSize;
-	if (iContentSize.x() <= 0.0f || iContentSize.y() <= 0.0f) {
-		numberSize = ImGui::GetContentRegionAvail();
-	} else {
-		numberSize = utils::vec2ToImVec2(iContentSize);
-	}
-	const auto numberTextSize = ImGui::CalcTextSize(iText.c_str());
-	const float scaleX = numberSize.x / numberTextSize.x;
-	const float scaleY = numberSize.y / numberTextSize.y;
-	const float scale = std::min(scaleX, scaleY) * 0.9f;// 80% of the available space
-	if (scale < 0.0f)
-		return;// No need to scale up
-	ImGui::SetWindowFontScale(scale);
-	const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;
-	const float centerY = (numberSize.y - numberTextSize.y * scale) * 0.5f;
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + centerX);
-	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + centerY);
-}
-
-}// namespace
-
 
 MainView::MainView(core::Event& iEvent) : m_currentEvent{iEvent} {}
 
@@ -203,7 +179,8 @@ void MainView::renderDrawnNumbersTab() const {
 			const float scaleX = buttonSize.x / textSize.x;
 			const float scaleY = buttonSize.y / textSize.y;
 			const float scale = std::min(scaleX, scaleY) * 0.8f;
-			ImGui::SetWindowFontScale(scale);
+			if (scale > 0.f)
+				ImGui::SetWindowFontScale(scale);
 			const bool clicked = ImGui::Button(label.c_str(), buttonSize);
 			ImGui::SetWindowFontScale(1.0f);
 
@@ -230,7 +207,7 @@ void MainView::renderRightPanel() const {
 	int prevDrawnNumber = -1;
 	int secondPrevDrawnNumber = -1;
 	int thirdPrevDrawnNumber = -1;
-		const ImGuiStyle& style = ImGui::GetStyle();
+	const ImGuiStyle& style = ImGui::GetStyle();
 	if (m_currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		if (const auto currentRound = m_currentEvent.getCurrentGameRound();
 			currentRound->getStatus() == core::GameRound::Status::Running) {
@@ -259,13 +236,10 @@ void MainView::renderRightPanel() const {
 							  ImGuiWindowFlags_NoResize)) {
 			ImGui::Text("Numéro tiré");
 			ImGui::Separator();
-			adaptTextToRegion("00");
-			if (prevDrawnNumber != -1) {
-				ImGui::Text("%d", prevDrawnNumber);
-			} else {
-				ImGui::Text("--");
-			}
-			ImGui::SetWindowFontScale(1.0f);
+			const std::string numberText = (prevDrawnNumber != -1) ? std::format("{}", prevDrawnNumber) : "--";
+			utils::adaptTextToRegion(
+					numberText,
+					{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00"});
 		}
 		ImGui::EndChild();
 
@@ -289,9 +263,9 @@ void MainView::renderRightPanel() const {
 			} else {
 				lastNumbers += "--";
 			}
-			adaptTextToRegion("00 00 00");
-			ImGui::Text("%s", lastNumbers.c_str());
-			ImGui::SetWindowFontScale(1.0f);
+			utils::adaptTextToRegion(
+					lastNumbers,
+					{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00 00 00"});
 		}
 		ImGui::EndChild();
 	}
@@ -321,13 +295,13 @@ void MainView::renderCommandsTab() const {
 			case core::Event::Status::Invalid:
 			case core::Event::Status::MissingParties:
 			case core::Event::Status::Finished:
+			case core::Event::Status::Ready:
+			case core::Event::Status::EventEnding:
 				btnDisabled = true;
 				break;
-			case core::Event::Status::Ready:
 			case core::Event::Status::EventStarting:
 			case core::Event::Status::DisplayRules:
 			case core::Event::Status::GameRunning:
-			case core::Event::Status::EventEnding:
 				break;
 		}
 		utils::defineActionButtonItem(
@@ -476,9 +450,10 @@ void MainView::renderEventInfo() const {
 	ImGui::NextColumn();
 	ImGui::BeginChild("RightColomunEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
 	// Large current time display
-	adaptTextToRegion("00:00:00");
-	ImGui::Text("%s", core::formatClock(core::clock::now()).c_str());
-	ImGui::SetWindowFontScale(1.0f);
+	utils::adaptTextToRegion(
+			core::formatClock(core::clock::now()),
+			{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00:00:00"});
+
 	ImGui::EndChild();
 	ImGui::Columns(1);
 }
@@ -683,7 +658,8 @@ void MainView::renderBottomStatisticsPanel() const {
 void MainView::renderBottomLogsPanel() {
 	ImGui::BeginChild("LogContent", {0, 0}, ImGuiChildFlags_None);
 	const auto& logs = logs::LogBuffer::get().getLogs();
-	ImGui::SetWindowFontScale(m_logScale);
+	if (m_logScale > 0.f)
+		ImGui::SetWindowFontScale(m_logScale);
 	for (const auto& [message, level, timestamp]: logs) {
 		ImVec4 color{0.85f, 0.85f, 0.85f, 1.0f};// Default text color
 		switch (level) {

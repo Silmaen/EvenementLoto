@@ -122,12 +122,12 @@ void GameRound::nextStatus() {
 }
 
 auto GameRound::getStateString() const -> std::string {
-	std::string result = std::format("Partie {} {}", getId(), getName());
+	std::string result = std::format("Partie {} ({})", getId(), getTypeStr());
 	if (m_type != Type::Pause) {
 		result += std::format(" - {}", getStatusStr());
 		if (m_status == Status::Running) {
 			const auto sub = getCurrentSubRound();
-			result += std::format(" - {} {}", sub->getTypeStr(), sub->getStatusStr());
+			result += std::format(" - {} - {}", sub->getTypeStr(), sub->getStatusStr());
 		}
 	}
 	return result;

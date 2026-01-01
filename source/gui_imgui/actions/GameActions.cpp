@@ -18,7 +18,14 @@ namespace evl::gui_imgui::actions {
 
 StartGameAction::StartGameAction() { setIconName("toggle-on"); }
 StartGameAction::~StartGameAction() = default;
-void StartGameAction::onExecute() { log_trace("Start game action executed."); }
+void StartGameAction::onExecute() {
+	auto& app = Application::get();
+	if (app.getCurrentEvent().getStatus() != core::Event::Status::Ready) {
+		return;
+	}
+	app.getCurrentEvent().nextState();
+	log_trace("Start game action executed.");
+}
 
 
 StopGameAction::StopGameAction() { setIconName("toggle-off"); }
@@ -29,6 +36,11 @@ GameNextActions::GameNextActions() { setIconName("submit-for-approval"); }
 GameNextActions::~GameNextActions() = default;
 void GameNextActions::onExecute() {
 	auto& currentEvent = Application::get().getCurrentEvent();
+
+	if (currentEvent.getStatus() == core::Event::Status::DisplayRules) {
+		currentEvent.displayRules();// The call in this state willrestore previous state.
+		return;// No further action needed.
+	}
 	bool goNext = true;
 	if (currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		if (const auto round = currentEvent.getCurrentCGameRound();

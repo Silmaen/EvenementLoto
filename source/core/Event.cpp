@@ -368,10 +368,10 @@ void Event::nextState() {
 //NOLINTEND(misc-no-recursion)
 
 auto Event::getStateString() const -> std::string {
-	std::string result = std::format("Event {}", getStatusStr());
+	std::string result = std::format("Event '{}'", getStatusStr());
 	if (m_status == Status::GameRunning) {
 		const auto sub = getCurrentCGameRound();
-		result += std::format(" - {}", sub->getStateString());
+		result = std::format("{} - {}", result, sub->getStateString());
 	}
 	return result;
 }
@@ -389,7 +389,13 @@ void Event::addWinnerToCurrentRound(const std::string& iWin) {
 void Event::displayRules() {
 	if (isEditable())
 		return;
+	if (m_status == Status::DisplayRules) {
+		restoreStatus();
+		log_info("Event restoring to {}", getStateString());
+		return;
+	}
 	changeStatus(Status::DisplayRules);
+	log_info("Event switching to {}", getStateString());
 }
 
 void Event::changeStatus(const Status& iNewStatus) {
