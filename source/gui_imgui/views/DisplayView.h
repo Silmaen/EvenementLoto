@@ -91,6 +91,9 @@ private:
 	void renderEventPause() const;
 	void renderEventEnd() const;
 	void renderEventRules() const;
+	void renderEventStart() const;
+
+	void applyCommonStyle() const;
 
 	core::Event& m_currentEvent;
 	size_t m_monitorId = 0;
@@ -99,6 +102,7 @@ private:
 	bool m_previewMode = false;
 	size_t m_previewRound = 0;
 	size_t m_previewSubRound = 0;
+	bool m_customStyle = true;
 };
 
 }// namespace evl::gui_imgui::views

@@ -49,6 +49,9 @@ private:
 	void renderDrawnNumbersTab() const;
 	void renderCommandsTab() const;
 	void renderBottomPanel();
+	void renderBottomConfigPanel();
+	void renderBottomStatisticsPanel() const;
+	void renderBottomLogsPanel();
 
 	core::Event& m_currentEvent;
 
@@ -60,6 +63,8 @@ private:
 	float m_leftRightSplit = 0.7f;
 	math::vec2 m_lastSize = {0.0f, 0.0f};
 	int m_selectedScreen = 0;
+	float m_logScale = 0.7f;
+	size_t m_lineInLog = 0;
 };
 
 }// namespace evl::gui_imgui::views

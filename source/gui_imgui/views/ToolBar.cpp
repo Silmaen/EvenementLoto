@@ -14,6 +14,7 @@
 #include "gui_imgui/utils/Rendering.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace evl::gui_imgui::views {
 
@@ -40,16 +41,16 @@ void ToolBar::onUpdate() {
 	utils::defineActionButtonItem("Sauver", "save_file");
 	utils::defineActionButtonItem("Sauver sous...", "save_file_as");
 	ImGui::SameLine();
-	ImGui::Separator();
+	ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 	utils::defineActionButtonItem("Commencer", "start_game");
 	utils::defineActionButtonItem("Arrêter", "stop_game");
 	ImGui::SameLine();
-	ImGui::Separator();
+	ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 	utils::defineActionButtonItem("Préférences", "preferences");
 	utils::defineActionButtonItem("Paramètres Événement", "event_settings");
 	utils::defineActionButtonItem("Paramètres Partie", "game_settings");
 	ImGui::SameLine();
-	ImGui::Separator();
+	ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 	utils::defineActionButtonItem(utils::getNextStepStr(Application::get().getCurrentEvent()), "game_next_step");
 	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick");
 	utils::defineActionButtonItem("Annuler dernier tirage", "cancel_pick");

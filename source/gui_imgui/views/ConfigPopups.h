@@ -63,11 +63,12 @@ private:
 	 */
 	struct Data {
 		std::filesystem::path dataLocation{core::getExecPath() / "data"};
-		float mainScale{0.020f};
-		float titleScale{2.0f};
-		float shortTextScale{1.4f};
-		float longTextScale{0.6f};
-		float gridTextScale{0.85f};
+		float titleScale{4.0f};
+		float valueScale{3.f};
+		float priceTextScale{2.5f};
+		float timeScale{1.6f};
+		float gridTextScale{0.9f};
+		math::vec2f gridSpace{4.0f, 4.0f};
 		math::vec4 backgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
 		math::vec4 gridBackgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
 		math::vec4 textColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -76,7 +77,7 @@ private:
 		int truncatePriceLines{3};
 		bool fadeNumbers{true};
 		int fadeAmount{3};
-		int fadeStrength{0};
+		float fadeStrength{0};
 	} m_data;
 	/**
 	 * @brief Convert data to settings.

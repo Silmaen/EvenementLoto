@@ -9,6 +9,7 @@
 
 #include "Rendering.h"
 
+#include "Convert.h"
 #include "gui_imgui/Application.h"
 #include <imgui.h>
 
@@ -144,6 +145,36 @@ auto getNextStepStr(const core::Event& iEvent) -> std::string {
 			return "Événement terminé";
 	}
 	return "Inconnu";
+}
+
+void adaptTextToRegion(const std::string& iText, const TextAdaptOptions& iOptions) {
+	ImVec2 numberSize;
+	if (iOptions.autoRegion) {
+		numberSize = ImGui::GetContentRegionAvail();
+	} else {
+		numberSize = vec2ToImVec2(iOptions.contentSize);
+	}
+	auto numberTextSize = ImGui::CalcTextSize(iText.c_str());
+	if (!iOptions.textAdapt.empty())
+		numberTextSize = ImGui::CalcTextSize(iOptions.textAdapt.c_str());
+	const float scaleX = numberSize.x / numberTextSize.x;
+	const float scaleY = numberSize.y / numberTextSize.y;
+	const float scale = std::min(scaleX, scaleY) * 0.9f;// 80% of the available space
+	if (scale <= 0.0f)
+		return;// No need to scale up
+	ImGui::SetWindowFontScale(scale);
+	if (iOptions.hCenter) {
+		const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + centerX);
+	}
+	if (iOptions.vCenter) {
+		const float centerY = (numberSize.y - numberTextSize.y * scale) * 0.5f;
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + centerY);
+	}
+	if (iOptions.drawText) {
+		ImGui::Text("%s", iText.c_str());
+		ImGui::SetWindowFontScale(1.0f);
+	}
 }
 
 }// namespace evl::gui_imgui::utils

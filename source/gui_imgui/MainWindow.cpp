@@ -35,9 +35,11 @@ namespace evl::gui_imgui {
 
 namespace {
 
-std::shared_ptr<ImGui_ImplVulkanH_Window> g_MainWindowData;
+std::shared_ptr<ImGui_ImplVulkanH_Window> g_mainWindowData;
 
-void glfw_error_callback(int iError, const char* iDescription) { log_error("GLFW Error %d: %s", iError, iDescription); }
+void glfwErrorCallback(int iError, const char* iDescription) { log_error("GLFW Error %d: %s", iError, iDescription); }
+
+void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__,  __LINE__); }
 
 }// namespace
 
@@ -49,7 +51,7 @@ MainWindow::~MainWindow() = default;
 
 void MainWindow::init(const MainWindowOptions& iOptions) {
 	m_options = iOptions;
-	glfwSetErrorCallback(glfw_error_callback);
+	glfwSetErrorCallback(glfwErrorCallback);
 	if (glfwInit() == 0) {
 		Application::get().reportError("Failed to initialize GLFW");
 		return;
@@ -80,19 +82,19 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 
 		auto& vkContext = vulkan::VulkanContext::get();
 		vkContext.init(extensions);
-		g_MainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
+		g_mainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
 
 		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool,
 			  commandPool] = vkContext.getVkData();
 		VkSurfaceKHR surface = nullptr;
 
 		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
-		vulkan::VulkanContext::checkVkResult(err);
+		vulkan::VulkanContext::checkVkResult(err, __FILE__,  __LINE__);
 		// Create Framebuffers
 		int w = 0;
 		int h = 0;
 		glfwGetFramebufferSize(window, &w, &h);
-		g_MainWindowData->Surface = surface;
+		g_mainWindowData->Surface = surface;
 		setupVulkanWindow(w, h);
 	}
 
@@ -129,9 +131,9 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 											   .DescriptorPool = descriptorPool,
 											   .DescriptorPoolSize = 0,
 											   .MinImageCount = m_minImageCount,
-											   .ImageCount = g_MainWindowData->ImageCount,
+											   .ImageCount = g_mainWindowData->ImageCount,
 											   .PipelineCache = pipelineCache,
-											   .PipelineInfoMain = {.RenderPass = g_MainWindowData->RenderPass,
+											   .PipelineInfoMain = {.RenderPass = g_mainWindowData->RenderPass,
 																	.Subpass = 0,
 																	.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
 #ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
@@ -141,7 +143,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 											   .PipelineInfoForViewports = {},
 											   .UseDynamicRendering = false,
 											   .Allocator = allocator,
-											   .CheckVkResultFn = vulkan::VulkanContext::checkVkResult,
+											   .CheckVkResultFn = vkErrorCallback,
 											   .MinAllocationSize = 0,
 											   .CustomShaderVertCreateInfo = {},
 											   .CustomShaderFragCreateInfo = {}};
@@ -160,7 +162,7 @@ void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
 
 	// Check for WSI support
 	VkBool32 res = 0;
-	vkGetPhysicalDeviceSurfaceSupportKHR(vkData.physicalDevice, vkData.queueFamily, g_MainWindowData->Surface, &res);
+	vkGetPhysicalDeviceSurfaceSupportKHR(vkData.physicalDevice, vkData.queueFamily, g_mainWindowData->Surface, &res);
 	if (res != VK_TRUE) {
 		log_error("Error no WSI support on physical device 0");
 		Application::get().reportError("Vulkan WSI not supported.");
@@ -171,8 +173,8 @@ void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
 	const std::vector<VkFormat> requestSurfaceImageFormat = {VK_FORMAT_B8G8R8A8_UNORM, VK_FORMAT_R8G8B8A8_UNORM,
 															 VK_FORMAT_B8G8R8_UNORM, VK_FORMAT_R8G8B8_UNORM};
 	constexpr VkColorSpaceKHR requestSurfaceColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
-	g_MainWindowData->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(
-			vkData.physicalDevice, g_MainWindowData->Surface, requestSurfaceImageFormat.data(),
+	g_mainWindowData->SurfaceFormat = ImGui_ImplVulkanH_SelectSurfaceFormat(
+			vkData.physicalDevice, g_mainWindowData->Surface, requestSurfaceImageFormat.data(),
 			static_cast<int>(requestSurfaceImageFormat.size()), requestSurfaceColorSpace);
 
 	// Select Present Mode
@@ -182,15 +184,15 @@ void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
 #else
 	const std::vector<VkPresentModeKHR> present_modes = {VK_PRESENT_MODE_FIFO_KHR};
 #endif
-	g_MainWindowData->PresentMode =
-			ImGui_ImplVulkanH_SelectPresentMode(vkData.physicalDevice, g_MainWindowData->Surface, present_modes.data(),
+	g_mainWindowData->PresentMode =
+			ImGui_ImplVulkanH_SelectPresentMode(vkData.physicalDevice, g_mainWindowData->Surface, present_modes.data(),
 												static_cast<int>(present_modes.size()));
-	log_info("[vulkan] Selected PresentMode = {}", magic_enum::enum_name(g_MainWindowData->PresentMode));
+	log_info("[vulkan] Selected PresentMode = {}", magic_enum::enum_name(g_mainWindowData->PresentMode));
 
 	// Create SwapChain, RenderPass, Framebuffer, etc.
 	assert(m_minImageCount >= 2);
 	ImGui_ImplVulkanH_CreateOrResizeWindow(vkData.instance, vkData.physicalDevice, vkData.device,
-										   g_MainWindowData.get(), vkData.queueFamily, vkData.allocator, iWidth,
+										   g_mainWindowData.get(), vkData.queueFamily, vkData.allocator, iWidth,
 										   iHeight, m_minImageCount, 0);
 	m_windowSetupDone = true;
 }
@@ -199,7 +201,7 @@ void MainWindow::cleanupVulkanWindow() {
 	if (!m_windowSetupDone)
 		return;
 	const auto vkData = vulkan::VulkanContext::get().getVkData();
-	ImGui_ImplVulkanH_DestroyWindow(vkData.instance, vkData.device, g_MainWindowData.get(), vkData.allocator);
+	ImGui_ImplVulkanH_DestroyWindow(vkData.instance, vkData.device, g_mainWindowData.get(), vkData.allocator);
 	m_windowSetupDone = false;
 }
 
@@ -283,13 +285,13 @@ void MainWindow::setCallbacks() {
 void MainWindow::close() {
 	const auto vkData = vulkan::VulkanContext::get().getVkData();
 	const auto err = vkDeviceWaitIdle(vkData.device);
-	vulkan::VulkanContext::checkVkResult(err);
+	vulkan::VulkanContext::checkVkResult(err, __FILE__,  __LINE__);
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
 	cleanupVulkanWindow();
-	g_MainWindowData.reset();
+	g_mainWindowData.reset();
 	vulkan::VulkanContext::get().reset();
 
 	auto* window = static_cast<GLFWwindow*>(m_window);
@@ -317,12 +319,12 @@ void MainWindow::newFrame() {
 	int fb_height = 0;
 	glfwGetFramebufferSize(window, &fb_width, &fb_height);
 	if (fb_width > 0 && fb_height > 0 &&
-		(m_swapChainRebuild || g_MainWindowData->Width != fb_width || g_MainWindowData->Height != fb_height)) {
+		(m_swapChainRebuild || g_mainWindowData->Width != fb_width || g_mainWindowData->Height != fb_height)) {
 		ImGui_ImplVulkan_SetMinImageCount(m_minImageCount);
 		ImGui_ImplVulkanH_CreateOrResizeWindow(vkData.instance, vkData.physicalDevice, vkData.device,
-											   g_MainWindowData.get(), vkData.queueFamily, vkData.allocator, fb_width,
+											   g_mainWindowData.get(), vkData.queueFamily, vkData.allocator, fb_width,
 											   fb_height, m_minImageCount, 0);
-		g_MainWindowData->FrameIndex = 0;
+		g_mainWindowData->FrameIndex = 0;
 		m_swapChainRebuild = false;
 	}
 	auto& app = Application::get();
@@ -352,11 +354,11 @@ void MainWindow::render(const math::vec4& iClearColor) {
 	ImDrawData* draw_data = ImGui::GetDrawData();
 
 	if (const bool is_minimized = draw_data->DisplaySize.x <= 0.0f || draw_data->DisplaySize.y <= 0.0f; !is_minimized) {
-		g_MainWindowData->ClearValue.color.float32[0] = iClearColor.r() * iClearColor.a();
-		g_MainWindowData->ClearValue.color.float32[1] = iClearColor.g() * iClearColor.a();
-		g_MainWindowData->ClearValue.color.float32[2] = iClearColor.b() * iClearColor.a();
-		g_MainWindowData->ClearValue.color.float32[3] = iClearColor.a();
-		vulkan::VulkanContext::get().frameRender(g_MainWindowData.get(), draw_data, m_swapChainRebuild);
+		g_mainWindowData->ClearValue.color.float32[0] = iClearColor.r() * iClearColor.a();
+		g_mainWindowData->ClearValue.color.float32[1] = iClearColor.g() * iClearColor.a();
+		g_mainWindowData->ClearValue.color.float32[2] = iClearColor.b() * iClearColor.a();
+		g_mainWindowData->ClearValue.color.float32[3] = iClearColor.a();
+		vulkan::VulkanContext::get().frameRender(g_mainWindowData.get(), draw_data, m_swapChainRebuild);
 	}
 }
 

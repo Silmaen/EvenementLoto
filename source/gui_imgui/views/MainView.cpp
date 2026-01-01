@@ -27,30 +27,6 @@ constexpr float g_minBottomPanelHeight = 200.0f;
 
 constexpr float g_commandSectionHeight = 150.0f;
 
-namespace {
-
-void adaptTextToRegion(const std::string& iText, const math::vec2& iContentSize = {0.0f, 0.0f}) {
-	ImVec2 numberSize;
-	if (iContentSize.x() <= 0.0f || iContentSize.y() <= 0.0f) {
-		numberSize = ImGui::GetContentRegionAvail();
-	} else {
-		numberSize = utils::vec2ToImVec2(iContentSize);
-	}
-	const auto numberTextSize = ImGui::CalcTextSize(iText.c_str());
-	const float scaleX = numberSize.x / numberTextSize.x;
-	const float scaleY = numberSize.y / numberTextSize.y;
-	const float scale = std::min(scaleX, scaleY) * 0.9f;// 80% of the available space
-	if (scale < 0.0f)
-		return;// No need to scale up
-	ImGui::SetWindowFontScale(scale);
-	const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;
-	const float centerY = (numberSize.y - numberTextSize.y * scale) * 0.5f;
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + centerX);
-	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + centerY);
-}
-
-}// namespace
-
 
 MainView::MainView(core::Event& iEvent) : m_currentEvent{iEvent} {}
 
@@ -203,7 +179,8 @@ void MainView::renderDrawnNumbersTab() const {
 			const float scaleX = buttonSize.x / textSize.x;
 			const float scaleY = buttonSize.y / textSize.y;
 			const float scale = std::min(scaleX, scaleY) * 0.8f;
-			ImGui::SetWindowFontScale(scale);
+			if (scale > 0.f)
+				ImGui::SetWindowFontScale(scale);
 			const bool clicked = ImGui::Button(label.c_str(), buttonSize);
 			ImGui::SetWindowFontScale(1.0f);
 
@@ -230,7 +207,7 @@ void MainView::renderRightPanel() const {
 	int prevDrawnNumber = -1;
 	int secondPrevDrawnNumber = -1;
 	int thirdPrevDrawnNumber = -1;
-		const ImGuiStyle& style = ImGui::GetStyle();
+	const ImGuiStyle& style = ImGui::GetStyle();
 	if (m_currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		if (const auto currentRound = m_currentEvent.getCurrentGameRound();
 			currentRound->getStatus() == core::GameRound::Status::Running) {
@@ -259,13 +236,10 @@ void MainView::renderRightPanel() const {
 							  ImGuiWindowFlags_NoResize)) {
 			ImGui::Text("Numéro tiré");
 			ImGui::Separator();
-			adaptTextToRegion("00");
-			if (prevDrawnNumber != -1) {
-				ImGui::Text("%d", prevDrawnNumber);
-			} else {
-				ImGui::Text("--");
-			}
-			ImGui::SetWindowFontScale(1.0f);
+			const std::string numberText = (prevDrawnNumber != -1) ? std::format("{}", prevDrawnNumber) : "--";
+			utils::adaptTextToRegion(
+					numberText,
+					{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00"});
 		}
 		ImGui::EndChild();
 
@@ -289,9 +263,9 @@ void MainView::renderRightPanel() const {
 			} else {
 				lastNumbers += "--";
 			}
-			adaptTextToRegion("00 00 00");
-			ImGui::Text("%s", lastNumbers.c_str());
-			ImGui::SetWindowFontScale(1.0f);
+			utils::adaptTextToRegion(
+					lastNumbers,
+					{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00 00 00"});
 		}
 		ImGui::EndChild();
 	}
@@ -321,13 +295,13 @@ void MainView::renderCommandsTab() const {
 			case core::Event::Status::Invalid:
 			case core::Event::Status::MissingParties:
 			case core::Event::Status::Finished:
+			case core::Event::Status::Ready:
+			case core::Event::Status::EventEnding:
 				btnDisabled = true;
 				break;
-			case core::Event::Status::Ready:
 			case core::Event::Status::EventStarting:
 			case core::Event::Status::DisplayRules:
 			case core::Event::Status::GameRunning:
-			case core::Event::Status::EventEnding:
 				break;
 		}
 		utils::defineActionButtonItem(
@@ -476,9 +450,10 @@ void MainView::renderEventInfo() const {
 	ImGui::NextColumn();
 	ImGui::BeginChild("RightColomunEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
 	// Large current time display
-	adaptTextToRegion("00:00:00");
-	ImGui::Text("%s", core::formatClock(core::clock::now()).c_str());
-	ImGui::SetWindowFontScale(1.0f);
+	utils::adaptTextToRegion(
+			core::formatClock(core::clock::now()),
+			{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00:00:00"});
+
 	ImGui::EndChild();
 	ImGui::Columns(1);
 }
@@ -504,178 +479,216 @@ void MainView::renderBottomPanel() {
 	// Could be used for notifications or logs in the future
 	if (ImGui::BeginTabBar("MainTabBar")) {
 		if (ImGui::BeginTabItem("Configuration")) {
-			ImGui::BeginChild("ConfigContent", {0, 0}, ImGuiChildFlags_None);
-
-			// Draw type selection group
-			ImGui::BeginGroup();
-			ImGui::Text("Tirage Aléatoire");
-			ImGui::Separator();
-			{
-				int drawMode = static_cast<int>(m_drawMode);
-				ImGui::RadioButton("Tirage aléatoire seul", &drawMode, 0);
-				ImGui::RadioButton("Tirage manuel seul", &drawMode, 1);
-				ImGui::RadioButton("Les Deux", &drawMode, 2);
-				if (drawMode != static_cast<int>(m_drawMode)) {
-					// Update draw mode in application settings
-					// Application::get().getSettings().setDrawMode(static_cast<core::DrawMode>(drawMode));
-					log_info("Changement du mode de tirage: {} Wip", drawMode);
-					m_drawMode = static_cast<DrawMode>(drawMode);
-				}
-			}
-			ImGui::EndGroup();
-
-			ImGui::SameLine();
-			ImGui::Spacing();
-			ImGui::SameLine();
-
-			// Display settings group
-			ImGui::BeginGroup();
-			ImGui::Text("Affichage");
-			ImGui::Separator();
-			ImGui::Text("Selection de l'écran");
-			{
-				const auto infos = Application::get().getMonitorsInfo();
-				const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
-				if (infos.size() == 1)
-					displayView->setFullscreen(false);
-				bool fullscreen = displayView->isFullscreen();
-				//ImGui::SetNextItemWidth(400.0f);
-				if (auto [scr_list_name, scr_list_idx] = screenInfoTolist(infos);
-					ImGui::Combo("##ScreenSelect", &m_selectedScreen, scr_list_name.c_str())) {
-					const size_t monitorIndex = scr_list_idx[static_cast<size_t>(m_selectedScreen)];
-					displayView->setMonitorNumber(monitorIndex);
-					log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
-				}
-				if (ImGui::Checkbox("Plein écran", &fullscreen)) {
-					if (infos.size() == 1)
-						fullscreen = false;
-					else {
-						displayView->setFullscreen(fullscreen);
-						log_info("Changement du mode plein écran: {}", fullscreen);
-					}
-				}
-			}
-			ImGui::EndGroup();
-
-			ImGui::EndChild();
+			renderBottomConfigPanel();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Information partie")) {
-			ImGui::BeginChild("RoundInfoContent", {0, 0}, ImGuiChildFlags_None);
-
-			const float drawWidth = ImGui::GetContentRegionAvail().x * 0.30f;
-			const float timingWidth = ImGui::GetContentRegionAvail().x * 0.10f;
-			const float roundWidth = ImGui::GetContentRegionAvail().x * 0.15f;
-			const float pricesWidth = ImGui::GetContentRegionAvail().x * 0.45f;
-
-			const auto currentRound = m_currentEvent.getCurrentCGameRound();
-			// Draws group
-			ImGui::BeginGroup();
-			ImGui::Text("Tirages");
-			ImGui::Separator();
-			ImGui::Text("Nombre:");
-			ImGui::SameLine();
-			ImGui::Text("%u", currentRound == m_currentEvent.endRounds()
-									  ? 0
-									  : static_cast<uint32_t>(currentRound->drawsCount()));
-			ImGui::Spacing();
-			ImGui::BeginChild("DrawsList", {drawWidth, 0}, ImGuiChildFlags_Border);
-			if (currentRound == m_currentEvent.endRounds() || currentRound->drawsCount() == 0) {
-				ImGui::TextWrapped("Aucun tirage effectué.");
-			} else {
-				ImGui::TextWrapped("%s", currentRound->getDrawStr().c_str());
-			}
-			ImGui::EndChild();
-			ImGui::EndGroup();
-
-			ImGui::SameLine();
-
-			// Timing group
-			ImGui::BeginGroup();
-			ImGui::Text("Timing");
-			ImGui::Separator();
-			ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Border);
-			if (currentRound == m_currentEvent.endRounds()) {
-				ImGui::Text("Début:");
-				ImGui::SameLine();
-				ImGui::Text("--");
-				ImGui::Text("Durée:");
-				ImGui::SameLine();
-				ImGui::Text("--");
-			} else {
-				ImGui::Text("Début:");
-				ImGui::SameLine();
-				ImGui::Text("%s", core::formatClockNoSecond(currentRound->getStarting()).c_str());
-				ImGui::Text("Durée:");
-				ImGui::SameLine();
-				ImGui::Text("%s", core::formatDuration(core::clock::now() - currentRound->getStarting()).c_str());
-			}
-			ImGui::EndChild();
-			ImGui::EndGroup();
-
-			ImGui::SameLine();
-
-			// Current round group
-			ImGui::BeginGroup();
-			ImGui::Text("Partie en cours");
-			ImGui::Separator();
-			ImGui::BeginChild("OngoingRound", {roundWidth, 0}, ImGuiChildFlags_Border);
-			ImGui::Text("Partie:");
-			ImGui::SameLine();
-			if (currentRound == m_currentEvent.endRounds()) {
-				ImGui::Text("");
-				ImGui::Text("Phase:");
-				ImGui::SameLine();
-				ImGui::Text("");
-				ImGui::Text("Valeur:");
-				ImGui::SameLine();
-				ImGui::Text("0 €");
-			} else {
-				ImGui::Text("%s", currentRound->getName().c_str());
-				ImGui::Text("Phase:");
-				ImGui::SameLine();
-				ImGui::Text("%s", currentRound->getStateString().c_str());
-				ImGui::Text("Valeur:");
-				ImGui::SameLine();
-				if (currentRound->getType() == core::GameRound::Type::Pause) {
-					ImGui::Text("N/A");
-				} else {
-					const auto value = std::format("{:.2f} €", currentRound->getCurrentSubRound()->getValue());
-					ImGui::Text("%s", value.c_str());
-				}
-			}
-			ImGui::EndChild();
-			ImGui::EndGroup();
-			ImGui::SameLine();
-
-			// Prizes group
-			ImGui::BeginGroup();
-			ImGui::Text("Lots");
-			ImGui::Separator();
-			ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Border);
-			if (currentRound == m_currentEvent.endRounds()) {
-				ImGui::TextWrapped("");
-			} else if (currentRound->getType() == core::GameRound::Type::Pause) {
-				ImGui::TextWrapped("Pas de lots pour une pause.");
-			} else {
-				ImGui::Text("%s", currentRound->getCurrentSubRound()->getPrices().c_str());
-			}
-			ImGui::EndChild();
-			ImGui::EndGroup();
-
-			ImGui::EndChild();
+			renderBottomStatisticsPanel();
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("log")) {
-			ImGui::BeginChild("LogContent", {0, 0}, ImGuiChildFlags_None);
-			ImGui::PushFont(ImGui::GetIO().Fonts->Fonts[1]);// Monospace font if available
-			ImGui::TextWrapped("Log messages will appear here...");
-			ImGui::PopFont();
-			ImGui::EndChild();
+			renderBottomLogsPanel();
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
 	}
+}
+void MainView::renderBottomConfigPanel() {
+	ImGui::BeginChild("ConfigContent", {0, 0}, ImGuiChildFlags_None);
+
+	// Draw type selection group
+	ImGui::BeginGroup();
+	ImGui::Text("Tirage Aléatoire");
+	ImGui::Separator();
+	{
+		int drawMode = static_cast<int>(m_drawMode);
+		ImGui::RadioButton("Tirage aléatoire seul", &drawMode, 0);
+		ImGui::RadioButton("Tirage manuel seul", &drawMode, 1);
+		ImGui::RadioButton("Les Deux", &drawMode, 2);
+		if (drawMode != static_cast<int>(m_drawMode)) {
+			// Update draw mode in application settings
+			// Application::get().getSettings().setDrawMode(static_cast<core::DrawMode>(drawMode));
+			log_info("Changement du mode de tirage: {} Wip", drawMode);
+			m_drawMode = static_cast<DrawMode>(drawMode);
+		}
+	}
+	ImGui::EndGroup();
+
+	ImGui::SameLine();
+	ImGui::Spacing();
+	ImGui::SameLine();
+
+	// Display settings group
+	ImGui::BeginGroup();
+	ImGui::Text("Affichage");
+	ImGui::Separator();
+	ImGui::Text("Selection de l'écran");
+	{
+		const auto infos = Application::get().getMonitorsInfo();
+		const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
+		if (infos.size() == 1)
+			displayView->setFullscreen(false);
+		bool fullscreen = displayView->isFullscreen();
+		//ImGui::SetNextItemWidth(400.0f);
+		if (auto [scr_list_name, scr_list_idx] = screenInfoTolist(infos);
+			ImGui::Combo("##ScreenSelect", &m_selectedScreen, scr_list_name.c_str())) {
+			const size_t monitorIndex = scr_list_idx[static_cast<size_t>(m_selectedScreen)];
+			displayView->setMonitorNumber(monitorIndex);
+			log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
+		}
+		if (ImGui::Checkbox("Plein écran", &fullscreen)) {
+			if (infos.size() == 1)
+				fullscreen = false;
+			else {
+				displayView->setFullscreen(fullscreen);
+				log_info("Changement du mode plein écran: {}", fullscreen);
+			}
+		}
+	}
+	ImGui::EndGroup();
+
+	ImGui::EndChild();
+}
+
+void MainView::renderBottomStatisticsPanel() const {
+	ImGui::BeginChild("RoundInfoContent", {0, 0}, ImGuiChildFlags_None);
+
+	const float drawWidth = ImGui::GetContentRegionAvail().x * 0.30f;
+	const float timingWidth = ImGui::GetContentRegionAvail().x * 0.10f;
+	const float roundWidth = ImGui::GetContentRegionAvail().x * 0.15f;
+	const float pricesWidth = ImGui::GetContentRegionAvail().x * 0.45f;
+
+	const auto currentRound = m_currentEvent.getCurrentCGameRound();
+	// Draws group
+	ImGui::BeginGroup();
+	ImGui::Text("Tirages");
+	ImGui::Separator();
+	ImGui::Text("Nombre:");
+	ImGui::SameLine();
+	ImGui::Text("%u",
+				currentRound == m_currentEvent.endRounds() ? 0 : static_cast<uint32_t>(currentRound->drawsCount()));
+	ImGui::Spacing();
+	ImGui::BeginChild("DrawsList", {drawWidth, 0}, ImGuiChildFlags_Border);
+	if (currentRound == m_currentEvent.endRounds() || currentRound->drawsCount() == 0) {
+		ImGui::TextWrapped("Aucun tirage effectué.");
+	} else {
+		ImGui::TextWrapped("%s", currentRound->getDrawStr().c_str());
+	}
+	ImGui::EndChild();
+	ImGui::EndGroup();
+
+	ImGui::SameLine();
+
+	// Timing group
+	ImGui::BeginGroup();
+	ImGui::Text("Timing");
+	ImGui::Separator();
+	ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Border);
+	if (currentRound == m_currentEvent.endRounds()) {
+		ImGui::Text("Début:");
+		ImGui::SameLine();
+		ImGui::Text("--");
+		ImGui::Text("Durée:");
+		ImGui::SameLine();
+		ImGui::Text("--");
+	} else {
+		ImGui::Text("Début:");
+		ImGui::SameLine();
+		ImGui::Text("%s", core::formatClockNoSecond(currentRound->getStarting()).c_str());
+		ImGui::Text("Durée:");
+		ImGui::SameLine();
+		ImGui::Text("%s", core::formatDuration(core::clock::now() - currentRound->getStarting()).c_str());
+	}
+	ImGui::EndChild();
+	ImGui::EndGroup();
+
+	ImGui::SameLine();
+
+	// Current round group
+	ImGui::BeginGroup();
+	ImGui::Text("Partie en cours");
+	ImGui::Separator();
+	ImGui::BeginChild("OngoingRound", {roundWidth, 0}, ImGuiChildFlags_Border);
+	ImGui::Text("Partie:");
+	ImGui::SameLine();
+	if (currentRound == m_currentEvent.endRounds()) {
+		ImGui::Text("");
+		ImGui::Text("Phase:");
+		ImGui::SameLine();
+		ImGui::Text("");
+		ImGui::Text("Valeur:");
+		ImGui::SameLine();
+		ImGui::Text("0 €");
+	} else {
+		ImGui::Text("%s", currentRound->getName().c_str());
+		ImGui::Text("Phase:");
+		ImGui::SameLine();
+		ImGui::Text("%s", currentRound->getStateString().c_str());
+		ImGui::Text("Valeur:");
+		ImGui::SameLine();
+		if (currentRound->getType() == core::GameRound::Type::Pause) {
+			ImGui::Text("N/A");
+		} else {
+			const auto value = std::format("{:.2f} €", currentRound->getCurrentSubRound()->getValue());
+			ImGui::Text("%s", value.c_str());
+		}
+	}
+	ImGui::EndChild();
+	ImGui::EndGroup();
+	ImGui::SameLine();
+
+	// Prizes group
+	ImGui::BeginGroup();
+	ImGui::Text("Lots");
+	ImGui::Separator();
+	ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Border);
+	if (currentRound == m_currentEvent.endRounds()) {
+		ImGui::TextWrapped("");
+	} else if (currentRound->getType() == core::GameRound::Type::Pause) {
+		ImGui::TextWrapped("Pas de lots pour une pause.");
+	} else {
+		ImGui::Text("%s", currentRound->getCurrentSubRound()->getPrices().c_str());
+	}
+	ImGui::EndChild();
+	ImGui::EndGroup();
+
+	ImGui::EndChild();
+}
+
+void MainView::renderBottomLogsPanel() {
+	ImGui::BeginChild("LogContent", {0, 0}, ImGuiChildFlags_None);
+	const auto& logs = logs::LogBuffer::get().getLogs();
+	if (m_logScale > 0.f)
+		ImGui::SetWindowFontScale(m_logScale);
+	for (const auto& [message, level, timestamp]: logs) {
+		ImVec4 color{0.85f, 0.85f, 0.85f, 1.0f};// Default text color
+		switch (level) {
+			case Log::Level::Trace:
+			case Log::Level::Debug:
+				color = {0.50f, 0.75f, 1.0f, 1.0f};// Blue
+				break;
+			case Log::Level::Info:
+				color = {0.85f, 0.85f, 0.85f, 1.0f};// White
+				break;
+			case Log::Level::Warning:
+				color = {1.0f, 0.85f, 0.0f, 1.0f};// Yellow
+				break;
+			case Log::Level::Error:
+			case Log::Level::Critical:
+				color = {1.0f, 0.30f, 0.30f, 1.0f};// Red
+				break;
+			case Log::Level::Off:
+				break;
+		}
+		auto line = std::format("[{}] [{}] {}", core::formatClock(timestamp), magic_enum::enum_name(level), message);
+		ImGui::TextColored(color, "%s", line.c_str());
+	}
+	if (m_lineInLog != logs.size()) {
+		ImGui::SetScrollHereY(1.0f);
+		m_lineInLog = logs.size();
+	}
+	ImGui::SetWindowFontScale(1.0f);
+	ImGui::EndChild();
 }
 
 }// namespace evl::gui_imgui::views

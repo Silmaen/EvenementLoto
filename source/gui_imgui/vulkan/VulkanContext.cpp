@@ -61,7 +61,7 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 										.queueFamilyIndexCount = 0,
 										.pQueueFamilyIndices = nullptr};
 
-	VulkanContext::checkVkResult(vkCreateBuffer(iVkData.device, &bufferInfo, iVkData.allocator, &oBuffer));
+	VulkanContext::checkVkResult(vkCreateBuffer(iVkData.device, &bufferInfo, iVkData.allocator, &oBuffer), __FILE__,  __LINE__);
 
 	VkMemoryRequirements memRequirements{};
 	vkGetBufferMemoryRequirements(iVkData.device, oBuffer, &memRequirements);
@@ -72,7 +72,7 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 										 .memoryTypeIndex =
 												 findMemoryType(iVkData, memRequirements.memoryTypeBits, iProperties)};
 
-	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oBufferMemory));
+	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oBufferMemory), __FILE__,  __LINE__);
 	vkBindBufferMemory(iVkData.device, oBuffer, oBufferMemory, 0);
 }
 
@@ -96,7 +96,7 @@ void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iH
 									  .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
 
 
-	VulkanContext::checkVkResult(vkCreateImage(iVkData.device, &imageInfo, iVkData.allocator, &oImage));
+	VulkanContext::checkVkResult(vkCreateImage(iVkData.device, &imageInfo, iVkData.allocator, &oImage),__FILE__,  __LINE__);
 
 	VkMemoryRequirements memRequirements{};
 	vkGetImageMemoryRequirements(iVkData.device, oImage, &memRequirements);
@@ -107,7 +107,7 @@ void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iH
 										 .memoryTypeIndex =
 												 findMemoryType(iVkData, memRequirements.memoryTypeBits, iProperties)};
 
-	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oImageMemory));
+	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oImageMemory), __FILE__,  __LINE__);
 	vkBindImageMemory(iVkData.device, oImage, oImageMemory, 0);
 }
 
@@ -126,7 +126,7 @@ auto createImageView(const VkData& iVkData, VkImage iImage, const VkFormat iForm
 															  .layerCount = 1}};
 
 	VkImageView imageView = VK_NULL_HANDLE;
-	VulkanContext::checkVkResult(vkCreateImageView(iVkData.device, &viewInfo, iVkData.allocator, &imageView));
+	VulkanContext::checkVkResult(vkCreateImageView(iVkData.device, &viewInfo, iVkData.allocator, &imageView), __FILE__,  __LINE__);
 	return imageView;
 }
 
@@ -151,7 +151,7 @@ auto createTextureSampler(const VkData& iVkData) -> VkSampler {
 											  .unnormalizedCoordinates = VK_FALSE};
 
 	VkSampler sampler = VK_NULL_HANDLE;
-	VulkanContext::checkVkResult(vkCreateSampler(iVkData.device, &samplerInfo, iVkData.allocator, &sampler));
+	VulkanContext::checkVkResult(vkCreateSampler(iVkData.device, &samplerInfo, iVkData.allocator, &sampler), __FILE__,  __LINE__);
 	return sampler;
 }
 
@@ -187,8 +187,8 @@ void endSingleTimeCommands(const VkData& iVkData, VkCommandBuffer iCommandBuffer
 								  .signalSemaphoreCount = 0,
 								  .pSignalSemaphores = nullptr};
 
-	VulkanContext::checkVkResult(vkQueueSubmit(iVkData.queue, 1, &submitInfo, VK_NULL_HANDLE));
-	VulkanContext::checkVkResult(vkQueueWaitIdle(iVkData.queue));
+	VulkanContext::checkVkResult(vkQueueSubmit(iVkData.queue, 1, &submitInfo, VK_NULL_HANDLE), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkQueueWaitIdle(iVkData.queue), __FILE__,  __LINE__);
 
 	vkFreeCommandBuffers(iVkData.device, iVkData.commandPool, 1, &iCommandBuffer);
 }
@@ -291,7 +291,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
 		properties.resize(properties_count);
 		err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, properties.data());
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 
 		// Enable required extensions
 		std::vector<const char*> instanceExtensions = iInstanceExtensions;
@@ -316,7 +316,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		create_info.enabledExtensionCount = static_cast<uint32_t>(instanceExtensions.size());
 		create_info.ppEnabledExtensionNames = instanceExtensions.data();
 		err = vkCreateInstance(&create_info, m_data.allocator, &m_data.instance);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 #ifdef IMGUI_IMPL_VULKAN_USE_VOLK
 		volkLoadInstance(g_Instance);
 #endif
@@ -337,7 +337,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		debug_report_ci.pUserData = nullptr;
 		err = f_vkCreateDebugReportCallbackEXT(m_data.instance, &debug_report_ci, m_data.allocator,
 											   &m_data.debugReport);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 #endif
 	}
 
@@ -378,7 +378,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		create_info.enabledExtensionCount = static_cast<uint32_t>(device_extensions.size());
 		create_info.ppEnabledExtensionNames = device_extensions.data();
 		err = vkCreateDevice(m_data.physicalDevice, &create_info, m_data.allocator, &m_data.device);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 		vkGetDeviceQueue(m_data.device, m_data.queueFamily, 0, &m_data.queue);
 	}
 
@@ -397,7 +397,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
 		pool_info.pPoolSizes = pool_sizes.data();
 		err = vkCreateDescriptorPool(m_data.device, &pool_info, m_data.allocator, &m_data.descriptorPool);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 	}
 	// Create Command Pool
 	{
@@ -406,7 +406,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 											   .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 											   .queueFamilyIndex = m_data.queueFamily};
 		err = vkCreateCommandPool(m_data.device, &poolInfo, m_data.allocator, &m_data.commandPool);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 		log_info("[vulkan] Command pool created.");
 	}
 	log_info("[vulkan] Vulkan context initialized.");
@@ -468,10 +468,10 @@ void VulkanContext::reset() {
 	m_data.queueFamily = static_cast<uint32_t>(-1);
 }
 
-void VulkanContext::checkVkResult(const VkResult iErr) {
+void VulkanContext::checkVkResult(const VkResult iErr, const char* iFile, int iLine) {
 	if (iErr == VK_SUCCESS)
 		return;
-	log_error("[vulkan] Error: VkResult = {}", magic_enum::enum_name(iErr));
+	log_error("[vulkan] Error({}:{}): VkResult = {}", iFile, iLine, magic_enum::enum_name(iErr));
 	if (iErr < 0)
 		Application::get().reportError("Vulkan encountered a fatal error.");
 }
@@ -491,25 +491,25 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 	if (err == VK_ERROR_OUT_OF_DATE_KHR)
 		return;
 	if (err != VK_SUBOPTIMAL_KHR)
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 
 	const ImGui_ImplVulkanH_Frame* fd = &wd->Frames[static_cast<int>(wd->FrameIndex)];
 	{
 		err = vkWaitForFences(m_data.device, 1, &fd->Fence, VK_TRUE,
 							  UINT64_MAX);// wait indefinitely instead of periodically checking
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 
 		err = vkResetFences(m_data.device, 1, &fd->Fence);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 	}
 	{
 		err = vkResetCommandPool(m_data.device, fd->CommandPool, 0);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 		VkCommandBufferBeginInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 		err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 	}
 	{
 		VkRenderPassBeginInfo info = {};
@@ -541,9 +541,9 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 		info.pSignalSemaphores = &render_complete_semaphore;
 
 		err = vkEndCommandBuffer(fd->CommandBuffer);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 		err = vkQueueSubmit(m_data.queue, 1, &info, fd->Fence);
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 	}
 	if (oRebuildSwapChain)
 		return;
@@ -560,7 +560,7 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 	if (err == VK_ERROR_OUT_OF_DATE_KHR)
 		return;
 	if (err != VK_SUBOPTIMAL_KHR)
-		checkVkResult(err);
+		checkVkResult(err, __FILE__,  __LINE__);
 	wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount;// Now we can use the next set of semaphores
 }
 

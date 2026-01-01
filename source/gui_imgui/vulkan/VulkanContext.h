@@ -69,8 +69,10 @@ public:
 	/**
 	 * @brief Check VkResult and log error if any.
 	 * @param[in] iErr The VkResult to check.
+	 * @param[in] iFile The calling file.
+	 * @param[in] iLine The calling line.
 	 */
-	static void checkVkResult(VkResult iErr);
+	static void checkVkResult(VkResult iErr, const char* iFile = __FILE__, int iLine = __LINE__);
 
 	/**
 	 * @brief Frame render function.

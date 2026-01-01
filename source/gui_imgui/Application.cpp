@@ -34,7 +34,8 @@ Application::Application() {
 	log_info("Starting application.");
 	m_instance = this;
 
-	m_mainWindow.init({.title = std::format("Application Loto ({})", EVL_VERSION), .size = {800, 600}, .iconPath = ""});
+	m_mainWindow.init(
+			{.title = std::format("Application Loto ({})", EVL_VERSION), .size = {1044, 1068}, .iconPath = ""});
 	if (m_state == State::Error)
 		return;
 
