@@ -33,40 +33,43 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC yaml-cpp::yaml-cpp)
 #spdlog
 find_package(spdlog REQUIRED)
 message(STATUS "Found spdlog: ${spdlog_DIR} (found version: ${spdlog_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PRIVATE spdlog::spdlog)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog)
 
 #magic enum
 find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_DIR} (found version: ${magic_enum_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC magic_enum::magic_enum)
+copy_shared_libraries(${CMAKE_PROJECT_NAME}_lib)
 #
 # ----====  UI Libraries ====----
 #
-#  QT dependency
-#
-include(../cmake/qt.cmake)
-#
-#  QT UI lib
-#
-file(GLOB_RECURSE
-        SRCS_UI_QT
-        ${CMAKE_CURRENT_SOURCE_DIR}/gui_qt/*
-)
-add_library(${CMAKE_PROJECT_NAME}_ui_qt ${SRCS_UI_QT})
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_qt
-        ${CMAKE_PROJECT_NAME}_lib
-)
-# precompiled headers
-if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
-        target_precompile_headers(${CMAKE_PROJECT_NAME}_ui_qt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
+if (${${PROJECT_PREFIX}_ENABLE_QT})
+    #  QT dependency
+    #
+    include(../cmake/qt.cmake)
+    #
+    #  QT UI lib
+    #
+    file(GLOB_RECURSE
+            SRCS_UI_QT
+            ${CMAKE_CURRENT_SOURCE_DIR}/gui_qt/*
+    )
+    add_library(${CMAKE_PROJECT_NAME}_ui_qt ${SRCS_UI_QT})
+    target_link_libraries(${CMAKE_PROJECT_NAME}_ui_qt
+            ${CMAKE_PROJECT_NAME}_lib
+    )
+    # precompiled headers
+    if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
+        if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
+            target_precompile_headers(${CMAKE_PROJECT_NAME}_ui_qt INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
+        endif ()
     endif ()
+    set_target_properties(${CMAKE_PROJECT_NAME}_ui_qt PROPERTIES FOLDER "core_libs")
+    qt_attach_to_target(${CMAKE_PROJECT_NAME}_ui_qt)
+    copy_shared_libraries(${CMAKE_PROJECT_NAME}_ui_qt)
+    #  QT UI Library
+    #
 endif ()
-set_target_properties(${CMAKE_PROJECT_NAME}_ui_qt PROPERTIES FOLDER "core_libs")
-qt_attach_to_target(${CMAKE_PROJECT_NAME}_ui_qt)
-#  QT UI Library
-#
-
 #
 #  ImGUI UI lib
 #
@@ -109,10 +112,10 @@ add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_ui_imgui POST_BUILD
         COMMENT "Copying Icon resources..."
         VERBATIM
 )
-
 #  ImGUI UI Library
 #
 target_link_vulkan(${CMAKE_PROJECT_NAME}_ui_imgui PUBLIC)
+copy_shared_libraries(${CMAKE_PROJECT_NAME}_ui_imgui)
 #
 # ----==== Main Executable ====----
 #
@@ -130,9 +133,15 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
 endif ()
 target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_PROJECT_NAME}_lib
-        ${CMAKE_PROJECT_NAME}_ui_qt
         ${CMAKE_PROJECT_NAME}_ui_imgui
 )
+if (${${PROJECT_PREFIX}_ENABLE_QT})
+    target_link_libraries(${CMAKE_PROJECT_NAME}
+            ${CMAKE_PROJECT_NAME}_ui_qt
+    )
+    target_compile_definitions(${CMAKE_PROJECT_NAME} PRIVATE
+            USE_QT)
+endif ()
 if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif ()

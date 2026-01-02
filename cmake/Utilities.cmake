@@ -12,3 +12,20 @@ function(dump_cmake_variables)
         message(STATUS "${_variableName}=${${_variableName}}")
     endforeach ()
 endfunction()
+
+function(copy_shared_libraries iTarget)
+    get_target_property(linkedLibraries ${iTarget} LINK_LIBRARIES)
+    foreach (linkedTarget ${linkedLibraries})
+        if ("${linkedTarget}" MATCHES "${CMAKE_PROJECT_NAME}")
+            continue()
+        endif ()
+        get_target_property(libraryPath ${linkedTarget} LOCATION)
+        if (libraryPath AND EXISTS ${libraryPath} AND libraryPath MATCHES "\\.so$|\\.so\..*$|\\.dll$|\\.dylib$")
+            add_custom_command(TARGET ${iTarget} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "$<TARGET_FILE:${linkedTarget}>" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+                    COMMENT "Copying shared library: ${libraryPath}"
+            )
+        endif ()
+    endforeach ()
+endfunction()

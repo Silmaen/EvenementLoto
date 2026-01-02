@@ -13,6 +13,8 @@
 #include "baseDefine.h"
 #include "external/spdlog.h"
 #include "utilities.h"
+
+#include <iostream>
 EVL_DIAG_PUSH
 EVL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 EVL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
@@ -60,8 +62,6 @@ void Log::init(const Level& iLevel) {
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(getLogPath(), true));
 
-	setPattern();
-
 	g_logger = std::make_shared<spdlog::logger>("EVL", begin(logSinks), end(logSinks));
 	register_logger(g_logger);
 
@@ -83,6 +83,7 @@ void Log::setVerbosityLevel(const Level& iLevel) {
 void Log::invalidate() {
 	spdlog::drop_all();
 	g_logger.reset();
+	spdlog::shutdown();
 }
 
 auto Log::initiated() -> bool { return g_logger != nullptr; }
@@ -102,12 +103,13 @@ void Log::setPattern() {
 	const std::string console_pattern_rls = "[\033[38;5;31m%T.%e\033[0m] [%^%l%$] %v";
 	if (!initiated())
 		return;
+	const auto& sk = g_logger->sinks();
 	if (m_verbosity == Level::Debug || m_verbosity == Level::Trace) {
-		g_logger->sinks()[0]->set_pattern(console_pattern_dbg);
-		g_logger->sinks()[1]->set_pattern(file_pattern_dbg);
+		sk[0]->set_pattern(console_pattern_dbg);
+		sk[1]->set_pattern(file_pattern_dbg);
 	} else {
-		g_logger->sinks()[0]->set_pattern(console_pattern_rls);
-		g_logger->sinks()[1]->set_pattern(file_pattern_rls);
+		sk[0]->set_pattern(console_pattern_rls);
+		sk[1]->set_pattern(file_pattern_rls);
 	}
 }
 

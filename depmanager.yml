@@ -23,7 +23,7 @@ packages:
     kind: "static"
   spdlog:
     version: 1.16.0
-    kind: "static"
+    kind: "shared"
   stb_image:
     version: 2.28
   vulkan_sdk:

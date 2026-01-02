@@ -28,43 +28,46 @@ foreach (child ${children})
         if ("${SRCS} " STREQUAL " ")
             message(STATUS "Test folder '${child}' is empty, skipping")
         else ()
-            set(${child}_exe ${PROJECT_PREFIX_LOWER}_${child}_unit_test)
-            add_executable(${${child}_exe} ${SRCS})
-            set_target_properties(${${child}_exe} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-            set_target_properties(${${child}_exe} PROPERTIES FOLDER "UnitTests")
-            target_include_directories(${${child}_exe} PUBLIC test_helper)
-            target_link_libraries(${${child}_exe} GTest::gtest)
-            target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
-            if (${child} MATCHES "gui_qt")
-                target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_qt)
-                if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-                    target_compile_options(${${child}_exe} PRIVATE
-                            -Wno-reserved-identifier
-                            -Wno-missing-prototypes
+            if (NOT (${child} MATCHES "gui_qt") OR ${${PROJECT_PREFIX}_ENABLE_QT})
+                set(${child}_exe ${PROJECT_PREFIX_LOWER}_${child}_unit_test)
+                add_executable(${${child}_exe} ${SRCS})
+                set_target_properties(${${child}_exe} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+                set_target_properties(${${child}_exe} PROPERTIES FOLDER "UnitTests")
+                if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test_helper")
+                    target_include_directories(${${child}_exe} PUBLIC test_helper)
+                endif ()
+                target_link_libraries(${${child}_exe} GTest::gtest)
+                target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
+                if (${child} MATCHES "gui_qt")
+                    target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_qt)
+                    if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+                        target_compile_options(${${child}_exe} PRIVATE
+                                -Wno-reserved-identifier
+                                -Wno-missing-prototypes
+                        )
+                    endif ()
+                endif ()
+                if (${child} MATCHES "gui_imgui")
+                    target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_imgui)
+                endif ()
+                set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
+                add_test(${PROJECT_PREFIX_LOWER}_${child}_UTests ${${PROJECT_PREFIX_LOWER}_${child}_test_command})
+                set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES TIMEOUT 3600)
+                if (${PROJECT_PREFIX}_BUILD_SHARED AND WIN32)
+                    add_custom_command(TARGET ${${child}_exe} POST_BUILD
+                            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest$<$<CONFIG:Debug>:d>.dll" "${CMAKE_BINARY_DIR}/bin"
+                            COMMAND_EXPAND_LISTS
                     )
                 endif ()
-            endif ()
-            if (${child} MATCHES "gui_imgui")
-                target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_imgui)
-            endif ()
-            set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
-            add_test(${PROJECT_PREFIX_LOWER}_${child}_UTests ${${PROJECT_PREFIX_LOWER}_${child}_test_command})
-            set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES TIMEOUT 3600)
-            if (${PROJECT_PREFIX}_BUILD_SHARED AND WIN32)
-                add_custom_command(TARGET ${${child}_exe} POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest$<$<CONFIG:Debug>:d>.dll" "${CMAKE_BINARY_DIR}/bin"
-                        COMMAND_EXPAND_LISTS
-                )
-            endif ()
 
-            add_dependencies(All_Tests ${${child}_exe})
-            add_custom_command(TARGET All_Tests POST_BUILD
-                    COMMAND ${${child}_exe}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-        ENDIF ()
-    ENDIF ()
-ENDFOREACH ()
+                add_dependencies(All_Tests ${${child}_exe})
+                add_custom_command(TARGET All_Tests POST_BUILD
+                        COMMAND ${${child}_exe}
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+            endif ()
+        endif ()
+    endif ()
+endforeach ()
 
 if (${PROJECT_PREFIX}_ENABLE_COVERAGE)
 

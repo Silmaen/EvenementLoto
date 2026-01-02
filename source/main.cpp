@@ -6,18 +6,24 @@
  * All modification must get authorization from the author.
  */
 
+#ifdef USE_QT
 #include <QApplication>
 #include <QCommandLineParser>
+#endif
 #include <core/Log.h>
 #include <core/Settings.h>
 #include <core/utilities.h>
 #include <gui_imgui/Application.h>
+#ifdef USE_QT
 #include <gui_qt/MainWindow.h>
 #include <gui_qt/baseDefinitions.h>
+#endif
 
 #include <magic_enum/magic_enum.hpp>
 
+#ifdef USE_QT
 using namespace evl::gui;
+#endif
 using namespace std::filesystem;
 
 auto main(int iArgc, char* iArgv[]) -> int {
@@ -53,6 +59,8 @@ auto main(int iArgc, char* iArgv[]) -> int {
 		// Shutdown
 		app.reset();
 	} else {
+
+#ifdef USE_QT
 		log_info("Utilisation de l'interface Qt");
 		const QApplication app(iArgc, iArgv);
 		QCommandLineParser parser;
@@ -68,6 +76,11 @@ auto main(int iArgc, char* iArgv[]) -> int {
 		window.show();
 		//NOLINTNEXTLINE
 		ret = app.exec();
+#else
+		log_error("L'application n'a pas été compilée avec le support de Qt, impossible de démarrer l'interface "
+				  "graphique.");
+		ret = EXIT_FAILURE;
+#endif
 	}
 	log_info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
 	log_info("---------------------------------------------------------------------------------------");

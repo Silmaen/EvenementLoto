@@ -10,38 +10,28 @@
   ],
   "configurePresets": [
     {
-      "name": "mingw-gcc-release",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
+      "name": "windows-gcc-release",
       "inherits": [
         "toolset-mingw",
         "gcc-release"
       ]
     },
     {
-      "name": "mingw-gcc-debug",
+      "name": "windows-gcc-debug",
       "inherits": [
         "toolset-mingw",
         "gcc-debug"
       ]
     },
     {
-      "name": "mingw-clang-release",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
+      "name": "windows-clang-release",
       "inherits": [
         "toolset-mingw",
         "clang-release"
       ]
     },
     {
-      "name": "mingw-clang-debug",
+      "name": "windows-clang-debug",
       "inherits": [
         "toolset-mingw",
         "clang-debug"

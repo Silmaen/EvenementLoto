@@ -612,10 +612,10 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::Text("Partie:");
 	ImGui::SameLine();
 	if (currentRound == m_currentEvent.endRounds()) {
-		ImGui::Text("");
+		ImGui::Text(" ");
 		ImGui::Text("Phase:");
 		ImGui::SameLine();
-		ImGui::Text("");
+		ImGui::Text(" ");
 		ImGui::Text("Valeur:");
 		ImGui::SameLine();
 		ImGui::Text("0 €");
@@ -643,7 +643,7 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::Separator();
 	ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Border);
 	if (currentRound == m_currentEvent.endRounds()) {
-		ImGui::TextWrapped("");
+		ImGui::TextWrapped(" ");
 	} else if (currentRound->getType() == core::GameRound::Type::Pause) {
 		ImGui::TextWrapped("Pas de lots pour une pause.");
 	} else {
