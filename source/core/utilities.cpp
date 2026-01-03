@@ -44,7 +44,7 @@ void mergeDefaultSettings() {
 	if (g_settings != nullptr) {
 		// General settings
 		if (!g_settings->contains("general/use_imgui")) {
-			g_settings->setValue("general/use_imgui", false);
+			g_settings->setValue("general/use_imgui", true);
 		}
 		if (!g_settings->contains("general/log_level")) {
 			g_settings->setValue("general/log_level", std::string("info"));

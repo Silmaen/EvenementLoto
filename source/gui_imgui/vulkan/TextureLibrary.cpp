@@ -35,7 +35,7 @@ void TextureLibrary::loadTexture(const std::string& iName, const std::filesystem
 	int height{0};
 	int channels{0};
 
-	unsigned char* imageData = stbi_load(iTexturePath.c_str(), &width, &height, &channels, 4);
+	unsigned char* imageData = stbi_load(iTexturePath.string().c_str(), &width, &height, &channels, 4);
 	if (imageData == nullptr) {
 		log_error("Failed to load texture: {} from {}", iName, iTexturePath.string());
 		return;

@@ -7,6 +7,7 @@
   },
   "include": [
     "CMakePresetsBase.json",
+    "CMakePresetsLinux.json",
     "CMakePresetsMinGW.json"
   ],
   "configurePresets": [
@@ -19,123 +20,73 @@
       }
     },
     {
-      "name": "CodeCoverage_gcc",
-      "inherits": "gcc-debug",
+      "name": "linux-coverage-gcc",
+      "inherits": "linux-gcc-debug",
       "cacheVariables": {
         "EVL_ENABLE_COVERAGE": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "CodeCoverage_clang",
-      "inherits": "clang-debug",
+      "name": "linux-coverage-clang",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_COVERAGE": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "CodeCoverage_gcc_mingw",
-      "inherits": "mingw-gcc-debug",
+      "name": "windows-coverage-gcc",
+      "inherits": "windows-gcc-debug",
       "cacheVariables": {
         "EVL_ENABLE_COVERAGE": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
-      "name": "CodeCoverage_clang_mingw",
-      "inherits": "mingw-clang-debug",
+      "name": "windows-coverage-clang",
+      "inherits": "windows-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_COVERAGE": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
-      "name": "clang-tidy",
-      "inherits": "clang-debug",
+      "name": "linux-clang-tidy",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_CLANG_TIDY": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "clang-tidy_mingw",
-      "inherits": "mingw-clang-debug",
+      "name": "windows-clang-tidy",
+      "inherits": "windows-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_CLANG_TIDY": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
       }
     },
     {
-      "name": "sanitizer-address",
-      "inherits": "clang-debug",
+      "name": "linux-sanitizer-address",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_ADDRESS_SANITIZER": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "sanitizer-thread",
-      "inherits": "clang-debug",
+      "name": "linux-sanitizer-thread",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_THREAD_SANITIZER": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "sanitizer-undefined-behavior",
-      "inherits": "clang-debug",
+      "name": "linux-sanitizer-undefined-behavior",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     },
     {
-      "name": "sanitizer-leak",
-      "inherits": "clang-debug",
+      "name": "linux-sanitizer-leak",
+      "inherits": "linux-clang-debug",
       "cacheVariables": {
         "EVL_ENABLE_LEAK_SANITIZER": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
       }
     }
   ]

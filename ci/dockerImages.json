@@ -1,10 +1,10 @@
 {
   "images": {
-    "CodeCoverage": "builder-gcc12-ubuntu2204",
-    "Documentation": "builder-clang15-ubuntu2204",
-    "linux-gcc-release": "builder-gcc12-ubuntu2204",
-    "linux-gcc-debug": "builder-gcc12-ubuntu2204",
-    "linux-clang-release": "builder-clang15-ubuntu2204",
-    "linux-clang-debug": "builder-clang15-ubuntu2204"
+    "CodeCoverage": "builder-gcc14-ubuntu2404",
+    "Documentation": "builder-clang18-ubuntu2404",
+    "linux-gcc-release": "builder-gcc14-ubuntu2404",
+    "linux-gcc-debug": "builder-gcc14-ubuntu2404",
+    "linux-clang-release": "builder-clang18-ubuntu2404",
+    "linux-clang-debug": "builder-clang18-ubuntu2404"
   }
 }

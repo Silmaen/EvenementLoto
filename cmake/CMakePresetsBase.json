@@ -64,20 +64,6 @@
           "toolchain": "MinGW"
         }
       }
-    },
-    {
-      "name": "toolset-wsl",
-      "hidden": true,
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "vendor": {
-        "jetbrains.com/clion": {
-          "toolchain": "WSL"
-        }
-      }
     }
   ]
 }

@@ -14,13 +14,13 @@ project(EvenementLoto VERSION 0.3.2 LANGUAGES CXX)
 #
 option(${PROJECT_PREFIX}_DOC_ONLY "To only generate documentation" OFF)
 option(${PROJECT_PREFIX}_TESTING "To build the tests" ON)
-
+option(${PROJECT_PREFIX}_ENABLE_QT "Enable QT version of the code" OFF)
 
 set(${PROJECT_PREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
 #
 # ---=== Base Configs ===---
 #
-include(cmake/BaseConfig.cmake)
+include(BaseConfig)
 
 
 if (NOT ${PROJECT_PREFIX}_DOC_ONLY)
@@ -46,6 +46,7 @@ endif ()
 #
 # ---=== Packaging ===---
 #
+include(CPackConfig.cmake)
 include(CPack)
 add_custom_target(Package
         DEPENDS ${CMAKE_PROJECT_NAME})
@@ -57,12 +58,16 @@ set(PACKAGE_LOCATION ${PROJECT_BINARY_DIR}/bin)
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     # copy along dlls
     cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
-    foreach (BASE_LIB stdc++-6 gcc_s_seh-1 harfbuzz-0
-            Qt6Core Qt6Gui Qt6Svg Qt6Widgets
-            winpthread-1 b2-1 double-conversion icuin74 icuuc74 pcre2-16-0
-            zlib1 zstd freetype-6 md4c png16-16 icudt74 bz2-1 brotlidec
-            glib-2.0-0 graphite2 intl-8 brotlicommon pcre2-8-0 iconv-2
-    )
+
+    set(BASE_LIBS stdc++-6 gcc_s_seh-1 winpthread-1 zlib1 zstd)
+
+    if (${${PROJECT_PREFIX}_ENABLE_QT})
+        list(APPEND BASE_LIBS Qt6Core Qt6Gui Qt6Svg Qt6Widgets harfbuzz-0 b2-1
+                double-conversion icuin74 icuuc74 pcre2-16-0 zlib1 zstd
+                freetype-6 md4c png16-16 icudt74 bz2-1 brotlidec glib-2.0-0
+                graphite2 intl-8 brotlicommon pcre2-8-0 iconv-)
+    endif ()
+    foreach (BASE_LIB ${BASE_LIBS})
         if (EXISTS ${COMPILER_PATH}/lib${BASE_LIB}.dll)
             add_custom_command(TARGET Package POST_BUILD
                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -78,6 +83,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows")
         endif ()
     endforeach ()
 endif ()
+
 add_custom_command(
         TARGET Package POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/document/Readme.md ${PROJECT_BINARY_DIR}/bin)

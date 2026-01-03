@@ -82,9 +82,10 @@ auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 #endif
 		parentWindow.handle = window;
 	}
+	const std::string mLast = m_lastPath.string();
 	const nfdopendialogu8args_t args{.filterList = ff.data(),
 									 .filterCount = static_cast<nfdfiltersize_t>(ff.size()),
-									 .defaultPath = m_lastPath.c_str(),
+									 .defaultPath = mLast.c_str(),
 									 .parentWindow = parentWindow};
 	if (const auto result = NFD_OpenDialogU8_With(&outPath, &args); result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
@@ -123,9 +124,10 @@ auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::f
 #endif
 		parentWindow.handle = window;
 	}
+	const std::string mLast = m_lastPath.string();
 	const nfdsavedialogu8args_t args{.filterList = ff.data(),
 									 .filterCount = static_cast<nfdfiltersize_t>(ff.size()),
-									 .defaultPath = m_lastPath.c_str(),
+									 .defaultPath = mLast.c_str(),
 									 .defaultName = nullptr,
 									 .parentWindow = parentWindow};
 	if (const auto result = NFD_SaveDialogU8_With(&outPath, &args); result == NFD_CANCEL) {
@@ -163,7 +165,8 @@ auto FileDialog::selectFolder() -> std::filesystem::path {
 #endif
 		parentWindow.handle = window;
 	}
-	const nfdpickfolderu8args_t args{.defaultPath = m_lastPath.c_str(), .parentWindow = parentWindow};
+	const std::string mLast = m_lastPath.string();
+	const nfdpickfolderu8args_t args{.defaultPath = mLast.c_str(), .parentWindow = parentWindow};
 	if (const auto result = NFD_PickFolderU8_With(&outPath, &args); result == NFD_CANCEL) {
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {

@@ -250,7 +250,7 @@ void MainConfigPopups::dataToSettings() {
 	settings.setValue("fade_amount", m_data.fadeAmount);
 	settings.setValue("fade_strength", m_data.fadeStrength);
 	core::getSettings()->include(settings, "gui");
-	core::getSettings()->setValue("general/data_location", std::string{m_data.dataLocation});
+	core::getSettings()->setValue("general/data_location", std::string{m_data.dataLocation.string()});
 }
 
 void MainConfigPopups::settingsToData() {
@@ -320,7 +320,7 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-80);
 		char eventLogo[256] = "";
-		std::strncpy(eventLogo, m_event.getLogo().c_str(), sizeof(eventLogo) - 1);
+		std::strncpy(eventLogo, m_event.getLogo().string().c_str(), sizeof(eventLogo) - 1);
 		if (ImGui::InputText("##EventLogo", eventLogo, sizeof(eventLogo))) {
 			m_event.setLogo(eventLogo);
 		}
@@ -357,7 +357,7 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-80);
 		char orgaLogo[256] = "";
-		std::strncpy(orgaLogo, m_event.getOrganizerLogo().c_str(), sizeof(orgaLogo) - 1);
+		std::strncpy(orgaLogo, m_event.getOrganizerLogo().string().c_str(), sizeof(orgaLogo) - 1);
 		if (ImGui::InputText("##OrgaLogo", orgaLogo, sizeof(orgaLogo))) {
 			m_event.setOrganizerLogo(orgaLogo);
 		}
@@ -695,7 +695,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			ImGui::Text("Condition de victoire:");
 			ImGui::SetNextItemWidth(-1);
 			char subRoundName[256];
-			std::strncpy(subRoundName, subRound->getTypeStr().c_str(), 256);
+			std::strncpy(subRoundName, subRound->getTypeStr().c_str(), 255);
 			ImGui::InputText("##SubRoundName", subRoundName, subRound->getTypeStr().size(),
 							 ImGuiInputTextFlags_ReadOnly);
 
@@ -712,7 +712,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			ImGui::Spacing();
 			ImGui::Text("Liste des lots:");
 			char textPrices[4096];
-			std::strncpy(textPrices, subRound->getPrices().c_str(), 4096);
+			std::strncpy(textPrices, subRound->getPrices().c_str(), 4095);
 			if (ImGui::InputTextMultiline("##TextPrices", textPrices, 4096, ImVec2(-1, -80))) {
 				subRound->define(subRound->getType(), textPrices, subRound->getValue());
 			}
