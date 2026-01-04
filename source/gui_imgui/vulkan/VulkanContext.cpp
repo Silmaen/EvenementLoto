@@ -61,7 +61,8 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 										.queueFamilyIndexCount = 0,
 										.pQueueFamilyIndices = nullptr};
 
-	VulkanContext::checkVkResult(vkCreateBuffer(iVkData.device, &bufferInfo, iVkData.allocator, &oBuffer), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkCreateBuffer(iVkData.device, &bufferInfo, iVkData.allocator, &oBuffer), __FILE__,
+								 __LINE__);
 
 	VkMemoryRequirements memRequirements{};
 	vkGetBufferMemoryRequirements(iVkData.device, oBuffer, &memRequirements);
@@ -72,7 +73,8 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 										 .memoryTypeIndex =
 												 findMemoryType(iVkData, memRequirements.memoryTypeBits, iProperties)};
 
-	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oBufferMemory), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oBufferMemory),
+								 __FILE__, __LINE__);
 	vkBindBufferMemory(iVkData.device, oBuffer, oBufferMemory, 0);
 }
 
@@ -96,7 +98,8 @@ void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iH
 									  .initialLayout = VK_IMAGE_LAYOUT_UNDEFINED};
 
 
-	VulkanContext::checkVkResult(vkCreateImage(iVkData.device, &imageInfo, iVkData.allocator, &oImage),__FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkCreateImage(iVkData.device, &imageInfo, iVkData.allocator, &oImage), __FILE__,
+								 __LINE__);
 
 	VkMemoryRequirements memRequirements{};
 	vkGetImageMemoryRequirements(iVkData.device, oImage, &memRequirements);
@@ -107,7 +110,8 @@ void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iH
 										 .memoryTypeIndex =
 												 findMemoryType(iVkData, memRequirements.memoryTypeBits, iProperties)};
 
-	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oImageMemory), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkAllocateMemory(iVkData.device, &allocInfo, iVkData.allocator, &oImageMemory),
+								 __FILE__, __LINE__);
 	vkBindImageMemory(iVkData.device, oImage, oImageMemory, 0);
 }
 
@@ -126,7 +130,8 @@ auto createImageView(const VkData& iVkData, VkImage iImage, const VkFormat iForm
 															  .layerCount = 1}};
 
 	VkImageView imageView = VK_NULL_HANDLE;
-	VulkanContext::checkVkResult(vkCreateImageView(iVkData.device, &viewInfo, iVkData.allocator, &imageView), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkCreateImageView(iVkData.device, &viewInfo, iVkData.allocator, &imageView), __FILE__,
+								 __LINE__);
 	return imageView;
 }
 
@@ -151,7 +156,8 @@ auto createTextureSampler(const VkData& iVkData) -> VkSampler {
 											  .unnormalizedCoordinates = VK_FALSE};
 
 	VkSampler sampler = VK_NULL_HANDLE;
-	VulkanContext::checkVkResult(vkCreateSampler(iVkData.device, &samplerInfo, iVkData.allocator, &sampler), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkCreateSampler(iVkData.device, &samplerInfo, iVkData.allocator, &sampler), __FILE__,
+								 __LINE__);
 	return sampler;
 }
 
@@ -187,8 +193,8 @@ void endSingleTimeCommands(const VkData& iVkData, VkCommandBuffer iCommandBuffer
 								  .signalSemaphoreCount = 0,
 								  .pSignalSemaphores = nullptr};
 
-	VulkanContext::checkVkResult(vkQueueSubmit(iVkData.queue, 1, &submitInfo, VK_NULL_HANDLE), __FILE__,  __LINE__);
-	VulkanContext::checkVkResult(vkQueueWaitIdle(iVkData.queue), __FILE__,  __LINE__);
+	VulkanContext::checkVkResult(vkQueueSubmit(iVkData.queue, 1, &submitInfo, VK_NULL_HANDLE), __FILE__, __LINE__);
+	VulkanContext::checkVkResult(vkQueueWaitIdle(iVkData.queue), __FILE__, __LINE__);
 
 	vkFreeCommandBuffers(iVkData.device, iVkData.commandPool, 1, &iCommandBuffer);
 }
@@ -291,7 +297,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
 		properties.resize(properties_count);
 		err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, properties.data());
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 
 		// Enable required extensions
 		std::vector<const char*> instanceExtensions = iInstanceExtensions;
@@ -316,7 +322,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		create_info.enabledExtensionCount = static_cast<uint32_t>(instanceExtensions.size());
 		create_info.ppEnabledExtensionNames = instanceExtensions.data();
 		err = vkCreateInstance(&create_info, m_data.allocator, &m_data.instance);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 #ifdef IMGUI_IMPL_VULKAN_USE_VOLK
 		volkLoadInstance(g_Instance);
 #endif
@@ -337,7 +343,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		debug_report_ci.pUserData = nullptr;
 		err = f_vkCreateDebugReportCallbackEXT(m_data.instance, &debug_report_ci, m_data.allocator,
 											   &m_data.debugReport);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 #endif
 	}
 
@@ -378,7 +384,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		create_info.enabledExtensionCount = static_cast<uint32_t>(device_extensions.size());
 		create_info.ppEnabledExtensionNames = device_extensions.data();
 		err = vkCreateDevice(m_data.physicalDevice, &create_info, m_data.allocator, &m_data.device);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 		vkGetDeviceQueue(m_data.device, m_data.queueFamily, 0, &m_data.queue);
 	}
 
@@ -397,7 +403,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
 		pool_info.pPoolSizes = pool_sizes.data();
 		err = vkCreateDescriptorPool(m_data.device, &pool_info, m_data.allocator, &m_data.descriptorPool);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 	}
 	// Create Command Pool
 	{
@@ -406,7 +412,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 											   .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
 											   .queueFamilyIndex = m_data.queueFamily};
 		err = vkCreateCommandPool(m_data.device, &poolInfo, m_data.allocator, &m_data.commandPool);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 		log_info("[vulkan] Command pool created.");
 	}
 	log_info("[vulkan] Vulkan context initialized.");
@@ -491,25 +497,25 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 	if (err == VK_ERROR_OUT_OF_DATE_KHR)
 		return;
 	if (err != VK_SUBOPTIMAL_KHR)
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 
 	const ImGui_ImplVulkanH_Frame* fd = &wd->Frames[static_cast<int>(wd->FrameIndex)];
 	{
 		err = vkWaitForFences(m_data.device, 1, &fd->Fence, VK_TRUE,
 							  UINT64_MAX);// wait indefinitely instead of periodically checking
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 
 		err = vkResetFences(m_data.device, 1, &fd->Fence);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 	}
 	{
 		err = vkResetCommandPool(m_data.device, fd->CommandPool, 0);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 		VkCommandBufferBeginInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		info.flags |= VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 		err = vkBeginCommandBuffer(fd->CommandBuffer, &info);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 	}
 	{
 		VkRenderPassBeginInfo info = {};
@@ -541,9 +547,9 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 		info.pSignalSemaphores = &render_complete_semaphore;
 
 		err = vkEndCommandBuffer(fd->CommandBuffer);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 		err = vkQueueSubmit(m_data.queue, 1, &info, fd->Fence);
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 	}
 	if (oRebuildSwapChain)
 		return;
@@ -560,7 +566,7 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 	if (err == VK_ERROR_OUT_OF_DATE_KHR)
 		return;
 	if (err != VK_SUBOPTIMAL_KHR)
-		checkVkResult(err, __FILE__,  __LINE__);
+		checkVkResult(err, __FILE__, __LINE__);
 	wd->SemaphoreIndex = (wd->SemaphoreIndex + 1) % wd->SemaphoreCount;// Now we can use the next set of semaphores
 }
 
@@ -627,6 +633,9 @@ auto VulkanContext::getImagePixels(const uint64_t iTextureId) const -> std::vect
 		return pixels;
 	}
 
+	// AJOUT: Attendre que le GPU ait fini tous les rendus en cours
+	vkQueueWaitIdle(m_data.queue);
+
 	const auto& texture = it->second;
 	const auto info = getImageInfo(iTextureId);
 	const VkDeviceSize imageSize = static_cast<VkDeviceSize>(info.width) * static_cast<VkDeviceSize>(info.height) * 4;
@@ -640,8 +649,24 @@ auto VulkanContext::getImagePixels(const uint64_t iTextureId) const -> std::vect
 
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands(m_data);
 
-	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-						  VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	// Transition avec barrière explicite
+	VkImageMemoryBarrier barrier{.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+								 .pNext = nullptr,
+								 .srcAccessMask = VK_ACCESS_SHADER_READ_BIT,
+								 .dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT,
+								 .oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+								 .newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+								 .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								 .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+								 .image = texture.image,
+								 .subresourceRange = {.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+													  .baseMipLevel = 0,
+													  .levelCount = 1,
+													  .baseArrayLayer = 0,
+													  .layerCount = 1}};
+
+	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0,
+						 nullptr, 0, nullptr, 1, &barrier);
 
 	const VkBufferImageCopy region{.bufferOffset = 0,
 								   .bufferRowLength = 0,
@@ -656,10 +681,16 @@ auto VulkanContext::getImagePixels(const uint64_t iTextureId) const -> std::vect
 	vkCmdCopyImageToBuffer(commandBuffer, texture.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, stagingBuffer, 1,
 						   &region);
 
-	endSingleTimeCommands(m_data, commandBuffer);
+	// Retour au layout original avec barrière
+	barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+	barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+	barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
 
-	transitionImageLayout(m_data, texture.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
-						  VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
+						 nullptr, 0, nullptr, 1, &barrier);
+
+	endSingleTimeCommands(m_data, commandBuffer);
 
 	pixels.resize(imageSize);
 	void* data = nullptr;
@@ -671,6 +702,30 @@ auto VulkanContext::getImagePixels(const uint64_t iTextureId) const -> std::vect
 	vkFreeMemory(m_data.device, stagingBufferMemory, m_data.allocator);
 
 	return pixels;
+}
+
+void VulkanContext::unloadImage(const uint64_t iTextureId) {
+	const auto it = m_textures.find(iTextureId);
+	if (it == m_textures.end()) {
+		log_error("Texture ID {} not found", iTextureId);
+		return;
+	}
+
+	auto& [image, memory, imageView, sampler, descriptorSet, infos] = it->second;
+
+	if (descriptorSet != VK_NULL_HANDLE)
+		vkFreeDescriptorSets(m_data.device, m_data.descriptorPool, 1, &descriptorSet);
+	if (sampler != VK_NULL_HANDLE)
+		vkDestroySampler(m_data.device, sampler, m_data.allocator);
+	if (imageView != VK_NULL_HANDLE)
+		vkDestroyImageView(m_data.device, imageView, m_data.allocator);
+	if (image != VK_NULL_HANDLE)
+		vkDestroyImage(m_data.device, image, m_data.allocator);
+	if (memory != VK_NULL_HANDLE)
+		vkFreeMemory(m_data.device, memory, m_data.allocator);
+
+	m_textures.erase(it);
+	log_info("[vulkan] Texture {} unloaded", iTextureId);
 }
 
 

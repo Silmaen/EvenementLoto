@@ -42,23 +42,41 @@ void renderTitle(const std::string& iTitle, const math::vec2& iRegion, const flo
 void drawImage(const std::string& iTextureName, const math::vec2& iPosition, const math::vec2& iSize) {
 	auto& app = Application::get();
 	const auto& texLib = app.getTextureLibrary();
-	const uint64_t texId = texLib.getTextureId(iTextureName);
-	ImGui::SetCursorPos({iPosition.x(), iPosition.y()});
-	if (texId != 0) {
-		utils::adaptTextToRegion("<image>", {.autoRegion = false,
-											 .contentSize = iSize,
-											 .vCenter = true,
-											 .hCenter = true,
-											 .drawText = true,
-											 .textAdapt = ""});
 
+	if (const uint64_t texId = texLib.getTextureId(iTextureName); texId != 0) {
+		const auto imgInfo = texLib.getRawPixels(iTextureName);
+		const auto scale =
+				std::min(iSize.x() / static_cast<float>(imgInfo.width), iSize.y() / static_cast<float>(imgInfo.height));
+		const ImVec2 adaptedSize = {static_cast<float>(imgInfo.width) * scale,
+									static_cast<float>(imgInfo.height) * scale};
+		ImGui::SetCursorPos({iPosition.x() + (iSize.x() - adaptedSize.x) * 0.5f,
+							 iPosition.y() + (iSize.y() - adaptedSize.y) * 0.5f});
+		ImGui::Image(texId, adaptedSize);
 	} else {
+		ImGui::SetCursorPos({iPosition.x(), iPosition.y()});
 		utils::adaptTextToRegion("<no logo>", {.autoRegion = false,
 											   .contentSize = iSize,
 											   .vCenter = true,
 											   .hCenter = true,
 											   .drawText = true,
 											   .textAdapt = ""});
+	}
+}
+
+void loadEventImages(const core::Event& iEvent) {
+	auto& app = Application::get();
+	auto& texLib = app.getTextureLibrary();
+	// Organizer logo
+	if (const std::string organizerLogoPath = iEvent.getOrganizerLogoFull().string(); !organizerLogoPath.empty()) {
+		if (texLib.getOrLoadTextureId("logo_organizer", organizerLogoPath) == 0) {
+			log_warning("Failed to load organizer logo from '{}'", organizerLogoPath);
+		}
+	}
+	// Event logo
+	if (const std::string eventLogoPath = iEvent.getLogoFull().string(); !eventLogoPath.empty()) {
+		if (texLib.getOrLoadTextureId("logo_event", eventLogoPath) == 0) {
+			log_warning("Failed to load event logo from '{}'", eventLogoPath);
+		}
 	}
 }
 
@@ -74,6 +92,7 @@ void DisplayView::onUpdate() {
 	applyCommonStyle();
 	auto& app = Application::get();
 	m_currentEvent = app.getCurrentEvent();
+	loadEventImages(m_currentEvent);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_None;
 	const auto monitors = app.getMonitorsInfo();
 	if (monitors.size() < 2 && m_fullscreen) {
@@ -280,7 +299,7 @@ void DisplayView::renderRoundReady() const {
 							  style.ItemSpacing.y * 2 + style.FramePadding.y + style.SeparatorTextPadding.y * 2.0f;
 
 	ImGui::SetCursorPosX((region.x() - frameWidth) * 0.5f);
-	if (ImGui::BeginChild("RoundInfoFrame", {frameWidth, frameHeight}, ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("RoundInfoFrame", {frameWidth, frameHeight}, ImGuiChildFlags_Borders)) {
 		// SubRound prices
 		if (price_scale > 0.0f)
 			ImGui::SetWindowFontScale(price_scale);
@@ -343,7 +362,7 @@ void DisplayView::renderRoundRunning() const {
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.05f);
 	const auto nextPos = ImGui::GetCursorPosY() + contentHeight;
 	// Left panel - Number grid
-	if (ImGui::BeginChild("NumberGridPanel", {leftPanelWidth, contentHeight}, ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("NumberGridPanel", {leftPanelWidth, contentHeight}, ImGuiChildFlags_Borders)) {
 		// Render 9x10 grid
 		const ImVec2 availWidth = ImGui::GetContentRegionAvail();
 		const math::vec2 spacing = gui_settings.getValue("grid_button_spacing", math::vec2{4.0f, 4.0f});
@@ -400,7 +419,7 @@ void DisplayView::renderRoundRunning() const {
 	ImGui::SameLine();
 
 	// Right panel - Info and display
-	if (ImGui::BeginChild("InfoPanel", {0, 0}, ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("InfoPanel", {0, 0}, ImGuiChildFlags_Borders)) {
 		auto fullWidth = ImGui::GetContentRegionAvail().x;
 		// Current draw
 		ImGui::Text("Numéro tiré");

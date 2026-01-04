@@ -59,14 +59,8 @@ public:
 	 * @param iTexturePath The texture file path.
 	 * @return The texture ID.
 	 */
-	[[nodiscard]]
-	auto getOrLoadTextureId(const std::string& iName, const std::filesystem::path& iTexturePath) -> uint64_t {
-		if (const auto id = getTextureId(iName); id != 0) {
-			return id;
-		}
-		loadTexture(iName, iTexturePath);
-		return getTextureId(iName);
-	}
+	[[nodiscard]] auto getOrLoadTextureId(const std::string& iName, const std::filesystem::path& iTexturePath)
+			-> uint64_t;
 
 	struct Pixels {
 		std::vector<uint8_t> data;
@@ -74,11 +68,28 @@ public:
 		uint32_t height{0};
 		uint32_t channels{0};
 	};
-	auto getRawPixels(const std::string& iName) -> Pixels;
+	auto getRawPixels(const std::string& iName) const -> Pixels;
 
 private:
 	/// Texture map.
 	std::unordered_map<std::string, uint64_t> m_textureMap;
+	std::unordered_map<std::string, std::filesystem::path> m_texturePaths;
+
+	/**
+	 * @brief Load a texture from SVG file.
+	 * @param iName The texture name.
+	 * @param iTexturePath The SVG file path.
+	 * @param iWidth The output image width in pixels.
+	 * @param iHeight The output image height in pixels.
+	 */
+	void loadSvgTexture(const std::string& iName, const std::filesystem::path& iTexturePath, uint32_t iWidth,
+						uint32_t iHeight);
+	/**
+	 * @brief Load a texture from SVG file.
+	 * @param iName The texture name.
+	 * @param iTexturePath The SVG file path.
+	 */
+	void loadImageTexture(const std::string& iName, const std::filesystem::path& iTexturePath);
 };
 
 }// namespace evl::gui_imgui::vulkan

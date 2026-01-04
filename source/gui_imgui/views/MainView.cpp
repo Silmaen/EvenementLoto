@@ -27,7 +27,6 @@ constexpr float g_minBottomPanelHeight = 200.0f;
 
 constexpr float g_commandSectionHeight = 150.0f;
 
-
 MainView::MainView(core::Event& iEvent) : m_currentEvent{iEvent} {}
 
 MainView::~MainView() = default;
@@ -493,6 +492,7 @@ void MainView::renderBottomPanel() {
 		ImGui::EndTabBar();
 	}
 }
+
 void MainView::renderBottomConfigPanel() {
 	ImGui::BeginChild("ConfigContent", {0, 0}, ImGuiChildFlags_None);
 
@@ -568,7 +568,7 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::Text("%u",
 				currentRound == m_currentEvent.endRounds() ? 0 : static_cast<uint32_t>(currentRound->drawsCount()));
 	ImGui::Spacing();
-	ImGui::BeginChild("DrawsList", {drawWidth, 0}, ImGuiChildFlags_Border);
+	ImGui::BeginChild("DrawsList", {drawWidth, 0}, ImGuiChildFlags_Borders);
 	if (currentRound == m_currentEvent.endRounds() || currentRound->drawsCount() == 0) {
 		ImGui::TextWrapped("Aucun tirage effectué.");
 	} else {
@@ -583,7 +583,7 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::BeginGroup();
 	ImGui::Text("Timing");
 	ImGui::Separator();
-	ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Border);
+	ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Borders);
 	if (currentRound == m_currentEvent.endRounds()) {
 		ImGui::Text("Début:");
 		ImGui::SameLine();
@@ -608,7 +608,7 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::BeginGroup();
 	ImGui::Text("Partie en cours");
 	ImGui::Separator();
-	ImGui::BeginChild("OngoingRound", {roundWidth, 0}, ImGuiChildFlags_Border);
+	ImGui::BeginChild("OngoingRound", {roundWidth, 0}, ImGuiChildFlags_Borders);
 	ImGui::Text("Partie:");
 	ImGui::SameLine();
 	if (currentRound == m_currentEvent.endRounds()) {
@@ -641,7 +641,7 @@ void MainView::renderBottomStatisticsPanel() const {
 	ImGui::BeginGroup();
 	ImGui::Text("Lots");
 	ImGui::Separator();
-	ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Border);
+	ImGui::BeginChild("PrizesList", {pricesWidth, 0}, ImGuiChildFlags_Borders);
 	if (currentRound == m_currentEvent.endRounds()) {
 		ImGui::TextWrapped(" ");
 	} else if (currentRound->getType() == core::GameRound::Type::Pause) {
