@@ -36,8 +36,10 @@ auto getOffset(const int iNbButtons) -> float {
 
 }// namespace
 
-
-MainConfigPopups::MainConfigPopups() = default;
+MainConfigPopups::MainConfigPopups() {
+	settingsToData();
+	dataToSettings();
+}
 
 MainConfigPopups::~MainConfigPopups() = default;
 
@@ -326,8 +328,9 @@ void EventConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("...##SearchEventLogo")) {
-			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty())
+			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
 				m_event.setLogo(path.string());
+			}
 		}
 		ImGui::NextColumn();
 
@@ -363,8 +366,9 @@ void EventConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("...##SearchOrgaLogo")) {
-			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty())
-				m_event.setLogo(path.string());
+			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
+				m_event.setOrganizerLogo(path.string());
+			}
 		}
 		ImGui::NextColumn();
 
@@ -549,7 +553,7 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		}
 	}
 	// Section résultats (GroupResult)
-	if (ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Borders)) {
 		renderResult();
 		ImGui::Separator();
 		ImGui::Spacing();
@@ -593,7 +597,7 @@ void GameRoundConfigPopups::toCurrentEvent() const {
 }
 
 void GameRoundConfigPopups::renderFirstColumn() {
-	if (ImGui::BeginChild("GroupGameRound", ImVec2(0, 0), ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("GroupGameRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
 		ImGui::Text("Liste des Parties");
 		ImGui::Separator();
 
@@ -635,7 +639,7 @@ void GameRoundConfigPopups::renderFirstColumn() {
 void GameRoundConfigPopups::renderSecondColumn() {
 	const auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
 
-	if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
 		ImGui::Text("Phases de la partie");
 		ImGui::Separator();
 
@@ -684,7 +688,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 
 	const auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
 
-	if (ImGui::BeginChild("GroupPhase", ImVec2(0, 0), ImGuiChildFlags_Border)) {
+	if (ImGui::BeginChild("GroupPhase", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
 		ImGui::Text("Configuration de la phase:");
 		ImGui::Separator();
 
@@ -758,7 +762,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 		ImGui::SameLine();
 		ImGui::Checkbox("Plein écran", &previewFullScreen);
 		if (previewEnabled) {
-			const auto dv = std::static_pointer_cast<views::DisplayView>(app.getView("display_window"));
+			const auto dv = std::static_pointer_cast<DisplayView>(app.getView("display_window"));
 			dv->setFullscreen(previewFullScreen);
 			dv->setEventToRender(m_event, m_selectedGameRound, m_selectedSubRound);
 		}
@@ -768,7 +772,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 
 void GameRoundConfigPopups::renderResult() {
 	if (const float resultHeight = ImGui::GetContentRegionAvail().y - 50;
-		ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Border)) {
+		ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Borders)) {
 
 		ImGui::Text("Résultats de la partie");
 		ImGui::Separator();

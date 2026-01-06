@@ -5,7 +5,7 @@ Gathering all action implementations for easy access.
 import logging
 from pathlib import Path
 
-from .run_utils import run_command
+from .run_utils import run_command, MODE_FOR_NINJA, MODE_BY_COLOR
 
 log = logging.getLogger(__name__)
 here = Path(__file__).resolve().parent
@@ -46,7 +46,7 @@ def build_project(preset: str) -> int:
     """
     log.info(f"Building project with preset: {preset}")
     # run cmake configure, capture output in real-time, and print it using logging
-    configure = run_command(["cmake", "--preset", preset, "-S", str(root)])
+    configure = run_command(["cmake", "--preset", preset, "-S", str(root)], MODE_BY_COLOR)
     if configure != 0:
         log.error("CMake configuration failed.")
         return configure
@@ -54,7 +54,7 @@ def build_project(preset: str) -> int:
     if not build_dir.exists():
         log.error(f"Build directory does not exist: {build_dir}")
         return 1
-    build = run_command(["cmake", "--build", str(build_dir)])
+    build = run_command(["cmake", "--build", str(build_dir)], MODE_FOR_NINJA)
     if build != 0:
         log.error("CMake build failed.")
         return build

@@ -110,16 +110,15 @@ public:
 	 * @param iChannels The number of channels.
 	 * @return The image ID.
 	 */
-	[[nodiscard]]
-	auto loadImage(const unsigned char* iImageData, uint32_t iWidth, uint32_t iHeight, uint32_t iChannels) -> uint64_t;
+	[[nodiscard]] auto loadImage(const unsigned char* iImageData, uint32_t iWidth, uint32_t iHeight, uint32_t iChannels)
+			-> uint64_t;
 
 	/**
 	 * @brief Check if a texture ID is valid.
 	 * @param iTextureId The texture ID.
 	 * @return True if the texture ID is valid.
 	 */
-	[[nodiscard]]
-	auto isTextureValid(const uint64_t iTextureId) const -> bool {
+	[[nodiscard]] auto isTextureValid(const uint64_t iTextureId) const -> bool {
 		return m_textures.contains(iTextureId);
 	}
 
@@ -128,16 +127,20 @@ public:
 	 * @param iTextureId The texture ID.
 	 * @return The image information.
 	 */
-	[[nodiscard]]
-	auto getImageInfo(uint64_t iTextureId) const -> ImageInfo;
+	[[nodiscard]] auto getImageInfo(uint64_t iTextureId) const -> ImageInfo;
 
 	/**
 	 * @brief Get image pixel data.
 	 * @param iTextureId The texture ID.
 	 * @return The image pixel data.
 	 */
-	[[nodiscard]]
-	auto getImagePixels(uint64_t iTextureId) const -> std::vector<unsigned char>;
+	[[nodiscard]] auto getImagePixels(uint64_t iTextureId) const -> std::vector<unsigned char>;
+
+	/**
+	 * @brief Unload an image.
+	 * @param iTextureId The texture ID.
+	 */
+	void unloadImage(uint64_t iTextureId);
 
 private:
 	/**

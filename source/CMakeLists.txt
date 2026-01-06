@@ -101,6 +101,10 @@ find_package(stb_image REQUIRED)
 message(STATUS "Found stb_image: ${stb_image_DIR} (found version: ${stb_image_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE stb_image::stb_image)
 
+find_package(NanoSVG REQUIRED)
+message(STATUS "Found nanosvg: ${nanosvg_DIR} (found version: ${nanosvg_VERSION})")
+target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE NanoSVG::nanosvg)
+
 find_package(nfd REQUIRED)
 message(STATUS "Found nfd: ${nfd_DIR}")
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE nfd::nfd)

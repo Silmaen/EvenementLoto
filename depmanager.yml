@@ -11,18 +11,21 @@ packages:
     version: 1.17.0
     kind: "static"
   imgui:
-    version: 1.92.4-docking
+    version: 1.92.5-docking
     kind: "shared"
   jsoncpp:
     version: 1.9.6
     kind: "static"
   magic_enum:
     version: 0.9.7
+  nanosvg:
+    version: 1.0.0
+    kind: "static"
   nfd:
     version: 1.2.1
     kind: "static"
   spdlog:
-    version: 1.16.0
+    version: 1.17.0
     kind: "shared"
   stb_image:
     version: 2.28
