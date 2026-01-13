@@ -159,18 +159,30 @@ void Application::onEvent(event::Event& ioEvent) {
 		if (ioEvent.handled)
 			return;
 		action->onEvent(ioEvent);
+		if (ioEvent.handled) {
+			log_debug("Event handled by action '{}'.", action->getName());
+			return;
+		}
 	}
 	// does any popup handle the event?
 	for (const auto& popup: m_popups) {
 		if (ioEvent.handled)
 			return;
 		popup->onEvent(ioEvent);
+		if (ioEvent.handled) {
+			log_debug("Event handled by popup '{}'.", popup->getName());
+			return;
+		}
 	}
 	// does any view handle the event?
 	for (const auto& view: m_views) {
 		if (ioEvent.handled)
 			return;
 		view->onEvent(ioEvent);
+		if (ioEvent.handled) {
+			log_debug("Event handled by view '{}'.", view->getName());
+			return;
+		}
 	}
 	m_mainWindow.onEvent(ioEvent);
 }

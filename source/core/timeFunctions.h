@@ -32,9 +32,23 @@ template<class T>
 constexpr auto floorMinutes(const T& iTimePoint) -> T {
 	return std::chrono::floor<std::chrono::minutes>(iTimePoint);
 }
+/**
+ * @brief Récupère les secondes d’un point dans le temps.
+ * @param iTimePoint Le point dans le temps
+ * @return Le nombre de secondes (0-59)
+ */
 constexpr auto getSeconds(const time_point& iTimePoint) -> uint32_t {
 	return static_cast<uint32_t>(
 			std::chrono::duration_cast<std::chrono::seconds>(iTimePoint - floorMinutes(iTimePoint)).count());
+}
+
+/**
+ * @brief Récupère la durée en secondes.
+ * @param iDuration La durée
+ * @return La durée en secondes
+ */
+constexpr auto durationSeconds(const duration& iDuration) -> double {
+	return static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(iDuration).count()) / 1000.0;
 }
 
 /**

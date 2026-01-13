@@ -126,19 +126,19 @@ public:
 /**
  * @brief Event of key typed
  */
-class KeyTypedEvent final : public KeyEvent {
+class KeyTypedEvent final : public Event {
 public:
 	/**
 	 * @brief Constructor.
 	 * @param[in] iKeyCode Code of the key typed.
 	 */
-	explicit KeyTypedEvent(const KeyCode iKeyCode) : KeyEvent(iKeyCode) {}
+	explicit KeyTypedEvent(const char32_t iKeyCode) : m_codepoint(iKeyCode) {}
 
 	/**
 	 * @brief Get the event as string.
 	 * @return String of the event.
 	 */
-	[[nodiscard]] auto toString() const -> std::string override { return std::format("KeyTypedEvent: {}", m_keyCode); }
+	[[nodiscard]] auto toString() const -> std::string override { return std::format("KeyTypedEvent: {}", getChar()); }
 
 	/**
 	 * @brief Get the event's name.
@@ -157,6 +157,41 @@ public:
 	 * @return Event's type.
 	 */
 	[[nodiscard]] auto getType() const -> Type override { return getStaticType(); }
+
+	/**
+	 * @brief Get the event's category flags.
+	 * @return Event's category flags.
+	 */
+	[[nodiscard]] auto getCategoryFlags() const -> uint8_t override;
+	/**
+	 * @brief Get the codepoint of the key typed.
+	 * @return The codepoint.
+	 */
+	[[nodiscard]] auto getCodepoint() const -> char32_t { return m_codepoint; }
+
+	/**
+	 * @brief Get the character of the key typed.
+	 * @return The character.
+	 */
+	[[nodiscard]] auto getChar() const -> std::string {
+		// Conversion UTF-32 vers UTF-8
+		std::string result;
+		if (m_codepoint < 0x80) {
+			result += static_cast<char>(m_codepoint);
+		} else if (m_codepoint < 0x800) {
+			result += static_cast<char>(0xC0 | (m_codepoint >> 6));
+			result += static_cast<char>(0x80 | (m_codepoint & 0x3F));
+		} else if (m_codepoint < 0x10000) {
+			result += static_cast<char>(0xE0 | (m_codepoint >> 12));
+			result += static_cast<char>(0x80 | ((m_codepoint >> 6) & 0x3F));
+			result += static_cast<char>(0x80 | (m_codepoint & 0x3F));
+		}
+		return result;
+	}
+
+private:
+	/// The codepoint of the key typed.
+	char32_t m_codepoint;
 };
 
 }// namespace evl::gui_imgui::event
