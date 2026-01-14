@@ -319,6 +319,12 @@ public:
 	 */
 	[[nodiscard]] auto isEditable() const -> bool;
 
+	/**
+	 * @brief Vérifie si l’événement est fini.
+	 * @return True si l’événement est fini.
+	 */
+	[[nodiscard]] auto isFinished() const -> bool { return m_status == Status::Finished; }
+
 	// ---- accès aux timers ----
 	/**
 	 * @brief Accès à la date de départ

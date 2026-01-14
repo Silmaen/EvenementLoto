@@ -101,9 +101,9 @@ Le programme a été correctement compilé avec :
         * [X] Police d'écriture adaptative
         * [X] Meilleure différence de contraste entre numéro tiré et non tiré
 * moteur de jeu
-    * [ ] Flexibilité en jeu
-        * [ ] permettre de réorganiser les parties non entamées
-        * [ ] permettre l'édition de parties non entamée
+    * [X] Flexibilité en jeu
+        * [X] permettre de réorganiser les parties non entamées
+        * [X] permettre l'édition de parties non entamée
 * Sauvegarde et restauration
     * [X] mettre à jour les import json
     * [ ] Permettre l'import/export au format YAML

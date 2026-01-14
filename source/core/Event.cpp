@@ -264,21 +264,43 @@ void Event::setRules(const std::string& iNewRules) {
 
 // ----- Manipulation des rounds ----
 void Event::pushGameRound(const GameRound& iRound) {
-	if (!isEditable())
+	if (isFinished()) {
+		log_warn("Impossible d'ajouter un round d'un événement terminé");
 		return;
+	}
 	m_gameRounds.push_back(iRound);
 	checkValidConfig();
 }
 
 void Event::deleteRoundByIndex(const uint16_t& iIndex) {
-	if (!isEditable())
+	if (isFinished()) {
+		log_warn("Impossible de supprimer un round d'un événement terminé");
 		return;
+	}
+	if (iIndex >= m_gameRounds.size()) {
+		log_warn("Index de round à supprimer hors limite");
+		return;
+	}
+	if (!m_gameRounds[iIndex].isEditable()) {
+		log_warn("Impossible de supprimer un round non éditable");
+		return;
+	}
 	m_gameRounds.erase(std::next(m_gameRounds.begin(), iIndex));
 }
 
 void Event::swapRoundByIndex(const uint16_t& iIndex, const uint16_t& iIndex2) {
-	if (!isEditable())
+	if (isFinished()) {
+		log_warn("Impossible de permuter des rounds d'un événement terminé");
 		return;
+	}
+	if (iIndex >= m_gameRounds.size() || iIndex2 >= m_gameRounds.size()) {
+		log_warn("Index de round à permuter hors limite");
+		return;
+	}
+	if (!m_gameRounds[iIndex].isEditable() || !m_gameRounds[iIndex2].isEditable()) {
+		log_warn("Impossible de permuter des rounds non éditables");
+		return;
+	}
 	std::swap(m_gameRounds[iIndex], m_gameRounds[iIndex2]);
 }
 

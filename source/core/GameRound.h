@@ -7,6 +7,7 @@
  */
 #pragma once
 
+#include "Log.h"
 #include "Serializable.h"
 #include "SubGameRound.h"
 #include <filesystem>
@@ -238,7 +239,13 @@ public:
 	 * @brief Défini le numéro de partie
 	 * @param iId Le numéro de partie
 	 */
-	void setId(const int iId) { m_id = iId; }
+	void setId(const int iId) {
+		if (!isEditable()) {
+			log_warn("Impossible de modifier l'identifiant d'une partie non éditable");
+			return;
+		}
+		m_id = iId;
+	}
 
 	/**
 	 * @brief Renvoie le numéro d'affichage de la partie
@@ -297,8 +304,17 @@ public:
 				[](draws_type::size_type iAccu, const auto& iItem) -> auto { return iAccu + iItem.getDraws().size(); });
 	}
 
+	/**
+	 * @brief Défini le diaporama pour la pause
+	 * @param iPath Le chemin du diaporama
+	 * @param iDelai Le délai entre chaque image
+	 */
 	void setDiapo(const std::string& iPath, double iDelai);
 
+	/**
+	 * @brief Renvoie le diaporama et son délai
+	 * @return Le chemin du diaporama et le délai
+	 */
 	[[nodiscard]] auto getDiapo() const -> std::tuple<std::filesystem::path, double>;
 
 	/**
@@ -314,6 +330,11 @@ public:
 	 * @return Pointeur vers la sous-partie courante
 	 */
 	auto getCurrentSubRound() -> sub_rounds_type::iterator;
+	/**
+	 * @brief Determine si la partie peut être éditée.
+	 * @return True si la partie est éditable
+	 */
+	[[nodiscard]] auto isEditable() const -> bool;
 
 private:
 	/// Le numéro de la partie (à ne pas afficher si négatif)
@@ -340,13 +361,6 @@ private:
 	/// Diaporama delay (only in pause)
 	double m_diapoDelay = 0;
 	// ---------------- private functions ----------------
-
-
-	/**
-	 * @brief Determine si la partie peut être éditée.
-	 * @return True si la partie est éditable
-	 */
-	[[nodiscard]] auto isEditable() const -> bool;
 };
 
 }// namespace evl::core
