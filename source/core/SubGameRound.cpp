@@ -176,7 +176,6 @@ void SubGameRound::fromJson(const Json::Value& iJson) {
 	}
 }
 
-
 auto SubGameRound::toYaml() const -> YAML::Node {
 	YAML::Node node;
 	node["type"] = getTypeStr();

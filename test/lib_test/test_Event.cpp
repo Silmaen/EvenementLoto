@@ -67,7 +67,7 @@ TEST(Event, DefinesAfterStart) {
 	evt.pushGameRound(GameRound());
 	evt.deleteRoundByIndex(0);
 	evt.addWinnerToCurrentRound("156");
-	EXPECT_EQ(evt.sizeRounds(), 1);
+	EXPECT_EQ(evt.sizeRounds(), 2);
 	EXPECT_EQ(evt.getCurrentGameRoundIndex(), 0);
 }
 

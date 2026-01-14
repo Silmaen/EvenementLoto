@@ -7,6 +7,7 @@
 */
 #pragma once
 
+#include "Log.h"
 #include "Serializable.h"
 #include "timeFunctions.h"
 
@@ -58,6 +59,10 @@ public:
 	 * @param iValue La valeur des lots
 	 */
 	void define(const Type& iType, const std::string& iPrices = "", const double iValue = 0) {
+		if (!isEditable()) {
+			log_warn("Impossible de modifier une sous-partie non éditable");
+			return;
+		}
 		m_type = iType;
 		m_prices = iPrices;
 		m_pricesValue = iValue;
@@ -206,6 +211,12 @@ public:
 	 * @return La date de fin
 	 */
 	[[nodiscard]] auto getEnding() const -> const time_point& { return m_end; }
+
+	/**
+	 * @brief Renvoie si la sous-partie est modifiable
+	 * @return True si modifiable
+	 */
+	[[nodiscard]] auto isEditable() const -> bool { return m_status == Status::Invalid || m_status == Status::Ready; }
 #ifdef EVL_DEBUG
 	/**
 	 * @brief define invalide Status for testing purpose

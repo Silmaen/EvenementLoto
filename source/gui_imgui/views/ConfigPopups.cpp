@@ -289,6 +289,10 @@ void EventConfigPopups::onOpen() {
 }
 
 void EventConfigPopups::onPopupUpdate() {
+
+	ImGuiInputTextFlags tags = ImGuiInputTextFlags_None;
+	if (!m_event.isEditable())
+		tags |= ImGuiInputTextFlags_ReadOnly;
 	// Configuration événement
 	if (ImGui::BeginChild("EventConfig", ImVec2(0, 140), ImGuiWindowFlags_NoTitleBar)) {
 		ImGui::Text("Configuration événement");
@@ -301,7 +305,7 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-1);
 		std::string eventName = m_event.getName();
-		if (ImGui::InputText("##EventName", &eventName)) {
+		if (ImGui::InputText("##EventName", &eventName, tags)) {
 			m_event.setName(eventName);
 		}
 		ImGui::NextColumn();
@@ -310,7 +314,7 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-1);
 		std::string eventLocation = m_event.getLocation();
-		if (ImGui::InputText("##EventLocation", &eventLocation)) {
+		if (ImGui::InputText("##EventLocation", &eventLocation, tags)) {
 			m_event.setLocation(eventLocation);
 		}
 		ImGui::NextColumn();
@@ -319,11 +323,11 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-80);
 		std::string eventLogo = m_event.getLogo().string();
-		if (ImGui::InputText("##EventLogo", &eventLogo)) {
+		if (ImGui::InputText("##EventLogo", &eventLogo, tags)) {
 			m_event.setLogo(eventLogo);
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("...##SearchEventLogo")) {
+		if (ImGui::Button("...##SearchEventLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
 			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
 				m_event.setLogo(path);
 			}
@@ -346,7 +350,7 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-1);
 		std::string orgaName = m_event.getOrganizerName();
-		if (ImGui::InputText("##OrgaName", &orgaName)) {
+		if (ImGui::InputText("##OrgaName", &orgaName, tags)) {
 			m_event.setOrganizerName(orgaName);
 		}
 		ImGui::NextColumn();
@@ -355,11 +359,11 @@ void EventConfigPopups::onPopupUpdate() {
 		ImGui::NextColumn();
 		ImGui::SetNextItemWidth(-80);
 		std::string orgaLogo = m_event.getOrganizerLogo().string();
-		if (ImGui::InputText("##OrgaLogo", &orgaLogo)) {
+		if (ImGui::InputText("##OrgaLogo", &orgaLogo, tags)) {
 			m_event.setOrganizerLogo(orgaLogo);
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("...##SearchOrgaLogo")) {
+		if (ImGui::Button("...##SearchOrgaLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
 			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
 				m_event.setOrganizerLogo(path.string());
 			}
@@ -378,20 +382,21 @@ void EventConfigPopups::onPopupUpdate() {
 
 		const float rulesTextHeight = ImGui::GetContentRegionAvail().y - 40;
 		std::string rules = m_event.getRules();
-		if (ImGui::InputTextMultiline("##Rules", &rules, ImVec2(-1, rulesTextHeight), ImGuiInputTextFlags_WordWrap)) {
+		if (ImGui::InputTextMultiline("##Rules", &rules, ImVec2(-1, rulesTextHeight),
+									  tags | ImGuiInputTextFlags_WordWrap)) {
 			m_event.setRules(rules);
 		}
 
 		ImGui::Spacing();
 
 		// Boutons Import/Export
-		if (ImGui::Button("Import", ImVec2(g_buttonWidth, 0))) {
+		if (ImGui::Button("Import", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
 			// Action import règlement
 		}
 		ImGui::SameLine();
 		const float exportOffset = ImGui::GetContentRegionAvail().x - g_buttonWidth;
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + exportOffset);
-		if (ImGui::Button("Export", ImVec2(g_buttonWidth, 0))) {
+		if (ImGui::Button("Export", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
 			// Action export règlement
 		}
 	}
@@ -713,22 +718,23 @@ void GameRoundConfigPopups::renderThirdColumn() {
 				std::string subRoundName = subRound->getTypeStr();
 				ImGui::InputText("##SubRoundName", &subRoundName, ImGuiInputTextFlags_ReadOnly);
 			}
+			ImGuiInputFlags flags = ImGuiInputTextFlags_None;
+			if (!subRound->isEditable())
+				flags |= ImGuiInputTextFlags_ReadOnly;
 			ImGui::Spacing();
 			ImGui::Text("Valeur Totale");
 			ImGui::SetNextItemWidth(-1);
 			auto priceValue = static_cast<float>(subRound->getValue());
-			if (ImGui::InputFloat("##PriceValue", &priceValue, 0.0f, 0.0f, "%.2f €")) {
+			if (ImGui::InputFloat("##PriceValue", &priceValue, 0.0f, 0.0f, "%.2f €", flags)) {
 				subRound->define(subRound->getType(), subRound->getPrices(), static_cast<double>(priceValue));
 			}
 
 			ImGui::Spacing();
 			ImGui::Text("Liste des lots:");
 			std::string prices = subRound->getPrices();
-			if (ImGui::InputTextMultiline("##TextPrices", &prices, ImVec2(-1, -80))) {
+			if (ImGui::InputTextMultiline("##TextPrices", &prices, ImVec2(-1, -80), flags)) {
 				subRound->define(subRound->getType(), prices, subRound->getValue());
 			}
-
-
 		} else {
 			// Pause
 			bool pauseDiapo = currentRound->hasDiapo();
@@ -773,17 +779,19 @@ void GameRoundConfigPopups::renderThirdColumn() {
 		ImGui::Spacing();
 
 		// Aperçu
-		bool previewEnabled = app.getDisplayPreview();
-		if (ImGui::Checkbox("Aperçu", &previewEnabled)) {
-			// Toggle preview
-			app.setDisplayPreview(previewEnabled);
-		}
-		ImGui::SameLine();
-		ImGui::Checkbox("Plein écran", &previewFullScreen);
-		if (previewEnabled) {
-			const auto dv = std::static_pointer_cast<DisplayView>(app.getView("display_window"));
-			dv->setFullscreen(previewFullScreen);
-			dv->setEventToRender(m_event, m_selectedGameRound, m_selectedSubRound);
+		if (m_event.getStarting() == core::clock::time_point{}) {
+			bool previewEnabled = app.getDisplayPreview();
+			if (ImGui::Checkbox("Aperçu", &previewEnabled)) {
+				// Toggle preview
+				app.setDisplayPreview(previewEnabled);
+			}
+			ImGui::SameLine();
+			ImGui::Checkbox("Plein écran", &previewFullScreen);
+			if (previewEnabled) {
+				const auto dv = std::static_pointer_cast<DisplayView>(app.getView("display_window"));
+				dv->setFullscreen(previewFullScreen);
+				dv->setEventToRender(m_event, m_selectedGameRound, m_selectedSubRound);
+			}
 		}
 	}
 	ImGui::EndChild();

@@ -47,8 +47,10 @@ auto GameRound::getTypeStr() const -> std::string {
 }
 
 void GameRound::setType(const Type& iType) {
-	if (!isEditable())
+	if (!isEditable()) {
+		log_warn("Impossible de modifier le type d'une partie non éditable");
 		return;
+	}
 	m_type = iType;
 	m_subGames.clear();
 	switch (m_type) {
@@ -338,6 +340,10 @@ auto GameRound::getWinnerStr() const -> std::string {
 }
 
 void GameRound::setDiapo(const std::string& iPath, const double iDelai) {
+	if (!isEditable()) {
+		log_warn("Impossible de modifier le diaporama d'une partie non éditable");
+		return;
+	}
 	m_diapoPath = iPath;
 	m_diapoDelay = iDelai;
 }
