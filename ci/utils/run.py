@@ -1,10 +1,10 @@
 """
-Utility functuion for running application commands.
+Utility function for running application commands.
 """
 
-import logging
+from logging import INFO, WARNING, ERROR
 
-log = logging.getLogger(__name__)
+from ci import log
 
 # enum for mode of log level determination
 MODE_BY_CONTENT = 0
@@ -12,8 +12,8 @@ MODE_BY_COLOR = 1
 MODE_FOR_NINJA = 2
 
 # variables to keep track of current and next log levels for color-based detection
-current_level = logging.INFO
-next_level = logging.INFO
+current_level = INFO
+next_level = INFO
 
 
 def _determine_log_level(line: str, mode: int = MODE_BY_CONTENT) -> int:
@@ -29,30 +29,30 @@ def _determine_log_level(line: str, mode: int = MODE_BY_CONTENT) -> int:
     current_level = next_level
     if mode == MODE_BY_COLOR:
         if "\x1b[31m" in line:  # Red
-            current_level = logging.ERROR
-            next_level = logging.ERROR
+            current_level = ERROR
+            next_level = ERROR
         elif "\x1b[33m" in line:  # Yellow
-            current_level = logging.WARNING
-            next_level = logging.WARNING
+            current_level = WARNING
+            next_level = WARNING
         if "\x1b[0m" in line:  # Green
-            next_level = logging.INFO
+            next_level = INFO
         return current_level
     elif mode == MODE_FOR_NINJA:
         if re.match(r"^\[\d+/\d+]", line):
-            return logging.INFO
+            return INFO
         else:
-            return logging.ERROR
+            return ERROR
     else:
         # old content-based detection (may trigger false positives)
         line_lower = line.lower()
         if re.search(r"\b0\s+(tests?|errors?)\s+(failed|error)", line_lower):
-            return logging.INFO
+            return INFO
         if re.search(r"\b(error|failed|fatal|exception)\b", line_lower):
-            return logging.ERROR
+            return ERROR
         elif re.search(r"\b(warning|warn|deprecated)\b", line_lower):
-            return logging.WARNING
+            return WARNING
         else:
-            return logging.INFO
+            return INFO
 
 
 def _strip_ansi_codes(text: str) -> str:
@@ -64,8 +64,8 @@ def _strip_ansi_codes(text: str) -> str:
     """
     import re
 
-    ansi_escape = re.compile(r'\x1B[@-_][0-?]*[ -/]*[@-~]')
-    return ansi_escape.sub('', text)
+    ansi_escape = re.compile(r"\x1B[@-_][0-?]*[ -/]*[@-~]")
+    return ansi_escape.sub("", text)
 
 
 def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT) -> int:
@@ -95,8 +95,6 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
             env=env,
         )
 
-        current_out_level = logging.INFO
-
         for line in process.stdout:
             line = line.rstrip("\n")
             if line:
@@ -108,7 +106,7 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
         for line in process.stderr:
             line = line.rstrip("\n")
             if line:
-                level = max(_determine_log_level(line, detection_mode), logging.WARNING)
+                level = max(_determine_log_level(line, detection_mode), WARNING)
                 if detection_mode == MODE_BY_COLOR:
                     line = _strip_ansi_codes(line)
                 log.log(level, line)

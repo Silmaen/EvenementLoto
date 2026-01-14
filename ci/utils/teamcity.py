@@ -2,9 +2,7 @@
 Module providing utility functions for interacting with TeamCity CI/CD system.
 """
 
-import logging
-
-log = logging.getLogger(__name__)
+from ci import log
 
 
 def set_teamcity_parameter(name: str, value: str) -> None:

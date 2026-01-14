@@ -3,12 +3,6 @@ Utility functions for logging configuration and management.
 """
 
 import logging
-import os
-
-try:
-    import rich.logging
-except ImportError:
-    rich = None
 
 
 class TeamCityFormatter(logging.Formatter):
@@ -49,13 +43,22 @@ def setup_logging(level: int = logging.INFO) -> None:
 
     :param level: The logging level to set (default is logging.INFO).
     """
-    if "TEAMCITY_VERSION" in os.environ:
+    from os import environ
+    if "TEAMCITY_VERSION" in environ:
         handler = logging.StreamHandler()
         handler.setFormatter(TeamCityFormatter())
-    elif rich is not None:
-        handler = rich.logging.RichHandler()
-        handler.setFormatter(logging.Formatter("%(message)s"))
     else:
-        handler = logging.StreamHandler()
+        try:
+            import rich.logging
+        except ImportError:
+            print(
+                "WARNING: Rich python library not found. Falling back to standard logging."
+            )
+            rich = None
+        if rich is not None:
+            handler = rich.logging.RichHandler()
+            handler.setFormatter(logging.Formatter("%(message)s"))
+        else:
+            handler = logging.StreamHandler()
 
     logging.basicConfig(level=level, handlers=[handler])
