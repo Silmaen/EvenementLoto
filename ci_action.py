@@ -3,38 +3,25 @@
 Entry point for all the CI actions.
 """
 
-import logging
-from argparse import ArgumentParser
-from pathlib import Path
-
-from ci import actions
-from ci.logging_utils import setup_logging
-
-root = Path(__file__).resolve().parent
-log = logging.getLogger(__name__)
-
-actions = {
-    "determine_docker_image": actions.define_docker_image,
-    "build": actions.build_project,
-    "run_tests": actions.run_tests,
-    "deploy": actions.deploy,
-    "clean": actions.clean,
-}
-
 
 def main():
-    setup_logging()
+    from argparse import ArgumentParser
+    from ci.actions import get_actions
+    from ci import log
+
+    action_list = get_actions()
+
     parser = ArgumentParser("CI Action Selector")
     parser.add_argument(
-        "action", type=str, choices=actions.keys(), help="The CI action to perform."
+        "action", type=str, choices=action_list.keys(), help="The CI action to perform."
     )
     parser.add_argument("preset", type=str, help="The preset to check.")
     args = parser.parse_args()
 
-    if args.action not in actions:
+    if args.action not in action_list:
         log.error(f"Unknown action: {args.action}")
         return 1
-    action_func = actions[args.action]
+    action_func = action_list[args.action]
     result = action_func(args.preset)
     if result != 0:
         log.error(f"Action '{args.action}' failed with exit code: {result}")

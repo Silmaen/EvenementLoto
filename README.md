@@ -54,7 +54,7 @@ Le programme a été correctement compilé avec :
 
 ## Roadmap
 
-### Version 0.5 (Planned for 2026)
+### Version 0.5 (Planned for autumn 2026)
 
 * Documentation
     * [ ] Écrire les pages d’aide
@@ -72,27 +72,34 @@ Le programme a été correctement compilé avec :
 * Contrôle et paramètres
     * [ ] permettre le choix de la police de caractère
 
-### Version 0.4 (In development)
+### Version 0.4.1 (planned for spring 2026)
 
 * Contrôle et paramètres
     * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
         * [ ] ajouter le réglage de cette valeur
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
-    * [ ] Refonte de l'affichage en ImGui, suppression de QT.
+    * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
+* Packaging
+    * [ ] Package des resources.
+    * [ ] Inclusion de la documentation dans le paquet.]
+
+### Version 0.4.0 (In development)
+
+* Affichage
+    * [X] Refonte de l'affichage en ImGui, suppression de QT.
         * [X] Permettre le choix du moteur de rendu (Qt ou ImGui)
-        * [ ] Refaire l'affichage en ImGui
-            * [ ] Fenêtre principale
+        * [X] Refaire l'affichage en ImGui
+            * [X] Fenêtre principale
             * [X] Fenêtre à propos
             * [X] Fenêtre d'aide
             * [X] Fenêtre de configuration générale
             * [X] Fenêtre de configuration de l'événement
-            * [ ] Fenêtre de configuration des parties
-            * [ ] Fenêtre d'affichage aux joueurs
-    * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
-    * [ ] Amélioration du rendu des boutons de numéro sur la grille du présentateur
-        * [ ] Police d'écriture adaptative
-        * [ ] Meilleure différence de contraste entre numéro tiré et non tiré
+            * [X] Fenêtre de configuration des parties
+            * [X] Fenêtre d'affichage aux joueurs
+    * [X] Amélioration du rendu des boutons de numéro sur la grille du présentateur
+        * [X] Police d'écriture adaptative
+        * [X] Meilleure différence de contraste entre numéro tiré et non tiré
 * moteur de jeu
     * [ ] Flexibilité en jeu
         * [ ] permettre de réorganiser les parties non entamées
@@ -101,14 +108,14 @@ Le programme a été correctement compilé avec :
     * [X] mettre à jour les import json
     * [ ] Permettre l'import/export au format YAML
 
-### Version 0.3.1 (Released 26 november 2023)
+### Version 0.3.1 (Released 26 November 2023)
 
 * Contrôle et paramètres
     * [X] choix de l’écran de plein écran
 * Packaging
     * [X] Faire des paquets linux
 
-### Version 0.3 (Released 28 november 2022)
+### Version 0.3 (Released 28 November 2022)
 
 * Affichage
     * [X] affichage des lots
@@ -130,7 +137,7 @@ Le programme a été correctement compilé avec :
         * [X] Archlinux
     * [X] Mise en place test CI
 
-### Version 0.2 (Released 30 november 2021)
+### Version 0.2 (Released 30 November 2021)
 
 * Affichage:
     * [X] Affichage logo organisateur dans les vues intermédiaires
