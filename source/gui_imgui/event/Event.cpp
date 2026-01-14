@@ -30,6 +30,7 @@ auto KeyEvent::getCategoryFlags() const -> uint8_t { return Input | Keyboard; }
 auto KeyPressedEvent::getName() const -> std::string { return std::format("KeyPressedEvent"); }
 auto KeyReleasedEvent::getName() const -> std::string { return std::format("KeyReleasedEvent"); }
 auto KeyTypedEvent::getName() const -> std::string { return std::format("KeyTypedEvent"); }
+auto KeyTypedEvent::getCategoryFlags() const -> uint8_t { return Input | Keyboard; }
 
 auto MouseMovedEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }
 auto MouseScrolledEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }

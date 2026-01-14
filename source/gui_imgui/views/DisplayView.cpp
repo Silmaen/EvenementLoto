@@ -80,6 +80,30 @@ void loadEventImages(const core::Event& iEvent) {
 	}
 }
 
+auto loadSlideFolderImages(const std::filesystem::path& iFolderPath) -> size_t {
+	auto& app = Application::get();
+	auto& texLib = app.getTextureLibrary();
+	if (!exists(iFolderPath) || !is_directory(iFolderPath)) {
+		log_warning("Slide folder '{}' does not exist or is not a directory", iFolderPath.string());
+		return 0;
+	}
+	size_t slideIndex = 0;
+	for (const auto& entry: std::filesystem::directory_iterator(iFolderPath)) {
+		if (entry.is_regular_file()) {
+			const auto ext = entry.path().extension().string();
+			if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp") {
+				const std::string textureName = std::format("slide_{}", slideIndex);
+				if (texLib.getOrLoadTextureId(textureName, entry.path().string()) == 0) {
+					log_warning("Failed to load slide image from '{}'", entry.path().string());
+				} else {
+					slideIndex++;
+				}
+			}
+		}
+	}
+	return slideIndex;
+}
+
 }// namespace
 
 DisplayView::DisplayView(core::Event& iEvent) : m_currentEvent{iEvent} {}
@@ -121,15 +145,19 @@ void DisplayView::onUpdate() {
 	if (ImGui::Begin("DisplayView", nullptr, flags)) {
 		// Render based on event status
 		if (m_previewMode) {
-			const auto currentRound = m_currentEvent.getCurrentGameRound();
+			const auto currentRound = m_currentEvent.getGameRound(static_cast<uint32_t>(m_previewRound));
 			if (currentRound == m_currentEvent.endRounds()) {
 				ImGui::TextDisabled("Invalid round to preview");
 				return;
 			}
-			if (currentRound->getType() == core::GameRound::Type::Pause)
+			if (currentRound->getType() == core::GameRound::Type::Pause) {
 				renderEventPause();
-			else
+			} else {
+				m_currentDiapoIndex = 0;
+				m_totalDiapoImages = 0;
+				m_diapoChanged = core::clock::now();
 				renderRoundReady();
+			}
 		} else {
 			switch (m_currentEvent.getStatus()) {
 				case core::Event::Status::Ready:
@@ -142,6 +170,9 @@ void DisplayView::onUpdate() {
 						if (currentRound->getType() == core::GameRound::Type::Pause) {
 							renderEventPause();
 						} else {
+							m_currentDiapoIndex = 0;
+							m_totalDiapoImages = 0;
+							m_diapoChanged = core::clock::now();
 							if (currentRound->getCurrentSubRound()->getStatus() ==
 								core::SubGameRound::Status::PreScreen) {
 								renderRoundReady();
@@ -563,12 +594,12 @@ void DisplayView::renderRoundEnd() const {
 	ImGui::EndChild();
 }
 
-void DisplayView::renderEventPause() const {
+void DisplayView::renderEventPause() {
 	auto round = m_currentEvent.getCurrentGameRound();
 	if (m_previewMode) {
 		round = m_currentEvent.getGameRound(static_cast<uint32_t>(m_previewRound));
 	}
-	renderTitle("Pause", {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.3f / 0.05f}, 2.0f);
+	renderTitle("Pause", {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y * 0.05f / 0.05f}, 2.0f);
 	drawImage("logo_organizer", {0, 0},
 			  {ImGui::GetContentRegionAvail().x * 0.1f, ImGui::GetContentRegionAvail().x * 0.1f});
 	drawImage("logo_organizer", {ImGui::GetContentRegionAvail().x * 0.9f, 0},
@@ -576,13 +607,33 @@ void DisplayView::renderEventPause() const {
 
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.1f);
 	if (round->hasDiapo()) {
-		const ImVec2 msgSize = ImGui::CalcTextSize("Diaporama en cours");
-		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - msgSize.x) * 0.5f);
-		ImGui::Text("Diaporama en cours");
+		auto [folder, timing] = round->getDiapo();
+		if (m_totalDiapoImages == 0)
+			m_totalDiapoImages = loadSlideFolderImages(folder);
+		// Change diapo if needed
+		if (const auto now = core::clock::now();
+			core::durationSeconds(now - m_diapoChanged) >= timing && m_totalDiapoImages > 0) {
+			m_currentDiapoIndex = (m_currentDiapoIndex + 1) % m_totalDiapoImages;
+			m_diapoChanged = now;
+		}
+		const std::string diapoTextureName = std::format("slide_{}", m_currentDiapoIndex);
+		if (ImGui::BeginChild("DiapoLogo", {0, ImGui::GetContentRegionAvail().y * 0.95f}, ImGuiChildFlags_None)) {
+			drawImage(diapoTextureName, {ImGui::GetContentRegionAvail().x * 0.1f, 0},
+					  {ImGui::GetContentRegionAvail().x * 0.8f, ImGui::GetContentRegionAvail().y});
+		}
+		ImGui::EndChild();
 	} else {
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.4f);
 		const ImVec2 msgSize = ImGui::CalcTextSize("Une buvette est à votre disposition");
-		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - msgSize.x) * 0.5f);
+		const auto gui_settings = core::getSettings()->extract("gui");
+		auto scale = gui_settings.getValue("title_scale", 4.0f);
+		if (scale <= 0.0f) {
+			scale = 1.0f;
+		}
+		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - msgSize.x * scale) * 0.5f);
+		ImGui::SetWindowFontScale(scale);
 		ImGui::Text("Une buvette est à votre disposition");
+		ImGui::SetWindowFontScale(1.0f);
 	}
 }
 

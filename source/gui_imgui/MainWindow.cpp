@@ -37,9 +37,9 @@ namespace {
 
 std::shared_ptr<ImGui_ImplVulkanH_Window> g_mainWindowData;
 
-void glfwErrorCallback(int iError, const char* iDescription) { log_error("GLFW Error %d: %s", iError, iDescription); }
+void glfwErrorCallback(int iError, const char* iDescription) { log_error("GLFW Error {}: {}", iError, iDescription); }
 
-void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__,  __LINE__); }
+void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__, __LINE__); }
 
 }// namespace
 
@@ -89,7 +89,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		VkSurfaceKHR surface = nullptr;
 
 		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
-		vulkan::VulkanContext::checkVkResult(err, __FILE__,  __LINE__);
+		vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
 		// Create Framebuffers
 		int w = 0;
 		int h = 0;
@@ -249,7 +249,7 @@ void MainWindow::setCallbacks() {
 				}
 			});
 	glfwSetCharCallback(window, [](GLFWwindow* iWindow, const unsigned int iKeycode) -> void {
-		event::KeyTypedEvent event(static_cast<KeyCode>(iKeycode));
+		event::KeyTypedEvent event(static_cast<char32_t>(iKeycode));
 		static_cast<WindowData*>(glfwGetWindowUserPointer(iWindow))->eventCallback(event);
 	});
 	glfwSetMouseButtonCallback(
@@ -285,7 +285,7 @@ void MainWindow::setCallbacks() {
 void MainWindow::close() {
 	const auto vkData = vulkan::VulkanContext::get().getVkData();
 	const auto err = vkDeviceWaitIdle(vkData.device);
-	vulkan::VulkanContext::checkVkResult(err, __FILE__,  __LINE__);
+	vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -532,8 +532,8 @@ void MainWindow::onEvent(event::Event& ioEvent) {
 		return true;
 	});
 	dispatcher.dispatch<event::KeyTypedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {
-		ImGui_ImplGlfw_KeyCallback(static_cast<GLFWwindow*>(m_window), static_cast<int>(ioInternalEvent.getKeyCode()),
-								   0, GLFW_REPEAT, 0);
+		ImGui_ImplGlfw_CharCallback(static_cast<GLFWwindow*>(m_window),
+									static_cast<unsigned int>(ioInternalEvent.getCodepoint()));
 		return true;
 	});
 	dispatcher.dispatch<event::MouseMovedEvent>([this]<typename T>(const T& ioInternalEvent) -> auto {

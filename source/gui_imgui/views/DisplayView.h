@@ -88,7 +88,7 @@ private:
 	void renderRoundReady() const;
 	void renderRoundRunning() const;
 	void renderRoundEnd() const;
-	void renderEventPause() const;
+	void renderEventPause();
 	void renderEventEnd() const;
 	void renderEventRules() const;
 	void renderEventStart() const;
@@ -103,6 +103,9 @@ private:
 	size_t m_previewRound = 0;
 	size_t m_previewSubRound = 0;
 	bool m_customStyle = true;
+	core::clock::time_point m_diapoChanged{};
+	size_t m_currentDiapoIndex = 0;
+	size_t m_totalDiapoImages = 0;
 };
 
 }// namespace evl::gui_imgui::views
