@@ -18,6 +18,7 @@ const std::string g_imageFilter = "Image Files|png,jpg,jpeg,bmp,tga,gif,svg\n"
 								  "TGA Files|tga\n"
 								  "GIF Files|gif\n"
 								  "SVG Files|svg";
+const std::string g_yamlFilter = "YAML Files|yaml,yml";
 
 /**
  * @brief Class FileDialog.

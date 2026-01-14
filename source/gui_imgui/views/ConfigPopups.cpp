@@ -391,13 +391,32 @@ void EventConfigPopups::onPopupUpdate() {
 
 		// Boutons Import/Export
 		if (ImGui::Button("Import", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			// Action import règlement
+			if (const auto path = utils::FileDialog::openFile(utils::g_yamlFilter); !path.empty()) {
+				try {
+					if (YAML::Node node = YAML::LoadFile(path.string()); node["rules"]) {
+						m_event.setRules(node["rules"].as<std::string>());
+					} else {
+						log_warn("No 'rules' field found in file: {}", path.string());
+					}
+				} catch (const YAML::Exception& e) { log_error("Failed to load YAML file: {}", e.what()); }
+			}
 		}
 		ImGui::SameLine();
 		const float exportOffset = ImGui::GetContentRegionAvail().x - g_buttonWidth;
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + exportOffset);
 		if (ImGui::Button("Export", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			// Action export règlement
+			if (const auto path = utils::FileDialog::saveFile(utils::g_yamlFilter); !path.empty()) {
+				try {
+					YAML::Node node;
+					node["rules"] = m_event.getRules();
+					if (std::ofstream fout(path); !fout.is_open()) {
+						log_error("Failed to open file for writing: {}", path.string());
+					} else {
+						fout << node;
+						fout.close();
+					}
+				} catch (const YAML::Exception& e) { log_error("Failed to save YAML file: {}", e.what()); }
+			}
 		}
 	}
 	ImGui::EndChild();
@@ -556,7 +575,7 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		ImGui::Spacing();
 
 		// Boutons Ok/Appliquer/Annuler/Import/Export
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(3));
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(5));
 		if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
 			toCurrentEvent();
 			onClose();
@@ -569,16 +588,20 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
 			onClose();
 		}
-		/*ImGui::SameLine();
+		ImGui::SameLine();
 		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
 			// Action import
-			log_warning("Import not implemented yet.");
+			if (const auto path = utils::FileDialog::openFile(utils::g_yamlFilter); !path.empty()) {
+				m_event.importYaml(path);
+			}
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
 			// Action export
-			log_warning("Export not implemented yet.");
-		}*/
+			if (const auto path = utils::FileDialog::saveFile(utils::g_yamlFilter); !path.empty()) {
+				m_event.exportYaml(path);
+			}
+		}
 	}
 	ImGui::EndChild();
 }

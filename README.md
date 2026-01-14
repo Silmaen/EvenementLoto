@@ -106,7 +106,7 @@ Le programme a été correctement compilé avec :
         * [X] permettre l'édition de parties non entamée
 * Sauvegarde et restauration
     * [X] mettre à jour les import json
-    * [ ] Permettre l'import/export au format YAML
+    * [X] Permettre l'import/export au format YAML
 
 ### Version 0.3.1 (Released 26 November 2023)
 
