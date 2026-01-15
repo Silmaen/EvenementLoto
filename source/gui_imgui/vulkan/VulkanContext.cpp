@@ -81,6 +81,8 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iHeight, const VkFormat iFormat,
 				 const VkImageTiling iTiling, const VkImageUsageFlags iUsage, const VkMemoryPropertyFlags iProperties,
 				 VkImage& oImage, VkDeviceMemory& oImageMemory) {
+	VkImageUsageFlags usage = iUsage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
 	const VkImageCreateInfo imageInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 									  .pNext = nullptr,
 									  .flags = 0,
@@ -91,7 +93,7 @@ void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iH
 									  .arrayLayers = 1,
 									  .samples = VK_SAMPLE_COUNT_1_BIT,
 									  .tiling = iTiling,
-									  .usage = iUsage,
+									  .usage = usage,
 									  .sharingMode = VK_SHARING_MODE_EXCLUSIVE,
 									  .queueFamilyIndexCount = 0,
 									  .pQueueFamilyIndices = nullptr,

@@ -70,24 +70,31 @@ auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 	if (m_lastPath.empty() || !exists(m_lastPath))
 		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
 
+	std::string mLast = m_lastPath.string();
+	if (!exists(m_lastPath))
+		mLast = core::getExecPath().string();
+#ifdef WIN32
+	if (const auto result =
+				NFD_OpenDialogU8(&outPath, ff.data(), static_cast<nfdfiltersize_t>(ff.size()), mLast.c_str());
+		result == NFD_CANCEL) {
+
+#else
 	// Set parent window to inherit icon
 	nfdwindowhandle_t parentWindow = {.type = NFD_WINDOW_HANDLE_TYPE_UNSET, .handle = nullptr};
 	if (auto* window = Application::get().getMainWindow().getNativeWindow()) {
-#if defined(_WIN32)
-		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_WINDOWS;
-#elif defined(__APPLE__)
+#ifdef __APPLE__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_COCOA;
-#elif defined(__linux__)
+#elifdef __linux__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_X11;
 #endif
 		parentWindow.handle = window;
 	}
-	const std::string mLast = m_lastPath.string();
 	const nfdopendialogu8args_t args{.filterList = ff.data(),
 									 .filterCount = static_cast<nfdfiltersize_t>(ff.size()),
 									 .defaultPath = mLast.c_str(),
 									 .parentWindow = parentWindow};
 	if (const auto result = NFD_OpenDialogU8_With(&outPath, &args); result == NFD_CANCEL) {
+#endif
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
 		resultPath = std::filesystem::path{outPath};
@@ -112,25 +119,31 @@ auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::f
 	auto ff = parseFilter(filters);
 	if (m_lastPath.empty() || !exists(m_lastPath))
 		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
+	std::string mLast = m_lastPath.string();
+	if (!exists(m_lastPath))
+		mLast = core::getExecPath().string();
+#ifdef WIN32
+	if (const auto result =
+				NFD_SaveDialogU8(&outPath, ff.data(), static_cast<nfdfiltersize_t>(ff.size()), mLast.c_str(), nullptr);
+		result == NFD_CANCEL) {
+#else
 	// Set parent window to inherit icon
 	nfdwindowhandle_t parentWindow = {.type = NFD_WINDOW_HANDLE_TYPE_UNSET, .handle = nullptr};
 	if (auto* window = Application::get().getMainWindow().getNativeWindow()) {
-#if defined(_WIN32)
-		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_WINDOWS;
-#elif defined(__APPLE__)
+#ifdef __APPLE__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_COCOA;
-#elif defined(__linux__)
+#elifdef __linux__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_X11;
 #endif
 		parentWindow.handle = window;
 	}
-	const std::string mLast = m_lastPath.string();
 	const nfdsavedialogu8args_t args{.filterList = ff.data(),
 									 .filterCount = static_cast<nfdfiltersize_t>(ff.size()),
 									 .defaultPath = mLast.c_str(),
 									 .defaultName = nullptr,
 									 .parentWindow = parentWindow};
 	if (const auto result = NFD_SaveDialogU8_With(&outPath, &args); result == NFD_CANCEL) {
+#endif
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
 		resultPath = std::filesystem::path{outPath};
@@ -153,21 +166,25 @@ auto FileDialog::selectFolder() -> std::filesystem::path {
 	if (m_lastPath.empty() || !exists(m_lastPath))
 		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
 
+	std::string mLast = m_lastPath.string();
+	if (!exists(m_lastPath))
+		mLast = core::getExecPath().string();
+#ifdef WIN32
+	if (const auto result = NFD_PickFolderU8(&outPath, mLast.c_str()); result == NFD_CANCEL) {
+#else
 	// Set parent window to inherit icon
 	nfdwindowhandle_t parentWindow = {.type = NFD_WINDOW_HANDLE_TYPE_UNSET, .handle = nullptr};
 	if (auto* window = Application::get().getMainWindow().getNativeWindow()) {
-#if defined(_WIN32)
-		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_WINDOWS;
-#elif defined(__APPLE__)
+#ifdef __APPLE__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_COCOA;
-#elif defined(__linux__)
+#elifdef __linux__
 		parentWindow.type = NFD_WINDOW_HANDLE_TYPE_X11;
 #endif
 		parentWindow.handle = window;
 	}
-	const std::string mLast = m_lastPath.string();
 	const nfdpickfolderu8args_t args{.defaultPath = mLast.c_str(), .parentWindow = parentWindow};
 	if (const auto result = NFD_PickFolderU8_With(&outPath, &args); result == NFD_CANCEL) {
+#endif
 		resultPath = std::filesystem::path{};
 	} else if (result == NFD_OKAY) {
 		resultPath = std::filesystem::path{outPath};
