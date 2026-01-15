@@ -659,6 +659,13 @@ void GameRoundConfigPopups::renderFirstColumn() {
 void GameRoundConfigPopups::renderSecondColumn() {
 	const auto currentRound = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
 
+	if (currentRound == m_event.endRounds()) {
+		if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
+			ImGui::Text("Aucune partie sélectionnée");
+		}
+		ImGui::EndChild();
+		return;
+	}
 	if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
 		ImGui::Text("Phases de la partie");
 		ImGui::Separator();
