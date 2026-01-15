@@ -15,15 +15,14 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 * `EVL_ENABLE_COVERAGE` active ou non le calcul de la couverture de code.
   (nécessite `gcovr` voir dépendances)
 * `EVL_ENABLE_CLANG_TIDY` active ou non l’utilisation de clang-tidy durant la compilation.
-* `EVL_ENABLE_ADDRESS_SANITIZER` active ou non l’utilisation de l’address sanitizer durant la compilation.
-* `EVL_ENABLE_THREAD_SANITIZER` active ou non l’utilisation du thread sanitizer durant la compilation.
-* `EVL_ENABLE_MEMORY_SANITIZER` active ou non l’utilisation du memory sanitizer durant la compilation.
-* `EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER` active ou non l’utilisation de l’undefined behavior sanitizer durant la
+* `EVL_ENABLE_ADDRESS_SANITIZER` active ou non l’utilisation de l’`address sanitizer` durant la compilation.
+* `EVL_ENABLE_THREAD_SANITIZER` active ou non l’utilisation du `thread sanitizer` durant la compilation.
+* `EVL_ENABLE_MEMORY_SANITIZER` active ou non l’utilisation du `memory sanitizer` durant la compilation.
+* `EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER` active ou non l’utilisation de l’`undefined behavior` sanitizer durant la
   compilation.
 
 ### Dépendance
 
-* Ce projet dépend de la librairie Qt6 (qui doit être installé sur le système)
 * Ce projet dépend de python3.10 ou supérieur
 * Ce projet dépend de dependency manager [DepManager](https://github.com/Silmaen/DepManager)
     * Pour l'installer par pip: `pip intall depmanager`
@@ -45,10 +44,10 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 Le programme a été correctement compilé avec :
 
 * windows
-    * gcc 13 (mingw)
-    * clang 17 (mingw)
+    * gcc 14 (mingw)
+    * clang 21 (mingw)
 
-* linux
+* linux ubuntu 24.04
     * gcc 13
     * clang 18
 
@@ -80,14 +79,15 @@ Le programme a été correctement compilé avec :
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
+    * [ ] Suppression du code QT
 * Packaging
     * [ ] Package des resources.
-    * [ ] Inclusion de la documentation dans le paquet.]
+    * [ ] Inclusion de la documentation dans le paquet.
 
-### Version 0.4.0 (In development)
+### Version 0.4.0 (Released 15 January 2026)
 
 * Affichage
-    * [X] Refonte de l'affichage en ImGui, suppression de QT.
+    * [X] Refonte de l'affichage en ImGui.
         * [X] Permettre le choix du moteur de rendu (Qt ou ImGui)
         * [X] Refaire l'affichage en ImGui
             * [X] Fenêtre principale
@@ -97,6 +97,7 @@ Le programme a été correctement compilé avec :
             * [X] Fenêtre de configuration de l'événement
             * [X] Fenêtre de configuration des parties
             * [X] Fenêtre d'affichage aux joueurs
+        * [X] Code QT désactivé, mais toujours présent
     * [X] Amélioration du rendu des boutons de numéro sur la grille du présentateur
         * [X] Police d'écriture adaptative
         * [X] Meilleure différence de contraste entre numéro tiré et non tiré
@@ -119,7 +120,7 @@ Le programme a été correctement compilé avec :
 
 * Affichage
     * [X] affichage des lots
-        * [X] à chaque changement de quine
+        * [X] à chaque changement de ligne.
         * [X] affichage de la valeur
     * [X] affichage de la phase dans le titre de la partie
     * [X] améliorer la lisibilité les derniers numéros tirés
