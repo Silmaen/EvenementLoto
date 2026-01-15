@@ -1,0 +1,22 @@
+option(RSH_USE_PYTHON_VENV "Use Python virtual environment for dependency management" ON)
+
+find_package(Python3 COMPONENTS Interpreter REQUIRED)
+
+if (RSH_USE_PYTHON_VENV)
+    message(STATUS "Setting up Python virtual environment...")
+
+    if (DEFINED ENV{VENV_PATH} AND NOT "$ENV{VENV_PATH}" STREQUAL "")
+        if (EXISTS $ENV{VENV_PATH})
+            # Set environment variables for the virtual environment
+            set(ENV{VIRTUAL_ENV} $ENV{VENV_PATH})
+            set(ENV{PATH} "$ENV{VENV_PATH}/bin:$ENV{PATH}")
+            message(STATUS "Using Python virtual environment at: $ENV{VENV_PATH}")
+        else ()
+            message(STATUS "No Python virtual environment found at: $ENV{VENV_PATH}")
+        endif ()
+    else ()
+        message(STATUS "VENV_PATH not defined in .env file. Skipping virtual environment setup.")
+    endif ()
+else ()
+    message(STATUS "Use System Python interpreter at: ${Python3_EXECUTABLE}")
+endif ()

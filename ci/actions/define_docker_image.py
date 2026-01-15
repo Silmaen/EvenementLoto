@@ -19,21 +19,20 @@ class DefineDockerImage(BaseAction):
         """
         from ci.utils.docker import (
             determine_docker_image,
-            list_docker_presets,
         )
         from ci.utils.teamcity import set_teamcity_parameter
 
         result = determine_docker_image(preset)
-        if result == "notfound":
-            log.error(f"Docker image not found for preset: {preset}")
-            log.info("Available presets are:")
-
-            for p in list_docker_presets():
-                log.info(f" - {p}")
-            return 1
         if result == "":
-            log.info(f"No Docker image needed for preset '{preset}' on this platform.")
-
+            log.info(f"Docker image not found for preset: {preset}, assuming run on native host.")
+            return 0
         log.info(f"Docker image for preset '{preset}': {result}")
         set_teamcity_parameter("docker_image", result)
+        docker_parameters = "-u %env.BUILDER_UID%:%env.BUILDER_GID%"
+        docker_parameters += " -v %teamcity.agent.home.dir%/user/cache_dir:/tmp/cache_dir"
+        docker_parameters += " --network host"
+        docker_parameters += " -v %teamcity.agent.home.dir%/user:/home/user"
+        docker_parameters += " -e HOME=/home/user"
+
+        set_teamcity_parameter("docker_parameters", docker_parameters)
         return 0

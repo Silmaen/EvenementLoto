@@ -37,7 +37,7 @@ class TeamCityFormatter(logging.Formatter):
         return text
 
 
-def setup_logging(level: int = logging.INFO) -> None:
+def setup_logging(level: int = logging.DEBUG) -> None:
     """
     Configures the logging system with Rich for development or TeamCity formatter for CI.
 
