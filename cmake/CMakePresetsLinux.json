@@ -41,7 +41,10 @@
       "inherits": [
         "toolset-mold",
         "gcc-debug"
-      ]
+      ],
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      }
     },
     {
       "name": "linux-clang-release",
@@ -55,7 +58,10 @@
       "inherits": [
         "linux-base",
         "clang-debug"
-      ]
+      ],
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      }
     }
   ]
 }

@@ -15,6 +15,11 @@ MODE_FOR_NINJA = 2
 current_level = INFO
 next_level = INFO
 
+# list of regex patterns to exclude from ninja error detection
+ninja_error_exclusions = [
+    r"^CPack:.*"
+]
+
 
 def _determine_log_level(line: str, mode: int = MODE_BY_CONTENT) -> int:
     """
@@ -41,6 +46,9 @@ def _determine_log_level(line: str, mode: int = MODE_BY_CONTENT) -> int:
         if re.match(r"^\[\d+/\d+]", line):
             return INFO
         else:
+            for pattern in ninja_error_exclusions:
+                if re.search(pattern, line):
+                    return INFO
             return ERROR
     else:
         # old content-based detection (may trigger false positives)

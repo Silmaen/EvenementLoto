@@ -25,6 +25,8 @@ class PresetConfig:
         self.release_preset = f""
         self.run_tests = True
         self.run_deploy = False
+        self.run_coverage = False
+        self.run_documentation = False
 
     def from_json(self, data: dict):
         """
@@ -48,6 +50,10 @@ class PresetConfig:
             self.run_tests = p_data["run_tests"]
         if "run_deploy" in p_data:
             self.run_deploy = p_data["run_deploy"]
+        if "run_coverage" in p_data:
+            self.run_coverage = p_data["run_coverage"]
+        if "run_documentation" in p_data:
+            self.run_documentation = p_data["run_documentation"]
 
 
 def get_preset_config(preset: str) -> PresetConfig:

@@ -81,7 +81,7 @@ void createBuffer(const VkData& iVkData, const VkDeviceSize iSize, VkBufferUsage
 void createImage(const VkData& iVkData, const uint32_t iWidth, const uint32_t iHeight, const VkFormat iFormat,
 				 const VkImageTiling iTiling, const VkImageUsageFlags iUsage, const VkMemoryPropertyFlags iProperties,
 				 VkImage& oImage, VkDeviceMemory& oImageMemory) {
-	VkImageUsageFlags usage = iUsage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+	const VkImageUsageFlags usage = iUsage | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
 
 	const VkImageCreateInfo imageInfo{.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO,
 									  .pNext = nullptr,

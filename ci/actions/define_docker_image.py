@@ -33,6 +33,7 @@ class DefineDockerImage(BaseAction):
         docker_parameters += " --network host"
         docker_parameters += " -v %teamcity.agent.home.dir%/user:/home/user"
         docker_parameters += " -e HOME=/home/user"
+        docker_parameters += " --cap-add=SYS_PTRACE --security-opt seccomp=unconfined"
 
         set_teamcity_parameter("docker_parameters", docker_parameters)
         return 0
