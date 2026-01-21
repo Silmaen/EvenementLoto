@@ -1,0 +1,32 @@
+{
+  "defaults": {
+    "docker_registry": "registry.argawaen.net",
+    "docker_namespace": "builder"
+  },
+  "presets": {
+    "linux-clang-debug": {
+      "run_tests": true,
+      "run_deploy": true,
+      "release_preset": "linux-clang-release",
+      "docker_image": "builder-clang18-ubuntu2404"
+    },
+    "linux-gcc-debug": {
+      "run_tests": true,
+      "run_deploy": false,
+      "release_preset": "linux-gcc-release",
+      "docker_image": "builder-gcc14-ubuntu2404"
+    },
+    "windows-clang-debug": {
+      "run_tests": true,
+      "run_deploy": true,
+      "release_preset": "windows-clang-release",
+      "docker_image": ""
+    },
+    "windows-gcc-debug": {
+      "run_tests": true,
+      "run_deploy": false,
+      "release_preset": "windows-gcc-release",
+      "docker_image": ""
+    }
+  }
+}

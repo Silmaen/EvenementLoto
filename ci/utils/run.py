@@ -70,7 +70,7 @@ def _strip_ansi_codes(text: str) -> str:
 
 def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT) -> int:
     """
-    Runs a command as a subprocess and logs its output in real-time.
+    Runs a potentially long command as a subprocess and logs its output in real-time.
 
     :param command: The command to run as a list of strings.
     :param detection_mode: Log Level detection mode.
@@ -86,6 +86,7 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
         env = environ.copy()
         if detection_mode == MODE_BY_COLOR:
             env["CLICOLOR_FORCE"] = "1"
+        env["PYTHONUNBUFFERED"] = "1"
         process = subprocess.Popen(
             command,
             stdout=subprocess.PIPE,
@@ -94,22 +95,63 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
             bufsize=1,
             env=env,
         )
+        import select
+        from sys import platform
 
-        for line in process.stdout:
-            line = line.rstrip("\n")
-            if line:
-                level = _determine_log_level(line, detection_mode)
-                if detection_mode == MODE_BY_COLOR:
-                    line = _strip_ansi_codes(line)
-                log.log(level, line)
-
-        for line in process.stderr:
-            line = line.rstrip("\n")
-            if line:
-                level = max(_determine_log_level(line, detection_mode), WARNING)
-                if detection_mode == MODE_BY_COLOR:
-                    line = _strip_ansi_codes(line)
-                log.log(level, line)
+        # Process Outputs in real time
+        if platform != "win32":
+            import fcntl
+            import os as os_module
+            fcntl.fcntl(process.stdout, fcntl.F_SETFL, os_module.O_NONBLOCK)
+            fcntl.fcntl(process.stderr, fcntl.F_SETFL, os_module.O_NONBLOCK)
+            while process.poll() is None:
+                reads = [process.stdout, process.stderr]
+                ret = select.select(reads, [], [])
+                for stream in ret[0]:
+                    try:
+                        line = stream.readline()
+                        if not line:
+                            continue
+                        line = line.rstrip("\n")
+                        if line:
+                            is_stderr = stream == process.stderr
+                            level = _determine_log_level(line, detection_mode)
+                            if is_stderr:
+                                level = max(level, WARNING)
+                            if detection_mode == MODE_BY_COLOR:
+                                line = _strip_ansi_codes(line)
+                            log.log(level, line)
+                    except (BlockingIOError, IOError):
+                        continue  # Capture any remaining output after process ends
+            for line in process.stdout:
+                line = line.rstrip("\n")
+                if line:
+                    level = _determine_log_level(line, detection_mode)
+                    if detection_mode == MODE_BY_COLOR:
+                        line = _strip_ansi_codes(line)
+                    log.log(level, line)
+            for line in process.stderr:
+                line = line.rstrip("\n")
+                if line:
+                    level = max(_determine_log_level(line, detection_mode), WARNING)
+                    if detection_mode == MODE_BY_COLOR:
+                        line = _strip_ansi_codes(line)
+                    log.log(level, line)
+        else:
+            for line in process.stdout:
+                line = line.rstrip("\n")
+                if line:
+                    level = _determine_log_level(line, detection_mode)
+                    if detection_mode == MODE_BY_COLOR:
+                        line = _strip_ansi_codes(line)
+                    log.log(level, line)
+            for line in process.stderr:
+                line = line.rstrip("\n")
+                if line:
+                    level = max(_determine_log_level(line, detection_mode), WARNING)
+                    if detection_mode == MODE_BY_COLOR:
+                        line = _strip_ansi_codes(line)
+                    log.log(level, line)
 
         process.wait()
         return process.returncode
@@ -121,3 +163,34 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
     except Exception as e:
         log.error(f"Error running command '{' '.join(command)}': {e}")
         return 1
+
+
+def run_command_capture_output(command: list[str] | str) -> tuple[int, str]:
+    """
+    Runs a command as a subprocess and captures its output.
+
+    :param command: The command to run as a list of strings.
+    :return: A tuple containing the exit code, stdout, and stderr.
+    """
+    import subprocess
+
+    if isinstance(command, str):
+        command = command.split()
+    try:
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+
+        stdout, stderr = process.communicate()
+        return process.returncode, stdout
+    except FileNotFoundError:
+        log.error(
+            f"Command not found: {command[0]}. Make sure it's installed and in PATH."
+        )
+        return 1, ""
+    except Exception as e:
+        log.error(f"Error running command '{' '.join(command)}': {e}")
+        return 1, ""

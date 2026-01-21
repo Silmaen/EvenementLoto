@@ -1,8 +1,15 @@
 #
 #
-#
+# load custom Environment variables
+include(Environment)
+# Python setup (including virtual env if requested)
+include(Python)
+# Setup Poetry, and sync python dependencies
+include(Poetry)
+# Initialize Dependency Manager
 include(Depmanager)
-include(Utilities)
+# Load Utility functions
+include(UtilityFunctions)
 #
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_INSTALL_PREFIX ${PROJECT_BUILD_DIR}/Install)

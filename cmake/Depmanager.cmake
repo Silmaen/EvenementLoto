@@ -3,14 +3,26 @@ find_program(EDEPMANAGER depmanager)
 if (${EDEPMANAGER} STREQUAL EDEPMANAGER-NOTFOUND)
     message(FATAL_ERROR "Dependency manager not found.")
 else ()
-    execute_process(COMMAND ${EDEPMANAGER} info cmakedir
-            OUTPUT_VARIABLE depmanager_path)
-    execute_process(COMMAND ${EDEPMANAGER} info version
+    execute_process(COMMAND ${EDEPMANAGER} info version --raw
             OUTPUT_VARIABLE depmanager_version)
-    message(STATUS "Depmanager found: version ${depmanager_version}")
-    string(STRIP ${depmanager_path} depmanager_path)
-    string(REPLACE "\\" "/" depmanager_path ${depmanager_path})
-    list(PREPEND CMAKE_MODULE_PATH ${depmanager_path})
+    string(STRIP ${depmanager_version} depmanager_version)
+    string(REPLACE "depmanager" "" depmanager_version ${depmanager_version})
+    string(REPLACE "version" "" depmanager_version ${depmanager_version})
+    string(STRIP ${depmanager_version} depmanager_version)
+    message(STATUS "Depmanager found: ${EDEPMANAGER} version ${depmanager_version}")
+
+    execute_process(COMMAND ${EDEPMANAGER} info cmakedir --raw
+            OUTPUT_VARIABLE depmanager_cmake_dir)
+    string(STRIP ${depmanager_cmake_dir} depmanager_cmake_dir)
+    string(REPLACE "\\" "/" depmanager_cmake_dir ${depmanager_cmake_dir})
+    string(REPLACE "\n" "" depmanager_cmake_dir ${depmanager_cmake_dir})
+    string(REPLACE "\r" "" depmanager_cmake_dir ${depmanager_cmake_dir})
+    message(STATUS "Depmanager cmake modules path: ${depmanager_cmake_dir}")
+    if (NOT EXISTS ${depmanager_cmake_dir}/DepManager.cmake)
+        message(FATAL_ERROR "Depmanager cmake modules not found at: ${depmanager_cmake_dir}")
+    endif ()
+
+    list(PREPEND CMAKE_MODULE_PATH ${depmanager_cmake_dir})
     include(DepManager)
 endif ()
 
