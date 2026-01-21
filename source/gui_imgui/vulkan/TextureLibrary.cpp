@@ -55,33 +55,34 @@ void TextureLibrary::loadImageTexture(const std::string& iName, const std::files
 			VulkanContext::get().loadImage(imageData, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
 	m_texturePaths[iName] = iTexturePath;
 	stbi_image_free(imageData);
-	//log_trace("Loaded texture: {} from {}", iName, iTexturePath.string());
 }
 
 void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesystem::path& iTexturePath,
 									const uint32_t iWidth, const uint32_t iHeight) {
-	NSVGimage* image = nsvgParseFromFile(iTexturePath.string().c_str(), "px", 96.0f);
-	if (image == nullptr) {
+	struct SvgImageDeleter {
+		void operator()(NSVGimage* iImg) const { nsvgDelete(iImg); }
+	};
+	struct SvgRasterizerDeleter {
+		void operator()(NSVGrasterizer* iRast) const { nsvgDeleteRasterizer(iRast); }
+	};
+
+	const std::unique_ptr<NSVGimage, SvgImageDeleter> imagePtr(nsvgParseFromFile(iTexturePath.string().c_str(), "px", 96.0f));
+	const std::unique_ptr<NSVGrasterizer, SvgRasterizerDeleter> rastPtr(nsvgCreateRasterizer());
+	if (!imagePtr) {
 		log_error("Failed to load SVG: {} from {}", iName, iTexturePath.string());
 		return;
 	}
-
-	NSVGrasterizer* rast = nsvgCreateRasterizer();
-	if (rast == nullptr) {
+	if (!rastPtr) {
 		log_error("Failed to create SVG rasterizer");
-		nsvgDelete(image);
 		return;
 	}
-
 	std::vector<unsigned char> imageData(static_cast<size_t>(iWidth * iHeight * 4));
-	nsvgRasterize(rast, image, 0, 0, static_cast<float>(iWidth) / image->width, imageData.data(),
+	nsvgRasterize(rastPtr.get(), imagePtr.get(), 0, 0, static_cast<float>(iWidth) / imagePtr->width, imageData.data(),
 				  static_cast<int>(iWidth), static_cast<int>(iHeight), static_cast<int>(iWidth) * 4);
 
 	m_textureMap[iName] = VulkanContext::get().loadImage(imageData.data(), iWidth, iHeight, 4);
 	m_texturePaths[iName] = iTexturePath;
 
-	nsvgDeleteRasterizer(rast);
-	nsvgDelete(image);
 	log_trace("Loaded SVG texture: {} from {}", iName, iTexturePath.string());
 }
 
@@ -121,7 +122,7 @@ void TextureLibrary::loadFolder(const std::filesystem::path& iFolderPath) {
 	for (const auto& entry: std::filesystem::directory_iterator(iFolderPath)) {
 		if (entry.is_regular_file()) {
 			if (const auto ext = entry.path().extension().string();
-				ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp" || ext == ".tga") {
+				ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".bmp" || ext == ".tga" || ext == ".svg") {
 				loadTexture(entry.path());
 			}
 		}

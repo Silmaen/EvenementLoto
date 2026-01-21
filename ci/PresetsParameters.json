@@ -1,32 +1,58 @@
 {
   "defaults": {
     "docker_registry": "registry.argawaen.net",
-    "docker_namespace": "builder"
+    "docker_namespace": "builder",
+    "release_preset": "",
+    "run_tests": false,
+    "run_deploy": false,
+    "run_documentation": false,
+    "run_coverage": false
   },
   "presets": {
     "linux-clang-debug": {
       "run_tests": true,
       "run_deploy": true,
+      "run_documentation": true,
+      "run_coverage": true,
       "release_preset": "linux-clang-release",
       "docker_image": "builder-clang18-ubuntu2404"
     },
     "linux-gcc-debug": {
       "run_tests": true,
-      "run_deploy": false,
+      "run_coverage": true,
       "release_preset": "linux-gcc-release",
       "docker_image": "builder-gcc14-ubuntu2404"
     },
     "windows-clang-debug": {
       "run_tests": true,
       "run_deploy": true,
+      "run_documentation": true,
       "release_preset": "windows-clang-release",
       "docker_image": ""
     },
     "windows-gcc-debug": {
       "run_tests": true,
-      "run_deploy": false,
       "release_preset": "windows-gcc-release",
       "docker_image": ""
+    },
+    "linux-clang-tidy": {
+      "docker_image": "builder-clang18-ubuntu2404"
+    },
+    "linux-sanitizer-address": {
+      "run_tests": true,
+      "docker_image": "builder-clang18-ubuntu2404"
+    },
+    "linux-sanitizer-thread": {
+      "run_tests": true,
+      "docker_image": "builder-clang18-ubuntu2404"
+    },
+    "linux-sanitizer-undefined-behavior": {
+      "run_tests": true,
+      "docker_image": "builder-clang18-ubuntu2404"
+    },
+    "linux-sanitizer-leak": {
+      "run_tests": true,
+      "docker_image": "builder-clang18-ubuntu2404"
     }
   }
 }

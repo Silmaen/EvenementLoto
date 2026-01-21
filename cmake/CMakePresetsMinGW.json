@@ -21,7 +21,10 @@
       "inherits": [
         "toolset-mingw",
         "gcc-debug"
-      ]
+      ],
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      }
     },
     {
       "name": "windows-clang-release",
@@ -35,7 +38,10 @@
       "inherits": [
         "toolset-mingw",
         "clang-debug"
-      ]
+      ],
+      "cacheVariables": {
+        "EVL_ENABLE_COVERAGE": "ON"
+      }
     }
   ]
 }

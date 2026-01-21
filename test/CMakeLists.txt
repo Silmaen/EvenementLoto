@@ -38,15 +38,6 @@ foreach (child ${children})
             endif ()
             target_link_libraries(${${child}_exe} GTest::gtest)
             target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
-            if (${child} MATCHES "gui_qt")
-                target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_qt)
-                if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
-                    target_compile_options(${${child}_exe} PRIVATE
-                            -Wno-reserved-identifier
-                            -Wno-missing-prototypes
-                    )
-                endif ()
-            endif ()
             if (${child} MATCHES "gui_imgui")
                 target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui_imgui)
             endif ()
