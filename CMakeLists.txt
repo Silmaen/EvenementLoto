@@ -1,8 +1,6 @@
 #
 #  CMAKE du projet d'événement loto
 #
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
-#
 # ---=== GENERALITIES ===---
 #
 cmake_minimum_required(VERSION 3.24)
@@ -12,92 +10,31 @@ project(EvenementLoto VERSION 0.4.0 LANGUAGES CXX)
 #
 # ---=== Options ===---
 #
-option(${PROJECT_PREFIX}_DOC_ONLY "To only generate documentation" OFF)
 option(${PROJECT_PREFIX}_TESTING "To build the tests" ON)
-
-set(${PROJECT_PREFIX}_ROOT_DIR "${PROJECT_SOURCE_DIR}")
+option(${PROJECT_PREFIX}_PACKAGING "To enable packaging" ON)
 #
 # ---=== Base Configs ===---
 #
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 include(BaseConfig)
-
-
-if (NOT ${PROJECT_PREFIX}_DOC_ONLY)
-    #
-    # ---=== Sanitizers ===---
-    #
-    include(Sanitizers)
-
-    #
-    # ---=== The Program ===---
-    #
-    add_subdirectory(source)
-
-    #
-    # ---=== TESTING PROCEDURES ===---
-    #
-
-    if (${PROJECT_PREFIX}_TESTING)
-        enable_testing()
-        add_subdirectory(test)
-    endif ()
+#
+# ---=== The Program ===---
+#
+add_subdirectory(source)
+#
+# ---=== TESTING PROCEDURES ===---
+#
+if (${PROJECT_PREFIX}_TESTING)
+    enable_testing()
+    add_subdirectory(test)
 endif ()
 #
 # ---=== Packaging ===---
 #
-include(CPackConfig.cmake)
-include(CPack)
-add_custom_target(Package
-        DEPENDS ${CMAKE_PROJECT_NAME})
-set(PACKAGE_BINARY ${PROJECT_BINARY_DIR}/source)
-
-set(PACKAGE_LOCATION ${PROJECT_BINARY_DIR}/bin)
-# copy main executable
-
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    # copy along dlls
-    cmake_path(GET CMAKE_CXX_COMPILER PARENT_PATH COMPILER_PATH)
-
-    set(BASE_LIBS stdc++-6 gcc_s_seh-1 winpthread-1 zlib1 zstd)
-
-    foreach (BASE_LIB ${BASE_LIBS})
-        if (EXISTS ${COMPILER_PATH}/lib${BASE_LIB}.dll)
-            add_custom_command(TARGET Package POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${COMPILER_PATH}/lib${BASE_LIB}.dll"
-                    "${PROJECT_BINARY_DIR}/bin")
-        elseif (EXISTS ${COMPILER_PATH}/${BASE_LIB}.dll)
-            add_custom_command(TARGET Package POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${COMPILER_PATH}/${BASE_LIB}.dll"
-                    "${PROJECT_BINARY_DIR}/bin")
-        else ()
-            message(FATAL_ERROR "${BASE_LIB} : Not found")
-        endif ()
-    endforeach ()
+if (${PROJECT_PREFIX}_PACKAGING)
+    include(CPackConfig.cmake)
+    include(CPack)
 endif ()
-
-add_custom_command(
-        TARGET Package POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/document/Readme.md ${PROJECT_BINARY_DIR}/bin)
-add_custom_command(
-        TARGET Package POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${PROJECT_SOURCE_DIR}/data/base_rules.txt ${PROJECT_BINARY_DIR}/bin/data
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/slides ${PROJECT_BINARY_DIR}/bin/data/slides
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${PROJECT_SOURCE_DIR}/data/theme ${PROJECT_BINARY_DIR}/bin/data/theme)
-
-install(DIRECTORY ${CMAKE_BINARY_DIR}/bin/ DESTINATION .)
-if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    add_custom_command(
-            TARGET Package POST_BUILD
-            COMMAND ${CMAKE_CPACK_COMMAND} -G ZIP)
-else ()
-    add_custom_command(
-            TARGET Package POST_BUILD
-            COMMAND ${CMAKE_CPACK_COMMAND} -G TGZ)
-endif ()
-
 #
 # ---=== End ===---
 #

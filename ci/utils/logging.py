@@ -56,7 +56,7 @@ def setup_logging(level: int = logging.DEBUG) -> None:
             )
             rich = None
         if rich is not None:
-            handler = rich.logging.RichHandler()
+            handler = rich.logging.RichHandler(markup=True, log_time_format="[%Y/%m/%d %X]")
             handler.setFormatter(logging.Formatter("%(message)s"))
         else:
             handler = logging.StreamHandler()

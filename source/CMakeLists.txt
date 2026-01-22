@@ -2,96 +2,17 @@
 #
 # ----==== Base Library ====----
 #
-file(GLOB_RECURSE
-        SRCS
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/core/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/basedefine.h
-)
-add_library(${CMAKE_PROJECT_NAME}_lib ${SRCS})
-target_include_directories(${CMAKE_PROJECT_NAME}_lib PUBLIC .)
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC ${CMAKE_PROJECT_NAME}_Base)
-# precompiled headers
-if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
-        target_precompile_headers(${CMAKE_PROJECT_NAME}_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
-    endif ()
-endif ()
-set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES FOLDER "core_libs")
-
-# ----==== third party ====----
-# json
-find_package(jsoncpp REQUIRED)
-message(STATUS "Found jsoncpp: ${jsoncpp_DIR} (found version: ${jsoncpp_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC jsoncpp_static)
-
-# YAML
-find_package(yaml-cpp REQUIRED)
-message(STATUS "Found yaml-cpp: ${yaml-cpp_DIR} (found version: ${yaml-cpp_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC yaml-cpp::yaml-cpp)
-
-#spdlog
-find_package(spdlog REQUIRED)
-message(STATUS "Found spdlog: ${spdlog_DIR} (found version: ${spdlog_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog)
-
-#magic enum
-find_package(magic_enum REQUIRED)
-message(STATUS "Found magic_enum: ${magic_enum_DIR} (found version: ${magic_enum_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC magic_enum::magic_enum)
-copy_shared_libraries(${CMAKE_PROJECT_NAME}_lib)
+add_subdirectory(core)
 #
 # ----====  UI Library ====----
 #
 #  ImGUI UI lib
 #
-file(GLOB_RECURSE
-        SRCS_UI_IMGUI
-        ${CMAKE_CURRENT_SOURCE_DIR}/gui_imgui/*
-)
-add_library(${CMAKE_PROJECT_NAME}_ui_imgui ${SRCS_UI_IMGUI})
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PUBLIC
-        ${CMAKE_PROJECT_NAME}_lib
-)
-# precompiled headers
-if (NOT ${PROJECT_PREFIX}_ENABLE_CLANG_TIDY)
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/pch.h")
-        target_precompile_headers(${CMAKE_PROJECT_NAME}_ui_imgui INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/pch.h)
-    endif ()
-endif ()
-set_target_properties(${CMAKE_PROJECT_NAME}_ui_imgui PROPERTIES FOLDER "core_libs")
+add_subdirectory(resources)
+add_subdirectory(gui_imgui)
 
-find_package(ImGui REQUIRED)
-message(STATUS "Found ImGui: ${ImGui_DIR} (found version: ${ImGui_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE imgui::imgui)
-
-find_package(glfw3 REQUIRED)
-message(STATUS "Found glfw3: ${glfw3_DIR} (found version: ${glfw3_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE glfw)
-
-find_package(stb_image REQUIRED)
-message(STATUS "Found stb_image: ${stb_image_DIR} (found version: ${stb_image_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE stb_image::stb_image)
-
-find_package(NanoSVG REQUIRED)
-message(STATUS "Found nanosvg: ${nanosvg_DIR} (found version: ${nanosvg_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE NanoSVG::nanosvg)
-
-find_package(nfd REQUIRED)
-message(STATUS "Found nfd: ${nfd_DIR}")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui_imgui PRIVATE nfd::nfd)
-
-add_custom_command(TARGET ${CMAKE_PROJECT_NAME}_ui_imgui POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/resources/darkicons"
-        "$<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/resources/darkicons"
-        COMMENT "Copying Icon resources..."
-        VERBATIM
-)
 #  ImGUI UI Library
 #
-target_link_vulkan(${CMAKE_PROJECT_NAME}_ui_imgui PUBLIC)
-copy_shared_libraries(${CMAKE_PROJECT_NAME}_ui_imgui)
 #
 # ----==== Main Executable ====----
 #
@@ -116,3 +37,58 @@ if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
 endif ()
 #  Main Executable
 #
+# install functions
+install(TARGETS ${CMAKE_PROJECT_NAME}
+        RUNTIME DESTINATION .
+        LIBRARY DESTINATION .
+)
+if (CMAKE_SYSTEM_NAME MATCHES "Windows")
+    install(CODE [[
+		file(GET_RUNTIME_DEPENDENCIES
+			EXECUTABLES $<TARGET_FILE:EvenementLoto>
+			RESOLVED_DEPENDENCIES_VAR _r_deps
+			UNRESOLVED_DEPENDENCIES_VAR _u_deps
+			DIRECTORIES ${CMAKE_BINARY_DIR}
+			PRE_EXCLUDE_REGEXES "api-ms-.*" "ext-ms-.*"
+			POST_EXCLUDE_REGEXES ".*[Ss]ystem32/.*\\.dll"
+		)
+		foreach(_file ${_r_deps})
+			file(INSTALL
+				DESTINATION "${CMAKE_INSTALL_PREFIX}"
+				TYPE SHARED_LIBRARY
+				FILES "${_file}"
+			)
+		endforeach()
+	]])
+elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
+    install(CODE [[
+		file(GET_RUNTIME_DEPENDENCIES
+			EXECUTABLES $<TARGET_FILE:EvenementLoto>
+			RESOLVED_DEPENDENCIES_VAR _r_deps
+			UNRESOLVED_DEPENDENCIES_VAR _u_deps
+			DIRECTORIES ${CMAKE_BINARY_DIR}
+			PRE_EXCLUDE_REGEXES "^/lib" "^/usr/lib"
+			POST_EXCLUDE_REGEXES "^/lib" "^/usr/lib"
+		)
+		foreach(_file ${_r_deps})
+			file(INSTALL
+				DESTINATION "${CMAKE_INSTALL_PREFIX}"
+				TYPE SHARED_LIBRARY
+				FOLLOW_SYMLINK_CHAIN
+				FILES "${_file}"
+			)
+		endforeach()
+	]])
+endif ()
+
+if (EXISTS "${CMAKE_SOURCE_DIR}/data")
+    install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/"
+            DESTINATION data
+            PATTERN ".git" EXCLUDE
+    )
+endif ()
+# When Documetation will be ready, just include it into the build process
+#install(DIRECTORY "${CMAKE_BINARY_DIR}/Documentation/html/"
+#        DESTINATION doc
+#        OPTIONAL
+#)

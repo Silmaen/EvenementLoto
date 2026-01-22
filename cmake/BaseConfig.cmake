@@ -25,15 +25,11 @@ set(${PROJECT_PREFIX}_GNU_MINIMAL 14)
 set(${PROJECT_PREFIX}_CLANG_MINIMAL 18)
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(EXE_EXT ".exe")
-    set(LIB_EXT ".dll")
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
     set(${PROJECT_PREFIX}_PLATFORM_WINDOWS ON)
     set(${PROJECT_PREFIX}_PLATFORM_STR "Windows")
     target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_PLATFORM_WINDOWS)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(EXE_EXT "")
-    set(LIB_EXT ".so")
     message(STATUS "Detected Operating System '${CMAKE_SYSTEM_NAME}'")
     set(${PROJECT_PREFIX}_PLATFORM_LINUX ON)
     set(${PROJECT_PREFIX}_PLATFORM_STR "Linux")
@@ -43,15 +39,15 @@ else ()
 endif ()
 
 if (CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64|AMD64")
-    message(STATUS "Detected Architecture 'x86_64'")
+    message(STATUS "Detected Architecture 'x64'")
     set(${PROJECT_PREFIX}_ARCH_X86_64 ON)
-    set(${PROJECT_PREFIX}_ARCH_STR "x86_64")
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_ARCH_X86_64)
+    set(${PROJECT_PREFIX}_ARCH_STR "x64")
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_ARCH_X64)
 elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64|ARM64")
-    message(STATUS "Detected Architecture 'aarch64'")
+    message(STATUS "Detected Architecture 'arm64'")
     set(${PROJECT_PREFIX}_ARCH_AARCH64 ON)
-    set(${PROJECT_PREFIX}_ARCH_STR "aarch64")
-    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_ARCH_AARCH64)
+    set(${PROJECT_PREFIX}_ARCH_STR "arm64")
+    target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_ARCH_ARM64)
 else ()
     message(FATAL_ERROR "Unsupported Architecture '${CMAKE_SYSTEM_PROCESSOR}'")
 endif ()
@@ -89,17 +85,9 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-exit-time-destructors
             -Wno-global-constructors
             -Wno-unused-macros
+            -Wno-unsafe-buffer-usage
+            -Wno-switch-default
     )
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 17)
-        target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
-                -Wno-unsafe-buffer-usage
-        )
-    endif ()
-    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 18)
-        target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
-                -Wno-switch-default
-        )
-    endif ()
     set(${PROJECT_PREFIX}_COMPILER_CLANG ON)
     set(${PROJECT_PREFIX}_COMPILER_STR "clang")
 else ()
@@ -119,9 +107,6 @@ else ()
 endif ()
 
 set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output/install)
-
-set(${PROJECT_PREFIX}_INSTALL_BIN "bin/${${PROJECT_PREFIX}_PLATFORM_STR}_${${PROJECT_PREFIX}_ARCH_STR}")
-set(${PROJECT_PREFIX}_INSTALL_LIB "lib/${${PROJECT_PREFIX}_PLATFORM_STR}_${${PROJECT_PREFIX}_ARCH_STR}")
 
 add_custom_target(${CMAKE_PROJECT_NAME}_SuperBase)
 set_target_properties(${CMAKE_PROJECT_NAME}_SuperBase PROPERTIES FOLDER "Utils")
@@ -173,4 +158,5 @@ else ()
 endif ()
 
 include(DocumentationConfig)
+include(Sanitizers)
 include(Vulkan)
