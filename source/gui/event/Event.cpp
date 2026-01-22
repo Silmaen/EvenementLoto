@@ -22,9 +22,6 @@ Event::~Event() = default;
 
 auto WindowResizeEvent::getCategoryFlags() const -> uint8_t { return Application; }
 auto WindowCloseEvent::getCategoryFlags() const -> uint8_t { return Application; }
-auto AppTickEvent::getCategoryFlags() const -> uint8_t { return Application; }
-auto AppUpdateEvent::getCategoryFlags() const -> uint8_t { return Application; }
-auto AppRenderEvent::getCategoryFlags() const -> uint8_t { return Application; }
 
 auto KeyEvent::getCategoryFlags() const -> uint8_t { return Input | Keyboard; }
 auto KeyPressedEvent::getName() const -> std::string { return std::format("KeyPressedEvent"); }
@@ -35,7 +32,7 @@ auto KeyTypedEvent::getCategoryFlags() const -> uint8_t { return Input | Keyboar
 auto MouseMovedEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }
 auto MouseScrolledEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }
 auto MouseButtonEvent::getCategoryFlags() const -> uint8_t {
-	return static_cast<uint8_t>(Input | Mouse) | static_cast<uint8_t>(MouseButton);
+	return Input | Mouse | MouseButton;
 }
 auto MouseButtonPressedEvent::getName() const -> std::string { return std::format("MouseButtonPressedEvent"); }
 auto MouseButtonReleasedEvent::getName() const -> std::string { return std::format("MouseButtonReleasedEvent"); }
