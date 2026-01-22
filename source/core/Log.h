@@ -109,29 +109,61 @@ private:
 #define log_error(...) ::evl::Log::log(::evl::Log::Level::Error, __FILE__, __LINE__, __VA_ARGS__)
 #define log_critical(...) ::evl::Log::log(::evl::Log::Level::Critical, __FILE__, __LINE__, __VA_ARGS__)
 
+/**
+ * @brief Logs internal namespace.
+ */
 namespace evl::logs {
 
+/**
+ * @brief Log buffer class.
+ */
 class LogBuffer {
 public:
+	/**
+	 * @brief Log entry structure.
+	 */
 	struct LogEntry {
+		/// The log message.
 		std::string message;
+		/// The log level.
 		Log::Level level;
+		/// The log timestamp.
 		core::clock::time_point timestamp;
 	};
 
+	/**
+	 * @brief Get the Log Buffer singleton instance.
+	 * @return The Log Buffer instance.
+	 */
 	static auto get() -> LogBuffer& {
 		static LogBuffer instance;
 		return instance;
 	}
+
+	/**
+	 * @brief Add a log entry to the buffer.
+	 * @param iMessage The log message.
+	 * @param iLevel The log level.
+	 */
 	void addLog(const std::string& iMessage, Log::Level iLevel);
 
-	auto getLogs() const -> const std::vector<LogEntry>&;
+	/**
+	 * @brief Get the logs.
+	 * @return The log entries.
+	 */
+	[[nodiscard]] auto getLogs() const -> const std::vector<LogEntry>&;
 
+	/**
+	 * @brief Clear the log buffer.
+	 */
 	void clear();
 
 private:
+	/// @brief Default constructor.
 	LogBuffer() = default;
+	/// @brief Default destructor.
 	mutable std::mutex m_mutex;
+	/// The log entries.
 	std::vector<LogEntry> m_logs;
 };
 

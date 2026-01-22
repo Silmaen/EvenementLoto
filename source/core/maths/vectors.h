@@ -10,6 +10,9 @@
 
 #include <cmath>
 
+/**
+ * @brief Namespace for math functions and classes.
+ */
 namespace evl::math {
 
 /**
