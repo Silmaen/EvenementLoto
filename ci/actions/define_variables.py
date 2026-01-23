@@ -21,6 +21,7 @@ class DefineVariables(BaseAction):
 
         from ci.utils.preset import get_preset_config
         from ci.utils.teamcity import set_teamcity_parameter
+
         preset_config = get_preset_config(preset)
         if preset_config.release_preset not in [None, ""]:
             set_teamcity_parameter("release_preset", preset_config.release_preset)
@@ -29,7 +30,24 @@ class DefineVariables(BaseAction):
         if preset_config.run_deploy is not None:
             set_teamcity_parameter("run_deploy", str(preset_config.run_deploy).lower())
         if preset_config.run_coverage is not None:
-            set_teamcity_parameter("run_coverage", str(preset_config.run_coverage).lower())
+            set_teamcity_parameter(
+                "run_coverage", str(preset_config.run_coverage).lower()
+            )
         if preset_config.run_documentation is not None:
-            set_teamcity_parameter("run_documentation", str(preset_config.run_documentation).lower())
+            set_teamcity_parameter(
+                "run_documentation", str(preset_config.run_documentation).lower()
+            )
+        artifact_path = """+:output/build/%cmake_preset%/bin => BuildArtefact.zip!bin/debug/
++:output/build/%cmake_preset%/lib => BuildArtefact.zip!lib/debug/
++:output/build/%cmake_preset%/test/*.xml => BuildArtefact.zip!test/debug/
++:output/build/%cmake_preset%/Coverage => Coverage.zip"""
+        if preset_config.release_preset not in [None, ""]:
+            artifact_path += """+:output/build/%release_preset%/bin => BuildArtefact.zip!bin/release/
++:output/build/%release_preset%/lib => BuildArtefact.zip!lib/release/
++:output/build/%release_preset%/test/*.xml => BuildArtefact.zip!test/release/
++:output/build/%release_preset%/Documentation/html => Documentation.zip
++:output/build/%release_preset%/*.zip
++:output/build/%release_preset%/*.tar.gz"""
+        set_teamcity_parameter("artifact_path", artifact_path)
+
         return 0
