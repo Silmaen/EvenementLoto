@@ -48,6 +48,7 @@ class DefineVariables(BaseAction):
 +:output/build/%release_preset%/Documentation/html => Documentation.zip
 +:output/build/%release_preset%/*.zip
 +:output/build/%release_preset%/*.tar.gz"""
+        log.info(f"Setting artifact path:\n{artifact_path}")
         set_teamcity_parameter("artifact_path", artifact_path)
 
         return 0
