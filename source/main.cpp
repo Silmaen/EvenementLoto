@@ -13,7 +13,7 @@
 #include <core/Log.h>
 #include <core/Settings.h>
 #include <core/utilities.h>
-#include <gui_imgui/Application.h>
+#include <gui/Application.h>
 #ifdef USE_QT
 #include <gui_qt/MainWindow.h>
 #include <gui_qt/baseDefinitions.h>
@@ -53,7 +53,7 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	if (settings->getValue<bool>("general/use_imgui", false)) {
 		log_info("Utilisation de l'interface ImGui");
 		// Startup
-		auto app = evl::gui_imgui::createApplication(iArgc, iArgv);
+		auto app = evl::gui::createApplication(iArgc, iArgv);
 		// Runtime
 		app->run();
 		// Shutdown

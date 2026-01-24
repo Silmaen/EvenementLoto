@@ -2,8 +2,7 @@
 if (NOT CMAKE_BUILD_TYPE MATCHES "Debug")
     message(FATAL_ERROR "Coverage only works on debug builds")
 endif ()
-#set(GCOVR ${Python_EXECUTABLE} -u -m gcovr)
-set(GCOVR gcovr)
+find_program(GCOVR gcovr)
 # Get gcov version
 execute_process(COMMAND ${GCOVR} --version
         OUTPUT_VARIABLE GCOVR_VERSION)
@@ -12,9 +11,9 @@ list(SUBLIST GCOVR_VERSION 0 1 GCOVR_VERSION)
 string(REPLACE " " ";" GCOVR_VERSION ${GCOVR_VERSION})
 list(SUBLIST GCOVR_VERSION 1 1 GCOVR_VERSION)
 
-message(STATUS "Found gcovr version ${GCOVR_VERSION}.")
-if (${GCOVR_VERSION} VERSION_LESS 7.0)
-    message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 7.0")
+message(STATUS "Found gcovr version ${GCOVR_VERSION} @ ${GCOVR}.")
+if (${GCOVR_VERSION} VERSION_LESS 8.5)
+    message(FATAL_ERROR "gcovr: Too old version of gcovr, minimum required is 8.5")
 endif ()
 
 target_compile_definitions(${CMAKE_PROJECT_NAME}_Base INTERFACE ${PROJECT_PREFIX}_COVERAGE)
