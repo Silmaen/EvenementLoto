@@ -526,6 +526,8 @@ void MainView::renderBottomConfigPanel() {
 	{
 		const auto infos = Application::get().getMonitorsInfo();
 		const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
+		if (displayView == nullptr)
+			return;
 		if (infos.size() == 1)
 			displayView->setFullscreen(false);
 		bool fullscreen = displayView->isFullscreen();

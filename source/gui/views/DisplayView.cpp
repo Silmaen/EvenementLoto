@@ -123,6 +123,8 @@ void DisplayView::onUpdate() {
 		m_fullscreen = false;
 		m_lastFullscreen = true;
 	}
+	if (m_monitorId >= monitors.size())
+		m_monitorId = 0;
 	const auto& desiredMonitor = monitors[m_monitorId];
 	math::vec2 monitorPos = {static_cast<float>(desiredMonitor.workAreaPosition.x()),
 							 static_cast<float>(desiredMonitor.workAreaPosition.y())};

@@ -108,6 +108,8 @@ void Application::run() {
 		if (m_state != State::Running)
 			continue;
 		const auto dview = getView("display_window");
+		if (dview == nullptr)
+			continue;
 		if (isDisplayNeeded()) {
 			if (!dview->visibility())
 				log_debug("Show Display view.");
@@ -193,27 +195,32 @@ auto Application::getModifiers() const -> Modifiers { return m_mainWindow.getMod
 
 void Application::checkActionEnable() const {
 	const auto status = m_currentEvent.getStatus();
+	const auto saveFileAs = getAction("save_file_as");
+	const auto saveFile = getAction("save_file");
+	const auto startGame = getAction("start_game");
+	const auto stopGame = getAction("stop_game");
+	const auto gameSettings = getAction("game_settings");
 	if (status == core::Event::Status::Invalid || status == core::Event::Status::MissingParties) {
-		getAction("save_file_as")->disable();
-		getAction("save_file")->disable();
+		if (saveFileAs) saveFileAs->disable();
+		if (saveFile) saveFile->disable();
 	} else {
-		getAction("save_file")->enable();
-		getAction("save_file_as")->enable();
+		if (saveFile) saveFile->enable();
+		if (saveFileAs) saveFileAs->enable();
 	}
 	if (status == core::Event::Status::Ready) {
-		getAction("start_game")->enable();
+		if (startGame) startGame->enable();
 	} else {
-		getAction("start_game")->disable();
+		if (startGame) startGame->disable();
 	}
 	if (status == core::Event::Status::Finished) {
-		getAction("stop_game")->enable();
+		if (stopGame) stopGame->enable();
 	} else {
-		getAction("stop_game")->disable();
+		if (stopGame) stopGame->disable();
 	}
 	if (status == core::Event::Status::Invalid) {
-		getAction("game_settings")->disable();
+		if (gameSettings) gameSettings->disable();
 	} else {
-		getAction("game_settings")->enable();
+		if (gameSettings) gameSettings->enable();
 	}
 }
 

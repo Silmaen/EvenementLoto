@@ -23,9 +23,7 @@ if (${PROJECT_PREFIX}_USE_POETRY)
         )
 
         if (NOT POETRY_INSTALL_RESULT EQUAL 0)
-            message(WARNING "Poetry sync failed or Poetry not installed. Attempting to continue...")
-            message(STATUS "Poetry output: ${POETRY_INSTALL_OUTPUT}")
-            message(STATUS "Poetry error: ${POETRY_INSTALL_ERROR}")
+            message(FATAL_ERROR "Poetry sync failed: ${POETRY_INSTALL_ERROR}")
         endif ()
 
     else ()

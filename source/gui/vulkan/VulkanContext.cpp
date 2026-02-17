@@ -171,7 +171,8 @@ auto beginSingleTimeCommands(const VkData& iVkData) -> VkCommandBuffer {
 												.commandBufferCount = 1};
 
 	VkCommandBuffer commandBuffer = VK_NULL_HANDLE;
-	vkAllocateCommandBuffers(iVkData.device, &allocInfo, &commandBuffer);
+	const VkResult result = vkAllocateCommandBuffers(iVkData.device, &allocInfo, &commandBuffer);
+	VulkanContext::checkVkResult(result, __FILE__, __LINE__);
 
 	constexpr VkCommandBufferBeginInfo beginInfo{.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
 												 .pNext = nullptr,
@@ -326,7 +327,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		err = vkCreateInstance(&create_info, m_data.allocator, &m_data.instance);
 		checkVkResult(err, __FILE__, __LINE__);
 #ifdef IMGUI_IMPL_VULKAN_USE_VOLK
-		volkLoadInstance(g_Instance);
+		volkLoadInstance(m_data.instance);
 #endif
 
 		// Setup the debug report callback

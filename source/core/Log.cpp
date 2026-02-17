@@ -104,6 +104,8 @@ void Log::setPattern() {
 	if (!initiated())
 		return;
 	const auto& sk = g_logger->sinks();
+	if (sk.size() < 2)
+		return;
 	if (m_verbosity == Level::Debug || m_verbosity == Level::Trace) {
 		sk[0]->set_pattern(console_pattern_dbg);
 		sk[1]->set_pattern(file_pattern_dbg);
@@ -121,7 +123,7 @@ void LogBuffer::addLog(const std::string& iMessage, Log::Level iLevel) {
 		m_logs.erase(m_logs.begin());
 	}
 }
-auto LogBuffer::getLogs() const -> const std::vector<LogEntry>& {
+auto LogBuffer::getLogs() const -> std::vector<LogEntry> {
 	const std::scoped_lock<std::mutex> lock(m_mutex);
 	return m_logs;
 }

@@ -34,6 +34,6 @@ class Deploy(BaseAction):
         )
         chdir(cwd)
         if build_result != 0:
-            log.error("CMake build failed.")
+            log.error("CPack packaging failed.")
             return build_result
         return 0

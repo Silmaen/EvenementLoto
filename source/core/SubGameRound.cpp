@@ -84,7 +84,7 @@ void SubGameRound::read(std::istream& iBs, const int iFileVersion) {
 		uint32_t readTmp = 0;//----UNCOVER----
 		iBs.read(reinterpret_cast<char*>(&readTmp), sizeof(uint32_t));//----UNCOVER----
 		if (readTmp != 0)//----UNCOVER----
-			m_winner = "toto";//----UNCOVER----
+			m_winner = "gagnant";//----UNCOVER----
 		else//----UNCOVER----
 			m_winner = "";//----UNCOVER----
 	} else {//----UNCOVER----
@@ -160,7 +160,7 @@ void SubGameRound::fromJson(const Json::Value& iJson) {
 	if (const auto val = iJson.get("prices", ""); val.isString()) {
 		m_prices = val.asString();
 	}
-	if (const auto val = iJson.get("prices", 0); val.isDouble()) {
+	if (const auto val = iJson.get("value", 0); val.isDouble()) {
 		m_pricesValue = val.asDouble();
 	}
 	if (const auto val = iJson.get("winner", ""); val.isString()) {

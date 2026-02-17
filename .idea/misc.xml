@@ -12,6 +12,7 @@
   <component name="CidrRootsConfiguration">
     <excludeRoots>
       <file path="$PROJECT_DIR$/.venv" />
+      <file path="$PROJECT_DIR$/output" />
     </excludeRoots>
   </component>
 </project>

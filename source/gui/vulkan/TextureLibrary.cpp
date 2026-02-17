@@ -51,10 +51,15 @@ void TextureLibrary::loadImageTexture(const std::string& iName, const std::files
 		return;
 	}
 
-	m_textureMap[iName] =
+	const auto textureId =
 			VulkanContext::get().loadImage(imageData, static_cast<uint32_t>(width), static_cast<uint32_t>(height), 4);
-	m_texturePaths[iName] = iTexturePath;
 	stbi_image_free(imageData);
+	if (textureId == 0) {
+		log_error("Failed to create GPU texture: {} from {}", iName, iTexturePath.string());
+		return;
+	}
+	m_textureMap[iName] = textureId;
+	m_texturePaths[iName] = iTexturePath;
 }
 
 void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesystem::path& iTexturePath,

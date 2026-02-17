@@ -25,7 +25,7 @@ foreach (child ${children})
                 SRCS
                 ${CMAKE_CURRENT_SOURCE_DIR}/${child}/*.cpp
         )
-        if ("${SRCS} " STREQUAL " ")
+        if (NOT SRCS)
             message(STATUS "Test folder '${child}' is empty, skipping")
         else ()
 
