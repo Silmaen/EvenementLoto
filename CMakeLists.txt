@@ -6,7 +6,7 @@
 cmake_minimum_required(VERSION 3.24)
 set(PROJECT_PREFIX EVL)
 set(PROJECT_PREFIX_LOWER evl)
-project(EvenementLoto VERSION 0.4.0 LANGUAGES CXX)
+project(EvenementLoto VERSION 0.4.1 LANGUAGES CXX)
 #
 # ---=== Options ===---
 #

@@ -71,7 +71,7 @@ Le programme a été correctement compilé avec :
 * Contrôle et paramètres
     * [ ] permettre le choix de la police de caractère
 
-### Version 0.4.1 (planned for spring 2026)
+### Version 0.4.2 (planned for summer 2026)
 
 * Contrôle et paramètres
     * [ ] délai de réactivation des boutons de tirage (éviter de tirer des nombres trop vite, donner une idée du tempo)
@@ -79,10 +79,23 @@ Le programme a été correctement compilé avec :
         * [ ] permettre de régler cette valeur dans les onglets du bas
 * Affichage
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
-    * [ ] Suppression du code QT
 * Packaging
     * [ ] Package des resources.
     * [ ] Inclusion de la documentation dans le paquet.
+
+### Version 0.4.1 (Released 17 February 2026)
+
+* Affichage
+    * [X] Suppression du code QT
+* Sauvegarde et restauration
+    * [X] Sauvegarde périodique de la partie en cours dans rescue.lev
+* Misc
+    * [X] Corrections de bugs.
+    * [X] Amélioration de la stabilité générale du logiciel.
+    * [X] Amélioration de la gestion des erreurs (affichage d'un message d'erreur plus clair et plus précis en cas de
+      problème)
+    * [X] Amélioration des performances générales du logiciel (optimisation du code, réduction de la consommation de
+      ressources, etc.)
 
 ### Version 0.4.0 (Released 15 January 2026)
 
@@ -101,10 +114,10 @@ Le programme a été correctement compilé avec :
     * [X] Amélioration du rendu des boutons de numéro sur la grille du présentateur
         * [X] Police d'écriture adaptative
         * [X] Meilleure différence de contraste entre numéro tiré et non tiré
-* moteur de jeu
+* Moteur de jeu
     * [X] Flexibilité en jeu
         * [X] permettre de réorganiser les parties non entamées
-        * [X] permettre l'édition de parties non entamée
+        * [X] permettre l'édition de parties non entamée.
 * Sauvegarde et restauration
     * [X] mettre à jour les import json
     * [X] Permettre l'import/export au format YAML

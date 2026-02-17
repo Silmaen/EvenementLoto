@@ -184,19 +184,6 @@ public:
 	 */
 	auto getCurrentFile() -> std::filesystem::path& { return m_currentFile; }
 	/**
-	 * @brief Draw mode of the number.
-	 */
-	enum struct DrawMode : uint8_t {
-		Both,///< Both manual and using internal RNG.
-		PickOnly,///< Using the internal RNG.
-		ManualOnly///< Manual picking (external)
-	};
-	/**
-	 * @brief Access to the draw mode.
-	 * @return The draw mode.
-	 */
-	auto getDrawMode() -> DrawMode& { return m_currentDrawMode; }
-	/**
 	 * @brief Access to the texture library.
 	 * @return The texture library.
 	 */
@@ -269,8 +256,6 @@ private:
 	core::Event m_currentEvent{};
 	/// The current file.
 	std::filesystem::path m_currentFile{};
-	/// The current draw mode.
-	DrawMode m_currentDrawMode = DrawMode::Both;
 	/// The random number generator.
 	core::RandomNumberGenerator m_rng;
 

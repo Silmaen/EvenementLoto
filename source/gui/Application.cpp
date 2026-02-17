@@ -254,8 +254,12 @@ void Application::autoSave() {
 		return;
 	m_lastAutoSave = now;
 	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
-	if (!exists(dataLocation))
+	if (!exists(dataLocation) && !dataLocation.empty())
 		create_directories(dataLocation);
+	else if (!is_directory(dataLocation)) {
+		log_warn("Data location '{}' is not a directory, cannot autosave.", dataLocation.string());
+		return;
+	}
 	const auto rescuePath = dataLocation / "rescue.lev";
 	std::ofstream f(rescuePath, std::ios::out | std::ios::binary);
 	if (!f.is_open()) {
