@@ -18,6 +18,7 @@
 #include "vulkan/TextureLibrary.h"
 
 #include <core/Event.h>
+#include <core/timeFunctions.h>
 #include <list>
 #include <memory>
 
@@ -278,6 +279,14 @@ private:
 
 	/// Display preview flag.
 	bool m_displayPreview = false;
+
+	/// Timestamp of the last autosave.
+	core::time_point m_lastAutoSave{};
+
+	/**
+	 * @brief Autosave the current event to rescue.lev if a game is in progress.
+	 */
+	void autoSave();
 
 	/**
 	 * @brief check the enablement of the actions.

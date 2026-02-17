@@ -44,6 +44,10 @@ foreach (child ${children})
             set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
             add_test(${PROJECT_PREFIX_LOWER}_${child}_UTests ${${PROJECT_PREFIX_LOWER}_${child}_test_command})
             set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES TIMEOUT 3600)
+            if (${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER)
+                set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES
+                        ENVIRONMENT "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/lsan_suppressions.txt")
+            endif ()
             if (${PROJECT_PREFIX}_BUILD_SHARED AND WIN32)
                 add_custom_command(TARGET ${${child}_exe} POST_BUILD
                         COMMAND ${CMAKE_COMMAND} -E copy_if_different "${GTest_DIR}/../../../bin/libgtest$<$<CONFIG:Debug>:d>.dll" "${CMAKE_BINARY_DIR}/bin"
@@ -52,9 +56,15 @@ foreach (child ${children})
             endif ()
 
             add_dependencies(All_Tests ${${child}_exe})
-            add_custom_command(TARGET All_Tests POST_BUILD
-                    COMMAND ${${child}_exe}
-                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+            if (${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER)
+                add_custom_command(TARGET All_Tests POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E env "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/lsan_suppressions.txt" ${${child}_exe}
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+            else ()
+                add_custom_command(TARGET All_Tests POST_BUILD
+                        COMMAND ${${child}_exe}
+                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+            endif ()
         endif ()
     endif ()
 endforeach ()

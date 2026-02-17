@@ -12,6 +12,7 @@
 
 namespace evl::core {
 
+//NOLINTBEGIN(cert-msc32-c,cert-msc51-cpp)
 RandomNumberGenerator::RandomNumberGenerator(const bool iDebug) {
 	if (iDebug) {
 		m_rng.seed(1234);
@@ -19,6 +20,7 @@ RandomNumberGenerator::RandomNumberGenerator(const bool iDebug) {
 		m_rng.seed(static_cast<uint32_t>(std::chrono::steady_clock::now().time_since_epoch().count()));
 	}
 }
+//NOLINTEND(cert-msc32-c,cert-msc51-cpp)
 
 auto RandomNumberGenerator::addPick(const uint8_t& iNumber) -> bool {
 	if (std::ranges::find(m_alreadyPicked, iNumber) != m_alreadyPicked.end())

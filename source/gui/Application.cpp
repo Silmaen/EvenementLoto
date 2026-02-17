@@ -122,6 +122,7 @@ void Application::run() {
 		for (const auto& view: m_views) { view->update(); }
 		for (const auto& popup: m_popups) { popup->update(); }
 		m_mainWindow.render(m_theme.windowBackground);
+		autoSave();
 		frameCount++;
 		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
 			log_info("Maximum frame count {} reached, closing application.", m_maxFrame);
@@ -238,6 +239,29 @@ void Application::setDisplayPreview(const bool iDisplay) {
 	if (!iDisplay) {
 		dv->setEventToRender(m_currentEvent);
 	}
+}
+
+void Application::autoSave() {
+	const auto status = m_currentEvent.getStatus();
+	if (status == core::Event::Status::Invalid || status == core::Event::Status::Finished)
+		return;
+	const auto now = core::clock::now();
+	if (core::durationSeconds(now - m_lastAutoSave) < 10.0)
+		return;
+	m_lastAutoSave = now;
+	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
+	if (!exists(dataLocation))
+		create_directories(dataLocation);
+	const auto rescuePath = dataLocation / "rescue.lev";
+	std::ofstream f;
+	f.open(rescuePath, std::ios::out | std::ios::binary);
+	if (!f.is_open()) {
+		log_warn("Failed to open autosave file '{}'.", rescuePath.string());
+		return;
+	}
+	m_currentEvent.write(f);
+	f.close();
+	log_trace("Autosaved event to '{}'.", rescuePath.string());
 }
 
 }// namespace evl::gui
