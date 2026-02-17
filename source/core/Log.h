@@ -9,6 +9,7 @@
 #pragma once
 #include "timeFunctions.h"
 
+#include <deque>
 #include <filesystem>
 #include <mutex>
 
@@ -151,7 +152,7 @@ public:
 	 * @brief Get the logs.
 	 * @return The log entries.
 	 */
-	[[nodiscard]] auto getLogs() const -> std::vector<LogEntry>;
+	[[nodiscard]] auto getLogs() const -> std::deque<LogEntry>;
 
 	/**
 	 * @brief Clear the log buffer.
@@ -164,7 +165,7 @@ private:
 	/// @brief Default destructor.
 	mutable std::mutex m_mutex;
 	/// The log entries.
-	std::vector<LogEntry> m_logs;
+	std::deque<LogEntry> m_logs;
 };
 
 }// namespace evl::logs

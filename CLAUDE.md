@@ -16,6 +16,7 @@ Author: Silmaen
   - `source/gui/views/` - View components (MainView, DisplayView, MenuBar, ToolBar, StatusBar, ConfigPopups, HelpPopups)
   - `source/gui/actions/` - Action handlers (FileActions, GameActions, SettingsActions, HelpActions)
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
+  - `source/gui/utils/` - UI utilities (FileDialog, Convert, Rendering helpers)
 - `source/resources/` - Icon resources (dark icons copied at build time)
 - `source/main.cpp` - Entry point (supports ImGui UI; legacy Qt path still exists behind `USE_QT` ifdef)
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
@@ -36,20 +37,21 @@ Author: Silmaen
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
-### Math Utilities (namespace `evl::core::math`)
+### Math Utilities (namespace `evl::math`)
 
 - `vectors.h` - Generic `Vector<BaseType, Dim>` template (fixed-size array backed)
 - Type aliases: `vec2`, `vec2i`, etc.
 
 ### GUI (namespace `evl::gui`)
 
-- `Application` - Singleton application class, manages views/popups/actions, Vulkan rendering
+- `Application` - Singleton application class, manages views/popups/actions, Vulkan rendering, autosave (`rescue.lev` every 10s during active gameplay)
 - `MainWindow` - GLFW window management with Vulkan surface
-- `Theme` - Theme configuration for the UI
+- `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in settings)
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
 - `views/` - View, MainView, DisplayView, MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups
 - `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
+- `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), Rendering (action buttons, text auto-fit)
 
 ## Build System
 
@@ -164,7 +166,7 @@ Python-based CI scripts in `ci/` (21 files), driven by `ci_action.py`:
 - Use early returns to reduce nesting
 - Use `[[nodiscard]]` on getters and query functions
 - Use `#pragma once` for header guards
-- Namespaces: `evl::core`, `evl::core::math`, `evl::gui`, `evl::gui::views`, `evl::gui::actions`, `evl::gui::event`, `evl::gui::vulkan`
+- Namespaces: `evl`, `evl::core`, `evl::math`, `evl::logs`, `evl::gui`, `evl::gui::views`, `evl::gui::actions`, `evl::gui::event`, `evl::gui::vulkan`, `evl::gui::utils`
 - Precompiled header: `pch.h` included in `.cpp` files
 
 ### Logging
@@ -188,3 +190,4 @@ All domain objects inherit from `Serializable` and implement:
 - Tests are in `test/lib_test/` (core, 10 files) and `test/gui_test/` (GUI, 6 files)
 - Coverage via gcovr (configured in `gcovr.cfg`)
 - Test helper header: `test/TestMainHelper.h`
+- Sanitizer suppressions: `lsan_suppressions.txt` (suppresses known libdbus leaks for Address/Leak sanitizer presets)

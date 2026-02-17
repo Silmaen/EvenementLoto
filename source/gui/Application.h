@@ -283,6 +283,14 @@ private:
 	/// Timestamp of the last autosave.
 	core::time_point m_lastAutoSave{};
 
+	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
+	std::shared_ptr<views::View> m_cachedDisplayView;
+	std::shared_ptr<actions::Action> m_cachedSaveFile;
+	std::shared_ptr<actions::Action> m_cachedSaveFileAs;
+	std::shared_ptr<actions::Action> m_cachedStartGame;
+	std::shared_ptr<actions::Action> m_cachedStopGame;
+	std::shared_ptr<actions::Action> m_cachedGameSettings;
+
 	/**
 	 * @brief Autosave the current event to rescue.lev if a game is in progress.
 	 */

@@ -40,14 +40,16 @@ class DefineVariables(BaseAction):
         artifact_path = """+:output/build/%cmake_preset%/bin => BuildArtefact.zip!bin/debug/
 +:output/build/%cmake_preset%/lib => BuildArtefact.zip!lib/debug/
 +:output/build/%cmake_preset%/test/*.xml => BuildArtefact.zip!test/debug/
-+:output/build/%cmake_preset%/Coverage => Coverage.zip"""
++:output/build/%cmake_preset%/Coverage => Coverage.zip
+"""
         if preset_config.release_preset not in [None, ""]:
             artifact_path += """+:output/build/%release_preset%/bin => BuildArtefact.zip!bin/release/
 +:output/build/%release_preset%/lib => BuildArtefact.zip!lib/release/
 +:output/build/%release_preset%/test/*.xml => BuildArtefact.zip!test/release/
 +:output/build/%release_preset%/Documentation/html => Documentation.zip
 +:output/build/%release_preset%/*.zip
-+:output/build/%release_preset%/*.tar.gz"""
++:output/build/%release_preset%/*.tar.gz
+"""
         log.info(f"Setting artifact path:\n{artifact_path}")
         set_teamcity_parameter("artifact_path", artifact_path)
 

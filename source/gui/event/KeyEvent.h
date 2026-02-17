@@ -185,6 +185,11 @@ public:
 			result += static_cast<char>(0xE0 | (m_codepoint >> 12));
 			result += static_cast<char>(0x80 | ((m_codepoint >> 6) & 0x3F));
 			result += static_cast<char>(0x80 | (m_codepoint & 0x3F));
+		} else if (m_codepoint < 0x110000) {
+			result += static_cast<char>(0xF0 | (m_codepoint >> 18));
+			result += static_cast<char>(0x80 | ((m_codepoint >> 12) & 0x3F));
+			result += static_cast<char>(0x80 | ((m_codepoint >> 6) & 0x3F));
+			result += static_cast<char>(0x80 | (m_codepoint & 0x3F));
 		}
 		return result;
 	}

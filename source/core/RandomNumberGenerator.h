@@ -16,6 +16,9 @@
  */
 namespace evl::core {
 
+/// Maximum bingo number (1 to g_maxNumber inclusive).
+constexpr uint8_t g_maxNumber = 90;
+
 /**
  * @brief Class permettant de tirer aléatoirement des nombres entre 1 et 90 (inclus).
  */
@@ -30,7 +33,7 @@ public:
 	/**
 	 * @brief Remet à zéro la liste des numéros déjà tiré.
 	 */
-	void resetPick() { m_alreadyPicked.clear(); }
+	void resetPick();
 
 	/**
 	 * @brief Ajoute manuellement un numéro à la liste des numéros déjà tirés.
@@ -57,12 +60,15 @@ public:
 	void popNum();
 
 private:
-	/// Liste des numéros déjà tirer.
+	/// Liste des numéros déjà tirés.
 	std::vector<uint8_t> m_alreadyPicked;
+	/// Numéros restants disponibles pour le tirage.
+	std::vector<uint8_t> m_remaining;
 	/// Le générateur de nombres aléatoires.
 	std::mt19937 m_rng;
-	/// La distribution uniforme [1, 90].
-	std::uniform_int_distribution<int> m_dist{1, 90};
+
+	/// @brief Rebuild remaining numbers from alreadyPicked.
+	void rebuildRemaining();
 };
 
 }// namespace evl::core
