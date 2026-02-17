@@ -9,6 +9,7 @@ if (${PROJECT_PREFIX}_COMPILER_CLANG)
     option(${PROJECT_PREFIX}_ENABLE_MEMORY_SANITIZER "Enable memory sanitizer" OFF)
 endif ()
 # ----------------------------------------------------------------------------------------------------------------------
+set(${PROJECT_PREFIX}_SANITIZER_COUNT 0)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Clang-tidy

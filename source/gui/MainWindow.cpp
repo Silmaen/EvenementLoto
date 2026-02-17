@@ -64,6 +64,10 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 	GLFWwindow* window = glfwCreateWindow(static_cast<int>(static_cast<float>(m_options.size.x()) * main_scale),
 										  static_cast<int>(static_cast<float>(m_options.size.y()) * main_scale),
 										  m_options.title.c_str(), nullptr, nullptr);
+	if (window == nullptr) {
+		Application::get().reportError("Failed to create GLFW window");
+		return;
+	}
 	m_window = window;
 	if (glfwVulkanSupported() == 0) {
 		Application::get().reportError("GLFW: Vulkan Not Supported");
@@ -90,6 +94,8 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 
 		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
 		vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
+		if (err != VK_SUCCESS)
+			return;
 		// Create Framebuffers
 		int w = 0;
 		int h = 0;

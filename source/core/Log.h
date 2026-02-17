@@ -151,7 +151,7 @@ public:
 	 * @brief Get the logs.
 	 * @return The log entries.
 	 */
-	[[nodiscard]] auto getLogs() const -> const std::vector<LogEntry>&;
+	[[nodiscard]] auto getLogs() const -> std::vector<LogEntry>;
 
 	/**
 	 * @brief Clear the log buffer.

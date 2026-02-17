@@ -8,6 +8,7 @@
 #pragma once
 
 #include <cstdint>
+#include <random>
 #include <vector>
 
 /**
@@ -58,6 +59,10 @@ public:
 private:
 	/// Liste des numéros déjà tirer.
 	std::vector<uint8_t> m_alreadyPicked;
+	/// Le générateur de nombres aléatoires.
+	std::mt19937 m_rng;
+	/// La distribution uniforme [1, 90].
+	std::uniform_int_distribution<int> m_dist{1, 90};
 };
 
 }// namespace evl::core

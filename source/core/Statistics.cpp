@@ -53,7 +53,10 @@ void Statistics::pushRound(const GameRound& iRound) {
 	// update tirages
 	if (m_pickCounts.size() != 90)
 		m_pickCounts.resize(90);
-	for (const auto draw: iRound.getAllDraws()) m_pickCounts[draw - 1]++;
+	for (const auto draw: iRound.getAllDraws()) {
+		if (draw >= 1 && draw <= m_pickCounts.size())
+			m_pickCounts[draw - 1]++;
+	}
 	lessPickNb = *std::ranges::min_element(m_pickCounts);
 	mostPickNb = *std::ranges::max_element(m_pickCounts);
 	lessPickList.clear();

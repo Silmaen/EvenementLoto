@@ -93,7 +93,7 @@ public:
 	template<size_t Dim2>
 	constexpr Vector(const Vector<BaseType, Dim2>& iVector) noexcept {
 		if constexpr (Dim2 < Dim)
-			std::fill(m_data, BaseType{0});
+			std::fill(m_data.begin(), m_data.end(), BaseType{0});
 		std::copy_n(iVector.begin(), std::min(Dim, Dim2), m_data.begin());
 	}
 	//NOLINTEND(google-explicit-constructor,hicpp-explicit-conversions)

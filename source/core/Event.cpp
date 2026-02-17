@@ -36,8 +36,11 @@ void Event::read(std::istream& iBs, int) {
 	uint16_t save_version = 0;
 	iBs.read(reinterpret_cast<char*>(&save_version), sizeof(uint16_t));
 	log_debug("Version des données du stream: {}, version courante: {}", save_version, getSaveVersion());
-	if (save_version > getSaveVersion())
+	if (save_version > getSaveVersion()) {
+		log_warn("Version des données du stream ({}) supérieure à la version courante ({}), lecture impossible",
+				 save_version, getSaveVersion());
 		return;// incompatible
+	}
 	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
 	std::string::size_type l = 0;
 	std::string::size_type i = 0;
@@ -393,7 +396,8 @@ auto Event::getStateString() const -> std::string {
 	std::string result = std::format("Event '{}'", getStatusStr());
 	if (m_status == Status::GameRunning) {
 		const auto sub = getCurrentCGameRound();
-		result = std::format("{} - {}", result, sub->getStateString());
+		if (sub != m_gameRounds.cend())
+			result = std::format("{} - {}", result, sub->getStateString());
 	}
 	return result;
 }
@@ -402,6 +406,8 @@ void Event::addWinnerToCurrentRound(const std::string& iWin) {
 	if (m_status != Status::GameRunning)
 		return;
 	const auto round = getCurrentGameRound();
+	if (round == m_gameRounds.end())
+		return;
 	round->addWinner(iWin);
 	if (round->isFinished()) {
 		nextState();

@@ -67,8 +67,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 			RESOLVED_DEPENDENCIES_VAR _r_deps
 			UNRESOLVED_DEPENDENCIES_VAR _u_deps
 			DIRECTORIES ${CMAKE_BINARY_DIR}
-			PRE_EXCLUDE_REGEXES "^/lib" "^/usr/lib"
-			POST_EXCLUDE_REGEXES "^/lib" "^/usr/lib"
+			PRE_EXCLUDE_REGEXES "^/lib" "^/usr/lib" "^/lib64" "^/usr/lib64"
+			POST_EXCLUDE_REGEXES "^/lib" "^/usr/lib" "^/lib64" "^/usr/lib64"
 		)
 		foreach(_file ${_r_deps})
 			file(INSTALL

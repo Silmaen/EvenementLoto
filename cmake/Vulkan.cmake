@@ -8,7 +8,7 @@ function(target_link_vulkan target_name INCLUDE_TYPE)
     message(STATUS "Found Vulkan version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
     target_link_libraries(${target_name} ${INCLUDE_TYPE} Vulkan::Loader)
     find_package(VulkanUtilityLibraries REQUIRED)
-    message(STATUS "Found VulkanUtilityLibrary version ${VulkanLoader_VERSION} @ ${VULKAN_DIR}")
+    message(STATUS "Found VulkanUtilityLibrary version ${VulkanUtilityLibraries_VERSION} @ ${VULKAN_DIR}")
     target_link_libraries(${target_name} ${INCLUDE_TYPE} Vulkan::LayerSettings)
     target_link_libraries(${target_name} ${INCLUDE_TYPE} Vulkan::UtilityHeaders)
     # Vulkan layers

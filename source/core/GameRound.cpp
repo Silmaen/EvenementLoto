@@ -129,7 +129,8 @@ auto GameRound::getStateString() const -> std::string {
 		result += std::format(" - {}", getStatusStr());
 		if (m_status == Status::Running) {
 			const auto sub = getCurrentSubRound();
-			result += std::format(" - {} - {}", sub->getTypeStr(), sub->getStatusStr());
+			if (sub != m_subGames.cend())
+				result += std::format(" - {} - {}", sub->getTypeStr(), sub->getStatusStr());
 		}
 	}
 	return result;
@@ -178,7 +179,7 @@ void GameRound::read(std::istream& iBs, const int iFileVersion) {
 	iBs.read(reinterpret_cast<char*>(&l2), sizeof(sub_rounds_type::size_type));
 	m_subGames.resize(l2);
 	for (sub_rounds_type::size_type i = 0; i < l2; ++i) m_subGames[i].read(iBs, iFileVersion);
-	if (iFileVersion < 4) {//----UNCOVER----
+	if (iFileVersion < 4 && l2 != 0) {//----UNCOVER----
 		// faking sub game picking
 		const auto part = static_cast<uint32_t>(l / l2);//----UNCOVER----
 		for (draws_type::size_type i = 0; i < l; ++i) {//----UNCOVER----
@@ -306,7 +307,7 @@ auto GameRound::getName() const -> std::string {
 	res << "Partie";
 	if (m_id > 0)
 		res << " " << m_id;
-	if (m_type != Type::OneTwoQuineFullCard)
+	if (m_type != Type::OneTwoQuineFullCard && g_typeConvert.contains(m_type))
 		res << " " << g_typeConvert.at(m_type);
 	return res.str();
 }

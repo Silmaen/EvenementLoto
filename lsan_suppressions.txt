@@ -1,0 +1,9 @@
+# LeakSanitizer suppressions
+# Known leaks in system libraries (not from project code).
+
+# libdbus internal allocations not freed at shutdown
+leak:dbus_message_new_empty_header
+leak:dbus_bus_register
+leak:internal_bus_get
+leak:_dbus_string_copy_len
+leak:reallocate_for_length
