@@ -34,8 +34,8 @@ inline auto vec4ToImVec4(const math::vec4& iColor) -> ImVec4 {
 
 /**
  * @brief Convert ImVec2 to vec2.
- * @param iVector The ImVec4 vector.
- * @return The vec4 vector.
+ * @param iVector The ImVec2 vector.
+ * @return The vec2 vector.
  */
 inline auto imVec2ToVec2(const ImVec2& iVector) -> math::vec2 { return {iVector.x, iVector.y}; }
 

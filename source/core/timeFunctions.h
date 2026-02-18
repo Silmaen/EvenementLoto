@@ -23,7 +23,7 @@ using duration = std::chrono::duration<double>;
 constexpr time_point g_epoch{};
 
 /**
- * @brief Tronque le temp ou la durée à la seconde près.
+ * @brief Tronque le temps ou la durée à la seconde près.
  * @tparam T Template pour pouvoir appliquer cette fonction à une durée ou un point de temps.
  * @param iTimePoint L'objet qu'il faut tronquer.
  * @return Le temps tronqué.

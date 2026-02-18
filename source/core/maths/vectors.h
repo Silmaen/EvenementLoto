@@ -40,12 +40,12 @@ public:
 	 */
 	constexpr ~Vector() noexcept = default;
 	/**
-	 * @brief Copy affectation operator.
+	 * @brief Copy assignment operator.
 	 * @return This vector.
 	 */
 	constexpr auto operator=(const Vector&) noexcept -> Vector& = default;
 	/**
-	 * @brief Move affectation operator.
+	 * @brief Move assignment operator.
 	 * @return This vector.
 	 */
 	constexpr auto operator=(Vector&&) noexcept -> Vector& = default;
@@ -80,7 +80,7 @@ public:
 	 * @param iX X value.
 	 * @param iY Y value.
 	 * @param iZ Z value.
-	 * @param iW Z value.
+	 * @param iW W value.
 	 */
 	constexpr Vector(const BaseType& iX, const BaseType& iY, const BaseType& iZ, const BaseType& iW) noexcept
 		requires(Dim == 4)
@@ -98,7 +98,7 @@ public:
 	}
 	//NOLINTEND(google-explicit-constructor,hicpp-explicit-conversions)
 	/**
-	 * @brief Copy affectation operator.
+	 * @brief Copy assignment operator.
 	 * @param iVector Vector for initialization.
 	 * @return This vector.
 	 */

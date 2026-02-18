@@ -36,7 +36,7 @@ protected:
 };
 
 /**
- * @brief Event of key presse
+ * @brief Event of key pressed.
  */
 class KeyPressedEvent final : public KeyEvent {
 public:

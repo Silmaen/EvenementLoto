@@ -346,11 +346,11 @@ void MainView::renderStatisticsTab() const {
 	const auto stats = m_currentEvent.getStats();
 	ImGui::Columns(2, "StatsColumns", true);
 
-	if (ImGui::BeginChild("LeftColomunStats")) {
+	if (ImGui::BeginChild("LeftColumnStats")) {
 		// Less picked numbers
 		if (ImGui::CollapsingHeader("Numéros le moins sortis", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::TextWrapped("%s", stats.lessPickStr().c_str());
-			ImGui::Text("Nombre de sortie: %d", stats.lessPickNb);
+			ImGui::Text("Nombre de sorties: %d", stats.lessPickNb);
 		}
 
 		// Round duration stats
@@ -370,11 +370,11 @@ void MainView::renderStatisticsTab() const {
 
 	ImGui::NextColumn();
 
-	if (ImGui::BeginChild("RightColomunStats")) {
+	if (ImGui::BeginChild("RightColumnStats")) {
 		// Most picked numbers
 		if (ImGui::CollapsingHeader("Numéros le plus sortis", ImGuiTreeNodeFlags_DefaultOpen)) {
 			ImGui::TextWrapped("%s", stats.mostPickStr().c_str());
-			ImGui::Text("Nombre de sortie: %d", stats.mostPickNb);
+			ImGui::Text("Nombre de sorties: %d", stats.mostPickNb);
 		}
 
 		// Round draws stats
@@ -418,7 +418,7 @@ void MainView::renderEventInfo() const {
 	}
 
 	ImGui::Columns(2, "EventInfoColumns", true);
-	ImGui::BeginChild("LeftColomunEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
+	ImGui::BeginChild("LeftColumnEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
 	// Event information in columns
 	ImGui::Columns(3, "EventInfoColumns", false);
 
@@ -455,7 +455,7 @@ void MainView::renderEventInfo() const {
 	ImGui::EndChild();
 
 	ImGui::NextColumn();
-	ImGui::BeginChild("RightColomunEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
+	ImGui::BeginChild("RightColumnEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
 	// Large current time display
 	utils::adaptTextToRegion(
 			core::formatClock(core::clock::now()),
@@ -528,7 +528,7 @@ void MainView::renderBottomConfigPanel() {
 	ImGui::BeginGroup();
 	ImGui::Text("Affichage");
 	ImGui::Separator();
-	ImGui::Text("Selection de l'écran");
+	ImGui::Text("Sélection de l'écran");
 	{
 		const auto infos = Application::get().getMonitorsInfo();
 		const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));

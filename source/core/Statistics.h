@@ -30,12 +30,12 @@ public:
 	 */
 	Statistics(Statistics&&) = default;
 	/**
-	 * @brief Default copy assignation
+	 * @brief Default copy assignment
 	 * @return this
 	 */
 	auto operator=(const Statistics&) -> Statistics& = default;
 	/**
-	 * @brief Default move assignation
+	 * @brief Default move assignment
 	 * @return this
 	 */
 	auto operator=(Statistics&&) -> Statistics& = default;

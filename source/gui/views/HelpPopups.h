@@ -1,5 +1,5 @@
 /**
- * @file Popups.h
+ * @file HelpPopups.h
  * @author Silmaen
  * @date 17/12/2025
  * Copyright © 2025 All rights reserved.
@@ -13,40 +13,7 @@ namespace evl::gui::views {
 
 
 /**
- * @brief Class PopupAide.
- */
-class PopupAide final : public Popup {
-public:
-	/// Default constructor.
-	PopupAide();
-	/// Default destructor.
-	~PopupAide() override;
-
-	PopupAide(const PopupAide&) = delete;
-	PopupAide(PopupAide&&) = delete;
-	auto operator=(const PopupAide&) -> PopupAide& = delete;
-	auto operator=(PopupAide&&) -> PopupAide& = delete;
-
-	/**
-	 * @brief Function called at Update Time.
-	 */
-	void onPopupUpdate() override;
-
-	/**
-	 * @brief Get the name of the view.
-	 * @return The name of the view.
-	 */
-	[[nodiscard]] auto getName() const -> std::string override { return "popup_aide"; }
-
-	/**
-	 * @brief Get the popup title.
-	 * @return The popup title.
-	 */
-	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Aide"; }
-};
-
-/**
- * @brief Class PopupAide.
+ * @brief Class PopupAbout.
  */
 class PopupAbout final : public Popup {
 public:

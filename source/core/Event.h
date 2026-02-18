@@ -153,8 +153,8 @@ public:
 	[[nodiscard]] auto getOrganizerLogo() const -> const std::filesystem::path& { return m_organizerLogo; }
 
 	/**
-	 * @brief Accès au chemin complet vers le log de l’organisateur
-	 * @return Chemin complet vers le log de l’organisateur
+	 * @brief Accès au chemin complet vers le logo de l'organisateur
+	 * @return Chemin complet vers le logo de l'organisateur
 	 */
 	[[nodiscard]] auto getOrganizerLogoFull() const -> std::filesystem::path {
 		if (m_organizerLogo.empty())
@@ -372,11 +372,11 @@ public:
 
 #ifdef EVL_DEBUG
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void invalidStatus() { m_status = Status::Invalid; }
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void restoreStatusDbg() { m_status = Status::Ready; }
 #endif
@@ -386,11 +386,11 @@ private:
 	/// Le précédent statut (pour pouvoir annuler)
 	Status m_previousStatus = Status::Invalid;
 
-	/// Le nom de l’organisateur (requit pour validité)
+	/// Le nom de l'organisateur (requis pour validité)
 	std::string m_organizerName;
 	/// Logo de l’organisateur.
 	std::filesystem::path m_organizerLogo;
-	/// Nom de l’événement. (requit pour validité)
+	/// Nom de l'événement. (requis pour validité)
 	std::string m_name;
 	/// Logo de l’événement.
 	std::filesystem::path m_logo;
@@ -406,7 +406,7 @@ private:
 	/// La date et heure de début de l’événement
 	time_point m_start;
 
-	/// La date et heure de début de l’événement
+	/// La date et heure de fin de l'événement
 	time_point m_end;
 
 	/// Le chemin de base de l’événement
@@ -416,7 +416,7 @@ private:
 	bool m_changed = false;
 
 	/**
-	 * @brief Si l’événement est en phase d’édition, met à jour son statuT.
+	 * @brief Si l’événement est en phase d’édition, met à jour son statut.
 	 */
 	void checkValidConfig();
 

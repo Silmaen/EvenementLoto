@@ -50,7 +50,7 @@ void StatusBar::onUpdate() {
 	if (ImGui::Begin("StatusBar", nullptr, flags)) {
 		// Contenu de la status bar (exemple)
 		ImGui::Text("%s", leftText.c_str());
-		// add separators to position center between en of left text and start of center text
+		// add separators to position center between end of left text and start of center text
 		ImGui::SameLine((leftSize.x + centerPos) / 2.0f);
 		ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 		ImGui::SameLine(centerPos);

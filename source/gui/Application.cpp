@@ -20,6 +20,7 @@
 #include "views/ConfigPopups.h"
 #include "views/DisplayView.h"
 #include "views/HelpPopups.h"
+#include "views/HelpView.h"
 #include "views/MainView.h"
 #include "views/MenuBar.h"
 #include "views/StatusBar.h"
@@ -54,9 +55,9 @@ Application::Application() {
 	m_views.push_back(std::make_shared<views::MainView>(m_currentEvent));
 	m_views.push_back(std::make_shared<views::DisplayView>(m_currentEvent));
 	m_views.back()->hide();// hidden at the application start.
+	m_views.push_back(std::make_shared<views::HelpView>());
 
 	// Create popups
-	m_popups.push_back(std::make_shared<views::PopupAide>());
 	m_popups.push_back(std::make_shared<views::PopupAbout>());
 	m_popups.push_back(std::make_shared<views::MainConfigPopups>());
 	m_popups.push_back(std::make_shared<views::EventConfigPopups>());

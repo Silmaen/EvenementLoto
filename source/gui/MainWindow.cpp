@@ -463,7 +463,7 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	colors[ImGuiCol_TableRowBgAlt] = utils::vec4ToImVec4(iTheme.tableRowBgAlt);
 	// Text Selected 51
 	colors[ImGuiCol_TextSelectedBg] = utils::vec4ToImVec4(iTheme.textSelectedBg);
-	// Drag n DRop 52
+	// Drag n Drop 52
 	colors[ImGuiCol_DragDropTarget] = utils::vec4ToImVec4(iTheme.dragDropTarget);
 	// Nav 53 54 55
 	colors[ImGuiCol_NavHighlight] = utils::vec4ToImVec4(iTheme.navHighlight);

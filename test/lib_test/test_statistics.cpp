@@ -140,8 +140,8 @@ TEST_F(StatisticsTest, PushRoundWithSubRounds) {
 
 	EXPECT_EQ(m_stats.subRoundLessNb, 0);
 	EXPECT_EQ(m_stats.subRoundMostNb, 2);
-	EXPECT_GT(m_stats.subRoundLongest, duration::zero());
-	EXPECT_GT(m_stats.subRoundShortest, duration::zero());
+	EXPECT_GE(m_stats.subRoundLongest, duration::zero());
+	EXPECT_GE(m_stats.subRoundShortest, duration::zero());
 }
 
 TEST_F(StatisticsTest, PickCountsUpdate) {

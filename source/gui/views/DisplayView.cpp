@@ -479,14 +479,14 @@ void DisplayView::renderRoundRunning() const {
 		ImGui::EndGroup();
 
 		// Timing info
-		const auto textHeigh = ImGui::CalcTextSize("D").y;
+		const auto textHeight = ImGui::CalcTextSize("D").y;
 		const float timeScale = gui_settings.getValue("time_scale", 1.6f);
 		auto now = core::clock::now();
 		auto elapsed = now - currentSubRound->getStarting();
 		const std::string nowStr = core::formatClockNoSecond(now);
 		auto nowSize = ImGui::CalcTextSize(nowStr.c_str()).x * (timeScale > 0.0f ? timeScale : 1.0f);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
-							 (ImGui::GetContentRegionAvail().y - textHeigh * (1 + timeScale) - style.WindowPadding.y));
+							 (ImGui::GetContentRegionAvail().y - textHeight * (1 + timeScale) - style.WindowPadding.y));
 		if (ImGui::BeginChild("##TimingInfo", {0, 0}, ImGuiChildFlags_None)) {
 			ImGui::BeginGroup();
 			ImGui::Text("Durée partie");

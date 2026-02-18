@@ -38,7 +38,7 @@ void GameNextActions::onExecute() {
 	auto& currentEvent = Application::get().getCurrentEvent();
 
 	if (currentEvent.getStatus() == core::Event::Status::DisplayRules) {
-		currentEvent.displayRules();// The call in this state willrestore previous state.
+		currentEvent.displayRules();// The call in this state will restore previous state.
 		return;// No further action needed.
 	}
 	bool goNext = true;

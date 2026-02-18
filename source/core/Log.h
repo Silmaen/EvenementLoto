@@ -162,7 +162,7 @@ public:
 private:
 	/// @brief Default constructor.
 	LogBuffer() = default;
-	/// @brief Default destructor.
+	/// The mutex for thread safety.
 	mutable std::mutex m_mutex;
 	/// The log entries.
 	std::deque<LogEntry> m_logs;

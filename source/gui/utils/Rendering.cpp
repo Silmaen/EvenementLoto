@@ -116,7 +116,7 @@ auto getNextStepStr(const core::Event& iEvent) -> std::string {
 		case core::Event::Status::Ready:
 			return "Démarrer l'événement";
 		case core::Event::Status::EventStarting:
-			return "Demarrer la première partie";
+			return "Démarrer la première partie";
 		case core::Event::Status::DisplayRules:
 			return "Terminer l'affichage des règles";
 		case core::Event::Status::GameRunning:
@@ -159,7 +159,7 @@ void adaptTextToRegion(const std::string& iText, const TextAdaptOptions& iOption
 		numberTextSize = ImGui::CalcTextSize(iOptions.textAdapt.c_str());
 	const float scaleX = numberSize.x / numberTextSize.x;
 	const float scaleY = numberSize.y / numberTextSize.y;
-	const float scale = std::min(scaleX, scaleY) * 0.9f;// 80% of the available space
+	const float scale = std::min(scaleX, scaleY) * 0.9f;// 90% of the available space
 	if (scale <= 0.0f)
 		return;// No need to scale up
 	ImGui::SetWindowFontScale(scale);

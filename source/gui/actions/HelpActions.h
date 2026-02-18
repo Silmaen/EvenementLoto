@@ -41,7 +41,7 @@ private:
 };
 
 /**
- * @brief Class HelpActions.
+ * @brief Class AboutAction.
  */
 class AboutAction final : public Action {
 public:

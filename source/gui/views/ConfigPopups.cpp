@@ -65,6 +65,8 @@ void MainConfigPopups::onPopupUpdate() {
 				m_data.dataLocation = path;
 			}
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Parcourir...");
 	}
 	ImGui::EndChild();
 
@@ -90,7 +92,7 @@ void MainConfigPopups::onPopupUpdate() {
 			ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 10.0f, "%.1f");
 			ImGui::NextColumn();
 
-			ImGui::Text("Echelle texte grille");
+			ImGui::Text("Échelle texte grille");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.1f, 0.3f, 1.5f, "%.1f");
@@ -183,13 +185,13 @@ void MainConfigPopups::onPopupUpdate() {
 			ImGui::Checkbox("##FadeNumbers", &m_data.fadeNumbers);
 			ImGui::NextColumn();
 
-			ImGui::Text("Nombre de chiffres fondu");
+			ImGui::Text("Nombre de chiffres fondus");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::DragInt("##FadeAmount", &m_data.fadeAmount, 1.0f, 0, 10);
 			ImGui::NextColumn();
 
-			ImGui::Text("Force de la fondue");
+			ImGui::Text("Force du fondu");
 			ImGui::NextColumn();
 			ImGui::SetNextItemWidth(-1);
 			ImGui::DragFloat("##FadeStrength", &m_data.fadeStrength, 0.1f, -2, 2, "%.1f");
@@ -207,7 +209,7 @@ void MainConfigPopups::onPopupUpdate() {
 			m_data = {};
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Restorer", ImVec2(g_buttonWidth, 0))) {
+		if (ImGui::Button("Restaurer", ImVec2(g_buttonWidth, 0))) {
 			settingsToData();
 		}
 	}
@@ -332,6 +334,8 @@ void EventConfigPopups::onPopupUpdate() {
 				m_event.setLogo(path);
 			}
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Parcourir...");
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
@@ -368,6 +372,8 @@ void EventConfigPopups::onPopupUpdate() {
 				m_event.setOrganizerLogo(path.string());
 			}
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Parcourir...");
 		ImGui::NextColumn();
 
 		ImGui::Columns(1);
@@ -625,18 +631,26 @@ void GameRoundConfigPopups::renderFirstColumn() {
 		if (ImGui::Button("+##AddRound")) { /* Action add round */
 			addGameRound();
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Ajouter une partie");
 		ImGui::SameLine();
 		if (ImGui::Button("-##DelRound")) { /* Action delete round */
 			deleteGameRound();
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Supprimer la partie");
 		ImGui::SameLine();
 		if (ImGui::Button("^##UpRound")) { /* Action move up */
 			moveGameRoundUp();
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Monter la partie");
 		ImGui::SameLine();
 		if (ImGui::Button("v##DownRound")) { /* Action move down */
 			moveGameRoundDown();
 		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Descendre la partie");
 
 		ImGui::Spacing();
 
@@ -794,6 +808,8 @@ void GameRoundConfigPopups::renderThirdColumn() {
 						currentRound->setDiapo(path.string(), delay);
 					}
 				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Parcourir...");
 
 				ImGui::Text("Délai par diapo");
 				ImGui::SetNextItemWidth(-1);
