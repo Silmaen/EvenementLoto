@@ -48,7 +48,7 @@ public:
 	[[nodiscard]] auto isEnabled() const -> bool { return m_enabled; }
 
 	/**
-	 * @brief Get the name of tha action.
+	 * @brief Get the name of the action.
 	 * @return The name of the action.
 	 */
 	[[nodiscard]] virtual auto getName() const -> std::string = 0;

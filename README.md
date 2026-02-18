@@ -25,14 +25,14 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 
 * Ce projet dépend de python3.10 ou supérieur
 * Ce projet dépend de dependency manager [DepManager](https://github.com/Silmaen/DepManager)
-    * Pour l'installer par pip: `pip intall depmanager`
-    * Les librairies doivent exister en local ou sur un serveur remote configuré avec DepManager.
+    * Pour l'installer par pip: `pip install depmanager`
+    * Les librairies doivent exister en local ou sur un serveur distant configuré avec DepManager.
 * Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code.
     * Pour l'installer par pip: `pip install gcovr`
 * Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
   documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
   documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
-* Depmanager va permettre de gérer les autres dépendances externer
+* Depmanager va permettre de gérer les autres dépendances externes
     * jsoncpp
     * spdlog
     * magic_enum
@@ -55,17 +55,15 @@ Le programme a été correctement compilé avec :
 
 ### Version 0.5 (Planned for autumn 2026)
 
-* Documentation
-    * [ ] Écrire les pages d’aide
 * Affichage
-    * [ ] Affichage sur l'écran présentateur de la liste des lots lot de la phase d'annonce
+    * [ ] Affichage sur l'écran présentateur de la liste des lots lors de la phase d'annonce
 * moteur de jeu
     * [ ] Résultat
         * [ ] Génération du rapport de fin d'événement
         * [ ] Permettre l'édition des noms de gagnant après la fin de la partie
     * [ ] Gestion des multiples gagnants
-        * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisi)
-    * [ ] Permettre de passer l'étape de saisi du gagnant
+        * [ ] permettre de départager les multiples gagnants (tirage au sort ou saisie)
+    * [ ] Permettre de passer l'étape de saisie du gagnant
     * [ ] Données
         * [ ] édition de lots sous forme de liste d’articles
 * Contrôle et paramètres
@@ -80,16 +78,19 @@ Le programme a été correctement compilé avec :
 * Affichage
     * [ ] Ajouter un onglet présentateur pour retour d'écran (affichage identique, réduit de ce qui est à l'écran)
 * Packaging
-    * [ ] Package des resources.
+    * [ ] Package des ressources.
     * [ ] Inclusion de la documentation dans le paquet.
 
-### Version 0.4.1 (Released 17 February 2026)
+### Version 0.4.1 (Released 18 February 2026)
 
-* Affichage
+* Affichage.
     * [X] Suppression du code QT
-* Sauvegarde et restauration
+    * [X] Affichage de la page de documentation.
+* Sauvegarde et restauration.
     * [X] Sauvegarde périodique de la partie en cours dans rescue.lev
-* Misc
+* Documentation
+    * [X] Rédaction d'une documentation de l'application (installation, utilisation, développement)
+* Misc.
     * [X] Corrections de bugs.
     * [X] Amélioration de la stabilité générale du logiciel.
     * [X] Amélioration de la gestion des erreurs (affichage d'un message d'erreur plus clair et plus précis en cas de
@@ -117,7 +118,7 @@ Le programme a été correctement compilé avec :
 * Moteur de jeu
     * [X] Flexibilité en jeu
         * [X] permettre de réorganiser les parties non entamées
-        * [X] permettre l'édition de parties non entamée.
+        * [X] permettre l'édition de parties non entamées.
 * Sauvegarde et restauration
     * [X] mettre à jour les import json
     * [X] Permettre l'import/export au format YAML
@@ -136,7 +137,7 @@ Le programme a été correctement compilé avec :
         * [X] à chaque changement de ligne.
         * [X] affichage de la valeur
     * [X] affichage de la phase dans le titre de la partie
-    * [X] améliorer la lisibilité les derniers numéros tirés
+    * [X] améliorer la lisibilité des derniers numéros tirés
     * [X] Police par défaut en gras pour les numéros de la grille
 * moteur de jeu
     * [X] Données
@@ -170,7 +171,7 @@ Le programme a été correctement compilé avec :
         * [X] Sélection des couleurs
         * [X] Possibilité de couleur différente en fonction du sous-niveau
         * [X] réglage de taille des polices
-        * [X] sauvegarde du theme dans les settings
+        * [X] sauvegarde du thème dans les settings
         * [X] export du thème en json
         * [X] import du thème en json
 * Interaction
@@ -180,7 +181,7 @@ Le programme a été correctement compilé avec :
 * Sauvegarde et restauration
     * [X] import fiches de lot en json
     * [X] Version des sauvegardes binaires
-        * [X] Permettre l’ouverture de vielles versions
+        * [X] Permettre l'ouverture de vieilles versions
     * [X] Chemin relatif au lieu de stockage du fichier binaire pour les images
         * [X] Copie des images dans le dossier contenant le fichier de sauvegarde
     * [X] Gestion du règlement

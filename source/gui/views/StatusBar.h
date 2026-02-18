@@ -21,7 +21,7 @@ public:
 	 */
 	StatusBar();
 	/**
-	 * @brief De fault destructor.
+	 * @brief Default destructor.
 	 */
 	~StatusBar() override;
 

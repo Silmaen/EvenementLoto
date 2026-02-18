@@ -31,7 +31,7 @@ public:
 	explicit RandomNumberGenerator(bool iDebug = false);
 
 	/**
-	 * @brief Remet à zéro la liste des numéros déjà tiré.
+	 * @brief Remet à zéro la liste des numéros déjà tirés.
 	 */
 	void resetPick();
 

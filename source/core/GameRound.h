@@ -1,7 +1,7 @@
 /**
  * @file GameRound.h
  * @author Silmaen
- * @date 20/10/202
+ * @date 20/10/2021
  * Copyright © 2021 All rights reserved.
  * All modification must get authorization from the author.
  */
@@ -36,7 +36,7 @@ public:
 		OneQuineFullCard,///< Une partie standard en remplissant une ligne, puis le carton.
 		OneTwoQuineFullCard,///< Une partie standard en remplissant une ligne, puis deux, puis le carton.
 		Enfant,///< Une partie pour les enfants, similaire à OneQuine.
-		Inverse,///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
+		Inverse,///< Le joueur est éliminé dès qu'un de ses numéros est tiré.
 		Pause,///< Une fausse 'partie' pour matérialiser une pause.
 	};
 
@@ -79,14 +79,14 @@ public:
 
 	// ---- manipulation du statut ----
 	/**
-	 * @brief Renvoie une chaine contenant le type de partie.
-	 * @return Le type de partie.
+	 * @brief Renvoie une chaine contenant le statut de la partie.
+	 * @return Le statut de la partie.
 	 */
 	[[nodiscard]] auto getStatusStr() const -> std::string;
 
 	/**
-	 * @brief Renvoie le type de partie.
-	 * @return Le type de partie
+	 * @brief Renvoie le statut de la partie.
+	 * @return Le statut de la partie
 	 */
 	[[nodiscard]] auto getStatus() const -> const Status& { return m_status; }
 
@@ -97,14 +97,14 @@ public:
 	[[nodiscard]] auto isFinished() const -> bool { return m_status == Status::Done; }
 #ifdef EVL_DEBUG
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void invalidStatus() {
 		m_status = Status::Invalid;
 		m_type = Type::Invalid;
 	}
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void restoreStatus() {
 		m_status = Status::Ready;
@@ -205,7 +205,7 @@ public:
 	 */
 	[[nodiscard]] auto isCurrentSubRoundLast() const -> bool;
 	/**
-	 * @brief Accès à la sous-partie courante l’interface
+	 * @brief Accès à la sous-partie courante par l'interface
 	 * @return Itérateur constant sur la sous-partie courante
 	 */
 	[[nodiscard]] auto getCurrentSubRound() const -> sub_rounds_type::const_iterator;
@@ -231,12 +231,12 @@ public:
 	[[nodiscard]] auto endSubRound() const -> sub_rounds_type::const_iterator { return m_subGames.cend(); }
 	/**
 	 * @brief Renvoie la taille de la liste des subround.
-	 * @return La taille de la fin de la liste des subround.
+	 * @return La taille de la liste des subround.
 	 */
 	[[nodiscard]] auto sizeSubRound() const -> sub_rounds_type::size_type { return m_subGames.size(); }
 
 	/**
-	 * @brief Défini le numéro de partie
+	 * @brief Définit le numéro de partie
 	 * @param iId Le numéro de partie
 	 */
 	void setId(const int iId) {
@@ -305,7 +305,7 @@ public:
 	}
 
 	/**
-	 * @brief Défini le diaporama pour la pause
+	 * @brief Définit le diaporama pour la pause
 	 * @param iPath Le chemin du diaporama
 	 * @param iDelai Le délai entre chaque image
 	 */
@@ -349,10 +349,10 @@ private:
 	/// La date et heure de début de partie
 	time_point m_start;
 
-	/// La date et heure de début de partie
+	/// La date et heure de fin de partie
 	time_point m_end;
 
-	/// La liste des
+	/// La liste des sous-parties.
 	sub_rounds_type m_subGames;
 
 	/// Diaporama Path (only in pause)

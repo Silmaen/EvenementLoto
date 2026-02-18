@@ -1,5 +1,5 @@
 /**
- * @file Popups.cpp
+ * @file HelpPopups.cpp
  * @author Silmaen
  * @date 17/12/2025
  * Copyright © 2025 All rights reserved.
@@ -14,20 +14,6 @@
 #include <imgui.h>
 
 namespace evl::gui::views {
-
-PopupAide::PopupAide() = default;
-PopupAide::~PopupAide() = default;
-
-void PopupAide::onPopupUpdate() {
-	ImGui::Text("L'aide n'est pas encore disponible.");
-	const float windowWidth = ImGui::GetWindowSize().x;
-	constexpr float buttonWidth = 120.0f;
-	ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-	if (ImGui::Button("Fermer", ImVec2(buttonWidth, 0))) {
-		ImGui::CloseCurrentPopup();
-	}
-}
-
 
 PopupAbout::PopupAbout() = default;
 PopupAbout::~PopupAbout() = default;

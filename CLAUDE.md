@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.4.0**.
+EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.4.1**.
 
 Author: Silmaen
 
@@ -13,11 +13,12 @@ Author: Silmaen
 - `source/core/` - Core library (`EvenementLoto_lib`): game logic, serialization, settings, logging, RNG, math utilities, statistics
 - `source/gui/` - GUI library (`EvenementLoto_ui`): ImGui/Vulkan-based interface (views, popups, actions, event handling, theming)
   - `source/gui/event/` - Event system (keyboard/mouse events, key codes, application events)
-  - `source/gui/views/` - View components (MainView, DisplayView, MenuBar, ToolBar, StatusBar, ConfigPopups, HelpPopups)
+  - `source/gui/views/` - View components (MainView, DisplayView, HelpView, MenuBar, ToolBar, StatusBar, ConfigPopups, HelpPopups)
   - `source/gui/actions/` - Action handlers (FileActions, GameActions, SettingsActions, HelpActions)
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
-  - `source/gui/utils/` - UI utilities (FileDialog, Convert, Rendering helpers)
-- `source/resources/` - Icon resources (dark icons copied at build time)
+  - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers)
+  - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
+- `source/resources/` - Resources copied at build time (dark icons, user documentation + images)
 - `source/main.cpp` - Entry point (supports ImGui UI; legacy Qt path still exists behind `USE_QT` ifdef)
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
 - `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
@@ -48,10 +49,10 @@ Author: Silmaen
 - `MainWindow` - GLFW window management with Vulkan surface
 - `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in settings)
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
-- `views/` - View, MainView, DisplayView, MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups
+- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups
 - `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
-- `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), Rendering (action buttons, text auto-fit)
+- `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
 ## Build System
 
@@ -115,17 +116,17 @@ cmake --preset linux-sanitizer-leak
 ### Build Commands
 
 ```bash
-# Configure + Build
-cmake --preset linux-clang-debug
-cmake --build --preset linux-clang-debug
+# Configure + Build (no build/test presets defined, use output directory)
+cmake --preset linux-gcc-release
+cmake --build output/build/linux-gcc-release
 
 # Run tests
-ctest --preset linux-clang-debug
+cd output/build/linux-gcc-release && ctest --output-on-failure
 ```
 
 ## CI System
 
-Python-based CI scripts in `ci/` (21 files), driven by `ci_action.py`:
+Python-based CI scripts in `ci/` (21 Python files), driven by `ci_action.py`:
 
 - `ci/actions/build.py` - CMake configure + Ninja build
 - `ci/actions/test.py` - Test execution
@@ -133,9 +134,13 @@ Python-based CI scripts in `ci/` (21 files), driven by `ci_action.py`:
 - `ci/actions/deploy.py` - CPack packaging
 - `ci/actions/documentation.py` - Doxygen documentation generation
 - `ci/actions/clean.py` - Build directory cleanup
+- `ci/actions/define_docker_image.py` - Docker image configuration
+- `ci/actions/define_variables.py` - Variable definitions
+- `ci/actions/python_requirements.py` - Python requirements handling
 - `ci/utils/run.py` - Command execution with real-time output
 - `ci/utils/preset.py` - CMake preset parsing (from `ci/PresetsParameters.json`)
 - `ci/utils/teamcity.py` - TeamCity CI integration
+- `ci/utils/cmake.py`, `ci/utils/docker.py`, `ci/utils/logging.py`, `ci/utils/python.py` - Additional utilities
 
 ## Coding Conventions
 

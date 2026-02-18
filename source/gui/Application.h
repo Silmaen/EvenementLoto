@@ -237,7 +237,7 @@ private:
 	State m_state = State::Created;
 	/// The main window.
 	MainWindow m_mainWindow;
-	//// The views list.
+	/// The views list.
 	std::list<std::shared_ptr<views::View>> m_views;
 	/// The popups list.
 	std::list<std::shared_ptr<views::Popup>> m_popups;

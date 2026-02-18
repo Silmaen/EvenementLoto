@@ -60,7 +60,7 @@ void MenuBar::onUpdate() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Paramètres")) {
-			defineMenuItem("General", "preferences");
+			defineMenuItem("Général", "preferences");
 			defineMenuItem("Événement", "event_settings");
 			defineMenuItem("Parties", "game_settings");
 			ImGui::EndMenu();

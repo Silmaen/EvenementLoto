@@ -76,11 +76,11 @@ public:
 	 */
 	Event(Event&&) = default;
 	/**
-	 * @brief Default copy affectation operator.
+	 * @brief Default copy assignment operator.
 	 */
 	auto operator=(const Event&) -> Event& = default;
 	/**
-	 * @brief Default move affectation operator.
+	 * @brief Default move assignment operator.
 	 */
 	auto operator=(Event&&) -> Event& = default;
 
@@ -103,7 +103,7 @@ public:
 	[[nodiscard]] virtual auto getName() const -> std::string = 0;
 
 	/**
-	 * @brief Get the Event Name;
+	 * @brief Get the Event Name.
 	 * @return Event names.
 	 */
 	[[nodiscard]] virtual auto toString() const -> std::string = 0;

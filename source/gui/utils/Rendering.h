@@ -50,7 +50,7 @@ struct TextAdaptOptions {
 	bool vCenter = true;///< Vertically center the text.
 	bool hCenter = true;///< Horizontally center the text.
 	bool drawText = false;///< Draw the text after adaptation.
-	std::string textAdapt;///< The text to adapt can be different thant the text to render.
+	std::string textAdapt;///< The text to adapt can be different than the text to render.
 };
 
 /**

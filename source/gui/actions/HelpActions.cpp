@@ -18,8 +18,12 @@ namespace evl::gui::actions {
 HelpAction::HelpAction() { setIconName("help"); }
 HelpAction::~HelpAction() = default;
 void HelpAction::onExecute() {
-	if (const auto popup = Application::get().getPopup("popup_aide"); popup != nullptr)
-		popup->open();
+	if (const auto view = Application::get().getView("help_view"); view != nullptr) {
+		if (view->isVisible())
+			view->hide();
+		else
+			view->show();
+	}
 }
 
 AboutAction::AboutAction() { setIconName("info"); }

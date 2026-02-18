@@ -1,7 +1,7 @@
 /**
 * @file SubGameRound.h
 * @author Silmaen
-* @date 26/10/202
+* @date 26/10/2021
 * Copyright © 2021 All rights reserved.
 * All modification must get authorization from the author.
 */
@@ -28,14 +28,14 @@ public:
 		OneQuine,///< Le joueur gagne dès qu’il complète une ligne.
 		TwoQuines,///< Le joueur gagne dès qu’il complète deux lignes.
 		FullCard,///< Le joueur gagne dès qu’il complète son carton.
-		Inverse,///< Le joueur est éliminé dès qu’un se ses numéros est tiré.
+		Inverse,///< Le joueur est éliminé dès qu'un de ses numéros est tiré.
 	};
 	/**
 	 * @brief Liste des statuts de sous-parties connus.
 	 */
 	enum struct Status : uint8_t {
 		Invalid,///< Statut invalide (pour debug)
-		Ready,///< Sous partie prê^te à jouer.
+		Ready,///< Sous partie prête à jouer.
 		PreScreen,///< Sous-partie en affichage.
 		Running,///< Sous partie en cours.
 		Done,///< Sous partie finie.
@@ -152,7 +152,7 @@ public:
 	[[nodiscard]] auto getWinner() const -> const std::string& { return m_winner; }
 
 	/**
-	 * @brief Défini le numéro du gagnant
+	 * @brief Définit le numéro du gagnant
 	 * @param iWinner Le numéro de la grille gagnante
 	 */
 	void setWinner(const std::string& iWinner) {
@@ -219,14 +219,14 @@ public:
 	[[nodiscard]] auto isEditable() const -> bool { return m_status == Status::Invalid || m_status == Status::Ready; }
 #ifdef EVL_DEBUG
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void invalidStatus() {
 		m_status = Status::Invalid;
 		m_type = Type::Invalid;
 	}
 	/**
-	 * @brief define invalide Status for testing purpose
+	 * @brief define invalid Status for testing purpose
 	 */
 	void restoreStatus() {
 		m_status = Status::Ready;
@@ -249,7 +249,7 @@ private:
 	/// La date et heure de début de partie
 	time_point m_start;
 
-	/// La date et heure de début de partie
+	/// La date et heure de fin de partie
 	time_point m_end;
 };
 

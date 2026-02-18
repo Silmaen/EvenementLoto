@@ -39,7 +39,7 @@ public:
 	 * @brief Get the view name.
 	 * @return The view name.
 	 */
-	[[nodiscard]] auto getName() const -> std::string override { return "tool_bar"; }
+	[[nodiscard]] auto getName() const -> std::string override { return "main_view"; }
 
 private:
 	void renderLeftPanel() const;
@@ -58,7 +58,7 @@ private:
 	enum struct DrawMode : uint8_t { Random, Manual, Both };
 	DrawMode m_drawMode = DrawMode::Both;
 
-	// internat size variables
+	// internal size variables
 	float m_topBottomSplit = 0.7f;
 	float m_leftRightSplit = 0.7f;
 	math::vec2 m_lastSize = {0.0f, 0.0f};
