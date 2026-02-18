@@ -120,10 +120,10 @@ void LogBuffer::addLog(const std::string& iMessage, Log::Level iLevel) {
 	const std::scoped_lock<std::mutex> lock(m_mutex);
 	m_logs.emplace_back(iMessage, iLevel, core::clock::now());
 	if (m_logs.size() > 1000) {// Limit to 1000 entries
-		m_logs.erase(m_logs.begin());
+		m_logs.pop_front();
 	}
 }
-auto LogBuffer::getLogs() const -> std::vector<LogEntry> {
+auto LogBuffer::getLogs() const -> std::deque<LogEntry> {
 	const std::scoped_lock<std::mutex> lock(m_mutex);
 	return m_logs;
 }

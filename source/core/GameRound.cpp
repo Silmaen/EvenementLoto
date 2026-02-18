@@ -296,10 +296,18 @@ auto GameRound::getCurrentSubRound() const -> std::vector<SubGameRound>::const_i
 }
 
 auto GameRound::getSubRound(const uint32_t iIndex) -> std::vector<SubGameRound>::iterator {
+	if (iIndex >= m_subGames.size()) {
+		log_warn("getSubRound: index {} out of bounds (size {})", iIndex, m_subGames.size());
+		return m_subGames.end();
+	}
 	return std::next(m_subGames.begin(), iIndex);
 }
 auto GameRound::getSubRound(const uint32_t iIndex) const -> std::vector<SubGameRound>::const_iterator {
-	return std::next(m_subGames.begin(), iIndex);
+	if (iIndex >= m_subGames.size()) {
+		log_warn("getSubRound: index {} out of bounds (size {})", iIndex, m_subGames.size());
+		return m_subGames.cend();
+	}
+	return std::next(m_subGames.cbegin(), iIndex);
 }
 
 auto GameRound::getName() const -> std::string {

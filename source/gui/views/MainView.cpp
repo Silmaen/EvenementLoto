@@ -162,6 +162,9 @@ void MainView::renderDrawnNumbersTab() const {
 	const ImVec2 buttonSize{(availWidth.x - spacing.x * 9) / 10.0f, (availWidth.y - spacing.y * 8) / 9.0f};
 
 	// Render 9 rows of 10 buttons (1-90)
+	const bool manualDisabled = (m_drawMode == DrawMode::Random);
+	if (manualDisabled)
+		ImGui::BeginDisabled();
 	for (uint8_t row = 0; row < 9; ++row) {
 		for (uint8_t col = 0; col < 10; ++col) {
 			const uint8_t number = row * 10 + col + 1;
@@ -189,7 +192,7 @@ void MainView::renderDrawnNumbersTab() const {
 			}
 
 			// Handle click only if not already drawn
-			if (clicked && !isDrawn) {
+			if (clicked && !isDrawn && !manualDisabled) {
 				currentRound->addPickedNumber(number);
 				rng.addPick(number);
 			}
@@ -200,6 +203,8 @@ void MainView::renderDrawnNumbersTab() const {
 			}
 		}
 	}
+	if (manualDisabled)
+		ImGui::EndDisabled();
 }
 
 void MainView::renderRightPanel() const {
@@ -328,7 +333,10 @@ void MainView::renderCommandsTab() const {
 	}
 	utils::defineActionButtonItem(
 			"Tirage Aléatoire", "random_pick",
-			{.showLabel = true, .disabled = !m_currentEvent.canDraw(), .sameLine = false, .setDisabled = true});
+			{.showLabel = true,
+			 .disabled = !m_currentEvent.canDraw() || m_drawMode == DrawMode::Manual,
+			 .sameLine = false,
+			 .setDisabled = true});
 	utils::defineActionButtonItem(
 			"Annuler dernier tirage", "cancel_pick",
 			{.showLabel = true, .disabled = prevDrawnNumber == -1, .sameLine = false, .setDisabled = true});
@@ -506,10 +514,8 @@ void MainView::renderBottomConfigPanel() {
 		ImGui::RadioButton("Tirage manuel seul", &drawMode, 1);
 		ImGui::RadioButton("Les Deux", &drawMode, 2);
 		if (drawMode != static_cast<int>(m_drawMode)) {
-			// Update draw mode in application settings
-			// Application::get().getSettings().setDrawMode(static_cast<core::DrawMode>(drawMode));
-			log_info("Changement du mode de tirage: {} Wip", drawMode);
 			m_drawMode = static_cast<DrawMode>(drawMode);
+			log_info("Changement du mode de tirage: {}", drawMode);
 		}
 	}
 	ImGui::EndGroup();

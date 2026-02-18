@@ -184,19 +184,6 @@ public:
 	 */
 	auto getCurrentFile() -> std::filesystem::path& { return m_currentFile; }
 	/**
-	 * @brief Draw mode of the number.
-	 */
-	enum struct DrawMode : uint8_t {
-		Both,///< Both manual and using internal RNG.
-		PickOnly,///< Using the internal RNG.
-		ManualOnly///< Manual picking (external)
-	};
-	/**
-	 * @brief Access to the draw mode.
-	 * @return The draw mode.
-	 */
-	auto getDrawMode() -> DrawMode& { return m_currentDrawMode; }
-	/**
 	 * @brief Access to the texture library.
 	 * @return The texture library.
 	 */
@@ -269,8 +256,6 @@ private:
 	core::Event m_currentEvent{};
 	/// The current file.
 	std::filesystem::path m_currentFile{};
-	/// The current draw mode.
-	DrawMode m_currentDrawMode = DrawMode::Both;
 	/// The random number generator.
 	core::RandomNumberGenerator m_rng;
 
@@ -282,6 +267,14 @@ private:
 
 	/// Timestamp of the last autosave.
 	core::time_point m_lastAutoSave{};
+
+	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
+	std::shared_ptr<views::View> m_cachedDisplayView;
+	std::shared_ptr<actions::Action> m_cachedSaveFile;
+	std::shared_ptr<actions::Action> m_cachedSaveFileAs;
+	std::shared_ptr<actions::Action> m_cachedStartGame;
+	std::shared_ptr<actions::Action> m_cachedStopGame;
+	std::shared_ptr<actions::Action> m_cachedGameSettings;
 
 	/**
 	 * @brief Autosave the current event to rescue.lev if a game is in progress.

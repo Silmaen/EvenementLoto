@@ -8,6 +8,8 @@
 
 #include "core/RandomNumberGenerator.h"
 
+#include <set>
+
 using namespace evl::core;
 
 TEST(RandomNumberGenerator, base) {
@@ -43,5 +45,41 @@ TEST(RandomNumberGenerator, LargePick) {
 	uint8_t a = 0;
 	for (uint8_t i = 0; i < 250; ++i) a = rng.pick();
 	EXPECT_EQ(a, 255);
+	EXPECT_EQ(rng.getPicked().size(), 90);
+}
+
+TEST(RandomNumberGenerator, AllNumbersUnique) {
+	RandomNumberGenerator rng(true);
+	std::set<uint8_t> picked;
+	for (int i = 0; i < 90; ++i) {
+		const uint8_t n = rng.pick();
+		EXPECT_GE(n, 1);
+		EXPECT_LE(n, 90);
+		EXPECT_EQ(picked.count(n), 0) << "Duplicate number picked: " << static_cast<int>(n);
+		picked.insert(n);
+	}
+	EXPECT_EQ(picked.size(), 90);
+	EXPECT_EQ(rng.pick(), 255);
+}
+
+TEST(RandomNumberGenerator, PopAfterExhaustion) {
+	RandomNumberGenerator rng(true);
+	for (int i = 0; i < 90; ++i) std::ignore = rng.pick();
+	EXPECT_EQ(rng.getPicked().size(), 90);
+	rng.popNum();
+	EXPECT_EQ(rng.getPicked().size(), 89);
+	const uint8_t n = rng.pick();
+	EXPECT_GE(n, 1);
+	EXPECT_LE(n, 90);
+}
+
+TEST(RandomNumberGenerator, AddPickAndPick) {
+	RandomNumberGenerator rng(true);
+	EXPECT_TRUE(rng.addPick(42));
+	// Pick should never return 42 now
+	for (int i = 0; i < 89; ++i) {
+		const uint8_t n = rng.pick();
+		EXPECT_NE(n, 42) << "Picked manually added number 42";
+	}
 	EXPECT_EQ(rng.getPicked().size(), 90);
 }

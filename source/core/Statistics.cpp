@@ -7,6 +7,7 @@
  */
 #include "pch.h"
 
+#include "RandomNumberGenerator.h"
 #include "Statistics.h"
 
 namespace evl::core {
@@ -51,8 +52,8 @@ void Statistics::pushRound(const GameRound& iRound) {
 	if (subRoundShortest == duration::max())
 		subRoundShortest = duration::zero();
 	// update tirages
-	if (m_pickCounts.size() != 90)
-		m_pickCounts.resize(90);
+	if (m_pickCounts.size() != g_maxNumber)
+		m_pickCounts.resize(g_maxNumber);
 	for (const auto draw: iRound.getAllDraws()) {
 		if (draw >= 1 && draw <= m_pickCounts.size())
 			m_pickCounts[draw - 1]++;

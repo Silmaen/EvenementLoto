@@ -197,6 +197,44 @@ TEST(Event, basePath) {
 	EXPECT_STREQ(evt.getLogo().string().c_str(), "");
 }
 
+TEST(Event, ImportInvalidPaths) {
+	Event evt;
+	// These should not crash, just log warnings
+	evt.importJSON("/nonexistent/path/does_not_exist.json");
+	EXPECT_EQ(evt.sizeRounds(), 0);
+	evt.importYaml("/nonexistent/path/does_not_exist.yaml");
+	EXPECT_EQ(evt.sizeRounds(), 0);
+}
+
+TEST(Event, ExportInvalidPaths) {
+	Event evt;
+	evt.setName("toto");
+	evt.setOrganizerName("tata");
+	evt.pushGameRound(GameRound());
+	// Export to a directory that doesn't exist - should not crash
+	evt.exportJSON("/nonexistent_dir_abc123/test.json");
+	evt.exportYaml("/nonexistent_dir_abc123/test.yaml");
+}
+
+TEST(Event, FullWorkflowWithAutoAdvance) {
+	// Test the iterative nextState when a round finishes and triggers auto-advance
+	Event evt;
+	evt.setName("Full test");
+	evt.setOrganizerName("Org");
+	GameRound gr1{GameRound::Type::OneQuine};
+	gr1.getSubRound(0)->define(SubGameRound::Type::OneQuine, "prix1", 100);
+	GameRound gr2{GameRound::Type::OneQuine};
+	gr2.getSubRound(0)->define(SubGameRound::Type::OneQuine, "prix2", 200);
+	evt.pushGameRound(gr1);
+	evt.pushGameRound(gr2);
+	EXPECT_EQ(evt.getStatus(), Event::Status::Ready);
+	evt.nextState();// Ready -> EventStarting
+	EXPECT_EQ(evt.getStatus(), Event::Status::EventStarting);
+	evt.nextState();// EventStarting -> GameRunning (round 1 starts)
+	EXPECT_EQ(evt.getStatus(), Event::Status::GameRunning);
+	EXPECT_EQ(evt.getCurrentGameRoundIndex(), 0);
+}
+
 TEST(Event, YamlSerialize) {
 	Event evt;
 	evt.setName("toto");

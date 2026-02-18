@@ -152,30 +152,41 @@ void Event::fromYaml(const YAML::Node& iNode) {
 }
 
 void Event::exportJSON(const std::filesystem::path& iFile) const {
-	std::ofstream file_save;
-	file_save.open(iFile, std::ios::out | std::ios::binary);
+	std::ofstream file_save(iFile, std::ios::out | std::ios::binary);
+	if (!file_save.is_open()) {
+		log_warn("Failed to open file '{}' for JSON export.", iFile.string());
+		return;
+	}
 	file_save << std::setw(4) << toJson();
-	file_save.close();
 }
 
 void Event::importJSON(const std::filesystem::path& iFile) {
-	std::ifstream file_read;
-	file_read.open(iFile, std::ios::in | std::ios::binary);
+	std::ifstream file_read(iFile, std::ios::in | std::ios::binary);
+	if (!file_read.is_open()) {
+		log_warn("Failed to open file '{}' for JSON import.", iFile.string());
+		return;
+	}
 	Json::Value j;
 	file_read >> j;
 	fromJson(j);
-	file_read.close();
 }
 
 void Event::exportYaml(const std::filesystem::path& iFile) const {
 	YAML::Emitter out;
 	out << toYaml();
 	std::ofstream fileOut(iFile);
+	if (!fileOut.is_open()) {
+		log_warn("Failed to open file '{}' for YAML export.", iFile.string());
+		return;
+	}
 	fileOut << out.c_str();
-	fileOut.close();
 }
 
 void Event::importYaml(const std::filesystem::path& iFile) {
+	if (!exists(iFile)) {
+		log_warn("File '{}' does not exist for YAML import.", iFile.string());
+		return;
+	}
 	const YAML::Node data = YAML::LoadFile(iFile.string());
 	fromYaml(data);
 }
@@ -344,53 +355,55 @@ auto Event::getNextGameRound() -> rounds_type::iterator {
 
 // ----- Action sur le flow -----
 
-//NOLINTBEGIN(misc-no-recursion)
 void Event::nextState() {
-	const auto status_save = m_status;
-	m_changed = false;
-	const auto sub = getCurrentGameRound();
-	switch (m_status) {
-		case Status::Invalid:
-		case Status::MissingParties:
-			checkValidConfig();// rien à faire si c'est invalide !
-			break;
-		case Status::Ready:
-			m_status = Status::EventStarting;
-			m_start = clock::now();
-			break;
-		case Status::EventStarting:
-			m_status = Status::GameRunning;
-			sub->nextStatus();
-			break;
-		case Status::DisplayRules:
-			m_status = Status::GameRunning;
-			break;
-		case Status::GameRunning:
-			if (sub == m_gameRounds.end()) {
-				m_status = Status::EventEnding;
-			} else {
+	bool keepGoing = true;
+	while (keepGoing) {
+		keepGoing = false;
+		const auto status_save = m_status;
+		m_changed = false;
+		const auto sub = getCurrentGameRound();
+		switch (m_status) {
+			case Status::Invalid:
+			case Status::MissingParties:
+				checkValidConfig();// rien à faire si c'est invalide !
+				break;
+			case Status::Ready:
+				m_status = Status::EventStarting;
+				m_start = clock::now();
+				break;
+			case Status::EventStarting:
+				m_status = Status::GameRunning;
 				sub->nextStatus();
-				if (sub->isFinished()) {
-					m_end = clock::now();
-					nextState();
+				break;
+			case Status::DisplayRules:
+				m_status = Status::GameRunning;
+				break;
+			case Status::GameRunning:
+				if (sub == m_gameRounds.end()) {
+					m_status = Status::EventEnding;
+				} else {
+					sub->nextStatus();
+					if (sub->isFinished()) {
+						m_end = clock::now();
+						keepGoing = true;
+					}
+					m_changed = true;
 				}
-				m_changed = true;
-			}
-			break;
-		case Status::EventEnding:
-			m_status = Status::Finished;
-			break;
-		case Status::Finished:
-			break;
+				break;
+			case Status::EventEnding:
+				m_status = Status::Finished;
+				break;
+			case Status::Finished:
+				break;
+		}
+		if (status_save != m_status)
+			m_changed = true;
+		if (m_changed)
+			log_info("Event switching to {}", getStateString());
+		else
+			log_info("Event stay in {}", getStateString());
 	}
-	if (status_save != m_status)
-		m_changed = true;
-	if (m_changed)
-		log_info("Event switching to {}", getStateString());
-	else
-		log_info("Event stay in {}", getStateString());
 }
-//NOLINTEND(misc-no-recursion)
 
 auto Event::getStateString() const -> std::string {
 	std::string result = std::format("Event '{}'", getStatusStr());

@@ -50,11 +50,11 @@ public:
 
 	int lessPickNb = 0;
 	pick_list lessPickList;
-	auto lessPickStr() const -> std::string;
+	[[nodiscard]] auto lessPickStr() const -> std::string;
 
 	int mostPickNb = 0;
 	pick_list mostPickList;
-	auto mostPickStr() const -> std::string;
+	[[nodiscard]] auto mostPickStr() const -> std::string;
 
 	int roundLessNb = 0;
 	int roundMostNb = 0;

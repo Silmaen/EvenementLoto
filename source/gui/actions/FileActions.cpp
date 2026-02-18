@@ -36,13 +36,11 @@ void LoadFileAction::onExecute() {
 	auto& app = Application::get();
 	app.getCurrentFile() = file;
 
-	std::ifstream f;
-	f.open(file, std::ios::in | std::ios::binary);
+	std::ifstream f(file, std::ios::in | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().read(f, 0);
 	app.getCurrentFile() = file;
 	log_info("File '{}' loaded successfully.", file.string());
-	f.close();
 }
 
 
@@ -64,12 +62,10 @@ void SaveFileAction::onExecute() {
 			return;
 		}
 	}
-	std::ofstream f;
-	f.open(file, std::ios::out | std::ios::binary);
+	std::ofstream f(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().write(f);
 	log_info("File '{}' saved successfully.", file.string());
-	f.close();
 }
 
 
@@ -85,12 +81,10 @@ void SaveAsFileAction::onExecute() {
 		return;
 	}
 	file = newfile;
-	std::ofstream f;
-	f.open(file, std::ios::out | std::ios::binary);
+	std::ofstream f(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
 	app.getCurrentEvent().write(f);
 	log_info("File '{}' saved successfully.", file.string());
-	f.close();
 }
 
 QuitAction::QuitAction() = default;

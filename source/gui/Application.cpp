@@ -86,6 +86,14 @@ Application::Application() {
 
 	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
 
+	// Cache frequently-accessed pointers to avoid per-frame O(n) lookups.
+	m_cachedDisplayView = getView("display_window");
+	m_cachedSaveFile = getAction("save_file");
+	m_cachedSaveFileAs = getAction("save_file_as");
+	m_cachedStartGame = getAction("start_game");
+	m_cachedStopGame = getAction("stop_game");
+	m_cachedGameSettings = getAction("game_settings");
+
 	m_state = State::Running;
 }
 
@@ -107,17 +115,16 @@ void Application::run() {
 		m_mainWindow.newFrame();
 		if (m_state != State::Running)
 			continue;
-		const auto dview = getView("display_window");
-		if (dview == nullptr)
+		if (m_cachedDisplayView == nullptr)
 			continue;
 		if (isDisplayNeeded()) {
-			if (!dview->visibility())
+			if (!m_cachedDisplayView->visibility())
 				log_debug("Show Display view.");
-			dview->show();
+			m_cachedDisplayView->show();
 		} else {
-			if (dview->visibility())
+			if (m_cachedDisplayView->visibility())
 				log_debug("Hide Display view.");
-			dview->hide();
+			m_cachedDisplayView->hide();
 		}
 		for (const auto& view: m_views) { view->update(); }
 		for (const auto& popup: m_popups) { popup->update(); }
@@ -196,32 +203,27 @@ auto Application::getModifiers() const -> Modifiers { return m_mainWindow.getMod
 
 void Application::checkActionEnable() const {
 	const auto status = m_currentEvent.getStatus();
-	const auto saveFileAs = getAction("save_file_as");
-	const auto saveFile = getAction("save_file");
-	const auto startGame = getAction("start_game");
-	const auto stopGame = getAction("stop_game");
-	const auto gameSettings = getAction("game_settings");
 	if (status == core::Event::Status::Invalid || status == core::Event::Status::MissingParties) {
-		if (saveFileAs) saveFileAs->disable();
-		if (saveFile) saveFile->disable();
+		if (m_cachedSaveFileAs) m_cachedSaveFileAs->disable();
+		if (m_cachedSaveFile) m_cachedSaveFile->disable();
 	} else {
-		if (saveFile) saveFile->enable();
-		if (saveFileAs) saveFileAs->enable();
+		if (m_cachedSaveFile) m_cachedSaveFile->enable();
+		if (m_cachedSaveFileAs) m_cachedSaveFileAs->enable();
 	}
 	if (status == core::Event::Status::Ready) {
-		if (startGame) startGame->enable();
+		if (m_cachedStartGame) m_cachedStartGame->enable();
 	} else {
-		if (startGame) startGame->disable();
+		if (m_cachedStartGame) m_cachedStartGame->disable();
 	}
 	if (status == core::Event::Status::Finished) {
-		if (stopGame) stopGame->enable();
+		if (m_cachedStopGame) m_cachedStopGame->enable();
 	} else {
-		if (stopGame) stopGame->disable();
+		if (m_cachedStopGame) m_cachedStopGame->disable();
 	}
 	if (status == core::Event::Status::Invalid) {
-		if (gameSettings) gameSettings->disable();
+		if (m_cachedGameSettings) m_cachedGameSettings->disable();
 	} else {
-		if (gameSettings) gameSettings->enable();
+		if (m_cachedGameSettings) m_cachedGameSettings->enable();
 	}
 }
 
@@ -234,7 +236,9 @@ auto Application::isDisplayNeeded() const -> bool {
 
 void Application::setDisplayPreview(const bool iDisplay) {
 	m_displayPreview = iDisplay;
-	const auto dv = std::static_pointer_cast<views::DisplayView>(getView("display_window"));
+	if (m_cachedDisplayView == nullptr)
+		return;
+	const auto dv = std::static_pointer_cast<views::DisplayView>(m_cachedDisplayView);
 	dv->setPreviewMode(iDisplay);
 	if (!iDisplay) {
 		dv->setEventToRender(m_currentEvent);
@@ -250,17 +254,19 @@ void Application::autoSave() {
 		return;
 	m_lastAutoSave = now;
 	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
-	if (!exists(dataLocation))
+	if (!exists(dataLocation) && !dataLocation.empty())
 		create_directories(dataLocation);
+	else if (!is_directory(dataLocation)) {
+		log_warn("Data location '{}' is not a directory, cannot autosave.", dataLocation.string());
+		return;
+	}
 	const auto rescuePath = dataLocation / "rescue.lev";
-	std::ofstream f;
-	f.open(rescuePath, std::ios::out | std::ios::binary);
+	std::ofstream f(rescuePath, std::ios::out | std::ios::binary);
 	if (!f.is_open()) {
 		log_warn("Failed to open autosave file '{}'.", rescuePath.string());
 		return;
 	}
 	m_currentEvent.write(f);
-	f.close();
 	log_trace("Autosaved event to '{}'.", rescuePath.string());
 }
 

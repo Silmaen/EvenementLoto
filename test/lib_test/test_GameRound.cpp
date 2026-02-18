@@ -233,6 +233,30 @@ TEST(GameRound, TypeEnfant) {
 	EXPECT_EQ(it->getType(), SubGameRound::Type::OneQuine);
 }
 
+TEST(GameRound, SubRoundBoundsCheck) {
+	GameRound gr{GameRound::Type::OneQuine};
+	EXPECT_EQ(gr.sizeSubRound(), 1);
+	auto it = gr.getSubRound(0);
+	EXPECT_NE(it, gr.endSubRound());
+	auto oob = gr.getSubRound(5);
+	EXPECT_EQ(oob, gr.endSubRound());
+	const GameRound& cgr = gr;
+	auto cit = cgr.getSubRound(0);
+	EXPECT_NE(cit, cgr.endSubRound());
+	auto coob = cgr.getSubRound(99);
+	EXPECT_EQ(coob, cgr.endSubRound());
+}
+
+TEST(GameRound, PauseType) {
+	GameRound gr{GameRound::Type::Pause};
+	EXPECT_EQ(gr.sizeSubRound(), 0);
+	EXPECT_STREQ(gr.getTypeStr().c_str(), "Pause");
+	gr.setDiapo("test/path", 5.0);
+	auto [path, delay] = gr.getDiapo();
+	EXPECT_EQ(path.string(), "test/path");
+	EXPECT_DOUBLE_EQ(delay, 5.0);
+}
+
 TEST(GameRound, results) {
 	GameRound gr{GameRound::Type::OneTwoQuineFullCard};
 	gr.nextStatus();
