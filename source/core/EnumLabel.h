@@ -8,6 +8,11 @@
 
 #pragma once
 
+#include <array>
+#include <cstddef>
+#include <string_view>
+#include <utility>
+
 namespace evl::core {
 
 /// Returned when an enum value has no known label.

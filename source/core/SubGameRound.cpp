@@ -10,6 +10,7 @@
 #include "SubGameRound.h"
 
 #include "EnumLabel.h"
+#include "StreamRead.h"
 
 #include "Log.h"
 #include "utilities.h"
@@ -66,43 +67,28 @@ void SubGameRound::nextStatus() {
 }
 
 void SubGameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, getSaveVersion()))
+	if (std::cmp_greater(iFileVersion, getSaveVersion())) {
+		iBs.setstate(std::ios::failbit);
 		return;
-	iBs.read(reinterpret_cast<char*>(&m_type), sizeof(Type));
-	if (iFileVersion >= 4) {
-		iBs.read(reinterpret_cast<char*>(&m_status), sizeof(Status));
 	}
+	if (!readEnum(iBs, m_type))
+		return;
+	if (iFileVersion >= 4 && !readEnum(iBs, m_status))
+		return;
 	if (iFileVersion < 4) {//----UNCOVER----
-		uint32_t readTmp = 0;//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&readTmp), sizeof(uint32_t));//----UNCOVER----
-		if (readTmp != 0)//----UNCOVER----
-			m_winner = "gagnant";//----UNCOVER----
-		else//----UNCOVER----
-			m_winner = "";//----UNCOVER----
-	} else {//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&m_pricesValue), sizeof(double));
-		std::string::size_type l = 0;
-		iBs.read(reinterpret_cast<char*>(&l), sizeof(std::string::size_type));
-		m_winner.resize(l);
-		for (std::string::size_type i = 0; i < l; i++)
-			iBs.read(reinterpret_cast<char*>(&m_winner[i]), sizeof(std::string::value_type));
+		uint32_t hasWinner = 0;//----UNCOVER----
+		if (!readRaw(iBs, hasWinner))//----UNCOVER----
+			return;//----UNCOVER----
+		m_winner = hasWinner != 0 ? "gagnant" : "";//----UNCOVER----
+	} else if (!readRaw(iBs, m_pricesValue) || !readString(iBs, m_winner)) {
+		return;
 	}
-	std::string::size_type l = 0;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(std::string::size_type));
-	m_prices.resize(l);
-	for (std::string::size_type i = 0; i < l; i++)
-		iBs.read(reinterpret_cast<char*>(&m_prices[i]), sizeof(std::string::value_type));
-	if (iFileVersion > 3) {
-		draws_type::size_type ld = 0;
-		iBs.read(reinterpret_cast<char*>(&ld), sizeof(draws_type::size_type));
-		m_draws.resize(ld);
-		for (draws_type::size_type i = 0; i < ld; ++i)
-			iBs.read(reinterpret_cast<char*>(&(m_draws[i])), sizeof(draws_type::value_type));
-	}
-	if (iFileVersion > 5) {
-		iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
-		iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
-	}
+	if (!readString(iBs, m_prices))
+		return;
+	if (iFileVersion > 3 && !readVector(iBs, m_draws))
+		return;
+	if (iFileVersion > 5 && (!readRaw(iBs, m_start) || !readRaw(iBs, m_end)))
+		return;
 }
 
 void SubGameRound::write(std::ostream& iBs) const {

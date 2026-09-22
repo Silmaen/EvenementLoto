@@ -10,6 +10,7 @@
 #include "Event.h"
 
 #include "EnumLabel.h"
+#include "StreamRead.h"
 #include "Log.h"
 #include "utilities.h"
 
@@ -34,56 +35,50 @@ auto Event::getStatusStr() const -> std::string { return std::string(enumLabel(g
 
 // ---- Serialisation ----
 void Event::read(std::istream& iBs, int) {
-	uint16_t save_version = 0;
-	iBs.read(reinterpret_cast<char*>(&save_version), sizeof(uint16_t));
-	log_debug("Version des données du stream: {}, version courante: {}", save_version, getSaveVersion());
-	if (save_version > getSaveVersion()) {
+	uint16_t saveVersion = 0;
+	if (!readRaw(iBs, saveVersion))
+		return;
+	log_debug("Version des données du stream: {}, version courante: {}", saveVersion, getSaveVersion());
+	if (saveVersion > getSaveVersion()) {
 		log_warn("Version des données du stream ({}) supérieure à la version courante ({}), lecture impossible",
-				 save_version, getSaveVersion());
-		return;// incompatible
+				 saveVersion, getSaveVersion());
+		iBs.setstate(std::ios::failbit);
+		return;
 	}
-	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
-	std::string::size_type l = 0;
-	std::string::size_type i = 0;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	m_organizerName.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_organizerName[i], sizeof(std::string::value_type));
+	if (!readEnum(iBs, m_status))
+		return;
 	std::string temp;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	temp.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&temp[i], sizeof(std::string::value_type));
+	if (!readString(iBs, m_organizerName) || !readString(iBs, temp))
+		return;
 	m_organizerLogo = temp;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	m_name.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_name[i], sizeof(std::string::value_type));
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	temp.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&temp[i], sizeof(std::string::value_type));
+	if (!readString(iBs, m_name) || !readString(iBs, temp))
+		return;
 	m_logo = temp;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-	m_location.resize(l);
-	for (i = 0; i < l; ++i) iBs.read(&m_location[i], sizeof(std::string::value_type));
+	if (!readString(iBs, m_location))
+		return;
 	// version 2
-	if (save_version > 1) {
-		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-		m_rules.resize(l);
-		for (i = 0; i < l; ++i) iBs.read(&m_rules[i], sizeof(std::string::value_type));
-	}
+	if (saveVersion > 1 && !readString(iBs, m_rules))
+		return;
 	// version 3
-	if (save_version > 2 && save_version < 4) {//----UNCOVER----
-		std::string srules;//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&l), sizeof(l));//----UNCOVER----
-		srules.resize(l);//----UNCOVER----
-		for (i = 0; i < l; ++i) iBs.read(&srules[i], sizeof(std::string::value_type));//----UNCOVER----
+	if (saveVersion > 2 && saveVersion < 4) {//----UNCOVER----
+		std::string obsoleteRules;//----UNCOVER----
+		if (!readString(iBs, obsoleteRules))//----UNCOVER----
+			return;//----UNCOVER----
 	}//----UNCOVER----
 	// version 1
-	rounds_type::size_type lv = 0;
-	iBs.read(reinterpret_cast<char*>(&lv), sizeof(lv));
-	m_gameRounds.resize(lv);
-	for (rounds_type::size_type iv = 0; iv < lv; ++iv) m_gameRounds[iv].read(iBs, save_version);
-	log_info("Event lu et contenant {} parties", lv);
-	iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
-	iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
+	rounds_type::size_type roundCount = 0;
+	if (!readLength(iBs, roundCount, g_maxSerializedCount))
+		return;
+	m_gameRounds.clear();
+	m_gameRounds.resize(roundCount);
+	for (auto& round: m_gameRounds) {
+		round.read(iBs, saveVersion);
+		if (!iBs.good())
+			return;
+	}
+	log_info("Event lu et contenant {} parties", roundCount);
+	if (!readRaw(iBs, m_start) || !readRaw(iBs, m_end))
+		return;
 	log_info("Event in state: {}", getStateString());
 }
 

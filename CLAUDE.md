@@ -42,6 +42,12 @@ Author: Silmaen
 - `Statistics` - Draw statistics tracking
 - `EnumLabel.h` - `constexpr` enum ⇄ French label tables, replacing static maps that
   could throw during static initialization
+- `AtomicFile.h` - `writeFileAtomically()`: write to `<name>.tmp`, flush, check, then
+  rename, so a crash never destroys the previous version
+- `StreamRead.h` - defensive binary readers (`readRaw`, `readEnum`, `readLength`,
+  `readString`, `readVector`); the stream's `failbit` is the error channel
+- `Rescue.h` - the interrupted game: `saveRescue`, `findRescue`, `loadRescue`,
+  `archiveRescue`, with two generations of `rescue.lev`
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
@@ -52,11 +58,13 @@ Author: Silmaen
 
 ### GUI (namespace `evl::gui`)
 
-- `Application` - Singleton application class, manages views/popups/actions, Vulkan rendering, autosave (`rescue.lev` every 10s during active gameplay)
+- `Application` - Singleton application class, manages views/popups/actions, Vulkan
+  rendering, autosave (`rescue.lev` every 10s during active gameplay, atomic, two
+  generations) and the recovery prompt at startup
 - `MainWindow` - GLFW window management with Vulkan surface
 - `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in settings)
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
-- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups
+- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups, RescuePopup (resume an interrupted game)
 - `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
@@ -199,7 +207,8 @@ Python-based CI scripts in `ci/` (21 Python files), driven by `ci_action.py`:
 
 - `log_trace(...)`, `log_debug(...)`, `log_info(...)`, `log_warn(...)`, `log_error(...)`, `log_critical(...)`
 - Macros in `Log.h` using `std::format` (C++23) for formatting
-- Backend: spdlog with console + file sinks
+- Backend: spdlog with console + rotating file sinks (5 MB × 5, appended so a crash
+  trace survives the next start), flushed every second
 - In-app log buffer: `evl::logs::LogBuffer` singleton (thread-safe, max 1000 entries)
 
 ### Serialization
@@ -216,4 +225,6 @@ All domain objects inherit from `Serializable` and implement:
 - Tests are in `test/lib_test/` (core, 10 files) and `test/gui_test/` (GUI, 6 files)
 - Coverage via gcovr (configured in `gcovr.cfg`)
 - Test helper header: `test/TestMainHelper.h`
+- `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted
+- `test_Rescue.cpp` checks the interrupted-game save, detection and fallback
 - Sanitizer suppressions: `lsan_suppressions.txt` (suppresses known libdbus leaks for Address/Leak sanitizer presets)

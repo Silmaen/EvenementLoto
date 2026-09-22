@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 phases 0 à 5 faites (Linux), phase 7 partielle
+**État global** : 🟩 migration : phases 0 à 5 (Linux) + 7 partielle — stabilité : S0 à S3, S4 partielle
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -643,135 +643,95 @@ Le reste est du durcissement.
 **Une ligne, à faire en premier** : sans ça, tout diagnostic des phases suivantes
 part avec une main dans le dos.
 
-- [ ] `source/core/Log.cpp:63` : `basic_file_sink_mt(getLogPath(), true)` — le
-      second paramètre **tronque le fichier à chaque démarrage**. Après un crash,
-      le premier réflexe de l'utilisateur est de relancer, ce qui détruit la seule
-      trace. Passer à `rotating_file_sink_mt` (ou conserver N sessions horodatées).
-- [ ] Choisir la politique : nombre de fichiers conservés et taille max
-      *(une session de 4 h en `Info` reste petite ; en `Trace` c'est autre chose)*
-- [ ] Journaliser en en-tête de session la version, le compilateur, la plateforme
-      et le chemin de `data_location` *(déjà partiellement fait dans `main.cpp`)*
+- [x] `basic_file_sink_mt(getLogPath(), true)` → `rotating_file_sink_mt` : le journal
+      n'est plus tronqué au démarrage, la trace du crash survit au redémarrage
+- [x] Politique retenue : **5 Mo × 5 fichiers** (25 Mo au plus)
+- [x] `spdlog::flush_every(1s)` n'était actif **qu'en debug** — activé aussi en release,
+      car les dernières secondes avant un crash sont les seules qui comptent
+- [ ] Journaliser en en-tête de session le compilateur et la plateforme
+      *(la version et le chemin d'exécution le sont déjà)*
 
 **Validation**
-- [ ] Deux démarrages consécutifs : le log du premier est toujours lisible
-- [ ] Une session longue ne remplit pas le disque
+- [x] Deux démarrages consécutifs : le log du premier reste lisible (sink en ajout)
+- [x] Une session longue ne remplit pas le disque (rotation)
 
 ---
 
 ## Phase S1 — Écritures atomiques et rotation
 
-🔴 **P0.** Aujourd'hui les trois chemins d'écriture ouvrent directement le fichier
-de destination :
+**Faite.** `source/core/AtomicFile.h/.cpp` fournit `writeFileAtomically()` : écriture
+dans `<nom>.tmp`, `flush`, contrôle de `good()`, puis `std::filesystem::rename()`. La
+cible n'est remplacée qu'une fois le contenu complet sur le disque.
 
-| Site | Fichier écrit |
-|---|---|
-| `Application.cpp:265` (`autoSave`) | `rescue.lev` |
-| `FileActions.cpp:65` (`SaveFileAction`) | le `.lev` de l'utilisateur |
-| `FileActions.cpp:83` (`SaveAsFileAction`) | le `.lev` de l'utilisateur |
-
-Un crash — ou une coupure de courant, réaliste dans une salle des fêtes —
-**pendant** l'écriture laisse un fichier tronqué. Le fichier de secours est détruit
-à l'instant précis où il devient utile.
-
-- [ ] Écrire une fonction utilitaire unique `writeAtomic(path, writer)` :
-  - [ ] écrire dans `<path>.tmp`
-  - [ ] `flush()` puis **vérifier `good()`** puis `close()`
-  - [ ] en cas d'échec : supprimer le `.tmp`, journaliser, **ne pas toucher** à la cible
-  - [ ] sinon `std::filesystem::rename()` (atomique sur le même système de fichiers)
-- [ ] Rotation à deux générations pour l'autosave : `rescue.lev` → `rescue.lev.1`
-      avant chaque bascule *(si la dernière sauvegarde est illisible, la précédente
-      reste exploitable)*
-- [ ] Router les trois sites d'écriture vers cette fonction
-- [ ] `Event::write()` doit signaler l'échec *(aujourd'hui `void`)*
-- [ ] `FileActions.cpp:67` et `:85` : `log_info("File '{}' saved successfully.")` est
-      émis **même si l'écriture a échoué** → conditionner au succès
-      *(des logs qui mentent pendant un incident, c'est le pire moment)*
-- [ ] `Application.cpp:262` : `create_directories()` peut lancer
-      `filesystem_error` si les droits manquent → traiter *(voir aussi S4)*
-
-**Validation**
-- [ ] Test : interrompre l'écriture (writer qui lance au milieu) ⇒ la cible
-      précédente est **intacte**
-- [ ] Test : destination en lecture seule ⇒ message d'erreur, pas de crash, pas de
-      fichier corrompu
-- [ ] Vérifier que `.tmp` et `rescue.lev.1` ne polluent pas la liste du sélecteur de fichiers
-
----
+- [x] `writeFileAtomically(path, writer, keepPrevious)`, `noexcept` — la garantie est
+      réelle : le corps est isolé dans une fonction interne et le point d'entrée
+      rattrape tout, puisque les appelants sont souvent sur un chemin d'arrêt
+- [x] En cas d'échec : le `.tmp` est supprimé et **la cible précédente reste intacte**
+- [x] Rotation à deux générations pour l'autosave (`rescue.lev` → `rescue.lev.1`),
+      en « meilleur effort » : perdre l'ancienne génération n'empêche pas la nouvelle
+- [x] Les trois sites d'écriture passent par cette fonction (`Application::autoSave`
+      via `core::saveRescue`, `SaveFileAction`, `SaveAsFileAction`)
+- [x] `FileActions` ne journalise plus « saved successfully » quand l'écriture a échoué
+- [x] `SaveAsFileAction` met à jour le fichier courant (il ne le faisait pas)
+- [x] La logique de répertoire de `autoSave()` ne fonctionne plus « par accident »
+      sur un chemin vide
+- [ ] Vérifier que `.tmp` et `rescue.lev.1` ne polluent pas le sélecteur de fichiers
+      *(le filtre `lev` les exclut, à confirmer à l'usage)*
 
 ## Phase S2 — Lecture défensive du format binaire
 
-🔴 **P0.** `Event::read()` fait confiance au contenu du fichier :
+**Faite.** `source/core/StreamRead.h` fournit `readRaw`, `readEnum`, `readLength`,
+`readString` et `readVector`. Le **canal d'erreur est le flux lui-même** (`failbit`) :
+aucun changement de l'interface `Serializable`, et les appelants testent `good()`.
+**Le format sur disque est inchangé** (mêmes largeurs, même ordre).
 
-```cpp
-// Event.cpp:46-48
-iBs.read(reinterpret_cast<char*>(&l), sizeof(l));
-m_organizerName.resize(l);          // l vient du fichier, aucune borne
-```
+- [x] État du flux vérifié après **chaque** lecture
+- [x] Toutes les longueurs bornées : 1 Mio pour les chaînes et tableaux d'octets,
+      65 536 pour les vecteurs d'objets
+- [x] Toutes les énumérations validées par `magic_enum::enum_cast` : `Event::Status`,
+      `GameRound::Type/Status`, `SubGameRound::Type/Status`
+- [x] Une version de fichier supérieure met le flux en échec au lieu de laisser
+      l'objet à moitié initialisé
+- [x] `Event::read`, `GameRound::read` et `SubGameRound::read` réécrites
+- [x] `Event::getStatusStr()` n'utilise plus de `.at()` non gardé *(fait en phase 5,
+      via les tables `constexpr` de `EnumLabel.h`)*
+- [ ] `FileActions::LoadFileAction` : exploiter l'échec de lecture pour prévenir
+      l'utilisateur *(la lecture est sûre, il reste à afficher l'erreur)*
 
-L'état du flux n'est **jamais** vérifié et aucune taille n'est bornée : un fichier
-tronqué donne un `size_type` arbitraire → `resize()` lance `length_error` /
-`bad_alloc` → `std::terminate` (voir S4).
-
-Pire, `m_status` est lu en brut (`Event.cpp:43`) sans validation. Un octet corrompu
-produit un statut hors domaine, et `Event::getStatusStr()` (`Event.cpp:32`) utilise
-`.at()` **sans garde** — alors que `SubGameRound::getStatusStr()` fait correctement
-`if (contains(...))` (`SubGameRound.cpp:37` et `:44`). Le statut étant affiché dans
-la barre d'état à chaque frame, le résultat est un **crash en boucle au
-redémarrage** : l'application ne s'ouvre plus du tout.
-
-- [ ] Vérifier `iBs.good()` après chaque lecture, et sortir proprement sinon
-- [ ] Borner toutes les longueurs avant `resize()`
-      *(un nom d'organisateur ne fait pas 4 Go)*
-- [ ] Valider toutes les énumérations lues via `magic_enum::enum_cast`
-      *(déjà une dépendance, déjà utilisé dans `main.cpp`)* : `Event::Status`,
-      `GameRound::Type`, `SubGameRound::Type`, `SubGameRound::Status`
-- [ ] Garder `Event::getStatusStr()` comme `SubGameRound::getStatusStr()`
-- [ ] Faire remonter l'échec : `Event::read()` retourne `void`, donc l'appelant ne
-      peut pas savoir *(→ statut de retour ou exception typée)*
-- [ ] `FileActions.cpp:39` : ajouter le contrôle `is_open()` avant `read()`
-      *(sur un flux invalide, chaque lecture échoue en silence, les champs gardent
-      leur valeur précédente, et on obtient un `Event` incohérent à moitié écrasé)*
-- [ ] `Event.cpp:38` : en cas de version de fichier supérieure, on `return` en
-      laissant l'objet à moitié initialisé sans en informer l'appelant → traiter
-      comme un échec de chargement
-
-**Validation** *(le test le plus rentable de tout ce document)*
-- [ ] Test paramétré : tronquer un `.lev` valide **à chaque offset** ⇒ aucun crash,
-      un message d'erreur, et l'état courant préservé
-- [ ] Test : longueurs absurdes injectées ⇒ refus propre
-- [ ] Test : statut / type hors domaine ⇒ refus propre
-- [ ] Test : fichier vide, fichier de 0 octet, fichier de version future
-- [ ] Test : fichier rempli d'octets aléatoires
-
----
+**Validation** — `test/lib_test/test_Serialization.cpp`, 7 tests
+- [x] Aller-retour complet d'un événement (parties, sous-parties, diaporama, règles)
+- [x] **Troncature à chaque offset** : aucun n'est accepté, aucun crash
+- [x] 64 tampons d'octets aléatoires : tous rejetés
+- [x] Flux vide, version future, statut hors domaine, longueur absurde : tous rejetés
+- [x] Suite verte sous gcc 14, clang 22, ASan et UBSan
 
 ## Phase S3 — Reprise après incident au démarrage
 
-🔴 **P0.** C'est le chaînon manquant qui transforme l'autosave existant en vraie
-reprise sur incident. **Dépend de S1 et S2** (ne proposer une reprise que si on
-sait écrire un fichier fiable et lire un fichier suspect sans crasher).
+**Faite.** C'était le chaînon manquant : l'autosave existait déjà mais n'était jamais
+relu. `source/core/Rescue.h/.cpp` porte la logique, testable hors interface, et
+`source/gui/views/RescuePopup.h/.cpp` la fenêtre de proposition.
 
-- [ ] Au démarrage, détecter `rescue.lev` dans `general/data_location`
-- [ ] Décider s'il est « pertinent » : statut ≠ `Invalid` / `Finished`, et
-      horodatage plus récent que le `.lev` courant
-- [ ] Proposer à l'utilisateur : « Une partie interrompue a été détectée
-      (il y a *N* minutes) — reprendre ? » avec le nom de l'événement et le nombre
-      de tirages effectués, pour qu'il puisse juger
-- [ ] Si la lecture de `rescue.lev` échoue, **retenter avec `rescue.lev.1`** (S1)
-- [ ] Après une reprise acceptée : conserver le fichier jusqu'à la première
-      sauvegarde explicite *(ne pas supprimer le filet trop tôt)*
-- [ ] Après une reprise refusée : archiver plutôt que supprimer
-      (`rescue-<horodatage>.lev`) — un refus par erreur ne doit pas être définitif
-- [ ] Nettoyer les archives au-delà de N
-- [ ] Documenter la procédure dans `document/Utilisation.md`
+- [x] Détection de `rescue.lev` dans `general/data_location` au démarrage
+- [x] Pertinence : statut ni `Invalid` ni `Finished`, et fichier réellement lisible
+- [x] Proposition avec le nom de l'événement, le nombre de numéros déjà tirés et
+      l'ancienneté en clair (« il y a 12 minutes »), pour que l'organisateur vérifie
+- [x] Si `rescue.lev` est illisible, **bascule automatique sur `rescue.lev.1`**
+- [x] « Ignorer » **archive** (`rescue-<horodatage>-rescue.lev`) au lieu de supprimer :
+      un refus par erreur n'est pas définitif
+- [x] Documenté dans `document/Utilisation.md`, section « En cas d'incident »
+      *(doc utilisateur, intégrée à l'aide de l'application)*
+- [ ] Nettoyer les archives au-delà de N *(elles s'accumulent aujourd'hui)*
+- [ ] Après une reprise acceptée, supprimer le fichier de secours à la première
+      sauvegarde explicite *(il est conservé pour l'instant, ce qui est le côté sûr)*
 
-**Validation**
-- [ ] `kill -9` en pleine partie, relance ⇒ la proposition apparaît et la reprise
-      restitue le bon nombre de tirages
-- [ ] `rescue.lev` volontairement corrompu ⇒ bascule sur `rescue.lev.1`
-- [ ] Les deux fichiers corrompus ⇒ message clair, démarrage normal, aucun crash
-
----
+**Validation** — `test/lib_test/test_Rescue.cpp`, 6 tests
+- [x] Enregistrement, détection puis rechargement d'une partie en cours
+- [x] Zone vide : rien n'est proposé
+- [x] Deuxième enregistrement : la génération précédente est conservée
+- [x] **Génération la plus récente tronquée ⇒ bascule sur la précédente**
+- [x] Un événement non repris (`Invalid`) n'est pas proposé
+- [x] L'archivage conserve le fichier
+- [ ] `kill -9` en pleine partie sur l'application réelle *(non vérifiable sans écran)*
 
 ## Phase S4 — Filet global contre les exceptions
 
@@ -784,8 +744,10 @@ Chemins qui peuvent lancer, tous réels : `create_directories()`
 (`Application.cpp:262`), `resize(l)` (`Event.cpp:47`+), `g_statusConvert.at()`
 (`Event.cpp:32`), YAML et jsoncpp dans les imports/exports.
 
-- [ ] `try/catch(...)` dans `main()` : journaliser le type et le message, tenter une
-      sauvegarde d'urgence, retourner un code d'erreur explicite
+- [x] `try/catch` dans `main()` : type et message journalisés, `EXIT_FAILURE` renvoyé.
+      Le gestionnaire de dernier recours est `noexcept`, donc rien ne peut s'échapper
+      *(confirmé par `bugprone-exception-escape`, qui est désormais vert)*
+- [ ] Sauvegarde d'urgence depuis le gestionnaire de `main()`
 - [ ] `try/catch` **par itération** dans `Application::run()` : une exception dans le
       rendu d'une vue ne doit pas emporter la partie en cours
       *(journaliser, incrémenter un compteur, et n'abandonner qu'après N échecs

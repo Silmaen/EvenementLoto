@@ -18,7 +18,7 @@
 EVL_DIAG_PUSH
 EVL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 EVL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 EVL_DIAG_POP
 
@@ -46,6 +46,11 @@ auto fromLevel(const Log::Level& iLevel) -> spdlog::level::level_enum {
 }
 std::shared_ptr<spdlog::logger> g_logger;
 
+/// Maximum size of a single log file.
+constexpr std::size_t g_logMaxSize = 5UL * 1024UL * 1024UL;
+/// Number of past log files kept beside the current one.
+constexpr std::size_t g_logMaxFiles = 5;
+
 }// namespace
 
 auto getLogPath() -> std::filesystem::path { return core::getExecPath() / "exec.log"; }
@@ -60,15 +65,18 @@ void Log::init(const Level& iLevel) {
 	}
 	std::vector<spdlog::sink_ptr> logSinks;
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-	logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(getLogPath(), true));
+	// Rotating and appending: relaunching after a crash must not erase its trace.
+	// std::string, not the path: spdlog's filename_t is a narrow string, and a path
+	// converts implicitly to std::wstring on Windows.
+	logSinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(getLogPath().string(), g_logMaxSize,
+																				g_logMaxFiles));
 
 	g_logger = std::make_shared<spdlog::logger>("EVL", begin(logSinks), end(logSinks));
 	register_logger(g_logger);
 
 	setVerbosityLevel(iLevel);
-#ifdef EVL_DEBUG
+	// Also in release: the last seconds before a crash are the interesting ones.
 	spdlog::flush_every(std::chrono::seconds(1U));
-#endif
 }
 
 void Log::setVerbosityLevel(const Level& iLevel) {

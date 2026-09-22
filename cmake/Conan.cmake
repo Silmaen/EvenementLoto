@@ -65,7 +65,16 @@ foreach (recipeFile IN LISTS localRecipeFiles)
 endforeach ()
 string(SHA256 localRecipesHash "${localRecipesHash}")
 
-set(localRecipesStamp "${CMAKE_BINARY_DIR}/conan-local-recipes.sha256")
+# The stamp belongs to the Conan cache, not to a build directory: a fresh build
+# directory must not purge a recipe that the other ones still point at.
+execute_process(COMMAND ${CONAN_COMMAND} config home
+        OUTPUT_VARIABLE conanHome
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        RESULT_VARIABLE conanResult)
+if (NOT conanResult EQUAL 0)
+    message(FATAL_ERROR "Unable to locate the Conan home.")
+endif ()
+set(localRecipesStamp "${conanHome}/evl-local-recipes.sha256")
 set(previousRecipesHash "")
 if (EXISTS "${localRecipesStamp}")
     file(READ "${localRecipesStamp}" previousRecipesHash)

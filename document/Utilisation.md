@@ -175,3 +175,21 @@ Durant une partie les écrans organisateur et d'affichage devrait ressembler à 
 ![ecran_joueurs.png](images/ecran_joueurs.png)
 
 Bonne chance pour votre événement, et n'hésitez pas à nous faire part de vos retours pour améliorer le logiciel !
+
+## En cas d'incident
+
+Pendant toute la durée d'un événement, le logiciel enregistre automatiquement la partie en cours dans un fichier de
+secours, placé dans le dossier de données choisi dans les réglages globaux. Cet enregistrement a lieu au moins toutes
+les dix secondes, et l'ancienne version est conservée : il y a donc toujours deux sauvegardes disponibles.
+
+Si le logiciel s'arrête brutalement (coupure de courant, plantage), il suffit de le relancer : au démarrage, il détecte
+la partie interrompue et propose de la reprendre. La fenêtre indique le nom de l'événement, le nombre de numéros déjà
+tirés et le moment du dernier enregistrement, pour permettre de vérifier qu'il s'agit bien de la bonne partie.
+
+- **Reprendre la partie** recharge l'événement à l'endroit exact où il s'était arrêté. Il faut ensuite l'enregistrer
+  normalement pour conserver la suite dans le fichier habituel.
+- **Ignorer** démarre sur un événement vierge. Le fichier de secours n'est pas supprimé pour autant : il est simplement
+  renommé avec la date et l'heure, et reste donc récupérable si le refus était une erreur.
+
+Si le fichier de secours le plus récent est illisible, parce que l'arrêt a eu lieu pendant son écriture, le logiciel
+propose automatiquement la sauvegarde précédente.

@@ -15,6 +15,7 @@
 #include "actions/SettingsActions.h"
 #include "baseDefine.h"
 #include "core/Log.h"
+#include "core/Rescue.h"
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "views/ConfigPopups.h"
@@ -23,6 +24,7 @@
 #include "views/HelpView.h"
 #include "views/MainView.h"
 #include "views/MenuBar.h"
+#include "views/RescuePopup.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
 
@@ -62,6 +64,7 @@ Application::Application() {
 	m_popups.push_back(std::make_shared<views::MainConfigPopups>());
 	m_popups.push_back(std::make_shared<views::EventConfigPopups>());
 	m_popups.push_back(std::make_shared<views::GameRoundConfigPopups>());
+	m_popups.push_back(std::make_shared<views::PopupRescue>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -96,6 +99,13 @@ Application::Application() {
 	m_cachedGameSettings = getAction("game_settings");
 
 	m_state = State::Running;
+
+	// A game interrupted by a crash or a power loss must come back on its own.
+	if (const auto rescue = core::findRescue(); rescue.has_value()) {
+		log_info("Partie interrompue détectée dans '{}'.", rescue->path.string());
+		if (const auto popup = std::dynamic_pointer_cast<views::PopupRescue>(getPopup("popup_rescue")))
+			popup->propose(rescue.value());
+	}
 }
 
 Application::~Application() {
@@ -254,25 +264,11 @@ void Application::autoSave() {
 	if (core::durationSeconds(now - m_lastAutoSave) < 10.0)
 		return;
 	m_lastAutoSave = now;
-	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
-	if (dataLocation.empty()) {
-		log_warn("No data location configured, cannot autosave.");
+	if (!core::saveRescue(m_currentEvent)) {
+		log_warn("Autosave failed.");
 		return;
 	}
-	if (!exists(dataLocation)) {
-		create_directories(dataLocation);
-	} else if (!is_directory(dataLocation)) {
-		log_warn("Data location '{}' is not a directory, cannot autosave.", dataLocation.string());
-		return;
-	}
-	const auto rescuePath = dataLocation / "rescue.lev";
-	std::ofstream f(rescuePath, std::ios::out | std::ios::binary);
-	if (!f.is_open()) {
-		log_warn("Failed to open autosave file '{}'.", rescuePath.string());
-		return;
-	}
-	m_currentEvent.write(f);
-	log_trace("Autosaved event to '{}'.", rescuePath.string());
+	log_trace("Autosaved event.");
 }
 
 }// namespace evl::gui
