@@ -764,6 +764,27 @@ pas sur les PR**.
 
 ---
 
+### 12.6 Dépendances entre configurations
+
+Il n'y en avait **aucune**, nulle part. Modèle d'Owl : tout attend `Code Style`, en
+`take-successful-builds-only` et sans démarrer du tout si la dépendance échoue.
+
+- [x] `Dependencies.after(vararg gates)` : `reuseBuilds = SUCCESSFUL`,
+      `onDependencyFailure = FAIL_TO_START`. Les options autres que `reuseBuilds` sont
+      les valeurs par défaut du serveur et ne sont donc pas émises dans le XML — elles
+      restent écrites dans le DSL, conformément au parti pris du fichier
+- [x] Les 9 builds, les 4 analyses et les 2 `Package` attendent `Code Style`
+- [x] **Divergence assumée avec Owl** : `Package` attend *aussi* la configuration Clang
+      de sa plateforme, celle qui construit et teste le preset release empaqueté. Owl
+      empaquette en parallèle de ses tests ; une archive issue d'un code dont les tests
+      échouent n'a pas à exister
+- [x] `codeStyle` remonté avant ses dépendants : l'initialisation des propriétés de
+      premier niveau suit l'ordre du fichier
+- [ ] **Conséquence à connaître** : un écart de forme sur `main` bloque tout, y compris
+      l'empaquetage. C'est le modèle voulu, mais c'est une porte unique
+
+---
+
 ## Risques ouverts
 
 | # | Risque | Phase | Atténuation |
