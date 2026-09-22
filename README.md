@@ -8,7 +8,8 @@ Logiciel de gestion d’événement de type loto associatif.
 
 ## Construction
 
-Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
+Ce projet utilise CMake (version 3.24 ou supérieure) pour se configurer, à travers les
+presets définis dans `CMakePresets.json`.
 
 ### Variables de construction
 
@@ -17,27 +18,39 @@ Ce projet utilise CMake (version 3.22 ou supérieure) pour se configurer.
 * `EVL_ENABLE_CLANG_TIDY` active ou non l’utilisation de clang-tidy durant la compilation.
 * `EVL_ENABLE_ADDRESS_SANITIZER` active ou non l’utilisation de l’`address sanitizer` durant la compilation.
 * `EVL_ENABLE_THREAD_SANITIZER` active ou non l’utilisation du `thread sanitizer` durant la compilation.
-* `EVL_ENABLE_MEMORY_SANITIZER` active ou non l’utilisation du `memory sanitizer` durant la compilation.
+* `EVL_ENABLE_LEAK_SANITIZER` active ou non l’utilisation du `leak sanitizer` durant la compilation.
 * `EVL_ENABLE_UNDEFINED_BEHAVIOR_SANITIZER` active ou non l’utilisation de l’`undefined behavior` sanitizer durant la
   compilation.
 
 ### Dépendance
 
-* Ce projet dépend de python3.10 ou supérieur
-* Ce projet dépend de dependency manager [DepManager](https://github.com/Silmaen/DepManager)
-    * Pour l'installer par pip: `pip install depmanager`
-    * Les librairies doivent exister en local ou sur un serveur distant configuré avec DepManager.
-* Ce projet nécessite `gcovr` pour la génération du rapport de couverture de code.
-    * Pour l'installer par pip: `pip install gcovr`
-* Ce projet nécessite l’installation d’une version de doxygen (version 1.9.1 ou supérieure) pour générer la
-  documentation de code. Bien que non essentiel pour la génération du logiciel, être capable de générer une
-  documentation reste fondamental. Doxygen doit avoir le module `dot` de disponible (package graphviz)
-* Depmanager va permettre de gérer les autres dépendances externes
-    * jsoncpp
-    * spdlog
-    * magic_enum
-    * googletest
-    * Il suffit de se placer dans le répertoire des sources et de lancer `python3 -u ci/DependencyCheck.py`
+Tout est piloté depuis CMake : `cmake --preset <preset>` puis `cmake --build` suffisent,
+il n’y a aucune commande à lancer avant.
+
+* **Python 3.12 ou supérieur** et [Poetry](https://python-poetry.org).
+  Poetry est le seul prérequis Python : au moment du `cmake --preset`, CMake exécute
+  `poetry sync` qui crée l’environnement virtuel et y installe l’outillage verrouillé
+  par `poetry.lock` — **Conan**, `gcovr` (rapport de couverture) et `black`.
+* **Conan 2** gère les dépendances C++, mais n’est jamais invoqué à la main :
+  `cmake/conan_provider.cmake` en fait un *dependency provider* de CMake, déclenché au
+  premier `find_package()`. Les profils sont dans `conan/config/profiles/` et c’est
+  CMake qui lui transmet le compilateur et sa version.
+    * glfw, imgui, jsoncpp, yaml-cpp, spdlog, magic_enum, stb, nanosvg,
+      vulkan-headers, vulkan-loader, googletest — depuis ConanCenter
+    * `nfd` ([nativefiledialog-extended](https://github.com/btzy/nativefiledialog-extended))
+      n’est pas publié sur ConanCenter : il est construit depuis la recette du dépôt,
+      dans `conan/local-recipes/`
+* **Doxygen** 1.9.1 ou supérieur, avec le module `dot` (paquet graphviz), pour la
+  documentation de code. Non indispensable à la génération du logiciel, mais pouvoir
+  produire une documentation reste fondamental.
+* Sous Linux, les **bibliothèques de développement X11/XCB et Wayland** du système sont
+  nécessaires à la compilation ; les images Docker de construction les fournissent.
+
+### Construction dans un conteneur
+
+La CI compile dans `registry.argawaen.net/builder/builder-ubuntu2404`, qui contient les
+deux chaînes de compilation (gcc et clang) ainsi que tout l’outillage. Les recettes de
+ces images vivent dans un dépôt séparé.
 
 ### Compilateur
 
@@ -48,8 +61,11 @@ Le programme a été correctement compilé avec :
     * clang 21 (mingw)
 
 * linux ubuntu 24.04
-    * gcc 13
-    * clang 18
+    * gcc 14
+    * clang 18 et 22
+
+Sous Linux, X11 et Wayland sont tous deux supportés : la plateforme est choisie au
+démarrage.
 
 ## Roadmap
 

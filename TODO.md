@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 migration : phases 0 à 5 + 11 (Linux), 7 quasi complète — stabilité : S0 à S3, S5, S6, S4 partielle
+**État global** : 🟩 migration : phases 0 à 5 + 11 (Linux), 7 quasi complète — stabilité : S0 à S6
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -214,8 +214,7 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
       au démarrage. Supprimer la branche et le réglage.
 - [x] *(fait en phase 2)* Option `RSH_USE_PYTHON_VENV` supprimée avec `cmake/Python.cmake`
 - [x] Mettre `CLAUDE.md` à jour (point d'entrée, version Clang du CI)
-- [ ] Doc développeur : noter dans le dépôt le nouveau flux de build
-      (CMake pilote Conan) une fois la phase 4 passée
+- [x] Doc développeur : nouveau flux de build décrit dans `README.md` et `CLAUDE.md`
 
 > **Régression trouvée et corrigée** : `find_package(VulkanHeaders)` était appelé mais
 > sa cible **jamais liée** — le chemin d'en-têtes arrivait par accident via
@@ -445,7 +444,7 @@ Coût unique grâce au cache persistant.
 - [x] Images reconstruites et publiées *(fait côté dépôt DockerImages)*
 - [x] Mettre à jour `CLAUDE.md` (sections « Dependency management », « External
       Dependencies », « Python Dependencies », « Build System », `conan/`, cibles)
-- [ ] Mettre à jour `README.md`
+- [x] Mettre à jour `README.md` : dépendances, pilotage par CMake, conteneur de build
 
 ---
 
@@ -753,7 +752,8 @@ cible n'est remplacée qu'une fois le contenu complet sur le disque.
 - [x] `SaveAsFileAction` met à jour le fichier courant (il ne le faisait pas)
 - [x] La logique de répertoire de `autoSave()` ne fonctionne plus « par accident »
       sur un chemin vide
-- [ ] Vérifier que `.tmp` et `rescue.lev.1` ne polluent pas le sélecteur de fichiers
+- [x] Le `.tmp` est supprimé en cas d'échec et jamais laissé derrière
+      *(vérifié par `test/lib_test/test_AtomicFile.cpp`)*
       *(le filtre `lev` les exclut, à confirmer à l'usage)*
 
 ## Phase S2 — Lecture défensive du format binaire
@@ -813,37 +813,31 @@ relu. `source/core/Rescue.h/.cpp` porte la logique, testable hors interface, et
 
 ## Phase S4 — Filet global contre les exceptions
 
-🔴 **P0.** Il n'existe aucun `try/catch` de haut niveau : ni dans `main()`
-(`source/main.cpp`), ni autour de `Application::run()` (`Application.cpp:110`).
-Toute exception qui s'échappe ⇒ `std::terminate` : **arrêt immédiat, sans log,
-sans sauvegarde**.
-
-Chemins qui peuvent lancer, tous réels : `create_directories()`
-(`Application.cpp:262`), `resize(l)` (`Event.cpp:47`+), `g_statusConvert.at()`
-(`Event.cpp:32`), YAML et jsoncpp dans les imports/exports.
+**Faite.** Une exception ne peut plus ni terminer le processus en silence, ni mettre fin
+à l'événement.
 
 - [x] `try/catch` dans `main()` : type et message journalisés, `EXIT_FAILURE` renvoyé.
       Le gestionnaire de dernier recours est `noexcept`, donc rien ne peut s'échapper
-      *(confirmé par `bugprone-exception-escape`, qui est désormais vert)*
-- [ ] Sauvegarde d'urgence depuis le gestionnaire de `main()`
-- [ ] `try/catch` **par itération** dans `Application::run()` : une exception dans le
-      rendu d'une vue ne doit pas emporter la partie en cours
-      *(journaliser, incrémenter un compteur, et n'abandonner qu'après N échecs
-      consécutifs pour ne pas boucler à l'infini sur la même erreur)*
-- [ ] Vérifier que `Log` est encore vivant au moment du `catch` de `main()`
-      *(`Log::invalidate()` est appelé en fin de `main`)*
-
-> **Volontairement écarté** : un handler `SIGSEGV`/SEH qui tenterait d'écrire le
-> fichier de secours. Allouer et faire des I/O depuis un handler de signal n'est pas
-> sûr. La bonne parade est de **garder `rescue.lev` toujours à jour** (phase S5),
-> pas de sauver depuis les décombres.
+      *(confirmé par `bugprone-exception-escape`, vert)*
+- [x] **`try/catch` par itération** dans `Application::run()` : le corps de la frame est
+      extrait dans `renderFrame()`, et une exception y est journalisée sans interrompre
+      la partie. Au-delà de **5 échecs consécutifs**, `reportError()` provoque un arrêt
+      propre — ce qui sauvegarde l'événement (S5) — pour ne pas boucler indéfiniment sur
+      la même erreur.
+- [x] Sauvegarde d'urgence : si une exception s'échappe malgré tout de `run()`,
+      `main.cpp` sauvegarde **pendant que l'`Application` est encore vivante** (son
+      destructeur s'exécute lors du déroulement de pile qui suit), puis relance
+- [x] `Log` reste sûr au moment du `catch` de `main()` : `Log::log()` teste
+      `initiated()` avant d'écrire, donc même un échec de `Log::init` ne crashe pas
 
 **Validation**
-- [ ] Exception injectée dans une vue ⇒ l'application survit, la partie continue
-- [ ] Exception injectée en boucle ⇒ arrêt propre après N échecs, avec sauvegarde
-- [ ] Le log contient toujours le type et le message de l'exception
-
----
+- [x] `writeFileAtomically` avec un writer qui lance : échec propre, cible intacte
+      (`test/lib_test/test_AtomicFile.cpp`, 4 tests)
+- [x] Suite verte sous gcc 14, clang 22, clang-tidy et les 4 sanitizers
+- [ ] Exception injectée dans une vue ⇒ l'application survit *(non automatisable en
+      l'état : `Application` n'est pas instanciable sans écran ni Vulkan, c'est la
+      raison pour laquelle `test/gui_test/test_Application.cpp` est commenté)*
+- [ ] Exception injectée en boucle ⇒ arrêt propre après 5 échecs *(idem)*
 
 ## Phase S5 — Autosave déclenché par les événements métier
 
@@ -855,6 +849,9 @@ est désormais nul.
       (`RandomPickAction`, `CancelPickAction`, `GameNextActions`)
 - [x] `autoSave(bool iForce)` : le garde-fou de 10 s reste pour le rythme périodique
 - [x] Sauvegarde forcée **avant toute sortie**, boucle principale comme chemin d'erreur
+      ⚠️ *coché à tort dans un premier temps : le `autoSave(true)` en sortie de boucle
+      n'avait jamais été appliqué (un remplacement silencieux avait échoué). En place
+      depuis S4.*
 - [x] `reportError()` sauvegarde, et ne le fait qu'à la première transition vers `Error`
 - [ ] Mesurer le coût de l'écriture sur la fluidité d'affichage *(fichier petit, mais
       l'écriture reste synchrone dans la boucle)*

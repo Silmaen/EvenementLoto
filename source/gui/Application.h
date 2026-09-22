@@ -291,6 +291,13 @@ private:
 	void autoSave(bool iForce = false);
 
 	/**
+	 * @brief Update every view and popup, then render one frame.
+	 *
+	 * Called from run() inside a try/catch: a failing frame must not end the event.
+	 */
+	void renderFrame();
+
+	/**
 	 * @brief check the enablement of the actions.
 	 */
 	void checkActionEnable() const;

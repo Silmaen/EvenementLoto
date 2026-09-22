@@ -34,6 +34,8 @@ namespace evl::gui {
 namespace {
 /// Period of the periodic autosave, in seconds.
 constexpr double g_autoSavePeriodSeconds = 10.0;
+/// Frames in a row allowed to fail before giving up.
+constexpr uint32_t g_maxConsecutiveFrameFailures = 5;
 }// namespace
 
 Application* Application::m_instance = nullptr;
@@ -119,39 +121,61 @@ Application::~Application() {
 	m_mainWindow.close();
 }
 
+void Application::renderFrame() {
+	checkActionEnable();
+	m_mainWindow.newFrame();
+	if (m_state != State::Running)
+		return;
+	if (m_cachedDisplayView == nullptr)
+		return;
+	if (isDisplayNeeded()) {
+		if (!m_cachedDisplayView->visibility())
+			log_debug("Show Display view.");
+		m_cachedDisplayView->show();
+	} else {
+		if (m_cachedDisplayView->visibility())
+			log_debug("Hide Display view.");
+		m_cachedDisplayView->hide();
+	}
+	for (const auto& view: m_views) { view->update(); }
+	for (const auto& popup: m_popups) { popup->update(); }
+	m_mainWindow.render(m_theme.windowBackground);
+	autoSave();
+}
+
 void Application::run() {
 	// Main loop
 	uint32_t frameCount = 0;
+	uint32_t consecutiveFailures = 0;
 	while (m_state == State::Running || m_state == State::Waiting) {
 		if (m_mainWindow.shouldClose()) {
 			m_state = State::Closed;
 			continue;
 		}
-		checkActionEnable();
-		m_mainWindow.newFrame();
-		if (m_state != State::Running)
-			continue;
-		if (m_cachedDisplayView == nullptr)
-			continue;
-		if (isDisplayNeeded()) {
-			if (!m_cachedDisplayView->visibility())
-				log_debug("Show Display view.");
-			m_cachedDisplayView->show();
-		} else {
-			if (m_cachedDisplayView->visibility())
-				log_debug("Hide Display view.");
-			m_cachedDisplayView->hide();
+		// A failing frame must not end the event: log it, and only give up after
+		// several failures in a row, to avoid spinning forever on the same error.
+		try {
+			renderFrame();
+			consecutiveFailures = 0;
+		} catch (const std::exception& e) {
+			++consecutiveFailures;
+			log_error("Exception pendant le rendu ({}/{}) : {}", consecutiveFailures, g_maxConsecutiveFrameFailures,
+					  e.what());
+		} catch (...) {
+			++consecutiveFailures;
+			log_error("Exception inconnue pendant le rendu ({}/{}).", consecutiveFailures,
+					  g_maxConsecutiveFrameFailures);
 		}
-		for (const auto& view: m_views) { view->update(); }
-		for (const auto& popup: m_popups) { popup->update(); }
-		m_mainWindow.render(m_theme.windowBackground);
-		autoSave();
-		frameCount++;
+		if (consecutiveFailures >= g_maxConsecutiveFrameFailures)
+			reportError("Trop d'erreurs consécutives pendant le rendu.");
+		++frameCount;
 		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
 			log_info("Maximum frame count {} reached, closing application.", m_maxFrame);
 			m_state = State::Closed;
 		}
 	}
+	// Leaving the loop must not cost the draws of the last ten seconds.
+	autoSave(true);
 }
 
 void Application::reportError(const std::string& iMessage) {

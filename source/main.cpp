@@ -34,7 +34,14 @@ auto run(int iArgc, char* iArgv[]) -> int {
 	log_info("Chemin d'exécution : {}", evl::core::getExecPath().string());
 
 	auto app = evl::gui::createApplication(iArgc, iArgv);
-	app->run();
+	try {
+		app->run();
+	} catch (...) {
+		// Save while the application is still alive: its destructor runs during the
+		// unwinding that follows.
+		app->saveProgress();
+		throw;
+	}
 	const int ret = app->getState() == evl::gui::Application::State::Error ? EXIT_FAILURE : EXIT_SUCCESS;
 	app.reset();
 
