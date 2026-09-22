@@ -87,12 +87,10 @@ TEST(AtomicFile, KeepsOnePreviousGeneration) {
 	const auto target = area.file("data.bin");
 	const auto previous = fs::path{target}.concat(".1");
 
-	EXPECT_TRUE(writeFileAtomically(
-			target, [](std::ostream& oStream) -> void { oStream << "version-1"; }, true));
+	EXPECT_TRUE(writeFileAtomically(target, [](std::ostream& oStream) -> void { oStream << "version-1"; }, true));
 	EXPECT_FALSE(exists(previous));
 
-	EXPECT_TRUE(writeFileAtomically(
-			target, [](std::ostream& oStream) -> void { oStream << "version-2"; }, true));
+	EXPECT_TRUE(writeFileAtomically(target, [](std::ostream& oStream) -> void { oStream << "version-2"; }, true));
 	ASSERT_TRUE(exists(previous));
 	EXPECT_EQ(readAll(target), "version-2");
 	EXPECT_EQ(readAll(previous), "version-1");

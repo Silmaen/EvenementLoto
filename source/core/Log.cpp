@@ -68,8 +68,8 @@ void Log::init(const Level& iLevel) {
 	// Rotating and appending: relaunching after a crash must not erase its trace.
 	// std::string, not the path: spdlog's filename_t is a narrow string, and a path
 	// converts implicitly to std::wstring on Windows.
-	logSinks.emplace_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(getLogPath().string(), g_logMaxSize,
-																				g_logMaxFiles));
+	logSinks.emplace_back(
+			std::make_shared<spdlog::sinks::rotating_file_sink_mt>(getLogPath().string(), g_logMaxSize, g_logMaxFiles));
 
 	g_logger = std::make_shared<spdlog::logger>("EVL", begin(logSinks), end(logSinks));
 	register_logger(g_logger);

@@ -24,12 +24,16 @@ class DefineDockerImage(BaseAction):
 
         result = determine_docker_image(preset)
         if result == "":
-            log.info(f"Docker image not found for preset: {preset}, assuming run on native host.")
+            log.info(
+                f"Docker image not found for preset: {preset}, assuming run on native host."
+            )
             return 0
         log.info(f"Docker image for preset '{preset}': {result}")
         set_teamcity_parameter("docker_image", result)
         docker_parameters = "-u %env.BUILDER_UID%:%env.BUILDER_GID%"
-        docker_parameters += " -v %teamcity.agent.home.dir%/user/cache_dir:/tmp/cache_dir"
+        docker_parameters += (
+            " -v %teamcity.agent.home.dir%/user/cache_dir:/tmp/cache_dir"
+        )
         docker_parameters += " --network host"
         docker_parameters += " -v %teamcity.agent.home.dir%/user:/home/user"
         docker_parameters += " -e HOME=/home/user"

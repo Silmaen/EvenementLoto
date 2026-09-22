@@ -27,9 +27,6 @@ class DefineVariables(BaseAction):
             set_teamcity_parameter("release_preset", preset_config.release_preset)
         if preset_config.run_tests is not None:
             set_teamcity_parameter("run_tests", str(preset_config.run_tests).lower())
-        if preset_config.run_deploy is not None:
-            set_teamcity_parameter("run_deploy", str(preset_config.run_deploy).lower())
-        if preset_config.run_coverage is not None:
             set_teamcity_parameter(
                 "run_coverage", str(preset_config.run_coverage).lower()
             )
@@ -47,8 +44,6 @@ class DefineVariables(BaseAction):
 +:output/build/%release_preset%/lib => BuildArtefact.zip!lib/release/
 +:output/build/%release_preset%/test/*.xml => BuildArtefact.zip!test/release/
 +:output/build/%release_preset%/Documentation/html => Documentation.zip
-+:output/build/%release_preset%/*.zip
-+:output/build/%release_preset%/*.tar.gz
 """
         log.info(f"Setting artifact path:\n{artifact_path}")
         set_teamcity_parameter("artifact_path", artifact_path)

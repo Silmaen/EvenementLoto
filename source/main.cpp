@@ -72,8 +72,8 @@ auto main(int iArgc, char* iArgv[]) -> int {
 #endif
 		ret = run(iArgc, iArgv);
 		evl::Log::invalidate();
-	} catch (const std::exception& e) {
-		reportFatal(e.what());
-	} catch (...) { reportFatal("type inconnu"); }
+	} catch (const std::exception& e) { reportFatal(e.what()); } catch (...) {
+		reportFatal("type inconnu");
+	}
 	return ret;
 }

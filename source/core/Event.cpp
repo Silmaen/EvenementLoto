@@ -10,8 +10,8 @@
 #include "Event.h"
 
 #include "EnumLabel.h"
-#include "StreamRead.h"
 #include "Log.h"
+#include "StreamRead.h"
 #include "utilities.h"
 
 namespace evl::core {

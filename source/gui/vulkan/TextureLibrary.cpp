@@ -67,7 +67,8 @@ void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesys
 		void operator()(NSVGrasterizer* iRast) const { nsvgDeleteRasterizer(iRast); }
 	};
 
-	const std::unique_ptr<NSVGimage, SvgImageDeleter> imagePtr(nsvgParseFromFile(iTexturePath.string().c_str(), "px", 96.0f));
+	const std::unique_ptr<NSVGimage, SvgImageDeleter> imagePtr(
+			nsvgParseFromFile(iTexturePath.string().c_str(), "px", 96.0f));
 	const std::unique_ptr<NSVGrasterizer, SvgRasterizerDeleter> rastPtr(nsvgCreateRasterizer());
 	if (!imagePtr) {
 		log_error("Failed to load SVG: {} from {}", iName, iTexturePath.string());

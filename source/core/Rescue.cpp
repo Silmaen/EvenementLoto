@@ -34,8 +34,7 @@ auto isResumable(const Event& iEvent) -> bool {
 
 auto countDraws(const Event& iEvent) -> std::size_t {
 	std::size_t count = 0;
-	for (auto round = iEvent.beginRounds(); round != iEvent.endRounds(); ++round)
-		count += round->drawsCount();
+	for (auto round = iEvent.beginRounds(); round != iEvent.endRounds(); ++round) count += round->drawsCount();
 	return count;
 }
 

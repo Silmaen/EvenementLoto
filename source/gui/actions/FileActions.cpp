@@ -64,7 +64,8 @@ void SaveFileAction::onExecute() {
 		}
 	}
 	app.getCurrentEvent().setBasePath(file);
-	if (!core::writeFileAtomically(file, [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
+	if (!core::writeFileAtomically(file,
+								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
 		log_error("Failed to save file '{}'.", file.string());
 		return;
 	}
@@ -85,7 +86,8 @@ void SaveAsFileAction::onExecute() {
 	}
 	file = newfile;
 	app.getCurrentEvent().setBasePath(file);
-	if (!core::writeFileAtomically(file, [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
+	if (!core::writeFileAtomically(file,
+								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
 		log_error("Failed to save file '{}'.", file.string());
 		return;
 	}

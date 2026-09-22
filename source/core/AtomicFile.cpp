@@ -23,8 +23,7 @@ auto previousPath(const std::filesystem::path& iPath) -> std::filesystem::path {
 	return std::filesystem::path{iPath}.concat(".1");
 }
 
-auto fillTemporary(const std::filesystem::path& iTemporary, const std::function<void(std::ostream&)>& iWriter)
-		-> bool {
+auto fillTemporary(const std::filesystem::path& iTemporary, const std::function<void(std::ostream&)>& iWriter) -> bool {
 	std::ofstream file(iTemporary, std::ios::out | std::ios::binary | std::ios::trunc);
 	if (!file.is_open()) {
 		log_error("Impossible d'ouvrir '{}' en écriture.", iTemporary.string());

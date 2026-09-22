@@ -12,9 +12,7 @@ MODE_BY_COLOR = 1
 MODE_FOR_NINJA = 2
 
 # list of regex patterns to exclude from ninja error detection
-ninja_error_exclusions = [
-    r"^CPack:.*"
-]
+ninja_error_exclusions = [r"^CPack:.*"]
 
 
 class LevelDetector:
@@ -135,8 +133,16 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
             env=env,
         )
         readers = [
-            Thread(target=_log_stream, args=(process.stdout, False, detection_mode), daemon=True),
-            Thread(target=_log_stream, args=(process.stderr, True, detection_mode), daemon=True),
+            Thread(
+                target=_log_stream,
+                args=(process.stdout, False, detection_mode),
+                daemon=True,
+            ),
+            Thread(
+                target=_log_stream,
+                args=(process.stderr, True, detection_mode),
+                daemon=True,
+            ),
         ]
         for reader in readers:
             reader.start()

@@ -146,7 +146,7 @@ TEST(mathVector, surface_ratio) {
 	EXPECT_FLOAT_EQ(surface, 20.0f);
 	constexpr float ratio = v1.ratio();
 	EXPECT_FLOAT_EQ(ratio, 0.8f);
-	auto bob = v1.surface()* v1.ratio();
+	auto bob = v1.surface() * v1.ratio();
 	bob += 4.0f;
 	EXPECT_FLOAT_EQ(bob, 20.0f);
 }
@@ -154,14 +154,10 @@ TEST(mathVector, surface_ratio) {
 TEST(mathVector, iterator) {
 	constexpr evl::math::vec3f v1{1.0f, 2.0f, 3.0f};
 	float sum = 0.0f;
-	for (const auto& comp : v1) {
-		sum += comp;
-	}
+	for (const auto& comp: v1) { sum += comp; }
 	EXPECT_FLOAT_EQ(sum, 6.0f);
 	evl::math::vec3f v2{0.0f, 0.0f, 0.0f};
-	for (auto& comp : v2) {
-		comp = 1.0f;
-	}
+	for (auto& comp: v2) { comp = 1.0f; }
 	EXPECT_FLOAT_EQ(v2.x(), 1.0f);
 	EXPECT_FLOAT_EQ(v2.y(), 1.0f);
 	EXPECT_FLOAT_EQ(v2.z(), 1.0f);
