@@ -162,6 +162,8 @@ private:
 	uint32_t m_minImageCount = 2;
 	/// Vulkan window setup done flag.
 	bool m_windowSetupDone = false;
+	/// True on a Wayland session, where a client cannot position its own windows.
+	bool m_wayland = false;
 	/// Setup Vulkan window.
 	void setupVulkanWindow(int iWidth, int iHeight);
 	/// Cleanup Vulkan window.

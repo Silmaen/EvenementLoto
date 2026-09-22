@@ -9,6 +9,9 @@
 
 #include "GameRound.h"
 
+#include "EnumLabel.h"
+#include "StreamRead.h"
+
 #include "Log.h"
 #include "StringUtils.h"
 #include "utilities.h"
@@ -16,7 +19,7 @@
 namespace evl::core {
 
 namespace {
-const std::unordered_map<GameRound::Type, const char*> g_typeConvert = {
+constexpr std::array<std::pair<GameRound::Type, std::string_view>, 8> g_typeLabels{{
 		{GameRound::Type::OneQuine, "Simple quine"},
 		{GameRound::Type::TwoQuines, "Double quine"},
 		{GameRound::Type::FullCard, "Gros lot"},
@@ -25,26 +28,21 @@ const std::unordered_map<GameRound::Type, const char*> g_typeConvert = {
 		{GameRound::Type::Enfant, "Enfant"},
 		{GameRound::Type::Inverse, "Inverse"},
 		{GameRound::Type::Pause, "Pause"},
-};
+}};
 
-const std::unordered_map<GameRound::Status, const char*> g_statusConvert = {
+constexpr std::array<std::pair<GameRound::Status, std::string_view>, 4> g_statusLabels{{
 		{GameRound::Status::Ready, "prêt"},
 		{GameRound::Status::Running, "démarré"},
 		{GameRound::Status::PostScreen, "écran de fin"},
 		{GameRound::Status::Done, "terminé"},
-};
+}};
 }// namespace
 
 // --- constructeurs ----
 GameRound::GameRound(const Type& iType) { setType(iType); }
 
 // ---- manipulation du type de partie ----
-auto GameRound::getTypeStr() const -> std::string {
-	if (g_typeConvert.contains(m_type)) {
-		return g_typeConvert.at(m_type);
-	}
-	return "inconnu";
-}
+auto GameRound::getTypeStr() const -> std::string { return std::string(enumLabel(g_typeLabels, m_type)); }
 
 void GameRound::setType(const Type& iType) {
 	if (!isEditable()) {
@@ -87,12 +85,7 @@ void GameRound::setType(const Type& iType) {
 }
 
 // ---- manipulation du statut ----
-auto GameRound::getStatusStr() const -> std::string {
-	if (g_statusConvert.contains(m_status)) {
-		return g_statusConvert.at(m_status);
-	}
-	return "inconnu";
-}
+auto GameRound::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 // ---- flux du jeu ----
 
@@ -157,32 +150,36 @@ void GameRound::addWinner(const std::string& iWinner) {
 
 // ---- Serialisation ----
 void GameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, getSaveVersion()))
+	if (std::cmp_greater(iFileVersion, getSaveVersion())) {
+		iBs.setstate(std::ios::failbit);
 		return;
-	if (iFileVersion < 3)//----UNCOVER----
+	}
+	if (iFileVersion < 3) {//----UNCOVER----
 		m_id = 0;//----UNCOVER----
-	else//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&m_id), sizeof(m_id));
-	iBs.read(reinterpret_cast<char*>(&m_type), sizeof(m_type));
-	iBs.read(reinterpret_cast<char*>(&m_status), sizeof(m_status));
-	iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
-	iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
-	draws_type::size_type l = 0;
+	} else if (!readRaw(iBs, m_id)) {
+		return;
+	}
+	if (!readEnum(iBs, m_type) || !readEnum(iBs, m_status))
+		return;
+	if (!readRaw(iBs, m_start) || !readRaw(iBs, m_end))
+		return;
 	draws_type draws;
-	if (iFileVersion < 4) {//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&l), sizeof(draws_type::size_type));//----UNCOVER----
-		draws.resize(l);//----UNCOVER----
-		for (draws_type::size_type i = 0; i < l; ++i)//----UNCOVER----
-			iBs.read(reinterpret_cast<char*>(&draws[i]), sizeof(draws_type::value_type));//----UNCOVER----
-	}//----UNCOVER----
-	sub_rounds_type::size_type l2 = 0;
-	iBs.read(reinterpret_cast<char*>(&l2), sizeof(sub_rounds_type::size_type));
-	m_subGames.resize(l2);
-	for (sub_rounds_type::size_type i = 0; i < l2; ++i) m_subGames[i].read(iBs, iFileVersion);
-	if (iFileVersion < 4 && l2 != 0) {//----UNCOVER----
+	if (iFileVersion < 4 && !readVector(iBs, draws))//----UNCOVER----
+		return;//----UNCOVER----
+	sub_rounds_type::size_type subCount = 0;
+	if (!readLength(iBs, subCount, g_maxSerializedCount))
+		return;
+	m_subGames.clear();
+	m_subGames.resize(subCount);
+	for (auto& sub: m_subGames) {
+		sub.read(iBs, iFileVersion);
+		if (!iBs.good())
+			return;
+	}
+	if (iFileVersion < 4 && subCount != 0) {//----UNCOVER----
 		// faking sub game picking
-		const auto part = static_cast<uint32_t>(l / l2);//----UNCOVER----
-		for (draws_type::size_type i = 0; i < l; ++i) {//----UNCOVER----
+		const auto part = static_cast<uint32_t>(draws.size() / subCount);//----UNCOVER----
+		for (draws_type::size_type i = 0; i < draws.size(); ++i) {//----UNCOVER----
 			if (part == 0)
 				break;//----UNCOVER----
 			m_subGames[i % part].addPickedNumber(draws[i]);//----UNCOVER----
@@ -191,19 +188,14 @@ void GameRound::read(std::istream& iBs, const int iFileVersion) {
 	m_diapoPath = std::filesystem::path{};
 	m_diapoDelay = 0;
 	if (m_type == Type::Pause && iFileVersion > 4) {
-		std::string::size_type len = 0;
-		iBs.read(reinterpret_cast<char*>(&len), sizeof(std::string::size_type));
-		if (len == 0) {
-			m_diapoPath.clear();
-			m_diapoDelay = 0.0;
-		} else {
-			std::string tmp;
-			tmp.resize(len);
-			for (std::string::size_type i = 0; i < len; i++)
-				iBs.read(reinterpret_cast<char*>(&tmp[i]), sizeof(std::string::value_type));
-			m_diapoPath = tmp;
-			iBs.read(reinterpret_cast<char*>(&m_diapoDelay), sizeof(double));
-		}
+		std::string diapo;
+		if (!readString(iBs, diapo))
+			return;
+		if (diapo.empty())
+			return;
+		m_diapoPath = diapo;
+		if (!readRaw(iBs, m_diapoDelay))
+			return;
 	}
 }
 
@@ -238,11 +230,7 @@ auto GameRound::toJson() const -> Json::Value {
 }
 
 void GameRound::fromJson(const Json::Value& iJson) {
-	std::string srType = iJson.get("type", "").asString();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iJson.get("type", "").asString(), m_type);
 	m_id = iJson.get("Id", 0).asInt();
 	m_subGames.clear();
 	for (auto& jj: iJson.get("subGames", Json::Value::null)) { m_subGames.emplace_back().fromJson(jj); }
@@ -259,11 +247,7 @@ auto GameRound::toYaml() const -> YAML::Node {
 }
 
 void GameRound::fromYaml(const YAML::Node& iNode) {
-	auto srType = iNode["type"].as<std::string>();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
 	m_id = iNode["Id"].as<int>();
 	m_subGames.clear();
 	for (const auto& jj: iNode["subGames"]) {
@@ -315,8 +299,8 @@ auto GameRound::getName() const -> std::string {
 	res << "Partie";
 	if (m_id > 0)
 		res << " " << m_id;
-	if (m_type != Type::OneTwoQuineFullCard && g_typeConvert.contains(m_type))
-		res << " " << g_typeConvert.at(m_type);
+	if (m_type != Type::OneTwoQuineFullCard)
+		res << " " << getTypeStr();
 	return res.str();
 }
 

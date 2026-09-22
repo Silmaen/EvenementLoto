@@ -9,6 +9,9 @@
 
 #include "SubGameRound.h"
 
+#include "EnumLabel.h"
+#include "StreamRead.h"
+
 #include "Log.h"
 #include "utilities.h"
 
@@ -17,35 +20,25 @@
 namespace evl::core {
 namespace {
 
-const std::unordered_map<SubGameRound::Type, std::string> g_typeConvert = {
+constexpr std::array<std::pair<SubGameRound::Type, std::string_view>, 4> g_typeLabels{{
 		{SubGameRound::Type::OneQuine, "simple quine"},
 		{SubGameRound::Type::TwoQuines, "double quine"},
 		{SubGameRound::Type::FullCard, "carton plein"},
 		{SubGameRound::Type::Inverse, "inverse"},
-};
+}};
 
-const std::unordered_map<SubGameRound::Status, std::string> g_statusConvert = {
+constexpr std::array<std::pair<SubGameRound::Status, std::string_view>, 4> g_statusLabels{{
 		{SubGameRound::Status::Ready, "prêt"},
 		{SubGameRound::Status::PreScreen, "affichage"},
 		{SubGameRound::Status::Running, "en cours"},
 		{SubGameRound::Status::Done, "fini"},
-};
+}};
 
 }// namespace
 
-auto SubGameRound::getTypeStr() const -> std::string {
-	if (g_typeConvert.contains(m_type)) {
-		return g_typeConvert.at(m_type);
-	}
-	return "inconnu";
-}
+auto SubGameRound::getTypeStr() const -> std::string { return std::string(enumLabel(g_typeLabels, m_type)); }
 
-auto SubGameRound::getStatusStr() const -> std::string {
-	if (g_statusConvert.contains(m_status)) {
-		return g_statusConvert.at(m_status);
-	}
-	return "inconnu";
-}
+auto SubGameRound::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 void SubGameRound::nextStatus() {
 	switch (m_status) {
@@ -74,43 +67,28 @@ void SubGameRound::nextStatus() {
 }
 
 void SubGameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, getSaveVersion()))
+	if (std::cmp_greater(iFileVersion, getSaveVersion())) {
+		iBs.setstate(std::ios::failbit);
 		return;
-	iBs.read(reinterpret_cast<char*>(&m_type), sizeof(Type));
-	if (iFileVersion >= 4) {
-		iBs.read(reinterpret_cast<char*>(&m_status), sizeof(Status));
 	}
+	if (!readEnum(iBs, m_type))
+		return;
+	if (iFileVersion >= 4 && !readEnum(iBs, m_status))
+		return;
 	if (iFileVersion < 4) {//----UNCOVER----
-		uint32_t readTmp = 0;//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&readTmp), sizeof(uint32_t));//----UNCOVER----
-		if (readTmp != 0)//----UNCOVER----
-			m_winner = "gagnant";//----UNCOVER----
-		else//----UNCOVER----
-			m_winner = "";//----UNCOVER----
-	} else {//----UNCOVER----
-		iBs.read(reinterpret_cast<char*>(&m_pricesValue), sizeof(double));
-		std::string::size_type l = 0;
-		iBs.read(reinterpret_cast<char*>(&l), sizeof(std::string::size_type));
-		m_winner.resize(l);
-		for (std::string::size_type i = 0; i < l; i++)
-			iBs.read(reinterpret_cast<char*>(&m_winner[i]), sizeof(std::string::value_type));
+		uint32_t hasWinner = 0;//----UNCOVER----
+		if (!readRaw(iBs, hasWinner))//----UNCOVER----
+			return;//----UNCOVER----
+		m_winner = hasWinner != 0 ? "gagnant" : "";//----UNCOVER----
+	} else if (!readRaw(iBs, m_pricesValue) || !readString(iBs, m_winner)) {
+		return;
 	}
-	std::string::size_type l = 0;
-	iBs.read(reinterpret_cast<char*>(&l), sizeof(std::string::size_type));
-	m_prices.resize(l);
-	for (std::string::size_type i = 0; i < l; i++)
-		iBs.read(reinterpret_cast<char*>(&m_prices[i]), sizeof(std::string::value_type));
-	if (iFileVersion > 3) {
-		draws_type::size_type ld = 0;
-		iBs.read(reinterpret_cast<char*>(&ld), sizeof(draws_type::size_type));
-		m_draws.resize(ld);
-		for (draws_type::size_type i = 0; i < ld; ++i)
-			iBs.read(reinterpret_cast<char*>(&(m_draws[i])), sizeof(draws_type::value_type));
-	}
-	if (iFileVersion > 5) {
-		iBs.read(reinterpret_cast<char*>(&m_start), sizeof(m_start));
-		iBs.read(reinterpret_cast<char*>(&m_end), sizeof(m_end));
-	}
+	if (!readString(iBs, m_prices))
+		return;
+	if (iFileVersion > 3 && !readVector(iBs, m_draws))
+		return;
+	if (iFileVersion > 5 && (!readRaw(iBs, m_start) || !readRaw(iBs, m_end)))
+		return;
 }
 
 void SubGameRound::write(std::ostream& iBs) const {
@@ -149,14 +127,9 @@ auto SubGameRound::toJson() const -> Json::Value {
 }
 
 void SubGameRound::fromJson(const Json::Value& iJson) {
-	std::string srType;
 	if (const auto val = iJson.get("type", ""); val.isString()) {
-		srType = val.asString();
+		m_type = enumFromLabel(g_typeLabels, val.asString(), m_type);
 	}
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
 	if (const auto val = iJson.get("prices", ""); val.isString()) {
 		m_prices = val.asString();
 	}
@@ -189,11 +162,7 @@ auto SubGameRound::toYaml() const -> YAML::Node {
 }
 
 void SubGameRound::fromYaml(const YAML::Node& iNode) {
-	auto srType = iNode["type"].as<std::string>();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
 	m_prices = iNode["prices"].as<std::string>();
 	m_pricesValue = iNode["value"].as<double>();
 	m_winner = iNode["winner"].as<std::string>();

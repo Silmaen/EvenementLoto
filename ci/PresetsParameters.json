@@ -15,13 +15,13 @@
       "run_documentation": true,
       "run_coverage": true,
       "release_preset": "linux-clang-release",
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "linux-gcc-debug": {
       "run_tests": true,
       "run_coverage": true,
       "release_preset": "linux-gcc-release",
-      "docker_image": "builder-gcc14-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "windows-clang-debug": {
       "run_tests": true,
@@ -36,23 +36,23 @@
       "docker_image": ""
     },
     "linux-clang-tidy": {
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "linux-sanitizer-address": {
       "run_tests": true,
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "linux-sanitizer-thread": {
       "run_tests": true,
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "linux-sanitizer-undefined-behavior": {
       "run_tests": true,
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     },
     "linux-sanitizer-leak": {
       "run_tests": true,
-      "docker_image": "builder-clang18-ubuntu2404"
+      "docker_image": "builder-ubuntu2404"
     }
   }
 }

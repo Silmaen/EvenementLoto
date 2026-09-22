@@ -56,6 +56,8 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		Application::get().reportError("Failed to initialize GLFW");
 		return;
 	}
+	m_wayland = glfwGetPlatform() == GLFW_PLATFORM_WAYLAND;
+	log_info("Serveur d'affichage : {}", m_wayland ? "Wayland" : "X11");
 
 	// Create window with Vulkan context
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -111,7 +113,13 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;// Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport
+		if (m_wayland) {
+			// Wayland does not let a client place its own windows, which is exactly what
+			// detached ImGui windows require.
+			log_info("Fenêtres détachées désactivées : le protocole Wayland ne permet pas de les positionner.");
+		} else {
+			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;// Enable Multi-Viewport
+		}
 		io.ConfigViewportsNoDecoration = true;
 		io.ConfigViewportsNoAutoMerge = false;
 
@@ -142,6 +150,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 											   .PipelineInfoMain = {.RenderPass = g_mainWindowData->RenderPass,
 																	.Subpass = 0,
 																	.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+																	.ExtraDynamicStates = {},
 #ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
 																	.PipelineRenderingCreateInfo = {},
 #endif
@@ -579,7 +588,8 @@ void MainWindow::setIcon(const std::string& iIconName) const {
 auto MainWindow::getMonitorsInfo() const -> std::vector<MonitorInfo> {
 	auto* w = static_cast<GLFWwindow*>(m_window);
 	math::vec2i windowPos;
-	glfwGetWindowPos(w, &windowPos.x(), &windowPos.y());
+	if (!m_wayland)
+		glfwGetWindowPos(w, &windowPos.x(), &windowPos.y());
 	std::vector<MonitorInfo> monitorsInfo;
 	int count = 0;
 	GLFWmonitor* const* monitors = glfwGetMonitors(&count);
@@ -595,10 +605,17 @@ auto MainWindow::getMonitorsInfo() const -> std::vector<MonitorInfo> {
 		glfwGetMonitorPhysicalSize(monitor, &monitorInfo.physicalSize.x(), &monitorInfo.physicalSize.y());
 		glfwGetMonitorWorkarea(monitor, &monitorInfo.workAreaPosition.x(), &monitorInfo.workAreaPosition.y(),
 							   &monitorInfo.workAreaSize.x(), &monitorInfo.workAreaSize.y());
-		monitorInfo.isMainWindow = monitorInfo.position.x() <= windowPos.x() &&
-								   monitorInfo.position.x() + static_cast<int>(monitorInfo.size.x()) > windowPos.x() &&
-								   monitorInfo.position.y() <= windowPos.y() &&
-								   monitorInfo.position.y() + static_cast<int>(monitorInfo.size.y()) > windowPos.y();
+		if (m_wayland) {
+			// The window position is unknowable here, so the control window is assumed
+			// to sit on the primary monitor.
+			monitorInfo.isMainWindow = monitor == glfwGetPrimaryMonitor();
+		} else {
+			monitorInfo.isMainWindow =
+					monitorInfo.position.x() <= windowPos.x() &&
+					monitorInfo.position.x() + static_cast<int>(monitorInfo.size.x()) > windowPos.x() &&
+					monitorInfo.position.y() <= windowPos.y() &&
+					monitorInfo.position.y() + static_cast<int>(monitorInfo.size.y()) > windowPos.y();
+		}
 		monitorsInfo.push_back(monitorInfo);
 	}
 	return monitorsInfo;

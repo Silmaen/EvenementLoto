@@ -18,6 +18,14 @@ namespace evl::gui::vulkan {
 
 namespace {
 
+constexpr uint64_t g_nanosecondsPerSecond = 1'000'000'000ULL;
+/// How long a frame may take on the GPU before it is declared stuck.
+constexpr uint64_t g_fenceTimeoutSeconds = 5;
+constexpr uint64_t g_fenceTimeout = g_fenceTimeoutSeconds * g_nanosecondsPerSecond;
+/// How long to wait for a swapchain image before rebuilding the swapchain.
+constexpr uint64_t g_acquireTimeoutSeconds = 2;
+constexpr uint64_t g_acquireTimeout = g_acquireTimeoutSeconds * g_nanosecondsPerSecond;
+
 auto isExtensionAvailable(const std::vector<VkExtensionProperties>& iProperties, const char* iExtension) -> bool {
 	for (const auto& [extensionName, specVersion]: iProperties)
 		if (strcmp(extensionName, iExtension) == 0)
@@ -297,7 +305,8 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 		// Enumerate available extensions
 		uint32_t properties_count = 0;
 		std::vector<VkExtensionProperties> properties;
-		vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
+		err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, nullptr);
+		checkVkResult(err, __FILE__, __LINE__);
 		properties.resize(properties_count);
 		err = vkEnumerateInstanceExtensionProperties(nullptr, &properties_count, properties.data());
 		checkVkResult(err, __FILE__, __LINE__);
@@ -396,7 +405,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 	{
 		std::vector<VkDescriptorPoolSize> pool_sizes = {
 				{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				 .descriptorCount = std::max(IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE, 200)},
+				 .descriptorCount = std::max(IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE, 200)},
 		};
 		VkDescriptorPoolCreateInfo pool_info = {};
 		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -481,6 +490,12 @@ void VulkanContext::checkVkResult(const VkResult iErr, const char* iFile, int iL
 	if (iErr == VK_SUCCESS)
 		return;
 	log_error("[vulkan] Error({}:{}): VkResult = {}", iFile, iLine, magic_enum::enum_name(iErr));
+	if (iErr == VK_ERROR_DEVICE_LOST) {
+		// Typically a driver reset. The state is saved on the way out, so relaunching
+		// offers to resume the game.
+		Application::get().reportError("La carte graphique a été réinitialisée.");
+		return;
+	}
 	if (iErr < 0)
 		Application::get().reportError("Vulkan encountered a fatal error.");
 }
@@ -493,8 +508,14 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 			wd->FrameSemaphores[static_cast<int>(wd->SemaphoreIndex)].ImageAcquiredSemaphore;
 	VkSemaphore render_complete_semaphore =
 			wd->FrameSemaphores[static_cast<int>(wd->SemaphoreIndex)].RenderCompleteSemaphore;
-	VkResult err = vkAcquireNextImageKHR(m_data.device, wd->Swapchain, UINT64_MAX, image_acquired_semaphore,
+	VkResult err = vkAcquireNextImageKHR(m_data.device, wd->Swapchain, g_acquireTimeout, image_acquired_semaphore,
 										 VK_NULL_HANDLE, &wd->FrameIndex);
+	if (err == VK_TIMEOUT || err == VK_NOT_READY) {
+		log_warn("[vulkan] Aucune image disponible après {} s, reconstruction de la swapchain.",
+				 g_acquireTimeoutSeconds);
+		oRebuildSwapChain = true;
+		return;
+	}
 	if (err == VK_ERROR_OUT_OF_DATE_KHR || err == VK_SUBOPTIMAL_KHR)
 		oRebuildSwapChain = true;
 	if (err == VK_ERROR_OUT_OF_DATE_KHR)
@@ -504,8 +525,14 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 
 	const ImGui_ImplVulkanH_Frame* fd = &wd->Frames[static_cast<int>(wd->FrameIndex)];
 	{
-		err = vkWaitForFences(m_data.device, 1, &fd->Fence, VK_TRUE,
-							  UINT64_MAX);// wait indefinitely instead of periodically checking
+		// Never wait forever: a frame that never completes would freeze the application
+		// for the rest of the event, without a crash and without a trace.
+		err = vkWaitForFences(m_data.device, 1, &fd->Fence, VK_TRUE, g_fenceTimeout);
+		if (err == VK_TIMEOUT) {
+			log_critical("[vulkan] Le GPU n'a pas terminé l'image en {} s.", g_fenceTimeoutSeconds);
+			Application::get().reportError("Le GPU ne répond plus.");
+			return;
+		}
 		checkVkResult(err, __FILE__, __LINE__);
 
 		err = vkResetFences(m_data.device, 1, &fd->Fence);

@@ -6,32 +6,16 @@
  * All modification must get authorization from the author.
  */
 
-#ifdef USE_QT
-#include <QApplication>
-#include <QCommandLineParser>
-#endif
 #include <core/Log.h>
 #include <core/Settings.h>
 #include <core/utilities.h>
 #include <gui/Application.h>
-#ifdef USE_QT
-#include <gui_qt/MainWindow.h>
-#include <gui_qt/baseDefinitions.h>
-#endif
 
 #include <magic_enum/magic_enum.hpp>
 
-#ifdef USE_QT
-using namespace evl::gui;
-#endif
-using namespace std::filesystem;
+namespace {
 
-auto main(int iArgc, char* iArgv[]) -> int {
-#ifdef EVL_DEBUG
-	evl::Log::init(evl::Log::Level::Trace);
-#else
-	evl::Log::init(evl::Log::Level::Info);
-#endif
+auto run(int iArgc, char* iArgv[]) -> int {
 	evl::core::initializeUtilities(iArgc, iArgv);
 	evl::core::loadSettings();
 	evl::core::mergeDefaultSettings();
@@ -48,44 +32,48 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	log_info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION,
 			 evl::EVL_AUTHOR_STR);
 	log_info("Chemin d'exécution : {}", evl::core::getExecPath().string());
-	int ret = 0;
 
-	if (settings->getValue<bool>("general/use_imgui", false)) {
-		log_info("Utilisation de l'interface ImGui");
-		// Startup
-		auto app = evl::gui::createApplication(iArgc, iArgv);
-		// Runtime
+	auto app = evl::gui::createApplication(iArgc, iArgv);
+	try {
 		app->run();
-		// Shutdown
-		app.reset();
-	} else {
-
-#ifdef USE_QT
-		log_info("Utilisation de l'interface Qt");
-		const QApplication app(iArgc, iArgv);
-		QCommandLineParser parser;
-		parser.setApplicationDescription(QCoreApplication::applicationName());
-		parser.addHelpOption();
-		parser.addVersionOption();
-		parser.process(app);
-		QCoreApplication::setOrganizationName(QString::fromStdString(evl::EVL_AUTHOR_STR));
-		QCoreApplication::setApplicationName(QString::fromStdString(evl::EVL_APP));
-		QCoreApplication::setApplicationVersion(QString::fromStdString(evl::EVL_VERSION));
-		MainWindow window;
-		window.syncSettings();
-		window.show();
-		//NOLINTNEXTLINE
-		ret = app.exec();
-#else
-		log_error("L'application n'a pas été compilée avec le support de Qt, impossible de démarrer l'interface "
-				  "graphique.");
-		ret = EXIT_FAILURE;
-#endif
+	} catch (...) {
+		// Save while the application is still alive: its destructor runs during the
+		// unwinding that follows.
+		app->saveProgress();
+		throw;
 	}
+	const int ret = app->getState() == evl::gui::Application::State::Error ? EXIT_FAILURE : EXIT_SUCCESS;
+	app.reset();
+
 	log_info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
 	log_info("---------------------------------------------------------------------------------------");
 	evl::core::leaveSettings();
-	// Destroy the logger
-	evl::Log::invalidate();
+	return ret;
+}
+
+void reportFatal(const std::string_view& iWhat) noexcept {
+	try {
+		log_critical("Exception non rattrapée : {}", iWhat);
+		// NOLINTNEXTLINE(bugprone-empty-catch): last resort, nothing left to report with
+	} catch (...) {}
+}
+
+}// namespace
+
+auto main(int iArgc, char* iArgv[]) -> int {
+	int ret = EXIT_FAILURE;
+	// Nothing must escape: an uncaught exception would terminate the process without a
+	// trace, in the middle of a game.
+	try {
+#ifdef EVL_DEBUG
+		evl::Log::init(evl::Log::Level::Trace);
+#else
+		evl::Log::init(evl::Log::Level::Info);
+#endif
+		ret = run(iArgc, iArgv);
+		evl::Log::invalidate();
+	} catch (const std::exception& e) {
+		reportFatal(e.what());
+	} catch (...) { reportFatal("type inconnu"); }
 	return ret;
 }

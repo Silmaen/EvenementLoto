@@ -18,12 +18,17 @@ Author: Silmaen
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
   - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers)
   - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
+- `source/third_party/` - Single translation unit instantiating the header-only third
+  parties, excluded from the project warnings and from clang-tidy
 - `source/resources/` - Resources copied at build time (dark icons, user documentation + images)
-- `source/main.cpp` - Entry point (supports ImGui UI; legacy Qt path still exists behind `USE_QT` ifdef)
+- `source/main.cpp` - Entry point (ImGui UI); returns `EXIT_FAILURE` when the application ends in `State::Error`
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
 - `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
 - `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation)
-- `cmake/` - CMake modules (14 files: BaseConfig, Vulkan, Sanitizers, Coverage, Depmanager, Poetry, Python, Environment, UtilityFunctions, DocumentationConfig)
+- `cmake/` - CMake modules (BaseConfig, Conan, conan_provider, Vulkan, Sanitizers,
+  Coverage, Poetry, UtilityFunctions, DocumentationConfig) + preset fragments
+- `conan/` - Conan profiles and `global.conf` (`conan/config/`) and the in-tree recipe
+  index (`conan/local-recipes/`)
 - `document/` - User documentation (in French)
 - `data/` - Runtime data files
 
@@ -35,6 +40,14 @@ Author: Silmaen
 - `Serializable` - Abstract base for binary stream, JSON (jsoncpp), and YAML (yaml-cpp) serialization
 - `Settings` - Application settings (key-value store)
 - `Statistics` - Draw statistics tracking
+- `EnumLabel.h` - `constexpr` enum ⇄ French label tables, replacing static maps that
+  could throw during static initialization
+- `AtomicFile.h` - `writeFileAtomically()`: write to `<name>.tmp`, flush, check, then
+  rename, so a crash never destroys the previous version
+- `StreamRead.h` - defensive binary readers (`readRaw`, `readEnum`, `readLength`,
+  `readString`, `readVector`); the stream's `failbit` is the error channel
+- `Rescue.h` - the interrupted game: `saveRescue`, `findRescue`, `loadRescue`,
+  `archiveRescue`, with two generations of `rescue.lev`
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
@@ -45,36 +58,78 @@ Author: Silmaen
 
 ### GUI (namespace `evl::gui`)
 
-- `Application` - Singleton application class, manages views/popups/actions, Vulkan rendering, autosave (`rescue.lev` every 10s during active gameplay)
+- `Application` - Singleton application class, manages views/popups/actions, Vulkan
+  rendering, autosave (`rescue.lev` every 10s during active gameplay, atomic, two
+  generations) and the recovery prompt at startup
 - `MainWindow` - GLFW window management with Vulkan surface
 - `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in settings)
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
-- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups
+- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups, RescuePopup (resume an interrupted game)
 - `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
+
+### Robustness
+
+- Vulkan waits are bounded: 2 s to acquire a swapchain image (rebuild on timeout), 5 s
+  for a frame fence (a stuck GPU reports an error instead of freezing forever)
+- `VK_ERROR_DEVICE_LOST` is reported with its own message; any fatal Vulkan error saves
+  the game before leaving the loop
+- `Application::saveProgress()` is called after every change of the game state (draw,
+  cancelled draw, round change), on top of the 10 s periodic autosave
 
 ## Build System
 
 - **CMake 3.24+** with CMake Presets (`CMakePresets.json` includes Linux, MinGW, and CI presets)
 - **C++ Standard**: C++23 (`CMAKE_CXX_STANDARD 23`)
-- **Supported compilers**: GCC 14+, Clang 18+
+- **Supported compilers**: GCC 14+, Clang 18+ (CI builds with GCC 14 and Clang 22 from
+  the same `builder-ubuntu2404` image)
 - **Supported platforms**: Linux, Windows (MinGW)
-- **Dependency management**: [DepManager](https://github.com/Silmaen/DepManager) (`depmanager.yml`)
+- **Dependency management**: [Conan 2](https://conan.io) driven by CMake through
+  [cmake-conan](https://github.com/conan-io/cmake-conan) `0.19.0` (`conanfile.py`, `conan/`)
 - **Python tooling**: Poetry (`pyproject.toml`), Python 3.12+
 - **Code formatting**: clang-format (`.clang-format`), cmake-format (`.cmake-format.json`)
 
-### External Dependencies (via DepManager)
+### External Dependencies (via Conan)
 
-glfw 3.4.0, googletest 1.17.0, imgui 1.92.5-docking, jsoncpp 1.9.6, magic_enum 0.9.7, nanosvg 1.0.0, nfd 1.2.1, spdlog 1.17.0, stb_image 2.28, vulkan_sdk 1.4.328, yaml-cpp 0.8.0
+glfw 3.4, gtest 1.17.0, imgui 1.92.9b-docking, jsoncpp 1.9.6, magic_enum 0.9.7,
+nanosvg cci.20231025, nfd 1.2.1, spdlog 1.17.0, stb cci.20240531,
+vulkan-headers/vulkan-loader 1.4.350.0, yaml-cpp 0.8.0
+
+Plus `wayland` and `xkbcommon`, pulled in by glfw for its Wayland backend (build time
+only: glfw `dlopen`s them by soname at runtime).
+
+All come from ConanCenter except `nfd` (nativefiledialog-extended), which is not
+published there and is built from the in-tree recipe in `conan/local-recipes/`.
+
+Linux builds run in `registry.argawaen.net/builder/builder-ubuntu2404`, which carries
+**both gcc 14 and clang 22** plus the full X11/XCB development set expected by
+`xorg/system`, the Wayland and libdecor headers and `xkb-data`. Having gcc beside clang
+matters: the **build** profile (`conan/config/profiles/linux-build`) always uses gcc,
+because the autotools based build tools Conan compiles (flex, m4, libiconv…) expect a
+native toolchain, and gcc matches the prebuilt tool packages, which are then shared
+between the gcc and clang host profiles.
+
+Both display servers are supported: glfw is built with `with_x11` and `with_wayland`,
+and picks the platform at runtime; `vulkan-loader` carries the xlib, xcb and wayland
+WSI backends. `MainWindow` reads the platform with `glfwGetPlatform()` and adapts: on
+Wayland the ImGui multi-viewport flag stays off and the monitor hosting the control
+window is deduced from the primary monitor, because the protocol does not let a client
+know or set its own window position.
 
 ### Python Dependencies (via Poetry)
 
-- depmanager ^0.5.1, black ^25.12.0, gcovr ^8.6, rich ^14.2.0
+- conan ^2.32, black ^25.12.0, gcovr ^8.6, rich ^14.2.0
+
+Poetry owns the virtual environment and every build tool in it; `cmake/Poetry.cmake`
+runs `poetry sync` at configure time and prepends the venv to `PATH`.
 
 ### Build Targets
 
 - `EvenementLoto` - Main executable
+- `EvenementLoto_third_party` - third parties that must be compiled locally: ImGui
+  backends and `std::string` helper (ConanCenter ships them as sources only) and the
+  single translation unit instantiating stb_image and nanosvg
 - `EvenementLoto_lib` - Core library
 - `EvenementLoto_ui` - GUI library
 - `EvenementLoto_resource` - Resource copy target
@@ -178,7 +233,8 @@ Python-based CI scripts in `ci/` (21 Python files), driven by `ci_action.py`:
 
 - `log_trace(...)`, `log_debug(...)`, `log_info(...)`, `log_warn(...)`, `log_error(...)`, `log_critical(...)`
 - Macros in `Log.h` using `std::format` (C++23) for formatting
-- Backend: spdlog with console + file sinks
+- Backend: spdlog with console + rotating file sinks (5 MB × 5, appended so a crash
+  trace survives the next start), flushed every second
 - In-app log buffer: `evl::logs::LogBuffer` singleton (thread-safe, max 1000 entries)
 
 ### Serialization
@@ -195,4 +251,6 @@ All domain objects inherit from `Serializable` and implement:
 - Tests are in `test/lib_test/` (core, 10 files) and `test/gui_test/` (GUI, 6 files)
 - Coverage via gcovr (configured in `gcovr.cfg`)
 - Test helper header: `test/TestMainHelper.h`
+- `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted
+- `test_Rescue.cpp` checks the interrupted-game save, detection and fallback
 - Sanitizer suppressions: `lsan_suppressions.txt` (suppresses known libdbus leaks for Address/Leak sanitizer presets)

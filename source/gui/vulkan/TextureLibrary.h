@@ -67,7 +67,7 @@ public:
 	 */
 	struct Pixels {
 		/// The pixel data.
-		std::vector<uint8_t> data{};
+		std::vector<uint8_t> data;
 		/// The image width.
 		uint32_t width{0};
 		/// The image height.

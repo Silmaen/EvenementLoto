@@ -25,7 +25,7 @@ set_target_properties(${CMAKE_PROJECT_NAME}_lib PROPERTIES FOLDER "core_libs")
 # json
 find_package(jsoncpp REQUIRED)
 message(STATUS "Found jsoncpp: ${jsoncpp_DIR} (found version: ${jsoncpp_VERSION})")
-target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC jsoncpp_static)
+target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC JsonCpp::JsonCpp)
 
 # YAML
 find_package(yaml-cpp REQUIRED)
@@ -41,4 +41,3 @@ target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC spdlog::spdlog)
 find_package(magic_enum REQUIRED)
 message(STATUS "Found magic_enum: ${magic_enum_DIR} (found version: ${magic_enum_VERSION})")
 target_link_libraries(${CMAKE_PROJECT_NAME}_lib PUBLIC magic_enum::magic_enum)
-copy_shared_libraries(${CMAKE_PROJECT_NAME}_lib)

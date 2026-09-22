@@ -37,3 +37,15 @@ CMakeUserPresets.json
 Doxyfile
 .env
 .venv
+
+# Python
+__pycache__/
+*.pyc
+
+# TeamCity
+TeamCity_*.zip
+projectSettings.zip
+.teamcity/target
+
+# Application log, written next to the binary
+exec.log

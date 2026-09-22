@@ -15,6 +15,7 @@
 #include "actions/SettingsActions.h"
 #include "baseDefine.h"
 #include "core/Log.h"
+#include "core/Rescue.h"
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "views/ConfigPopups.h"
@@ -23,11 +24,19 @@
 #include "views/HelpView.h"
 #include "views/MainView.h"
 #include "views/MenuBar.h"
+#include "views/RescuePopup.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
 
 
 namespace evl::gui {
+
+namespace {
+/// Period of the periodic autosave, in seconds.
+constexpr double g_autoSavePeriodSeconds = 10.0;
+/// Frames in a row allowed to fail before giving up.
+constexpr uint32_t g_maxConsecutiveFrameFailures = 5;
+}// namespace
 
 Application* Application::m_instance = nullptr;
 
@@ -62,6 +71,7 @@ Application::Application() {
 	m_popups.push_back(std::make_shared<views::MainConfigPopups>());
 	m_popups.push_back(std::make_shared<views::EventConfigPopups>());
 	m_popups.push_back(std::make_shared<views::GameRoundConfigPopups>());
+	m_popups.push_back(std::make_shared<views::PopupRescue>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -96,6 +106,13 @@ Application::Application() {
 	m_cachedGameSettings = getAction("game_settings");
 
 	m_state = State::Running;
+
+	// A game interrupted by a crash or a power loss must come back on its own.
+	if (const auto rescue = core::findRescue(); rescue.has_value()) {
+		log_info("Partie interrompue détectée dans '{}'.", rescue->path.string());
+		if (const auto popup = std::dynamic_pointer_cast<views::PopupRescue>(getPopup("popup_rescue")))
+			popup->propose(rescue.value());
+	}
 }
 
 Application::~Application() {
@@ -104,44 +121,70 @@ Application::~Application() {
 	m_mainWindow.close();
 }
 
+void Application::renderFrame() {
+	checkActionEnable();
+	m_mainWindow.newFrame();
+	if (m_state != State::Running)
+		return;
+	if (m_cachedDisplayView == nullptr)
+		return;
+	if (isDisplayNeeded()) {
+		if (!m_cachedDisplayView->visibility())
+			log_debug("Show Display view.");
+		m_cachedDisplayView->show();
+	} else {
+		if (m_cachedDisplayView->visibility())
+			log_debug("Hide Display view.");
+		m_cachedDisplayView->hide();
+	}
+	for (const auto& view: m_views) { view->update(); }
+	for (const auto& popup: m_popups) { popup->update(); }
+	m_mainWindow.render(m_theme.windowBackground);
+	autoSave();
+}
+
 void Application::run() {
 	// Main loop
 	uint32_t frameCount = 0;
+	uint32_t consecutiveFailures = 0;
 	while (m_state == State::Running || m_state == State::Waiting) {
 		if (m_mainWindow.shouldClose()) {
 			m_state = State::Closed;
 			continue;
 		}
-		checkActionEnable();
-		m_mainWindow.newFrame();
-		if (m_state != State::Running)
-			continue;
-		if (m_cachedDisplayView == nullptr)
-			continue;
-		if (isDisplayNeeded()) {
-			if (!m_cachedDisplayView->visibility())
-				log_debug("Show Display view.");
-			m_cachedDisplayView->show();
-		} else {
-			if (m_cachedDisplayView->visibility())
-				log_debug("Hide Display view.");
-			m_cachedDisplayView->hide();
+		// A failing frame must not end the event: log it, and only give up after
+		// several failures in a row, to avoid spinning forever on the same error.
+		try {
+			renderFrame();
+			consecutiveFailures = 0;
+		} catch (const std::exception& e) {
+			++consecutiveFailures;
+			log_error("Exception pendant le rendu ({}/{}) : {}", consecutiveFailures, g_maxConsecutiveFrameFailures,
+					  e.what());
+		} catch (...) {
+			++consecutiveFailures;
+			log_error("Exception inconnue pendant le rendu ({}/{}).", consecutiveFailures,
+					  g_maxConsecutiveFrameFailures);
 		}
-		for (const auto& view: m_views) { view->update(); }
-		for (const auto& popup: m_popups) { popup->update(); }
-		m_mainWindow.render(m_theme.windowBackground);
-		autoSave();
-		frameCount++;
+		if (consecutiveFailures >= g_maxConsecutiveFrameFailures)
+			reportError("Trop d'erreurs consécutives pendant le rendu.");
+		++frameCount;
 		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
 			log_info("Maximum frame count {} reached, closing application.", m_maxFrame);
 			m_state = State::Closed;
 		}
 	}
+	// Leaving the loop must not cost the draws of the last ten seconds.
+	autoSave(true);
 }
 
 void Application::reportError(const std::string& iMessage) {
 	log_error("Application reported error: {}", iMessage);
+	if (m_state == State::Error)
+		return;
 	m_state = State::Error;
+	// Whatever went wrong, the game must be resumable at the next start.
+	autoSave(true);
 }
 
 auto Application::getTheme() const -> const Theme& { return m_theme; }
@@ -246,29 +289,19 @@ void Application::setDisplayPreview(const bool iDisplay) {
 	}
 }
 
-void Application::autoSave() {
+void Application::autoSave(const bool iForce) {
 	const auto status = m_currentEvent.getStatus();
 	if (status == core::Event::Status::Invalid || status == core::Event::Status::Finished)
 		return;
 	const auto now = core::clock::now();
-	if (core::durationSeconds(now - m_lastAutoSave) < 10.0)
+	if (!iForce && core::durationSeconds(now - m_lastAutoSave) < g_autoSavePeriodSeconds)
 		return;
 	m_lastAutoSave = now;
-	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
-	if (!exists(dataLocation) && !dataLocation.empty())
-		create_directories(dataLocation);
-	else if (!is_directory(dataLocation)) {
-		log_warn("Data location '{}' is not a directory, cannot autosave.", dataLocation.string());
+	if (!core::saveRescue(m_currentEvent)) {
+		log_warn("Autosave failed.");
 		return;
 	}
-	const auto rescuePath = dataLocation / "rescue.lev";
-	std::ofstream f(rescuePath, std::ios::out | std::ios::binary);
-	if (!f.is_open()) {
-		log_warn("Failed to open autosave file '{}'.", rescuePath.string());
-		return;
-	}
-	m_currentEvent.write(f);
-	log_trace("Autosaved event to '{}'.", rescuePath.string());
+	log_trace("Autosaved event.");
 }
 
 }// namespace evl::gui

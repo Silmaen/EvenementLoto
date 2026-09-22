@@ -6,7 +6,10 @@
 cmake_minimum_required(VERSION 3.24)
 set(PROJECT_PREFIX EVL)
 set(PROJECT_PREFIX_LOWER evl)
-project(EvenementLoto VERSION 0.4.1 LANGUAGES CXX)
+# Conan acts as a CMake dependency provider: registered before project(), it only runs
+# on the first find_package().
+list(APPEND CMAKE_PROJECT_TOP_LEVEL_INCLUDES "${CMAKE_CURRENT_LIST_DIR}/cmake/conan_provider.cmake")
+project(EvenementLoto VERSION 0.4.1 LANGUAGES CXX C)
 #
 # ---=== Options ===---
 #

@@ -81,6 +81,14 @@ public:
 	void run();
 
 	/**
+	 * @brief Save the game right away, without waiting for the periodic autosave.
+	 *
+	 * Called after every change to the game state: the gap between a number announced
+	 * to the players and a number written to disk must stay null.
+	 */
+	void saveProgress() { autoSave(true); }
+
+	/**
 	 * @brief Request Error report.
 	 * @param[in] iMessage The error message.
 	 */
@@ -266,7 +274,7 @@ private:
 	bool m_displayPreview = false;
 
 	/// Timestamp of the last autosave.
-	core::time_point m_lastAutoSave{};
+	core::time_point m_lastAutoSave;
 
 	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
 	std::shared_ptr<views::View> m_cachedDisplayView;
@@ -278,8 +286,16 @@ private:
 
 	/**
 	 * @brief Autosave the current event to rescue.lev if a game is in progress.
+	 * @param[in] iForce Save even if the period has not elapsed.
 	 */
-	void autoSave();
+	void autoSave(bool iForce = false);
+
+	/**
+	 * @brief Update every view and popup, then render one frame.
+	 *
+	 * Called from run() inside a try/catch: a failing frame must not end the event.
+	 */
+	void renderFrame();
 
 	/**
 	 * @brief check the enablement of the actions.

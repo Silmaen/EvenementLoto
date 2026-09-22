@@ -1,0 +1,18 @@
+{% set version = os.getenv("EVL_COMPILER_VERSION") %}
+{% set cc = os.getenv("EVL_C_COMPILER") %}
+{% set cxx = os.getenv("EVL_CXX_COMPILER") %}
+{% set syspc = os.getenv("EVL_SYSTEM_PKG_CONFIG_PATH") %}
+[settings]
+os=Linux
+arch={{ detect_api.detect_arch() }}
+compiler=clang
+compiler.version={{ version }}
+compiler.libcxx=libstdc++11
+compiler.cppstd=gnu23
+build_type=Release
+
+[conf]
+tools.build:compiler_executables={"c": "{{ cc }}", "cpp": "{{ cxx }}"}
+
+[buildenv]
+PKG_CONFIG_PATH=+{{ syspc }}

@@ -33,7 +33,7 @@ auto split(const std::string_view iString, const char iDelimiter = '\n') -> std:
 	return result;
 }
 
-auto parseFilter(const std::string& iFilter) -> std::vector<nfdu8filteritem_t> {
+auto parseFilter(const std::string_view& iFilter) -> std::vector<nfdu8filteritem_t> {
 	std::vector<nfdu8filteritem_t> filters;
 	for (const auto filterLines = split(iFilter); const auto& line: filterLines) {
 		if (line.empty())
@@ -51,7 +51,7 @@ auto parseFilter(const std::string& iFilter) -> std::vector<nfdu8filteritem_t> {
 		name[items[0].size()] = '\0';
 		std::memcpy(specStr.get(), spec.data(), spec.size());
 		specStr[spec.size()] = '\0';
-		filters.push_back(nfdu8filteritem_t{name.release(), specStr.release()});
+		filters.push_back(nfdu8filteritem_t{.name = name.release(), .spec = specStr.release()});
 	}
 
 	return filters;
@@ -61,12 +61,11 @@ auto parseFilter(const std::string& iFilter) -> std::vector<nfdu8filteritem_t> {
 
 std::filesystem::path FileDialog::m_lastPath = std::filesystem::path{};
 
-auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
+auto FileDialog::openFile(const std::string_view& iFilter) -> std::filesystem::path {
 	NFD::Init();
 	nfdu8char_t* outPath = nullptr;
 	std::filesystem::path resultPath;
-	const std::string& filters{iFilter};
-	auto ff = parseFilter(filters);
+	auto ff = parseFilter(iFilter);
 	if (m_lastPath.empty() || !exists(m_lastPath))
 		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
 
@@ -111,12 +110,11 @@ auto FileDialog::openFile(const std::string& iFilter) -> std::filesystem::path {
 	return resultPath;
 }
 
-auto FileDialog::saveFile([[maybe_unused]] const std::string& iFilter) -> std::filesystem::path {
+auto FileDialog::saveFile([[maybe_unused]] const std::string_view& iFilter) -> std::filesystem::path {
 	NFD::Init();
 	nfdu8char_t* outPath = nullptr;
 	std::filesystem::path resultPath;
-	const std::string& filters{iFilter};
-	auto ff = parseFilter(filters);
+	auto ff = parseFilter(iFilter);
 	if (m_lastPath.empty() || !exists(m_lastPath))
 		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
 	std::string mLast = m_lastPath.string();

@@ -27,8 +27,8 @@ namespace evl {
 #ifndef EVL_PATCH
 #define EVL_PATCH "dev"
 #endif
-static const std::string EVL_VERSION = std::format("{}.{}.{}", EVL_MAJOR, EVL_MINOR, EVL_PATCH);
-static const std::string EVL_AUTHOR_STR = std::format("{}", EVL_AUTHOR);
-static const std::string EVL_APP = "Événement Loto";
+constexpr std::string_view EVL_VERSION = EVL_MAJOR "." EVL_MINOR "." EVL_PATCH;
+constexpr std::string_view EVL_AUTHOR_STR = EVL_AUTHOR;
+constexpr std::string_view EVL_APP = "Événement Loto";
 
 }// namespace evl

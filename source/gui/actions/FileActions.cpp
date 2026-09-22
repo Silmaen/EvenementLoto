@@ -9,6 +9,7 @@
 
 #include "FileActions.h"
 
+#include "core/AtomicFile.h"
 #include "gui/Application.h"
 #include "gui/utils/FileDialog.h"
 
@@ -62,9 +63,11 @@ void SaveFileAction::onExecute() {
 			return;
 		}
 	}
-	std::ofstream f(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
-	app.getCurrentEvent().write(f);
+	if (!core::writeFileAtomically(file, [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
+		log_error("Failed to save file '{}'.", file.string());
+		return;
+	}
 	log_info("File '{}' saved successfully.", file.string());
 }
 
@@ -81,9 +84,12 @@ void SaveAsFileAction::onExecute() {
 		return;
 	}
 	file = newfile;
-	std::ofstream f(file, std::ios::out | std::ios::binary);
 	app.getCurrentEvent().setBasePath(file);
-	app.getCurrentEvent().write(f);
+	if (!core::writeFileAtomically(file, [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
+		log_error("Failed to save file '{}'.", file.string());
+		return;
+	}
+	app.getCurrentFile() = file;
 	log_info("File '{}' saved successfully.", file.string());
 }
 
