@@ -145,7 +145,7 @@ TEST(Event, Serialize) {
 	Event evt2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	evt2.read(fileRead, getSaveVersion());
+	evt2.read(fileRead, {.version = getSaveVersion(), .wideEnums = false});
 	fileRead.close();
 
 	EXPECT_EQ(evt2.getName(), evt.getName());

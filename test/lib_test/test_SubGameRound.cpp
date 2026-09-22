@@ -76,7 +76,7 @@ TEST(SubGameRound, serialize) {
 	SubGameRound partie2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	partie2.read(fileRead, getSaveVersion());
+	partie2.read(fileRead, {.version = getSaveVersion(), .wideEnums = false});
 	fileRead.close();
 
 	EXPECT_EQ(partie2.getType(), SubGameRound::Type::TwoQuines);

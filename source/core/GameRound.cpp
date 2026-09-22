@@ -9,6 +9,8 @@
 
 #include "GameRound.h"
 
+#include "StreamWrite.h"
+
 #include "EnumLabel.h"
 #include "StreamRead.h"
 
@@ -149,45 +151,45 @@ void GameRound::addWinner(const std::string& iWinner) {
 }
 
 // ---- Serialisation ----
-void GameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, getSaveVersion())) {
+void GameRound::read(std::istream& iBs, const ReadContext& iContext) {
+	if (iContext.version > getSaveVersion()) {
 		iBs.setstate(std::ios::failbit);
 		return;
 	}
-	if (iFileVersion < 3) {//----UNCOVER----
-		m_id = 0;//----UNCOVER----
+	if (iContext.version < 3) {
+		m_id = 0;
 	} else if (!readRaw(iBs, m_id)) {
 		return;
 	}
-	if (!readEnum(iBs, m_type) || !readEnum(iBs, m_status))
+	if (!readEnum(iBs, m_type, iContext.wideEnums) || !readEnum(iBs, m_status, iContext.wideEnums))
 		return;
-	if (!readRaw(iBs, m_start) || !readRaw(iBs, m_end))
+	if (!readTimePoint(iBs, m_start) || !readTimePoint(iBs, m_end))
 		return;
 	draws_type draws;
-	if (iFileVersion < 4 && !readVector(iBs, draws))//----UNCOVER----
-		return;//----UNCOVER----
+	if (iContext.version < 4 && !readVector(iBs, draws))
+		return;
 	sub_rounds_type::size_type subCount = 0;
 	if (!readLength(iBs, subCount, g_maxSerializedCount))
 		return;
 	m_subGames.clear();
 	m_subGames.resize(subCount);
 	for (auto& sub: m_subGames) {
-		sub.read(iBs, iFileVersion);
+		sub.read(iBs, iContext);
 		if (!iBs.good())
 			return;
 	}
-	if (iFileVersion < 4 && subCount != 0) {//----UNCOVER----
+	if (iContext.version < 4 && subCount != 0) {
 		// faking sub game picking
-		const auto part = static_cast<uint32_t>(draws.size() / subCount);//----UNCOVER----
-		for (draws_type::size_type i = 0; i < draws.size(); ++i) {//----UNCOVER----
+		const auto part = static_cast<uint32_t>(draws.size() / subCount);
+		for (draws_type::size_type i = 0; i < draws.size(); ++i) {
 			if (part == 0)
-				break;//----UNCOVER----
-			m_subGames[i % part].addPickedNumber(draws[i]);//----UNCOVER----
-		}//----UNCOVER----
-	}//----UNCOVER----
+				break;
+			m_subGames[i % part].addPickedNumber(draws[i]);
+		}
+	}
 	m_diapoPath = std::filesystem::path{};
 	m_diapoDelay = 0;
-	if (m_type == Type::Pause && iFileVersion > 4) {
+	if (m_type == Type::Pause && iContext.version > 4) {
 		std::string diapo;
 		if (!readString(iBs, diapo))
 			return;
@@ -200,22 +202,18 @@ void GameRound::read(std::istream& iBs, const int iFileVersion) {
 }
 
 void GameRound::write(std::ostream& iBs) const {
-	iBs.write(reinterpret_cast<const char*>(&m_id), sizeof(m_id));
-	iBs.write(reinterpret_cast<const char*>(&m_type), sizeof(m_type));
-	iBs.write(reinterpret_cast<const char*>(&m_status), sizeof(m_status));
-	iBs.write(reinterpret_cast<const char*>(&m_start), sizeof(m_start));
-	iBs.write(reinterpret_cast<const char*>(&m_end), sizeof(m_end));
-	const sub_rounds_type::size_type l2 = m_subGames.size();
-	iBs.write(reinterpret_cast<const char*>(&l2), sizeof(sub_rounds_type::size_type));
-	for (sub_rounds_type::size_type i = 0; i < l2; ++i) m_subGames[i].write(iBs);
+	writeRaw(iBs, m_id);
+	writeEnum(iBs, m_type);
+	writeEnum(iBs, m_status);
+	writeTimePoint(iBs, m_start);
+	writeTimePoint(iBs, m_end);
+	writeLength(iBs, m_subGames.size());
+	for (const auto& subGame: m_subGames) subGame.write(iBs);
 	if (m_type == Type::Pause) {
-		const std::string::size_type l3 = m_diapoPath.string().size();
-		iBs.write(reinterpret_cast<const char*>(&l3), sizeof(l3));
-		if (l3 > 0) {
-			for (std::string::size_type i = 0; i < l3; ++i)
-				iBs.write(&m_diapoPath.string()[i], sizeof(std::string::value_type));
-			iBs.write(reinterpret_cast<const char*>(&m_diapoDelay), sizeof(double));
-		}
+		const std::string diapo = m_diapoPath.string();
+		writeString(iBs, diapo);
+		if (!diapo.empty())
+			writeRaw(iBs, m_diapoDelay);
 	}
 }
 

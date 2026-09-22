@@ -25,6 +25,11 @@ foreach (child ${children})
             if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/test_helper")
                 target_include_directories(${${child}_exe} PUBLIC test_helper)
             endif ()
+            # The shipped .lev files are read by the serialization tests: they are the
+            # only real files in versions 3, 4 and 6 we have, and the backward
+            # compatibility of the reader is exactly what they check.
+            target_compile_definitions(${${child}_exe} PRIVATE
+                    ${PROJECT_PREFIX}_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
             target_link_libraries(${${child}_exe} GTest::gtest)
             target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
             if (${child} MATCHES "gui")

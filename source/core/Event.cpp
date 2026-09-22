@@ -10,8 +10,10 @@
 #include "Event.h"
 
 #include "EnumLabel.h"
+#include "FileFormat.h"
 #include "Log.h"
 #include "StreamRead.h"
+#include "StreamWrite.h"
 #include "utilities.h"
 
 namespace evl::core {
@@ -34,10 +36,23 @@ constexpr std::array<std::pair<Event::Status, std::string_view>, 8> g_statusLabe
 auto Event::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 // ---- Serialisation ----
-void Event::read(std::istream& iBs, int) {
-	uint16_t saveVersion = 0;
-	if (!readRaw(iBs, saveVersion))
+void Event::read(std::istream& iBs, const ReadContext&) {
+	const auto frame = readFrame(iBs);
+	if (!frame.valid) {
+		log_warn("Fichier illisible : {}.", frame.framed ? "somme de contrôle invalide" : "contenu trop court");
+		iBs.setstate(std::ios::failbit);
 		return;
+	}
+	uint16_t saveVersion = frame.version;
+	if (!frame.framed) {
+		// An older file carries its version as the first field of the body instead of
+		// in a header.
+		std::istringstream head(frame.body, std::ios::in | std::ios::binary);
+		if (!readRaw(head, saveVersion)) {
+			iBs.setstate(std::ios::failbit);
+			return;
+		}
+	}
 	log_debug("Version des données du stream: {}, version courante: {}", saveVersion, getSaveVersion());
 	if (saveVersion > getSaveVersion()) {
 		log_warn("Version des données du stream ({}) supérieure à la version courante ({}), lecture impossible",
@@ -45,76 +60,89 @@ void Event::read(std::istream& iBs, int) {
 		iBs.setstate(std::ios::failbit);
 		return;
 	}
-	if (!readEnum(iBs, m_status))
-		return;
-	std::string temp;
-	if (!readString(iBs, m_organizerName) || !readString(iBs, temp))
-		return;
-	m_organizerLogo = temp;
-	if (!readString(iBs, m_name) || !readString(iBs, temp))
-		return;
-	m_logo = temp;
-	if (!readString(iBs, m_location))
-		return;
-	// version 2
-	if (saveVersion > 1 && !readString(iBs, m_rules))
-		return;
-	// version 3
-	if (saveVersion > 2 && saveVersion < 4) {//----UNCOVER----
-		std::string obsoleteRules;//----UNCOVER----
-		if (!readString(iBs, obsoleteRules))//----UNCOVER----
-			return;//----UNCOVER----
-	}//----UNCOVER----
-	// version 1
-	rounds_type::size_type roundCount = 0;
-	if (!readLength(iBs, roundCount, g_maxSerializedCount))
-		return;
-	m_gameRounds.clear();
-	m_gameRounds.resize(roundCount);
-	for (auto& round: m_gameRounds) {
-		round.read(iBs, saveVersion);
-		if (!iBs.good())
+
+	if (!readWith(frame, {.version = saveVersion, .wideEnums = false})) {
+		// Version 6 and below is ambiguous: the serialized enumerations were narrowed to
+		// `: uint8_t` without the save version being bumped, so two layouts share that
+		// number. A second pass with four-byte enumerations is what brings the events
+		// archived before that change back — and it costs nothing, the body is already
+		// in memory.
+		if (saveVersion >= g_firstFramedVersion || !readWith(frame, {.version = saveVersion, .wideEnums = true})) {
+			iBs.setstate(std::ios::failbit);
 			return;
+		}
+		log_info("Fichier de version {} lu avec des énumérations sur quatre octets.", saveVersion);
 	}
-	log_info("Event lu et contenant {} parties", roundCount);
-	if (!readRaw(iBs, m_start) || !readRaw(iBs, m_end))
-		return;
+	// The whole file was consumed on purpose, so the caller's stream is put back in a
+	// good state: `good()` is how every call site tells a complete read from a partial
+	// one.
+	iBs.clear();
 	log_info("Event in state: {}", getStateString());
 }
 
-void Event::write(std::ostream& oBs) const {
-	const auto vers = getSaveVersion();
-	oBs.write(reinterpret_cast<const char*>(&vers), sizeof(uint16_t));
-	oBs.write(reinterpret_cast<const char*>(&m_status), sizeof(m_status));
-	std::string::size_type l = 0;
-	std::string::size_type i = 0;
-	l = m_organizerName.size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_organizerName[i], sizeof(std::string::value_type));
-	l = m_organizerLogo.string().size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_organizerLogo.string()[i], sizeof(std::string::value_type));
-	l = m_name.size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_name[i], sizeof(std::string::value_type));
-	l = m_logo.string().size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_logo.string()[i], sizeof(std::string::value_type));
-	l = m_location.size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_location[i], sizeof(std::string::value_type));
-	// version >= 2
-	l = m_rules.size();
-	oBs.write(reinterpret_cast<char*>(&l), sizeof(l));
-	for (i = 0; i < l; ++i) oBs.write(&m_rules[i], sizeof(std::string::value_type));
-	// version >= 1
-	rounds_type::size_type lv = 0;
-	lv = m_gameRounds.size();
-	oBs.write(reinterpret_cast<char*>(&lv), sizeof(lv));
-	for (rounds_type::size_type iv = 0; iv < lv; ++iv) m_gameRounds[iv].write(oBs);
+auto Event::readWith(const FileFrame& iFrame, const ReadContext& iContext) -> bool {
+	std::istringstream body(iFrame.body, std::ios::in | std::ios::binary);
+	if (!iFrame.framed) {
+		uint16_t ignored = 0;
+		if (!readRaw(body, ignored))
+			return false;
+	}
+	return readBody(body, iContext);
+}
 
-	oBs.write(reinterpret_cast<const char*>(&m_start), sizeof(m_start));
-	oBs.write(reinterpret_cast<const char*>(&m_end), sizeof(m_end));
+auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
+	if (!readEnum(iBs, m_status, iContext.wideEnums))
+		return false;
+	std::string temp;
+	if (!readString(iBs, m_organizerName) || !readString(iBs, temp))
+		return false;
+	m_organizerLogo = temp;
+	if (!readString(iBs, m_name) || !readString(iBs, temp))
+		return false;
+	m_logo = temp;
+	if (!readString(iBs, m_location))
+		return false;
+	// version 2
+	if (iContext.version > 1 && !readString(iBs, m_rules))
+		return false;
+	// version 3
+	if (iContext.version > 2 && iContext.version < 4) {
+		std::string obsoleteRules;
+		if (!readString(iBs, obsoleteRules))
+			return false;
+	}
+	// version 1
+	rounds_type::size_type roundCount = 0;
+	if (!readLength(iBs, roundCount, g_maxSerializedCount))
+		return false;
+	m_gameRounds.clear();
+	m_gameRounds.resize(roundCount);
+	for (auto& round: m_gameRounds) {
+		round.read(iBs, iContext);
+		if (!iBs.good())
+			return false;
+	}
+	log_info("Event lu et contenant {} parties", roundCount);
+	return readTimePoint(iBs, m_start) && readTimePoint(iBs, m_end);
+}
+
+
+void Event::write(std::ostream& oBs) const {
+	std::ostringstream body(std::ios::out | std::ios::binary);
+	writeEnum(body, m_status);
+	writeString(body, m_organizerName);
+	writeString(body, m_organizerLogo.string());
+	writeString(body, m_name);
+	writeString(body, m_logo.string());
+	writeString(body, m_location);
+	// version >= 2
+	writeString(body, m_rules);
+	// version >= 1
+	writeLength(body, m_gameRounds.size());
+	for (const auto& round: m_gameRounds) round.write(body);
+	writeTimePoint(body, m_start);
+	writeTimePoint(body, m_end);
+	writeFrame(oBs, getSaveVersion(), body.str());
 }
 
 auto Event::toJson() const -> Json::Value {

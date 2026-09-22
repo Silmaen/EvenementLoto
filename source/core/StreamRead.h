@@ -8,8 +8,12 @@
 
 #pragma once
 
+#include "timeFunctions.h"
+
 #include <cstddef>
+#include <cstdint>
 #include <istream>
+#include <limits>
 #include <string>
 #include <type_traits>
 #include <utility>
@@ -44,17 +48,39 @@ auto readRaw(std::istream& ioBs, ValueType& oValue) -> bool {
 
 /**
  * @brief Read an enum value, rejecting anything that is not a declared enumerator.
+ *
+ * `iWide` reads the four bytes a plain `enum` used to occupy, for the files written
+ * before the serialized enumerations declared `: uint8_t`. See ReadContext.
+ *
  * @tparam EnumType Type of the enum to read.
  * @param[in,out] ioBs The stream to read from.
  * @param[out] oValue The value read.
+ * @param[in] iWide True to read four bytes instead of the underlying type's width.
  * @return True on success.
  */
 template<typename EnumType>
-auto readEnum(std::istream& ioBs, EnumType& oValue) -> bool {
-	std::underlying_type_t<EnumType> raw = 0;
-	if (!readRaw(ioBs, raw))
+auto readEnum(std::istream& ioBs, EnumType& oValue, const bool iWide = false) -> bool {
+	using underlying = std::underlying_type_t<EnumType>;
+	int64_t raw = 0;
+	if (iWide) {
+		int32_t stored = 0;
+		if (!readRaw(ioBs, stored))
+			return false;
+		raw = stored;
+	} else {
+		underlying stored = 0;
+		if (!readRaw(ioBs, stored))
+			return false;
+		raw = static_cast<int64_t>(stored);
+	}
+	// A four-byte field holding something the underlying type cannot even represent is
+	// not a stale layout, it is a corrupted file.
+	if (std::cmp_less(raw, std::numeric_limits<underlying>::min()) ||
+		std::cmp_greater(raw, std::numeric_limits<underlying>::max())) {
+		ioBs.setstate(std::ios::failbit);
 		return false;
-	const auto value = magic_enum::enum_cast<EnumType>(raw);
+	}
+	const auto value = magic_enum::enum_cast<EnumType>(static_cast<underlying>(raw));
 	if (!value.has_value()) {
 		ioBs.setstate(std::ios::failbit);
 		return false;
@@ -64,8 +90,14 @@ auto readEnum(std::istream& ioBs, EnumType& oValue) -> bool {
 }
 
 /**
- * @brief Read a length and check it against an upper bound.
- * @tparam SizeType Type of the length as stored in the file.
+ * @brief Read a length, on the fixed width it is stored on, and bound it.
+ *
+ * Always eight bytes, whatever the type asked for: that is what makes the file readable
+ * on a platform where `std::size_t` is not eight bytes. It is also what the 64-bit
+ * builds have always written, so a file from before the fixed width was spelled out
+ * still reads.
+ *
+ * @tparam SizeType Type the caller wants the length in.
  * @param[in,out] ioBs The stream to read from.
  * @param[out] oLength The length read.
  * @param[in] iMaximum Largest accepted value.
@@ -73,12 +105,28 @@ auto readEnum(std::istream& ioBs, EnumType& oValue) -> bool {
  */
 template<typename SizeType>
 auto readLength(std::istream& ioBs, SizeType& oLength, const std::size_t iMaximum = g_maxSerializedLength) -> bool {
-	if (!readRaw(ioBs, oLength))
+	uint64_t stored = 0;
+	if (!readRaw(ioBs, stored))
 		return false;
-	if (std::cmp_greater(oLength, iMaximum)) {
+	if (stored > iMaximum) {
 		ioBs.setstate(std::ios::failbit);
 		return false;
 	}
+	oLength = static_cast<SizeType>(stored);
+	return true;
+}
+
+/**
+ * @brief Read a point in time, stored as a count of nanoseconds since the epoch.
+ * @param[in,out] ioBs The stream to read from.
+ * @param[out] oValue The point in time read.
+ * @return True on success.
+ */
+inline auto readTimePoint(std::istream& ioBs, time_point& oValue) -> bool {
+	int64_t stored = 0;
+	if (!readRaw(ioBs, stored))
+		return false;
+	oValue = time_point{std::chrono::duration_cast<clock::duration>(std::chrono::nanoseconds{stored})};
 	return true;
 }
 
@@ -89,7 +137,7 @@ auto readLength(std::istream& ioBs, SizeType& oLength, const std::size_t iMaximu
  * @return True on success.
  */
 inline auto readString(std::istream& ioBs, std::string& oValue) -> bool {
-	std::string::size_type length = 0;
+	std::size_t length = 0;
 	if (!readLength(ioBs, length))
 		return false;
 	oValue.resize(length);
@@ -109,7 +157,7 @@ inline auto readString(std::istream& ioBs, std::string& oValue) -> bool {
 template<typename ValueType>
 auto readVector(std::istream& ioBs, std::vector<ValueType>& oValues) -> bool {
 	static_assert(std::is_trivially_copyable_v<ValueType>, "readVector only handles trivially copyable types");
-	typename std::vector<ValueType>::size_type count = 0;
+	std::size_t count = 0;
 	if (!readLength(ioBs, count))
 		return false;
 	oValues.resize(count);
