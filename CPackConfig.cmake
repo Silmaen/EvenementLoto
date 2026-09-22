@@ -19,7 +19,9 @@ else ()
     endif ()
 endif ()
 
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${${PROJECT_PREFIX}_PLATFORM_STR}-${${PROJECT_PREFIX}_ARCH_STR}")
+# No platform or architecture in the name: there is one Package configuration per
+# target and the extension already tells them apart (.tgz on Linux, .zip on Windows).
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 message(STATUS "PACKAGING Expected package Name: ${CPACK_PACKAGE_FILE_NAME}")
 
 if (${PROJECT_PREFIX}_PLATFORM_WINDOWS)

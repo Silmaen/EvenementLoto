@@ -639,6 +639,131 @@ des continuations.
 
 ---
 
+## Phase 12 — CI : qualité, analyse sur diff, packager
+
+Quatre chantiers demandés le 2026-09-22, après le merge de la migration. Références
+internes : `stack_owl/Owl` (Code Style, matrice PR/draft) et `Sources/Test_CI`
+(analyse sur diff, `ci/changed_tus.py` + `ci/clang_analysis.py`).
+
+### 12.0 Déclenchement (fait, PR #50)
+
+Le pont ne met en file que sur événements de pull request : son contrôleur webhook
+ignore `push` et `branchTrigger.enabled` n'a aucun consommateur à l'exécution en 1.10.0.
+`main` retrouve donc un `vcsTrigger` (`+:main`), les PR restent au pont, et une branche
+poussée sans PR ne déclenche rien — c'est le comportement voulu.
+
+- [x] `vcsTrigger` sur le template, `branchFilter = +:main`, comme Owl
+- [x] `branch_specification` : **garder** `Feature/*` et `Experiment/*`. Ce n'est pas un
+      déclencheur, c'est ce qui rend ces branches visibles à TeamCity, sans quoi les
+      builds de PR (`prBuildRef = branch`) n'auraient aucune branche sur laquelle tourner
+
+### 12.1 Un template léger pour les configurations hors build
+
+`globalBuild` enchaîne 11 étapes (build, test, couverture, doc, deploy). Code Style,
+Packager et Analysis n'en ont pas besoin. Il faut un second template avec les deux
+seules étapes communes : `DefineDockerImage` sur l'agent, puis `PythonRequirements` +
+`DefineVariables` dans le conteneur.
+
+- [x] `val toolBuild = Template { ... }` : `Determine docker` + `Tool Dependencies`, plus
+      le `vcsTrigger` factorisé dans `Triggers.mainBranchOnly()`
+- [x] `ci_action.py` : laisser passer les options non reconnues jusqu'à l'action, pour
+      que `Analysis` prenne des drapeaux (`--tool`, `--mode`, …) au lieu de variables
+      d'environnement. `BaseAction.withOptions()` refuse par défaut toute option, afin
+      qu'une option passée à une action qui n'en prend pas soit une erreur, pas un
+      silence
+
+### 12.2 Code Style
+
+Une action `CodeStyle` qui **inspecte sans jamais réécrire**, et dont chaque constat
+sort au format `chemin:ligne:colonne: error: <contrôle>: <message>` — c'est cette forme
+que le pont transforme en annotation GitHub posée sur la bonne ligne du diff.
+
+- [x] `clang-format --dry-run -Werror` sur `source/` et `test/`, un appel par fichier :
+      groupés, clang-format s'arrête au premier fautif et ne rapporterait qu'un constat
+- [x] ~~`cmake-format --check`~~ **abandonné.** Essayé, mesuré, retiré : avec
+      `.cmake-format.json` tel qu'il est, l'outil éclate `target_link_libraries(X PUBLIC
+      Y)` sur quatre lignes et casse les `file(GLOB_RECURSE)`. C'est moins lisible que la
+      mise en forme à la main. Régler ce fichier est un chantier en soi ; d'ici là les
+      sources CMake ne sont pas sous contrôle, et `cmakelang` n'est pas ajouté à Poetry
+- [x] `black --check` sur `ci/` et `ci_action.py`
+- [x] Configuration TeamCity `Code Style` dans le sous-projet *Quality*, sur `toolBuild`
+- [x] Arbre normalisé : 17 fichiers reformatés, 263 insertions / 248 suppressions,
+      commit séparé pour rester révocable
+
+### 12.3 Distinction PR / PR draft
+
+Owl ne construit pas la même chose selon l'état de la PR : les configurations lourdes
+sont en `triggerOnPrDraft = false`, seul `Code Style` tourne aussi sur les brouillons.
+
+- [x] `Code Style` : `triggerOnPrDraft = true` — c'est un contrôle de forme, il coûte
+      quelques secondes et c'est précisément sur un brouillon qu'on veut le savoir tôt
+- [x] Builds, tests et sanitizers : `triggerOnPrDraft = false`
+- [x] Conséquence : retiré de `LinuxX64_Clang` et `WindowsX64_Clang` — c'étaient deux
+      builds complets sur chaque poussée d'un brouillon. Le paramètre `triggerOnPrDraft`
+      de `presetBuild()` n'avait plus d'appelant et a été supprimé avec
+
+### 12.4 Analyse sur diff : clang-tidy et l'analyseur statique
+
+Aujourd'hui clang-tidy tourne **pendant la compilation** (`CXX_CLANG_TIDY` via le preset
+`linux-clang-tidy`) : tout ou rien, et impossible de le restreindre à un diff. Le modèle
+de Test_CI sépare l'analyse de la compilation — elle configure son propre arbre pour
+obtenir une base de compilation, puis appelle clang-tidy sur une liste de TU.
+
+- [x] `ci/utils/changed_tus.py` : un en-tête modifié tire **toute** TU qui l'inclut,
+      transitivement, sans quoi la porte laisserait passer une régression réelle
+- [x] `ci/actions/analysis.py` : `--tool tidy|analyzer`, `--mode full|diff`,
+      `--on-findings warn|fail`, `--merge-base`, `--base`
+- [x] **Une plage de diff indéterminable échoue** au lieu de passer : sans base de
+      fusion publiée et sans `origin/<base>` sur l'agent, une porte qui ne sait pas ce
+      qu'elle couvre doit être rouge. Vérifié dans les deux modes
+- [x] Preset `linux-analysis` produisant `compile_commands.json`, dans son propre
+      répertoire de build. **Configure seulement** : la base de compilation est un
+      produit de la génération, aucun objet n'est nécessaire pour analyser une TU
+- [x] Quatre configurations : tidy et analyzer × (sur diff, `fail`, porte de PR) et
+      (complète, `warn`, sur `main`). `Clang-Tidy` garde son id : c'est le même contrôle,
+      mieux exécuté, et son historique vaut la peine d'être conservé
+- [x] « Complète possible » : le mode est un paramètre, une exécution manuelle élargit
+      une porte à tout le code sans qu'une configuration de plus existe pour ça
+- [x] Mesuré : scan complet sur 38 TU, diff de 38 fichiers modifiés → 14 TU en 84 s.
+      Aucun constat, ni en tidy ni en analyzer — vérifié non vide par un contrôle avec
+      une vérification bruyante, qui remonte bien 16 diagnostics
+- [x] La base du diff vient de `teamcity.github.bridge.pullRequest.mergeBase` publié par
+      le pont, `pullRequest.targetBranch` en repli. Ces surcharges vont **sur la
+      configuration**, jamais sur le template : une référence de paramètre que TeamCity
+      ne peut pas résoudre devient une exigence d'agent implicite et le build ne démarre
+      jamais
+- [ ] **À vérifier côté serveur** : le réglage `mergeBase.enabled` du plugin doit être
+      actif, sinon `pullRequest.mergeBase` arrive vide et l'analyse retombe sur
+      `git merge-base HEAD origin/<base>`, qui exige cette branche dans le checkout.
+      C'est un réglage serveur, hors de portée du compte `claude`
+- [x] `annotateDiff = false` sur les analyses complètes : une trouvaille dans du code
+      vieux de deux ans n'a rien à faire en commentaire sur les lignes d'une PR
+- [x] Le `vcsTrigger` quitte le template léger : une analyse sur diff n'a rien à faire
+      sur une poussée, son diff contre `main` y serait vide. Seuls `Code Style`, les
+      analyses complètes et les `Package` le portent
+
+### 12.5 Packager
+
+Une configuration qui ne fait que produire l'archive prête à exécuter, et **ne tourne
+pas sur les PR**.
+
+- [x] `CPACK_PACKAGE_FILE_NAME` ⇒ `EvenementLoto-<version>`. `EVL_PLATFORM_STR` et
+      `EVL_ARCH_STR` n'avaient plus d'autre usage et ont été supprimés de
+      `cmake/BaseConfig.cmake`
+- [x] Le générateur `TGZ` de CPack écrit `.tar.gz` ; l'action renomme en `.tgz`
+- [x] Vérifié en conteneur : `EvenementLoto-0.4.1.tgz`, 5,7 Mo, contenant l'exécutable,
+      `libvulkan.so.1*`, `data/` et `resources/` sous un seul dossier racine
+- [x] Sous-projet *Package*, une configuration par plateforme, `artifactRules` sur la
+      seule archive — pas de `BuildArtefact.zip` ni de `Coverage.zip`
+- [x] `triggerOnPrReady = false` plutôt que pas de pont du tout : aucune PR ne le
+      déclenche, mais la ligne de check apparaît quand même sur le commit empaqueté
+- [x] `Deploy` retiré du template, avec tout son câblage : `ci/actions/deploy.py`,
+      `run_deploy` dans `PresetsParameters.json`, `preset.py`, `define_variables.py`,
+      la case à cocher du DSL et les deux lignes `*.zip` / `*.tar.gz` des artefacts de
+      build. On empaquetait sinon deux fois le même programme
+
+---
+
 ## Risques ouverts
 
 | # | Risque | Phase | Atténuation |

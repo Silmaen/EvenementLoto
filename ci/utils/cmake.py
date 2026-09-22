@@ -1,6 +1,7 @@
 """
 Cmake utility functions for CI scripts.
 """
+
 from ci import log
 
 
@@ -10,6 +11,7 @@ def list_cmake_presets() -> list[str]:
     :return: A list of available CMake presets.
     """
     from ci.utils.run import run_command_capture_output
+
     result, out = run_command_capture_output(["cmake", "--list-presets"])
     presets = []
     if result == 0:

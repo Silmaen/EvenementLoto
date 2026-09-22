@@ -16,12 +16,19 @@ def main():
         "action", type=str, choices=action_list.keys(), help="The CI action to perform."
     )
     parser.add_argument("preset", type=str, help="The preset to check.")
-    args = parser.parse_args()
+    # Anything left over goes to the action: an action that takes options declares them
+    # itself, so the exact command stays readable in the build log and in the TeamCity
+    # step instead of hiding in environment variables.
+    args, options = parser.parse_known_args()
 
     if args.action not in action_list:
         log.error(f"Unknown action: {args.action}")
         return 1
-    action_func = action_list[args.action]
+    try:
+        action_func = action_list[args.action].with_options(options)
+    except ValueError as error:
+        log.error(str(error))
+        return 1
     result = action_func(args.preset)
     if result != 0:
         log.error(f"Action '{args.action}' failed with exit code: {result}")

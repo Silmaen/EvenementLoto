@@ -7,6 +7,7 @@ def get_actions() -> dict[str, BaseAction]:
     import pkgutil
     from pathlib import Path
     from importlib import import_module
+
     actions = {}
     current_package = __name__
     package_dir = Path(__file__).resolve().parent

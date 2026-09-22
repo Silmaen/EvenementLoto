@@ -60,10 +60,18 @@ auto tryParseHeading(const std::string& iLine, MarkdownElement& oElement) -> boo
 		return false;
 	const auto text = iLine.substr(pos + 1);
 	switch (level) {
-		case 1: oElement.type = MarkdownElementType::Heading1; break;
-		case 2: oElement.type = MarkdownElementType::Heading2; break;
-		case 3: oElement.type = MarkdownElementType::Heading3; break;
-		default: oElement.type = MarkdownElementType::Heading4; break;
+		case 1:
+			oElement.type = MarkdownElementType::Heading1;
+			break;
+		case 2:
+			oElement.type = MarkdownElementType::Heading2;
+			break;
+		case 3:
+			oElement.type = MarkdownElementType::Heading3;
+			break;
+		default:
+			oElement.type = MarkdownElementType::Heading4;
+			break;
 	}
 	oElement.rawText = text;
 	oElement.spans = parseInlineFormatting(text);
@@ -98,7 +106,8 @@ auto tryParseBullet(const std::string& iLine, MarkdownElement& oElement) -> bool
 auto isTableSeparator(const std::string& iLine) -> bool {
 	if (!iLine.starts_with("|"))
 		return false;
-	return std::ranges::all_of(iLine, [](const char c) -> bool { return c == '|' || c == '-' || c == ' ' || c == ':'; });
+	return std::ranges::all_of(iLine,
+							   [](const char c) -> bool { return c == '|' || c == '-' || c == ' ' || c == ':'; });
 }
 
 auto parseTableCells(const std::string& iLine) -> std::vector<std::vector<TextSpan>> {
@@ -165,8 +174,7 @@ auto parseMarkdownFile(const std::filesystem::path& iFilePath) -> std::vector<Ma
 
 	while (std::getline(file, line)) {
 		// Remove trailing whitespace.
-		while (!line.empty() && (line.back() == ' ' || line.back() == '\r'))
-			line.pop_back();
+		while (!line.empty() && (line.back() == ' ' || line.back() == '\r')) line.pop_back();
 
 		// Empty line: flush paragraph.
 		if (line.empty()) {

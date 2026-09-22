@@ -12,12 +12,12 @@ namespace evl::gui::utils {
 
 constexpr std::string_view g_gameFilter = "Loto Files|lev";
 constexpr std::string_view g_imageFilter = "Image Files|png,jpg,jpeg,bmp,tga,gif,svg\n"
-								  "PNG Files|png\n"
-								  "JPG Files|jpg,jpeg\n"
-								  "BMP Files|bmp\n"
-								  "TGA Files|tga\n"
-								  "GIF Files|gif\n"
-								  "SVG Files|svg";
+										   "PNG Files|png\n"
+										   "JPG Files|jpg,jpeg\n"
+										   "BMP Files|bmp\n"
+										   "TGA Files|tga\n"
+										   "GIF Files|gif\n"
+										   "SVG Files|svg";
 constexpr std::string_view g_yamlFilter = "YAML Files|yaml,yml";
 
 /**

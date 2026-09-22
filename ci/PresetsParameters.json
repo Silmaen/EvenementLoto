@@ -4,14 +4,12 @@
     "docker_namespace": "builder",
     "release_preset": "",
     "run_tests": false,
-    "run_deploy": false,
     "run_documentation": false,
     "run_coverage": false
   },
   "presets": {
     "linux-clang-debug": {
       "run_tests": true,
-      "run_deploy": true,
       "run_documentation": true,
       "run_coverage": true,
       "release_preset": "linux-clang-release",
@@ -25,7 +23,6 @@
     },
     "windows-clang-debug": {
       "run_tests": true,
-      "run_deploy": true,
       "run_documentation": true,
       "release_preset": "windows-clang-release",
       "docker_image": ""
@@ -52,6 +49,17 @@
     },
     "linux-sanitizer-leak": {
       "run_tests": true,
+      "docker_image": "builder-ubuntu2404"
+    },
+    "code-style": {
+      "docker_image": "builder-ubuntu2404",
+      "run_tests": false
+    },
+    "linux-clang-release": {
+      "docker_image": "builder-ubuntu2404"
+    },
+    "windows-clang-release": {},
+    "linux-analysis": {
       "docker_image": "builder-ubuntu2404"
     }
   }

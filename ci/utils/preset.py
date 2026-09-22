@@ -1,6 +1,7 @@
 """
 Gathering tools for presets
 """
+
 from ci import root, Path, log
 
 
@@ -24,7 +25,6 @@ class PresetConfig:
         self.docker_image = f""
         self.release_preset = f""
         self.run_tests = True
-        self.run_deploy = False
         self.run_coverage = False
         self.run_documentation = False
 
@@ -48,8 +48,6 @@ class PresetConfig:
             self.release_preset = p_data["release_preset"]
         if "run_tests" in p_data:
             self.run_tests = p_data["run_tests"]
-        if "run_deploy" in p_data:
-            self.run_deploy = p_data["run_deploy"]
         if "run_coverage" in p_data:
             self.run_coverage = p_data["run_coverage"]
         if "run_documentation" in p_data:
@@ -69,7 +67,8 @@ def get_preset_config(preset: str) -> PresetConfig:
         log.warning(f"Preset configuration file does not exist: {config_file}")
         return config
     import json
-    with open(config_file, 'r') as f:
+
+    with open(config_file, "r") as f:
         data = json.load(f)
     config.from_json(data)
     return config

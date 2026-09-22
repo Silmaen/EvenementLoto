@@ -331,12 +331,11 @@ void MainView::renderCommandsTab() const {
 				"Affichage règlement", "display_rules",
 				{.showLabel = true, .disabled = btnDisabled, .sameLine = false, .setDisabled = true});
 	}
-	utils::defineActionButtonItem(
-			"Tirage Aléatoire", "random_pick",
-			{.showLabel = true,
-			 .disabled = !m_currentEvent.canDraw() || m_drawMode == DrawMode::Manual,
-			 .sameLine = false,
-			 .setDisabled = true});
+	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick",
+								  {.showLabel = true,
+								   .disabled = !m_currentEvent.canDraw() || m_drawMode == DrawMode::Manual,
+								   .sameLine = false,
+								   .setDisabled = true});
 	utils::defineActionButtonItem(
 			"Annuler dernier tirage", "cancel_pick",
 			{.showLabel = true, .disabled = prevDrawnNumber == -1, .sameLine = false, .setDisabled = true});

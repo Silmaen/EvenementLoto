@@ -44,6 +44,7 @@ def setup_logging(level: int = logging.DEBUG) -> None:
     :param level: The logging level to set (default is logging.INFO).
     """
     from os import environ
+
     if "TEAMCITY_VERSION" in environ:
         handler = logging.StreamHandler()
         handler.setFormatter(TeamCityFormatter())
@@ -56,7 +57,9 @@ def setup_logging(level: int = logging.DEBUG) -> None:
             )
             rich = None
         if rich is not None:
-            handler = rich.logging.RichHandler(markup=True, log_time_format="[%Y/%m/%d %X]")
+            handler = rich.logging.RichHandler(
+                markup=True, log_time_format="[%Y/%m/%d %X]"
+            )
             handler.setFormatter(logging.Formatter("%(message)s"))
         else:
             handler = logging.StreamHandler()

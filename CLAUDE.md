@@ -162,6 +162,7 @@ cmake --preset windows-clang-debug
 
 # CI presets (sanitizers, clang-tidy)
 cmake --preset linux-clang-tidy
+cmake --preset linux-analysis            # compilation database for ci_action.py Analysis
 cmake --preset linux-sanitizer-address
 cmake --preset linux-sanitizer-thread
 cmake --preset linux-sanitizer-undefined-behavior
@@ -181,18 +182,48 @@ cd output/build/linux-gcc-release && ctest --output-on-failure
 
 ## CI System
 
-Python-based CI scripts in `ci/` (21 Python files), driven by `ci_action.py`:
+Python-based CI scripts in `ci/`, driven by `ci_action.py`. Unrecognised arguments are
+passed through to the action, so `Analysis` takes flags (`--tool`, `--mode`, …) instead
+of environment variables; an action that takes none refuses them rather than ignoring
+them.
+
+Every finding a CI action reports is printed as `path:line:column: level: message`: the
+teamcity-github-bridge plugin scans the build log for that shape and turns each one into
+a GitHub check run annotation pinned to the diff. A finding printed otherwise never
+leaves the build log.
+
+The TeamCity configurations are described in `.teamcity/settings.kts`:
+
+- **Build** (one per preset) and the **sanitizers** — pull requests marked ready, and
+  pushes to `main`
+- **Code Style** — the only one that also runs on **draft** pull requests
+- **Clang-Tidy (diff)** / **Static Analyzer (diff)** — the gate: a finding fails the
+  build and lands on the diff
+- **Clang-Tidy** / **Static Analyzer** — the full scan on `main`, findings are warnings
+  and are not annotated
+- **Package** (Linux, Windows) — never triggered by a pull request
+
+Branch pushes are built by a `vcsTrigger` limited to `main`: the bridge plugin enqueues
+builds from pull request events only, its webhook controller ignoring `push`.
+
+The actions:
 
 - `ci/actions/build.py` - CMake configure + Ninja build
 - `ci/actions/test.py` - Test execution
 - `ci/actions/coverage.py` - gcovr coverage reports
-- `ci/actions/deploy.py` - CPack packaging
+- `ci/actions/package.py` - the ready-to-run archive: configure, build, CPack, and the
+  `.tar.gz` renamed `.tgz` so `EvenementLoto-<version>.tgz` / `.zip` is the only name
+- `ci/actions/code_style.py` - clang-format and black, inspect only, never rewrite
+- `ci/actions/analysis.py` - clang-tidy or the same binary restricted to
+  `clang-analyzer-*`, over every translation unit or only over what a diff touches
 - `ci/actions/documentation.py` - Doxygen documentation generation
 - `ci/actions/clean.py` - Build directory cleanup
 - `ci/actions/define_docker_image.py` - Docker image configuration
 - `ci/actions/define_variables.py` - Variable definitions
 - `ci/actions/python_requirements.py` - Python requirements handling
 - `ci/utils/run.py` - Command execution with real-time output
+- `ci/utils/changed_tus.py` - which translation units a diff requires analysing: a
+  changed header pulls in every unit that includes it, transitively
 - `ci/utils/preset.py` - CMake preset parsing (from `ci/PresetsParameters.json`)
 - `ci/utils/teamcity.py` - TeamCity CI integration
 - `ci/utils/cmake.py`, `ci/utils/docker.py`, `ci/utils/logging.py`, `ci/utils/python.py` - Additional utilities

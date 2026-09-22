@@ -31,9 +31,7 @@ auto KeyTypedEvent::getCategoryFlags() const -> uint8_t { return Input | Keyboar
 
 auto MouseMovedEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }
 auto MouseScrolledEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse; }
-auto MouseButtonEvent::getCategoryFlags() const -> uint8_t {
-	return Input | Mouse | MouseButton;
-}
+auto MouseButtonEvent::getCategoryFlags() const -> uint8_t { return Input | Mouse | MouseButton; }
 auto MouseButtonPressedEvent::getName() const -> std::string { return std::format("MouseButtonPressedEvent"); }
 auto MouseButtonReleasedEvent::getName() const -> std::string { return std::format("MouseButtonReleasedEvent"); }
 

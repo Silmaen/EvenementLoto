@@ -248,26 +248,36 @@ auto Application::getModifiers() const -> Modifiers { return m_mainWindow.getMod
 void Application::checkActionEnable() const {
 	const auto status = m_currentEvent.getStatus();
 	if (status == core::Event::Status::Invalid || status == core::Event::Status::MissingParties) {
-		if (m_cachedSaveFileAs) m_cachedSaveFileAs->disable();
-		if (m_cachedSaveFile) m_cachedSaveFile->disable();
+		if (m_cachedSaveFileAs)
+			m_cachedSaveFileAs->disable();
+		if (m_cachedSaveFile)
+			m_cachedSaveFile->disable();
 	} else {
-		if (m_cachedSaveFile) m_cachedSaveFile->enable();
-		if (m_cachedSaveFileAs) m_cachedSaveFileAs->enable();
+		if (m_cachedSaveFile)
+			m_cachedSaveFile->enable();
+		if (m_cachedSaveFileAs)
+			m_cachedSaveFileAs->enable();
 	}
 	if (status == core::Event::Status::Ready) {
-		if (m_cachedStartGame) m_cachedStartGame->enable();
+		if (m_cachedStartGame)
+			m_cachedStartGame->enable();
 	} else {
-		if (m_cachedStartGame) m_cachedStartGame->disable();
+		if (m_cachedStartGame)
+			m_cachedStartGame->disable();
 	}
 	if (status == core::Event::Status::Finished) {
-		if (m_cachedStopGame) m_cachedStopGame->enable();
+		if (m_cachedStopGame)
+			m_cachedStopGame->enable();
 	} else {
-		if (m_cachedStopGame) m_cachedStopGame->disable();
+		if (m_cachedStopGame)
+			m_cachedStopGame->disable();
 	}
 	if (status == core::Event::Status::Invalid) {
-		if (m_cachedGameSettings) m_cachedGameSettings->disable();
+		if (m_cachedGameSettings)
+			m_cachedGameSettings->disable();
 	} else {
-		if (m_cachedGameSettings) m_cachedGameSettings->enable();
+		if (m_cachedGameSettings)
+			m_cachedGameSettings->enable();
 	}
 }
 

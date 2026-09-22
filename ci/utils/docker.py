@@ -12,7 +12,9 @@ def determine_docker_image(preset: str) -> str:
     import platform
     from ci.utils.preset import get_preset_config
 
-    if platform.system() != "Linux":  # Docker images for CI are only used on Linux hosts
+    if (
+        platform.system() != "Linux"
+    ):  # Docker images for CI are only used on Linux hosts
         return ""  # providing empty string prevent TeamCity from using docker runner
     config = get_preset_config(preset)
     return config.docker_image
