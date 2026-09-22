@@ -12,7 +12,7 @@
 
 namespace evl::core {
 
-//NOLINTBEGIN(cert-msc32-c,cert-msc51-cpp)
+//NOLINTBEGIN(cert-msc32-c,cert-msc51-cpp,bugprone-random-generator-seed)
 RandomNumberGenerator::RandomNumberGenerator(const bool iDebug) {
 	if (iDebug) {
 		m_rng.seed(1234);
@@ -21,7 +21,7 @@ RandomNumberGenerator::RandomNumberGenerator(const bool iDebug) {
 	}
 	rebuildRemaining();
 }
-//NOLINTEND(cert-msc32-c,cert-msc51-cpp)
+//NOLINTEND(cert-msc32-c,cert-msc51-cpp,bugprone-random-generator-seed)
 
 void RandomNumberGenerator::resetPick() {
 	m_alreadyPicked.clear();

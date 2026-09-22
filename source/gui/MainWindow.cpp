@@ -142,6 +142,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 											   .PipelineInfoMain = {.RenderPass = g_mainWindowData->RenderPass,
 																	.Subpass = 0,
 																	.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+																	.ExtraDynamicStates = {},
 #ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
 																	.PipelineRenderingCreateInfo = {},
 #endif

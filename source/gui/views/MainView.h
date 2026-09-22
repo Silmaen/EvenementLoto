@@ -21,7 +21,7 @@ public:
 	/**
 	 * @brief Default constructor.
 	 */
-	MainView(core::Event&);
+	explicit MainView(core::Event&);
 	/**
 	 * @brief Default destructor.
 	 */

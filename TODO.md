@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 phases 0, 1 et 2 faites
+**État global** : 🟩 phases 0 à 5 faites (Linux), phase 7 partielle
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -65,7 +65,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 | # | Sujet | Décision | Date |
 |---|---|---|---|
 | D1 | Pilotage | **CMake pilote Conan**, jamais l'inverse. `cmake --preset` + `cmake --build` restent la seule interface. Aucun `conan install` manuel. | 2026-09-21 |
-| D2 | Intégration | `cmake-conan` **release 0.19.x**, fichier `conan_provider.cmake` **copié** dans `cmake/` (pas de clone, pas de `develop2`) → pas de réseau au configure, version visible dans le diff. | 2026-09-21 |
+| D2 | Intégration | `cmake-conan` **release 0.19.0**, `conan_provider.cmake` **copié** dans `cmake/`. Cette release utilise le générateur **stable `CMakeDeps`** (et non `CMakeConfigDeps` de `develop2`) : pas de fonctionnalité expérimentale, Conan ≥ 2.0.5 suffit. | 2026-09-21 |
 | D3 | Profils Conan | Écrits à la main et versionnés. Pas d'autodétection (elle ne couvre que Win+MSVC / Linux+gcc / Apple+clang). | 2026-09-21 |
 | D4 | Doxygen | **Reste une dépendance externe** de l'image Docker. Pas de `tool_requires`. | 2026-09-21 |
 | D5 | Python | **Poetry gère les venv ET les dépendances**, conan inclus. Suppression du bricolage `.env` / `VENV_PATH`. | 2026-09-21 |
@@ -129,8 +129,10 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
   `-of=${CMAKE_BINARY_DIR}/conan`. Sans `layout()` dans le conanfile, le dossier de
   générateurs est donc exactement `${CMAKE_BINARY_DIR}/conan`.
 - **Aucune liste d'exclusion** : *tous* les `find_package()` passent par le provider.
-- Le provider exige le générateur **`CMakeConfigDeps`** dans le conanfile
-  → **Conan ≥ 2.25** (expérimental). Dernière version publiée : **2.32.0**.
+- Le provider 0.19.0 exige le générateur **`CMakeDeps`** (stable). Conan verrouillé sur
+  **2.32.0** par `poetry.lock`.
+- `auto-cmake` écrirait `compiler.cppstd=gnu23` dans le profil généré (il lit
+  `CMAKE_CXX_STANDARD`) : raison de plus pour n'utiliser que nos profils.
 - Les include dirs des cibles `IMPORTED` sont traités comme `SYSTEM` par CMake par
   défaut → `-Weverything` ne devrait pas se déclencher sur les en-têtes tiers.
 
@@ -265,107 +267,149 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 
 ## Phase 3 — Recette locale nfd
 
-- [ ] Créer `conan/local-recipes/nfd/config.yml` (versions `1.4.0`, `1.2.1`)
-- [ ] Créer `conan/local-recipes/nfd/all/conanfile.py` :
-  - [ ] `name = "nfd"`, source depuis `github.com/btzy/nativefiledialog-extended`
-  - [ ] `cmake_file_name = "nfd"`, `cmake_target_name = "nfd::nfd"`
-        → **`source/gui/CMakeLists.txt:37-39` reste inchangé**
-  - [ ] options : `portal` (défaut OFF → GTK3), `x11` (ON), `wayland` (défaut **OFF**)
-  - [ ] Linux : `requires` GTK3 ou dbus selon `portal` — préférer les paquets *system*
-        pour ne pas empaqueter GTK via Conan
-  - [ ] Windows : `system_libs = ["ole32", "uuid", "shell32"]`
-  - [ ] `NFD_BUILD_TESTS=OFF`, `NFD_INSTALL=ON`
-- [ ] Créer `conan/local-recipes/nfd/all/conandata.yml` (URL + sha256 de v1.4.0)
-- [ ] Déclarer le remote `local-recipes-index` dans `conan/config/remotes.json`
+- [x] Créer `conan/local-recipes/recipes/nfd/config.yml` (versions `1.4.0`, `1.2.1`)
+- [x] Créer `conan/local-recipes/recipes/nfd/all/conanfile.py`
+- [x] Créer `conan/local-recipes/recipes/nfd/all/conandata.yml` (URL + sha256)
+- [x] Déclarer le remote `local-recipes-index` — fait par `cmake/Conan.cmake`, avec le
+      chemin absolu du dépôt, donc rien de figé dans un fichier
+
+> **Deux pièges**
+> 1. Le remote exige la disposition `<racine>/recipes/<nom>/`, pas `<racine>/<nom>/`.
+> 2. La révision d'un `local-recipes-index` **ne suit pas le contenu** : une recette
+>    modifiée continue d'être servie depuis le cache, et `--update` n'y change rien.
+>    `cmake/Conan.cmake` hache donc `conan/local-recipes/` et fait
+>    `conan remove "nfd/*"` dès que le contenu bouge. Les fichiers sont aussi déclarés
+>    en `CMAKE_CONFIGURE_DEPENDS`.
+
+> **Version retenue : 1.2.1**, pas 1.4.0. La 1.4.0 ajoute les champs `title`,
+> `acceptLabel` et `cancelLabel` aux structures d'arguments, ce qui casse les
+> initialisations désignées de `FileDialog.cpp` sous `-Werror=missing-field-initializers`.
+> La recette sait construire les deux ; passer à 1.4.0 est une amélioration à part.
 
 **Validation**
-- [ ] `conan create` OK sous les 4 profils (linux-gcc14, linux-clang18/22,
-      windows-mingw-gcc, windows-mingw-clang)
+- [x] `conan create` OK en linux-gcc (gcc 14) et linux-clang (clang 22), backend GTK3
+- [ ] `conan create` OK sous les profils MinGW *(phase 6)*
 - [ ] Les dialogues s'ouvrent réellement (ouvrir, enregistrer, sélectionner un dossier)
-- [ ] Les suppressions de `lsan_suppressions.txt` sont toujours pertinentes
-      (le backend GTK3 passe aussi par dbus en interne)
+      *(non vérifiable sans écran : à faire à la main)*
+- [ ] Les suppressions de `lsan_suppressions.txt` sont toujours pertinentes *(phase 5)*
 
 ---
 
 ## Phase 4 — Bascule Conan (Linux)
 
-**Le cœur de la migration.** Découpage shared/static **identique** à
-`depmanager.yml` (D7) : on ne change qu'une variable à la fois.
+**Faite.** Découpage shared/static identique à `depmanager.yml` (D7) : `imgui`, `glfw`,
+`spdlog` en partagé, le reste en statique — l'archive CPack contient exactement les
+mêmes `.so` qu'avant (`libimgui.so`, `libglfw.so.3.4`, `libspdlog.so.1.17.0`,
+`libvulkan.so.1.4.350`).
 
-### Fichiers à créer
+- [x] `cmake/conan_provider.cmake` — copie de la **release 0.19.0**
+      (sha256 `d574ac4f1ad0784e743304fde4af6e6692191783afae4898974903b622928546`)
+- [x] `conanfile.py` : générateur `CMakeDeps`, 11 dépendances, pas de `layout()`
+      (donc dossier de générateurs = `${CMAKE_BINARY_DIR}/conan`)
+- [x] `conanfile.py` → `generate()` : copie des backends imgui **et** de
+      `imgui_stdlib.*` (ConanCenter ne livre que les sources)
+- [x] `conan/config/global.conf` + 4 profils (`linux-gcc`, `linux-clang`,
+      `windows-mingw-gcc`, `windows-mingw-clang`)
+- [x] `cmake/Conan.cmake` : choix du profil, `conan config install`, remote local,
+      purge des recettes locales modifiées
+- [x] `CMakeLists.txt` : `CMAKE_PROJECT_TOP_LEVEL_INCLUDES` **avant** `project()`,
+      et `LANGUAGES CXX C` (Conan a besoin d'un compilateur C : glfw est en C)
+- [x] Presets : `CMAKE_C_COMPILER` explicite, pour ne pas mélanger gcc et clang
+- [x] `cmake/BaseConfig.cmake` : `include(Conan)` remplace `include(Depmanager)`
+- [x] `cmake/DocumentationConfig.cmake` : `BYPASS_PROVIDER` sur `find_package(Doxygen)`
+- [x] `source/core/CMakeLists.txt` : `jsoncpp_static` → `JsonCpp::JsonCpp`
+- [x] `source/gui/CMakeLists.txt` : `stb_image`→`stb`, `NanoSVG`→`nanosvg`, `ImGui`→`imgui`
+- [x] Cible `EvenementLoto_imgui_bindings` (backends + `imgui_stdlib`), includes en
+      `SYSTEM` et `CXX_CLANG_TIDY` vidé
+- [x] `copy_shared_libraries()` fonctionne avec les cibles importées de Conan (R8 levé)
 
-- [ ] `cmake/conan_provider.cmake` — copie depuis la **release 0.19.x** de cmake-conan
-      (noter la version exacte en commentaire d'en-tête)
-- [ ] `conanfile.py` (racine) :
-  - [ ] `generators = "CMakeConfigDeps"` *(exigé par le provider)*
-  - [ ] `requirements()` : les 11 paquets du tableau ci-dessus
-  - [ ] `build_requirements()` : `self.test_requires("gtest/1.17.0")`
-  - [ ] **pas de `layout()`** → dossier de générateurs = `${CMAKE_BINARY_DIR}/conan`
-  - [ ] `generate()` : copier `imgui_impl_glfw.*` et `imgui_impl_vulkan.*` depuis
-        `res/bindings/` du paquet imgui vers
-        `${generators_folder}/imgui_bindings/backends/`
-        → le sous-dossier `backends/` préserve les
-        `#include <backends/imgui_impl_*.h>` de `MainWindow.cpp:19-20` et
-        `VulkanContext.cpp:15`
-  - [ ] options shared : `imgui`, `glfw`, `spdlog` en `shared=True` ; le reste statique
-- [ ] `conan/config/global.conf`
-- [ ] `conan/config/remotes.json` (conancenter + le remote local de la phase 3)
-- [ ] `conan/config/profiles/linux-gcc14`
-- [ ] `conan/config/profiles/linux-clang` (clang 22)
-- [ ] `conan/config/profiles/windows-mingw-gcc`
-- [ ] `conan/config/profiles/windows-mingw-clang`
-      ⚠️ **NE PAS mettre `compiler.cppstd` dans les profils** : il entre dans le
-      package ID et ferait rater tous les binaires précompilés de ConanCenter.
-      Le C++23 du projet vient de `CMAKE_CXX_STANDARD 23` et ne concerne que nos cibles.
-- [ ] `cmake/Conan.cmake` (remplace `cmake/Depmanager.cmake`) :
-  - [ ] `conan config install ${PROJECT_SOURCE_DIR}/conan/config` (idempotent)
-  - [ ] vérification `conan --version` ≥ 2.25
-  - [ ] log du profil retenu et du mode (téléchargé / construit)
-  - [ ] fonction `target_link_imgui_backends()` : lib statique bâtie depuis
-        `${CMAKE_BINARY_DIR}/conan/imgui_bindings/backends/*.cpp`, dossier exposé en include
+### Profils : ce que CMake pousse à Conan
 
-### Fichiers à modifier
+Les profils sont des gabarits Jinja qui lisent des variables d'environnement posées par
+`cmake/Conan.cmake` : `EVL_COMPILER_VERSION`, `EVL_C_COMPILER`, `EVL_CXX_COMPILER` et
+`EVL_SYSTEM_PKG_CONFIG_PATH`. Un seul profil par famille de compilateur suffit donc, et
+la version reste toujours celle que CMake utilise réellement.
 
-- [ ] `CMakeLists.txt` ou presets : `CMAKE_PROJECT_TOP_LEVEL_INCLUDES` →
-      `cmake/conan_provider.cmake`
-- [ ] `cmake/BaseConfig.cmake:9` : `include(Depmanager)` → `include(Conan)`,
-      **placé après Poetry et avant tout `find_package()`**
-- [ ] `cmake/DocumentationConfig.cmake:4` : `find_package(Doxygen REQUIRED dot BYPASS_PROVIDER)`
-      *(sinon le provider déclenche `conan install` trop tôt)*
-- [ ] `cmake/CMakePresetsLinux.json` : `CONAN_HOST_PROFILE` par preset
-- [ ] `source/core/CMakeLists.txt:31` : `jsoncpp_static` → `JsonCpp::JsonCpp`
-- [ ] `source/gui/CMakeLists.txt:29-31` : `find_package(stb_image)` → `find_package(stb)`,
-      `stb_image::stb_image` → `stb::stb`
-- [ ] `source/gui/CMakeLists.txt:33-35` : `find_package(NanoSVG)` → `find_package(nanosvg)`,
-      `NanoSVG::nanosvg` → `nanosvg::nanosvg`
-- [ ] `source/gui/CMakeLists.txt` : appel à `target_link_imgui_backends()`
-- [ ] `cmake/UtilityFunctions.cmake` : vérifier que `copy_shared_libraries()` fonctionne
-      toujours avec les cibles importées de Conan (`LOCATION` sur une cible importée)
+### Obstacles rencontrés
+
+1. **`compiler.cppstd` est obligatoire.** `spdlog` (avec `use_std_fmt`) et `gtest`
+   refusent une configuration sans `cppstd`. Le plan initial (l'omettre pour récupérer
+   les binaires précompilés de ConanCenter) ne tient pas → `compiler.cppstd=gnu23`,
+   aligné sur le projet. **Conséquence assumée : 7 paquets se construisent depuis les
+   sources** (glfw, imgui, jsoncpp, yaml-cpp, spdlog, gtest, nfd) ; les paquets
+   d'en-têtes se téléchargent. Coût unique grâce au cache `~/.conan2` persistant.
+2. **`xorg/system` réclame 31 paquets X11 dev** absents de l'image. Résolu en
+   déclarant `[platform_requires] xorg/system` dans les profils Linux : X11 vient de
+   la plateforme, ce qui est la réalité d'une image de build de bureau.
+3. **Conan isole son `pkgconf`**, donc les `.pc` système devenaient invisibles et
+   `vulkan-loader` ne trouvait plus `x11`. `cmake/Conan.cmake` interroge le
+   `pkg-config` système (`--variable pc_path`) et le transmet via `[buildenv]`.
+4. **`vulkan-loader` WSI** : `with_wsi_xcb` et `with_wsi_wayland` exigent
+   `libxcb1-dev` et `libwayland-dev`, absents. Mis à `False`, ce qui est **cohérent**
+   avec glfw construit en X11 seul. ⚠️ voir « Image Docker » ci-dessous.
+5. **`CMAKE_MAP_IMPORTED_CONFIG_DEBUG Release`** dans `Vulkan.cmake` (hérité du SDK
+   DepManager qui n'avait que du Release) empêchait CMake de résoudre
+   `IMPORTED_LOCATION` du loader. Supprimé : Conan construit un vrai Debug.
+6. **imgui 1.92.5 → 1.92.9b** (1.92.5 n'est pas sur ConanCenter) : deux adaptations,
+   `.ExtraDynamicStates = {}` dans `PipelineInfoMain` et
+   `IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE` →
+   `IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE`.
+7. **nfd statique + GTK3** : les symboles `gdk_*` manquaient au lien final, la recette
+   doit exposer `gdk-3` en plus de `gtk-3` dans `system_libs`.
 
 **Validation**
-- [ ] `linux-gcc-debug` et `linux-clang-debug` : configure + build + `ctest`
-- [ ] **Vérifier dans le log si Conan télécharge ou reconstruit** — si tout se
-      reconstruit, c'est le symptôme d'un `cppstd` parasite dans le profil
-- [ ] Les en-têtes tiers ne déclenchent pas `-Weverything` (cibles `IMPORTED` ⇒ `SYSTEM`)
-- [ ] `linux-gcc-release` / `linux-clang-release` : build + `cpack` + l'archive
-      contient bien les `.so` attendus
-- [ ] L'application démarre, charge/enregistre une partie, affiche les images et la doc
-- [ ] Un `cmake --preset` sur un cache Conan vide fonctionne (bootstrap complet)
-
----
+- [x] `linux-gcc-debug` : configure + build + `ctest` (2/2)
+- [x] `linux-clang-debug` : configure + build + `ctest` (2/2), profil `linux-clang`
+- [x] `linux-clang-release` : build + `cpack` → `EvenementLoto-0.4.1-Linux-x64.tar.gz`
+      avec les mêmes `.so` qu'avant la migration
+- [x] Les en-têtes tiers ne déclenchent pas `-Weverything` (cibles `IMPORTED` ⇒ `SYSTEM`)
+- [x] Un `cmake --preset` sur un cache Conan vide fonctionne (bootstrap complet)
+- [ ] L'application démarre et charge une partie *(non vérifiable sans écran)*
 
 ## Phase 5 — Presets qualité
 
-- [ ] `linux-clang-tidy` : configure + build
-- [ ] `linux-sanitizer-address` : build + `ctest`
-- [ ] `linux-sanitizer-leak` : build + `ctest`, `lsan_suppressions.txt` toujours suffisant
-- [ ] `linux-sanitizer-thread` : build + `ctest`
-      *(les dépendances Conan ne sont pas instrumentées — acceptable, à documenter)*
-- [ ] `linux-sanitizer-undefined-behavior` : build + `ctest`
-- [ ] Vérifier que clang-tidy n'analyse pas les sources tierces
-      (`.clang-tidy` + en-têtes `SYSTEM`)
+- [x] `linux-sanitizer-address` : build + `ctest` (2/2)
+- [x] `linux-sanitizer-leak` : build + `ctest` (2/2), `lsan_suppressions.txt` suffisant
+- [x] `linux-sanitizer-thread` : build + `ctest` (2/2)
+      ⚠️ TSan exige `--cap-add=SYS_PTRACE --security-opt seccomp=unconfined` sur le
+      conteneur (l'ASLR le fait échouer sinon). La CI les passe déjà via
+      `ci/actions/define_docker_image.py`.
+- [x] `linux-sanitizer-undefined-behavior` : build + `ctest` (2/2)
+- [x] `linux-clang-tidy` : **vert**
+- [x] clang-tidy n'analyse plus les sources tierces
 
----
+### clang-tidy 22 : 32 constats, tous traités
+
+Le passage de clang-tidy 18 à 22 a fait remonter 32 diagnostics. Deux confirment
+l'analyse de stabilité de la Partie II, de façon indépendante :
+
+- `bugprone-exception-escape` sur `main` → **S4** : `main` est désormais protégé par un
+  `try/catch`, et le gestionnaire de dernier recours est `noexcept`.
+- `bugprone-throwing-static-initialization` (11×) → les tables de conversion statiques
+  `g_typeConvert` / `g_statusConvert` et les globales `const std::string` pouvaient
+  lancer **avant `main`**, sans rattrapage possible. Remplacées par des tables
+  `constexpr` (`source/core/EnumLabel.h`) et des `constexpr std::string_view`.
+  Effet de bord bienvenu : `Event::getStatusStr()` n'utilise plus un `.at()` non gardé,
+  ce qui **retire un des chemins de crash identifiés en S2**.
+
+Le reste : `readability-use-std-min-max` (2), `readability-inconsistent-ifelse-braces`
+(2), `modernize-use-trailing-return-type` (5), `modernize-use-designated-initializers`,
+`modernize-use-integer-sign-comparison`, `readability-redundant-member-init` (3),
+`google-explicit-constructor`, `misc-override-with-different-visibility` (3),
+`bugprone-random-generator-seed` (NOLINT : le tirage prévisible est volontaire en debug).
+
+Deux décisions de configuration, dans `.clang-tidy` :
+
+- `HeaderFilterRegex` restreint à `.*/source/.*` : il englobait tous les en-têtes hors
+  `test/`, donc ceux des paquets Conan.
+- `cppcoreguidelines-use-enum-class` désactivé : `event::Category` est un jeu de
+  drapeaux de bits et `MouseCode` reprend les codes glfw, tous deux non scopés à dessein.
+
+Et un changement de structure : les implémentations des bibliothèques à en-tête unique
+(`stb_image`, `nanosvg`) vivent maintenant dans `source/third_party/implementations.cpp`,
+au sein de la cible `EvenementLoto_third_party` qui porte aussi les backends ImGui.
+Cette cible est exclue de clang-tidy et des avertissements du projet — deux diagnostics
+de l'analyseur statique tombaient dans `nanosvg.h` alors qu'ils ne nous concernent pas.
 
 ## Phase 6 — MinGW
 
@@ -389,10 +433,10 @@ Coût unique grâce au cache persistant.
 
 ## Phase 7 — Suppression de DepManager
 
-- [ ] Supprimer `cmake/Depmanager.cmake`
-- [ ] Supprimer `depmanager.yml`
-- [ ] `pyproject.toml` : retirer `depmanager = "^0.5.1"`
-- [ ] `poetry.lock` : régénérer
+- [x] Supprimer `cmake/Depmanager.cmake`
+- [x] Supprimer `depmanager.yml`
+- [x] `pyproject.toml` : retirer `depmanager = "^0.5.1"`
+- [x] `poetry.lock` : régénérer
 - [ ] TeamCity : retirer `poetry run dmgr remote add …` du runner « Tool Dependencies »
       (le runner ne garde que `PythonRequirements` + `DefineVariables`)
 - [ ] TeamCity : supprimer les paramètres racine `remote_url`, `remote_login`, `remote_passwd`
@@ -400,8 +444,8 @@ Coût unique grâce au cache persistant.
       `pip install --break-system-packages … depmanager gcovr` de
       `ci_images/install/_common/builder.sh` (et `gcovr`, désormais fourni par `poetry.lock`)
 - [ ] Reconstruire et publier `builder-gcc14-ubuntu2404` et `builder-clang-llvm22-ubuntu2404`
-- [ ] Mettre à jour `CLAUDE.md` (sections « Dependency management », « External
-      Dependencies », « Python Dependencies », « Build System »)
+- [x] Mettre à jour `CLAUDE.md` (sections « Dependency management », « External
+      Dependencies », « Python Dependencies », « Build System », `conan/`, cibles)
 - [ ] Mettre à jour `README.md`
 
 ---
@@ -490,14 +534,14 @@ des continuations.
 
 | # | Risque | Phase | Atténuation |
 |---|---|---|---|
-| R1 | `compiler.cppstd` dans un profil ⇒ tout se reconstruit | 4 | ne pas le déclarer ; vérifier au log |
+| ~~R1~~ | `compiler.cppstd` ⇒ reconstruction depuis les sources | 4 | **confirmé et assumé** : `cppstd` est obligatoire (spdlog, gtest), 7 paquets construits, cache persistant |
 | R2 | `IMGUI_API` non exporté en DLL MinGW | 6 | passer imgui en statique (phase 9) |
 | ~~R3~~ | ~~clang 22 + `-Weverything`~~ | 1 | **levé** : aucun nouveau diagnostic |
-| R4 | `xorg/system` échoue faute de `-dev` X11 | 4 | l'erreur nomme le paquet ; `libglfw3-dev` devrait suffire |
+| ~~R4~~ | `xorg/system` échoue faute de `-dev` X11 | 4 | **levé** via `[platform_requires]` + pont `PKG_CONFIG_PATH` |
 | R5 | MinGW entièrement `--build=missing` | 6 | cache `~/.conan2` persistant, coût unique |
-| R6 | `CMakeConfigDeps` expérimental (« subject to breaking changes ») | 4 | épingler la version de Conan dans `poetry.lock` |
+| ~~R6~~ | `CMakeConfigDeps` expérimental | 4 | **sans objet** : la release 0.19.0 utilise `CMakeDeps`, stable |
 | R7 | Venv Poetry partagé entre images gcc et clang du même agent | 2 | même version de Python ; sinon deux venv cohabitent |
-| R8 | `copy_shared_libraries()` et `LOCATION` sur cibles importées Conan | 4 | à tester explicitement |
+| ~~R8~~ | `copy_shared_libraries()` et cibles importées Conan | 4 | **levé** : fonctionne, l'archive CPack est identique |
 
 ---
 
@@ -514,13 +558,21 @@ Présents et suffisants (dépôt `CI/DockerImages`) :
   `ccache`, `patchelf`, **`doxygen` + `graphviz`**, `pkg-config`, `libx11-dev`,
   **`libgtk-3-dev`**, `libvulkan-dev`, `libglfw3-dev`
 
+Vérifié en conteneur : cmake **4.3.1**, gcc **14.2.0**, clang **22.1.3** et **18.1.3**,
+python **3.12.3**, poetry **2.3.4**, doxygen 1.9.8 + graphviz, et les `-dev` X11 requis
+par glfw sont bien là (`libglfw3-dev` les tire). Le build Conan passe **sans modifier
+l'image**.
+
 À changer :
 
-- [ ] phase 7 : retirer `depmanager` (et `gcovr`) du `pip install`
-- [ ] à vérifier : jeu complet de `-dev` X11 pour `xorg/system`
-      (`apt-cache depends libglfw3-dev`) → sinon `libxrandr-dev libxinerama-dev
-      libxcursor-dev libxi-dev libgl-dev`
-- [ ] si `NFD_WAYLAND=ON` : `libwayland-dev` — sinon forcer `OFF`
+- [ ] phase 7 : retirer `depmanager` (et `gcovr`) du `pip install` de
+      `_common/builder.sh` — plus aucun consommateur côté projet
+- [ ] **optionnel, pour restaurer le WSI complet du loader Vulkan** :
+      `libxcb1-dev libx11-xcb-dev libwayland-dev`, puis remettre
+      `with_wsi_xcb=True` / `with_wsi_wayland=True` dans `conanfile.py`.
+      Sans ça le loader embarqué ne gère que X11 — cohérent avec glfw, qui est
+      lui aussi construit en X11 seul, mais c'est une réduction par rapport au
+      SDK Vulkan livré par DepManager.
 
 Inutiles : `libdbus-1-dev` (sauf `NFD_PORTAL=ON`), autotools, `perl`.
 

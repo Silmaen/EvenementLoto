@@ -9,6 +9,7 @@ add_subdirectory(core)
 #  ImGUI UI lib
 #
 add_subdirectory(resources)
+add_subdirectory(third_party)
 add_subdirectory(gui)
 
 #  ImGUI UI Library

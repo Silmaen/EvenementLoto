@@ -169,7 +169,7 @@ void HelpView::renderElement(const utils::MarkdownElement& iElement, const size_
 						tableElem.type != utils::MarkdownElementType::TableRow)
 						break;
 					ImGui::TableNextRow();
-					for (size_t c = 0; c < tableElem.tableCells.size() && c < static_cast<size_t>(cols); ++c) {
+					for (size_t c = 0; c < std::min(tableElem.tableCells.size(), static_cast<size_t>(cols)); ++c) {
 						ImGui::TableSetColumnIndex(static_cast<int>(c));
 						// Render cell spans.
 						for (size_t s = 0; s < tableElem.tableCells[c].size(); ++s) {

@@ -9,15 +9,11 @@
 
 #include "TextureLibrary.h"
 
-#define STB_IMAGE_IMPLEMENTATION
 #include "VulkanContext.h"
 #include "core/Log.h"
 
-#define NANOSVG_IMPLEMENTATION
 #include <nanosvg.h>
-#define NANOSVGRAST_IMPLEMENTATION
 #include <nanosvgrast.h>
-
 #include <stb_image.h>
 
 namespace evl::gui::vulkan {

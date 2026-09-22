@@ -98,7 +98,7 @@ auto tryParseBullet(const std::string& iLine, MarkdownElement& oElement) -> bool
 auto isTableSeparator(const std::string& iLine) -> bool {
 	if (!iLine.starts_with("|"))
 		return false;
-	return std::ranges::all_of(iLine, [](const char c) { return c == '|' || c == '-' || c == ' ' || c == ':'; });
+	return std::ranges::all_of(iLine, [](const char c) -> bool { return c == '|' || c == '-' || c == ' ' || c == ':'; });
 }
 
 auto parseTableCells(const std::string& iLine) -> std::vector<std::vector<TextSpan>> {
@@ -152,7 +152,7 @@ auto parseMarkdownFile(const std::filesystem::path& iFilePath) -> std::vector<Ma
 	std::string paragraphAccum;
 	bool inTable = false;
 
-	auto flushParagraph = [&]() {
+	auto flushParagraph = [&]() -> void {
 		if (paragraphAccum.empty())
 			return;
 		MarkdownElement elem;

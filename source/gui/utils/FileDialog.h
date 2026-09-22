@@ -10,15 +10,15 @@
 
 namespace evl::gui::utils {
 
-const std::string g_gameFilter = "Loto Files|lev";
-const std::string g_imageFilter = "Image Files|png,jpg,jpeg,bmp,tga,gif,svg\n"
+constexpr std::string_view g_gameFilter = "Loto Files|lev";
+constexpr std::string_view g_imageFilter = "Image Files|png,jpg,jpeg,bmp,tga,gif,svg\n"
 								  "PNG Files|png\n"
 								  "JPG Files|jpg,jpeg\n"
 								  "BMP Files|bmp\n"
 								  "TGA Files|tga\n"
 								  "GIF Files|gif\n"
 								  "SVG Files|svg";
-const std::string g_yamlFilter = "YAML Files|yaml,yml";
+constexpr std::string_view g_yamlFilter = "YAML Files|yaml,yml";
 
 /**
  * @brief Class FileDialog.
@@ -30,14 +30,14 @@ public:
 	 * @param[in] iFilter Filter to apply during the search.
 	 * @return A valid file path or null if canceled.
 	 */
-	static auto openFile(const std::string& iFilter) -> std::filesystem::path;
+	static auto openFile(const std::string_view& iFilter) -> std::filesystem::path;
 
 	/**
 	 * @brief Open a file dialog to define a file to create.
 	 * @param[in] iFilter Filter to apply during the search.
 	 * @return A valid file path or null if canceled.
 	 */
-	static auto saveFile(const std::string& iFilter) -> std::filesystem::path;
+	static auto saveFile(const std::string_view& iFilter) -> std::filesystem::path;
 
 	/**
 	 * @brief Open a dialog to select a folder.

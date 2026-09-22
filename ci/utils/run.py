@@ -11,56 +11,61 @@ MODE_BY_CONTENT = 0
 MODE_BY_COLOR = 1
 MODE_FOR_NINJA = 2
 
-# variables to keep track of current and next log levels for color-based detection
-current_level = INFO
-next_level = INFO
-
 # list of regex patterns to exclude from ninja error detection
 ninja_error_exclusions = [
     r"^CPack:.*"
 ]
 
 
-def _determine_log_level(line: str, mode: int = MODE_BY_CONTENT) -> int:
+class LevelDetector:
     """
-    Determine the appropriate log level based on the line content.
+    Determine the log level of each line of a command output.
 
-    :param line: The log line to analyze.
-    :return: The logging level (DEBUG, INFO, WARNING, ERROR).
+    One instance per stream: colour based detection carries a state from one line to the
+    next, and the two streams are read concurrently.
     """
-    import re
 
-    global current_level, next_level
-    current_level = next_level
-    if mode == MODE_BY_COLOR:
-        if "\x1b[31m" in line:  # Red
-            current_level = ERROR
-            next_level = ERROR
-        elif "\x1b[33m" in line:  # Yellow
-            current_level = WARNING
-            next_level = WARNING
-        if "\x1b[0m" in line:  # Green
-            next_level = INFO
-        return current_level
-    elif mode == MODE_FOR_NINJA:
-        if re.match(r"^\[\d+/\d+]", line):
-            return INFO
-        else:
+    def __init__(self, mode: int = MODE_BY_CONTENT):
+        self._mode = mode
+        self._current = INFO
+        self._next = INFO
+
+    def level(self, line: str) -> int:
+        """
+        Determine the appropriate log level based on the line content.
+
+        :param line: The log line to analyze.
+        :return: The logging level (DEBUG, INFO, WARNING, ERROR).
+        """
+        import re
+
+        if self._mode == MODE_BY_COLOR:
+            self._current = self._next
+            if "\x1b[31m" in line:  # Red
+                self._current = ERROR
+                self._next = ERROR
+            elif "\x1b[33m" in line:  # Yellow
+                self._current = WARNING
+                self._next = WARNING
+            if "\x1b[0m" in line:  # Green
+                self._next = INFO
+            return self._current
+        if self._mode == MODE_FOR_NINJA:
+            if re.match(r"^\[\d+/\d+]", line):
+                return INFO
             for pattern in ninja_error_exclusions:
                 if re.search(pattern, line):
                     return INFO
             return ERROR
-    else:
         # old content-based detection (may trigger false positives)
         line_lower = line.lower()
         if re.search(r"\b0\s+(tests?|errors?)\s+(failed|error)", line_lower):
             return INFO
         if re.search(r"\b(error|failed|fatal|exception)\b", line_lower):
             return ERROR
-        elif re.search(r"\b(warning|warn|deprecated)\b", line_lower):
+        if re.search(r"\b(warning|warn|deprecated)\b", line_lower):
             return WARNING
-        else:
-            return INFO
+        return INFO
 
 
 def _strip_ansi_codes(text: str) -> str:
@@ -76,9 +81,34 @@ def _strip_ansi_codes(text: str) -> str:
     return ansi_escape.sub("", text)
 
 
+def _log_stream(stream, is_stderr: bool, detection_mode: int) -> None:
+    """
+    Forward one output stream of a subprocess to the log, line by line.
+
+    :param stream: The stream to read until the process closes it.
+    :param is_stderr: Whether the stream is the error one, never logged below warning.
+    :param detection_mode: Log level detection mode.
+    """
+    detector = LevelDetector(detection_mode)
+    for line in stream:
+        line = line.rstrip("\n")
+        if not line:
+            continue
+        level = detector.level(line)
+        if is_stderr:
+            level = max(level, WARNING)
+        if detection_mode == MODE_BY_COLOR:
+            line = _strip_ansi_codes(line)
+        log.log(level, line)
+
+
 def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT) -> int:
     """
     Runs a potentially long command as a subprocess and logs its output in real-time.
+
+    Both streams are drained concurrently, by one thread each. Reading them one after
+    the other would deadlock: once a pipe buffer is full the child blocks on write, and
+    a build that writes mostly on stderr — `conan install` does — freezes for good.
 
     :param command: The command to run as a list of strings.
     :param detection_mode: Log Level detection mode.
@@ -86,6 +116,7 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
     """
     import subprocess
     from os import environ
+    from threading import Thread
 
     if isinstance(command, str):
         command = command.split()
@@ -103,66 +134,16 @@ def run_command(command: list[str] | str, detection_mode: int = MODE_BY_CONTENT)
             bufsize=1,
             env=env,
         )
-        import select
-        from sys import platform
-
-        # Process Outputs in real time
-        if platform != "win32":
-            import fcntl
-            import os as os_module
-            fcntl.fcntl(process.stdout, fcntl.F_SETFL, os_module.O_NONBLOCK)
-            fcntl.fcntl(process.stderr, fcntl.F_SETFL, os_module.O_NONBLOCK)
-            while process.poll() is None:
-                reads = [process.stdout, process.stderr]
-                ret = select.select(reads, [], [])
-                for stream in ret[0]:
-                    try:
-                        line = stream.readline()
-                        if not line:
-                            continue
-                        line = line.rstrip("\n")
-                        if line:
-                            is_stderr = stream == process.stderr
-                            level = _determine_log_level(line, detection_mode)
-                            if is_stderr:
-                                level = max(level, WARNING)
-                            if detection_mode == MODE_BY_COLOR:
-                                line = _strip_ansi_codes(line)
-                            log.log(level, line)
-                    except (BlockingIOError, IOError):
-                        continue  # Capture any remaining output after process ends
-            for line in process.stdout:
-                line = line.rstrip("\n")
-                if line:
-                    level = _determine_log_level(line, detection_mode)
-                    if detection_mode == MODE_BY_COLOR:
-                        line = _strip_ansi_codes(line)
-                    log.log(level, line)
-            for line in process.stderr:
-                line = line.rstrip("\n")
-                if line:
-                    level = max(_determine_log_level(line, detection_mode), WARNING)
-                    if detection_mode == MODE_BY_COLOR:
-                        line = _strip_ansi_codes(line)
-                    log.log(level, line)
-        else:
-            for line in process.stdout:
-                line = line.rstrip("\n")
-                if line:
-                    level = _determine_log_level(line, detection_mode)
-                    if detection_mode == MODE_BY_COLOR:
-                        line = _strip_ansi_codes(line)
-                    log.log(level, line)
-            for line in process.stderr:
-                line = line.rstrip("\n")
-                if line:
-                    level = max(_determine_log_level(line, detection_mode), WARNING)
-                    if detection_mode == MODE_BY_COLOR:
-                        line = _strip_ansi_codes(line)
-                    log.log(level, line)
-
-        process.wait()
-        return process.returncode
+        readers = [
+            Thread(target=_log_stream, args=(process.stdout, False, detection_mode), daemon=True),
+            Thread(target=_log_stream, args=(process.stderr, True, detection_mode), daemon=True),
+        ]
+        for reader in readers:
+            reader.start()
+        returncode = process.wait()
+        for reader in readers:
+            reader.join()
+        return returncode
     except FileNotFoundError:
         log.error(
             f"Command not found: {command[0]}. Make sure it's installed and in PATH."

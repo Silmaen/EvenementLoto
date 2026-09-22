@@ -1,6 +1,4 @@
 function(target_link_vulkan target_name INCLUDE_TYPE)
-    # The Vulkan SDK only ships Release binaries.
-    set(CMAKE_MAP_IMPORTED_CONFIG_DEBUG Release)
     find_package(VulkanHeaders REQUIRED)
     find_package(VulkanLoader REQUIRED)
     get_filename_component(VULKAN_DIR ${VulkanLoader_DIR} DIRECTORY)

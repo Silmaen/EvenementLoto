@@ -255,9 +255,13 @@ void Application::autoSave() {
 		return;
 	m_lastAutoSave = now;
 	const auto dataLocation = core::getSettings()->getValue<std::filesystem::path>("general/data_location");
-	if (!exists(dataLocation) && !dataLocation.empty())
+	if (dataLocation.empty()) {
+		log_warn("No data location configured, cannot autosave.");
+		return;
+	}
+	if (!exists(dataLocation)) {
 		create_directories(dataLocation);
-	else if (!is_directory(dataLocation)) {
+	} else if (!is_directory(dataLocation)) {
 		log_warn("Data location '{}' is not a directory, cannot autosave.", dataLocation.string());
 		return;
 	}

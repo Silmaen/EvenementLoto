@@ -2,7 +2,8 @@
 # ---=== documentation ===---
 #
 find_package(Doxygen
-        REQUIRED dot)
+        REQUIRED dot
+        BYPASS_PROVIDER)
 if (DOXYGEN_FOUND)
     message(STATUS "found doxygen version: ${DOXYGEN_VERSION}")
     if (${DOXYGEN_VERSION} VERSION_LESS 1.9.1)

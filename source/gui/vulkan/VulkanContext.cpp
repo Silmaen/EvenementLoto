@@ -396,7 +396,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 	{
 		std::vector<VkDescriptorPoolSize> pool_sizes = {
 				{.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-				 .descriptorCount = std::max(IMGUI_IMPL_VULKAN_MINIMUM_IMAGE_SAMPLER_POOL_SIZE, 200)},
+				 .descriptorCount = std::max(IMGUI_IMPL_VULKAN_MINIMUM_SAMPLER_POOL_SIZE, 200)},
 		};
 		VkDescriptorPoolCreateInfo pool_info = {};
 		pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;

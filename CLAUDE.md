@@ -18,12 +18,17 @@ Author: Silmaen
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
   - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers)
   - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
+- `source/third_party/` - Single translation unit instantiating the header-only third
+  parties, excluded from the project warnings and from clang-tidy
 - `source/resources/` - Resources copied at build time (dark icons, user documentation + images)
 - `source/main.cpp` - Entry point (ImGui UI); returns `EXIT_FAILURE` when the application ends in `State::Error`
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
 - `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
 - `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation)
-- `cmake/` - CMake modules (14 files: BaseConfig, Vulkan, Sanitizers, Coverage, Depmanager, Poetry, Python, Environment, UtilityFunctions, DocumentationConfig)
+- `cmake/` - CMake modules (BaseConfig, Conan, conan_provider, Vulkan, Sanitizers,
+  Coverage, Poetry, UtilityFunctions, DocumentationConfig) + preset fragments
+- `conan/` - Conan profiles and `global.conf` (`conan/config/`) and the in-tree recipe
+  index (`conan/local-recipes/`)
 - `document/` - User documentation (in French)
 - `data/` - Runtime data files
 
@@ -35,6 +40,8 @@ Author: Silmaen
 - `Serializable` - Abstract base for binary stream, JSON (jsoncpp), and YAML (yaml-cpp) serialization
 - `Settings` - Application settings (key-value store)
 - `Statistics` - Draw statistics tracking
+- `EnumLabel.h` - `constexpr` enum ⇄ French label tables, replacing static maps that
+  could throw during static initialization
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
@@ -60,21 +67,35 @@ Author: Silmaen
 - **C++ Standard**: C++23 (`CMAKE_CXX_STANDARD 23`)
 - **Supported compilers**: GCC 14+, Clang 18+ (CI builds with GCC 14 and Clang 22)
 - **Supported platforms**: Linux, Windows (MinGW)
-- **Dependency management**: [DepManager](https://github.com/Silmaen/DepManager) (`depmanager.yml`)
+- **Dependency management**: [Conan 2](https://conan.io) driven by CMake through
+  [cmake-conan](https://github.com/conan-io/cmake-conan) `0.19.0` (`conanfile.py`, `conan/`)
 - **Python tooling**: Poetry (`pyproject.toml`), Python 3.12+
 - **Code formatting**: clang-format (`.clang-format`), cmake-format (`.cmake-format.json`)
 
-### External Dependencies (via DepManager)
+### External Dependencies (via Conan)
 
-glfw 3.4.0, googletest 1.17.0, imgui 1.92.5-docking, jsoncpp 1.9.6, magic_enum 0.9.7, nanosvg 1.0.0, nfd 1.2.1, spdlog 1.17.0, stb_image 2.28, vulkan_sdk 1.4.328, yaml-cpp 0.8.0
+glfw 3.4, gtest 1.17.0, imgui 1.92.9b-docking, jsoncpp 1.9.6, magic_enum 0.9.7,
+nanosvg cci.20231025, nfd 1.2.1, spdlog 1.17.0, stb cci.20240531,
+vulkan-headers/vulkan-loader 1.4.350.0, yaml-cpp 0.8.0
+
+All come from ConanCenter except `nfd` (nativefiledialog-extended), which is not
+published there and is built from the in-tree recipe in `conan/local-recipes/`.
+X11 is declared as provided by the platform, so the build image must carry the X11
+development packages.
 
 ### Python Dependencies (via Poetry)
 
-- depmanager ^0.5.1, black ^25.12.0, gcovr ^8.6, rich ^14.2.0
+- conan ^2.32, black ^25.12.0, gcovr ^8.6, rich ^14.2.0
+
+Poetry owns the virtual environment and every build tool in it; `cmake/Poetry.cmake`
+runs `poetry sync` at configure time and prepends the venv to `PATH`.
 
 ### Build Targets
 
 - `EvenementLoto` - Main executable
+- `EvenementLoto_third_party` - third parties that must be compiled locally: ImGui
+  backends and `std::string` helper (ConanCenter ships them as sources only) and the
+  single translation unit instantiating stb_image and nanosvg
 - `EvenementLoto_lib` - Core library
 - `EvenementLoto_ui` - GUI library
 - `EvenementLoto_resource` - Resource copy target

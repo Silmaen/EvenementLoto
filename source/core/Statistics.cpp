@@ -22,8 +22,7 @@ void Statistics::pushRound(const GameRound& iRound) {
 			roundShortest = dur;
 		roundAverage = (roundAverage * m_nbRounds + dur) / (m_nbRounds + 1);
 		const int nbDraw = static_cast<int>(iRound.drawsCount());
-		if (nbDraw > roundMostNb)
-			roundMostNb = nbDraw;
+		roundMostNb = std::max(roundMostNb, nbDraw);
 		if (nbDraw < roundLessNb || roundLessNb == 0)
 			roundLessNb = nbDraw;
 		roundAverageNb = (roundAverageNb * m_nbRounds + nbDraw) / (m_nbRounds + 1);
@@ -42,8 +41,7 @@ void Statistics::pushRound(const GameRound& iRound) {
 			subRoundShortest = dur;
 		subRoundAverage = (subRoundAverage * m_nbSubRounds + dur) / (m_nbSubRounds + 1);
 		const int nbDraw = static_cast<int>(sub->getDraws().size());
-		if (nbDraw > subRoundMostNb)
-			subRoundMostNb = nbDraw;
+		subRoundMostNb = std::max(subRoundMostNb, nbDraw);
 		if (nbDraw < subRoundLessNb || subRoundLessNb == 0)
 			subRoundLessNb = nbDraw;
 		subRoundAverageNb = (subRoundAverageNb * m_nbSubRounds + nbDraw) / (m_nbSubRounds + 1);

@@ -95,7 +95,7 @@ TEST(gui_event, EventDispatcher) {
 	evl::gui::event::KeyPressedEvent keyPressEvent(evl::gui::KeyCode::A, 1);
 	evl::gui::event::EventDispatcher dispatcher(keyPressEvent);
 	bool dispatched = dispatcher.dispatch<evl::gui::event::KeyPressedEvent>(
-		[](const evl::gui::event::KeyPressedEvent& iE) {
+		[](const evl::gui::event::KeyPressedEvent& iE) -> bool {
 			EXPECT_EQ(iE.getKeyCode(), evl::gui::KeyCode::A);
 			EXPECT_EQ(iE.getRepeatCount(), 1);
 			return true;
@@ -106,7 +106,7 @@ TEST(gui_event, EventDispatcher) {
 	evl::gui::event::MouseMovedEvent mouseMoveEvent(200.0f, 250.0f);
 	evl::gui::event::EventDispatcher dispatcher2(mouseMoveEvent);
 	dispatched = dispatcher2.dispatch<evl::gui::event::MouseMovedEvent>(
-		[](const evl::gui::event::MouseMovedEvent& iE) {
+		[](const evl::gui::event::MouseMovedEvent& iE) -> bool {
 			EXPECT_FLOAT_EQ(iE.getX(), 200.0f);
 			EXPECT_FLOAT_EQ(iE.getY(), 250.0f);
 			return false;
@@ -117,7 +117,7 @@ TEST(gui_event, EventDispatcher) {
 	evl::gui::event::WindowCloseEvent closeEvent;
 	evl::gui::event::EventDispatcher dispatcher3(closeEvent);
 	dispatched = dispatcher3.dispatch<evl::gui::event::KeyPressedEvent>(
-		[](evl::gui::event::KeyPressedEvent&) {
+		[](evl::gui::event::KeyPressedEvent&) -> bool {
 			// This should not be called
 			EXPECT_TRUE(false);
 			return true;

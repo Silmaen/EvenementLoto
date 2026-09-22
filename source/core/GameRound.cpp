@@ -9,6 +9,8 @@
 
 #include "GameRound.h"
 
+#include "EnumLabel.h"
+
 #include "Log.h"
 #include "StringUtils.h"
 #include "utilities.h"
@@ -16,7 +18,7 @@
 namespace evl::core {
 
 namespace {
-const std::unordered_map<GameRound::Type, const char*> g_typeConvert = {
+constexpr std::array<std::pair<GameRound::Type, std::string_view>, 8> g_typeLabels{{
 		{GameRound::Type::OneQuine, "Simple quine"},
 		{GameRound::Type::TwoQuines, "Double quine"},
 		{GameRound::Type::FullCard, "Gros lot"},
@@ -25,26 +27,21 @@ const std::unordered_map<GameRound::Type, const char*> g_typeConvert = {
 		{GameRound::Type::Enfant, "Enfant"},
 		{GameRound::Type::Inverse, "Inverse"},
 		{GameRound::Type::Pause, "Pause"},
-};
+}};
 
-const std::unordered_map<GameRound::Status, const char*> g_statusConvert = {
+constexpr std::array<std::pair<GameRound::Status, std::string_view>, 4> g_statusLabels{{
 		{GameRound::Status::Ready, "prêt"},
 		{GameRound::Status::Running, "démarré"},
 		{GameRound::Status::PostScreen, "écran de fin"},
 		{GameRound::Status::Done, "terminé"},
-};
+}};
 }// namespace
 
 // --- constructeurs ----
 GameRound::GameRound(const Type& iType) { setType(iType); }
 
 // ---- manipulation du type de partie ----
-auto GameRound::getTypeStr() const -> std::string {
-	if (g_typeConvert.contains(m_type)) {
-		return g_typeConvert.at(m_type);
-	}
-	return "inconnu";
-}
+auto GameRound::getTypeStr() const -> std::string { return std::string(enumLabel(g_typeLabels, m_type)); }
 
 void GameRound::setType(const Type& iType) {
 	if (!isEditable()) {
@@ -87,12 +84,7 @@ void GameRound::setType(const Type& iType) {
 }
 
 // ---- manipulation du statut ----
-auto GameRound::getStatusStr() const -> std::string {
-	if (g_statusConvert.contains(m_status)) {
-		return g_statusConvert.at(m_status);
-	}
-	return "inconnu";
-}
+auto GameRound::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 // ---- flux du jeu ----
 
@@ -238,11 +230,7 @@ auto GameRound::toJson() const -> Json::Value {
 }
 
 void GameRound::fromJson(const Json::Value& iJson) {
-	std::string srType = iJson.get("type", "").asString();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iJson.get("type", "").asString(), m_type);
 	m_id = iJson.get("Id", 0).asInt();
 	m_subGames.clear();
 	for (auto& jj: iJson.get("subGames", Json::Value::null)) { m_subGames.emplace_back().fromJson(jj); }
@@ -259,11 +247,7 @@ auto GameRound::toYaml() const -> YAML::Node {
 }
 
 void GameRound::fromYaml(const YAML::Node& iNode) {
-	auto srType = iNode["type"].as<std::string>();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
 	m_id = iNode["Id"].as<int>();
 	m_subGames.clear();
 	for (const auto& jj: iNode["subGames"]) {
@@ -315,8 +299,8 @@ auto GameRound::getName() const -> std::string {
 	res << "Partie";
 	if (m_id > 0)
 		res << " " << m_id;
-	if (m_type != Type::OneTwoQuineFullCard && g_typeConvert.contains(m_type))
-		res << " " << g_typeConvert.at(m_type);
+	if (m_type != Type::OneTwoQuineFullCard)
+		res << " " << getTypeStr();
 	return res.str();
 }
 

@@ -9,6 +9,8 @@
 
 #include "SubGameRound.h"
 
+#include "EnumLabel.h"
+
 #include "Log.h"
 #include "utilities.h"
 
@@ -17,35 +19,25 @@
 namespace evl::core {
 namespace {
 
-const std::unordered_map<SubGameRound::Type, std::string> g_typeConvert = {
+constexpr std::array<std::pair<SubGameRound::Type, std::string_view>, 4> g_typeLabels{{
 		{SubGameRound::Type::OneQuine, "simple quine"},
 		{SubGameRound::Type::TwoQuines, "double quine"},
 		{SubGameRound::Type::FullCard, "carton plein"},
 		{SubGameRound::Type::Inverse, "inverse"},
-};
+}};
 
-const std::unordered_map<SubGameRound::Status, std::string> g_statusConvert = {
+constexpr std::array<std::pair<SubGameRound::Status, std::string_view>, 4> g_statusLabels{{
 		{SubGameRound::Status::Ready, "prêt"},
 		{SubGameRound::Status::PreScreen, "affichage"},
 		{SubGameRound::Status::Running, "en cours"},
 		{SubGameRound::Status::Done, "fini"},
-};
+}};
 
 }// namespace
 
-auto SubGameRound::getTypeStr() const -> std::string {
-	if (g_typeConvert.contains(m_type)) {
-		return g_typeConvert.at(m_type);
-	}
-	return "inconnu";
-}
+auto SubGameRound::getTypeStr() const -> std::string { return std::string(enumLabel(g_typeLabels, m_type)); }
 
-auto SubGameRound::getStatusStr() const -> std::string {
-	if (g_statusConvert.contains(m_status)) {
-		return g_statusConvert.at(m_status);
-	}
-	return "inconnu";
-}
+auto SubGameRound::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 void SubGameRound::nextStatus() {
 	switch (m_status) {
@@ -149,14 +141,9 @@ auto SubGameRound::toJson() const -> Json::Value {
 }
 
 void SubGameRound::fromJson(const Json::Value& iJson) {
-	std::string srType;
 	if (const auto val = iJson.get("type", ""); val.isString()) {
-		srType = val.asString();
+		m_type = enumFromLabel(g_typeLabels, val.asString(), m_type);
 	}
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
 	if (const auto val = iJson.get("prices", ""); val.isString()) {
 		m_prices = val.asString();
 	}
@@ -189,11 +176,7 @@ auto SubGameRound::toYaml() const -> YAML::Node {
 }
 
 void SubGameRound::fromYaml(const YAML::Node& iNode) {
-	auto srType = iNode["type"].as<std::string>();
-	if (const auto result = std::ranges::find_if(
-				g_typeConvert, [&srType](const auto& iItem) -> auto { return iItem.second == srType; });
-		result != g_typeConvert.end())
-		m_type = result->first;
+	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
 	m_prices = iNode["prices"].as<std::string>();
 	m_pricesValue = iNode["value"].as<double>();
 	m_winner = iNode["winner"].as<std::string>();

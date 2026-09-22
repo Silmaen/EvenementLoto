@@ -52,6 +52,7 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration générale"; }
 
+protected:
 	/**
 	 * @brief Function called when the popup is opened.
 	 */
@@ -125,6 +126,7 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration événement"; }
 
+protected:
 	/**
 	 * @brief Function called when the popup is opened.
 	 */
@@ -180,11 +182,13 @@ public:
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration parties"; }
 
+protected:
 	/**
 	 * @brief Function called when the popup is opened.
 	 */
 	void onOpen() override;
 
+public:
 	/**
 	 * @brief Function called when the popup is closed.
 	 */

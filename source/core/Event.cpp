@@ -9,6 +9,7 @@
 
 #include "Event.h"
 
+#include "EnumLabel.h"
 #include "Log.h"
 #include "utilities.h"
 
@@ -16,7 +17,7 @@ namespace evl::core {
 
 namespace {
 
-const std::unordered_map<Event::Status, const char*> g_statusConvert = {
+constexpr std::array<std::pair<Event::Status, std::string_view>, 8> g_statusLabels{{
 		{Event::Status::Invalid, "invalide"},
 		{Event::Status::MissingParties, "manque les parties"},
 		{Event::Status::Ready, "prêt"},
@@ -25,11 +26,11 @@ const std::unordered_map<Event::Status, const char*> g_statusConvert = {
 		{Event::Status::DisplayRules, "en affichage des règles"},
 		{Event::Status::EventEnding, "finalisation"},
 		{Event::Status::Finished, "fini"},
-};
+}};
 
 }// namespace
 
-auto Event::getStatusStr() const -> std::string { return g_statusConvert.at(m_status); }
+auto Event::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
 // ---- Serialisation ----
 void Event::read(std::istream& iBs, int) {

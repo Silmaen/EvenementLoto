@@ -103,7 +103,7 @@ private:
 	size_t m_previewRound = 0;
 	size_t m_previewSubRound = 0;
 	bool m_customStyle = true;
-	core::clock::time_point m_diapoChanged{};
+	core::clock::time_point m_diapoChanged;
 	size_t m_currentDiapoIndex = 0;
 	size_t m_totalDiapoImages = 0;
 };

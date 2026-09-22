@@ -266,7 +266,7 @@ private:
 	bool m_displayPreview = false;
 
 	/// Timestamp of the last autosave.
-	core::time_point m_lastAutoSave{};
+	core::time_point m_lastAutoSave;
 
 	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
 	std::shared_ptr<views::View> m_cachedDisplayView;

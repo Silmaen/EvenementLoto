@@ -545,9 +545,9 @@ void MainView::renderBottomConfigPanel() {
 			log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
 		}
 		if (ImGui::Checkbox("Plein écran", &fullscreen)) {
-			if (infos.size() == 1)
+			if (infos.size() == 1) {
 				fullscreen = false;
-			else {
+			} else {
 				displayView->setFullscreen(fullscreen);
 				log_info("Changement du mode plein écran: {}", fullscreen);
 			}

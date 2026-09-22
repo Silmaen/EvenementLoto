@@ -2,8 +2,8 @@
 #
 # Poetry provides the python tooling (conan, gcovr) and puts it in PATH
 include(Poetry)
-# Initialize Dependency Manager
-include(Depmanager)
+# Third parties, provided by Conan
+include(Conan)
 # Load Utility functions
 include(UtilityFunctions)
 #
@@ -124,8 +124,13 @@ if (${PROJECT_PREFIX}_PLATFORM_WINDOWS)
     endif ()
 elseif (${PROJECT_PREFIX}_PLATFORM_LINUX)
     set(CMAKE_PLATFORM_USES_PATH_WHEN_NO_SONAME OFF)
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath='$ORIGIN' -Wl,--disable-new-dtags")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath='$ORIGIN' -Wl,--disable-new-dtags")
+    # --as-needed is not optional here: xorg/system declares the whole X11 set in
+    # system_libs, so a statically linked glfw would record a DT_NEEDED for some sixty
+    # libraries it never calls — libXaw, libXv, libXRes… — and the application would
+    # refuse to start on a desktop that does not have them installed.
+    set(linuxLinkerFlags "-Wl,--as-needed -Wl,-rpath='$ORIGIN' -Wl,--disable-new-dtags")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${linuxLinkerFlags}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${linuxLinkerFlags}")
 endif ()
 add_dependencies(${CMAKE_PROJECT_NAME}_Base ${CMAKE_PROJECT_NAME}_SuperBase)
 

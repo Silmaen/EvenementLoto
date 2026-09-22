@@ -13,12 +13,9 @@
 
 #include <magic_enum/magic_enum.hpp>
 
-auto main(int iArgc, char* iArgv[]) -> int {
-#ifdef EVL_DEBUG
-	evl::Log::init(evl::Log::Level::Trace);
-#else
-	evl::Log::init(evl::Log::Level::Info);
-#endif
+namespace {
+
+auto run(int iArgc, char* iArgv[]) -> int {
 	evl::core::initializeUtilities(iArgc, iArgv);
 	evl::core::loadSettings();
 	evl::core::mergeDefaultSettings();
@@ -44,6 +41,32 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	log_info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
 	log_info("---------------------------------------------------------------------------------------");
 	evl::core::leaveSettings();
-	evl::Log::invalidate();
+	return ret;
+}
+
+void reportFatal(const std::string_view& iWhat) noexcept {
+	try {
+		log_critical("Exception non rattrapée : {}", iWhat);
+		// NOLINTNEXTLINE(bugprone-empty-catch): last resort, nothing left to report with
+	} catch (...) {}
+}
+
+}// namespace
+
+auto main(int iArgc, char* iArgv[]) -> int {
+	int ret = EXIT_FAILURE;
+	// Nothing must escape: an uncaught exception would terminate the process without a
+	// trace, in the middle of a game.
+	try {
+#ifdef EVL_DEBUG
+		evl::Log::init(evl::Log::Level::Trace);
+#else
+		evl::Log::init(evl::Log::Level::Info);
+#endif
+		ret = run(iArgc, iArgv);
+		evl::Log::invalidate();
+	} catch (const std::exception& e) {
+		reportFatal(e.what());
+	} catch (...) { reportFatal("type inconnu"); }
 	return ret;
 }
