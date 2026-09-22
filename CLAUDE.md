@@ -19,7 +19,7 @@ Author: Silmaen
   - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers)
   - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
 - `source/resources/` - Resources copied at build time (dark icons, user documentation + images)
-- `source/main.cpp` - Entry point (supports ImGui UI; legacy Qt path still exists behind `USE_QT` ifdef)
+- `source/main.cpp` - Entry point (ImGui UI); returns `EXIT_FAILURE` when the application ends in `State::Error`
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
 - `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
 - `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation)
@@ -58,7 +58,7 @@ Author: Silmaen
 
 - **CMake 3.24+** with CMake Presets (`CMakePresets.json` includes Linux, MinGW, and CI presets)
 - **C++ Standard**: C++23 (`CMAKE_CXX_STANDARD 23`)
-- **Supported compilers**: GCC 14+, Clang 18+
+- **Supported compilers**: GCC 14+, Clang 18+ (CI builds with GCC 14 and Clang 22)
 - **Supported platforms**: Linux, Windows (MinGW)
 - **Dependency management**: [DepManager](https://github.com/Silmaen/DepManager) (`depmanager.yml`)
 - **Python tooling**: Poetry (`pyproject.toml`), Python 3.12+

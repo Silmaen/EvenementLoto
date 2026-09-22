@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : ⬜ non commencé
+**État global** : 🟩 phases 0 et 1 faites
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -150,10 +150,10 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 
 **Aucun impact build. À faire en premier.**
 
-- [ ] `.gitignore` : ajouter `TeamCity_*.zip` (le zip **n'est pas ignoré** aujourd'hui,
+- [x] `.gitignore` : ajouter `TeamCity_*.zip` (le zip **n'est pas ignoré** aujourd'hui,
       un `git add .` le committerait)
-- [ ] `.gitignore` : ajouter `.teamcity/target/` (sortie de build du DSL Kotlin)
-- [ ] Vérifier qu'aucun export TeamCity n'est déjà dans l'historique Git
+- [x] `.gitignore` : ajouter `.teamcity/target/` (et `__pycache__/`) (sortie de build du DSL Kotlin)
+- [x] Vérifier qu'aucun export TeamCity n'est déjà dans l'historique Git — **aucun**
       (`git log --all --diff-filter=A --name-only | grep -i zip`)
 - [ ] **Rotation des secrets** exportés en clair ou en `zxx` (brouillage réversible) :
   - [ ] clé privée SSH `github connexion` (était en clair dans le zip)
@@ -162,15 +162,17 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
   - [ ] `deploy_passwd`, `remote_passwd`
 - [ ] Remonter la clé SSH au projet racine TeamCity *(décidé : cohérent avec D8,
       le root reste géré par l'UI)*
-- [ ] Supprimer `.github/copilot-instructions.md` *(contenu déjà couvert intégralement
+- [x] Supprimer `.github/copilot-instructions.md` *(contenu déjà couvert intégralement
       par `CLAUDE.md` : tabulations, commentaires en anglais, préfixes `m_`/`i`/`o`/`io`,
       trailing return types, `log_error`/`log_warn`/`log_info`)*
-- [ ] Supprimer les `.idea/copilot.data.migration.*.xml` en local
+- [x] Supprimer les `.idea/copilot.data.migration.*.xml` en local
       *(4 fichiers, déjà non suivis : `.idea/.gitignore` contient `copilot.*`)*
 - [ ] Désactiver Copilot côté GitHub (Settings → Copilot / Code security) — **manuel**
-- [ ] Vérifier si `Python3_EXECUTABLE` est utilisé quelque part
+- [x] Vérifier si `Python3_EXECUTABLE` est utilisé quelque part — **non**, seul usage :
+      son propre `message(STATUS)` dans `cmake/Python.cmake:25` ⇒ suppression en phase 2
       → si non, `find_package(Python3)` (`cmake/Python.cmake:3`) sera supprimé en phase 2
-- [ ] Vérifier la recette `doxygen` sur Conan Center *(pour mémoire uniquement : D4
+- [x] ~~Vérifier la recette `doxygen` sur Conan Center~~ — sans objet (D4 : reste externe,
+      et l'image `builder` fournit déjà doxygen 1.9.8 + graphviz) *(pour mémoire uniquement : D4
       tranche pour l'externe, cette case est là pour clore la question)*
 
 **Validation** : aucune, phase sans effet sur le build.
@@ -182,39 +184,47 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 **Encore sous DepManager.** Objectif : réduire la surface avant de toucher au
 gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 
-- [ ] `cmake/Vulkan.cmake` : réduire à `find_package(VulkanHeaders)` +
+- [x] `cmake/Vulkan.cmake` : réduire à `find_package(VulkanHeaders)` +
       `find_package(VulkanLoader)` + `target_link_libraries(… Vulkan::Loader)`
-- [ ] Supprimer `find_package` / liaisons : `VulkanUtilityLibraries`
+- [x] Supprimer `find_package` / liaisons : `VulkanUtilityLibraries`
       (`Vulkan::LayerSettings`, `Vulkan::UtilityHeaders`), `spirv_cross_*` (7 appels),
       `SPIRV-Tools`, `SPIRV-Tools-opt`, `glslang`, `shaderc`
-- [ ] Supprimer la branche morte `EVL_DEFINE_VULKAN_LAYERS` (`cmake/Vulkan.cmake:15-27`)
-- [ ] Supprimer la branche morte `EVL_BUILD_SHARED` (`cmake/Vulkan.cmake:28`,
-      `test/CMakeLists.txt:51-55`)
-- [ ] `depmanager.yml` : retirer les entrées devenues inutiles si DepManager les
-      exposait séparément *(vulkan_sdk reste, il fournit headers + loader)*
-- [ ] `ci/PresetsParameters.json` : `builder-clang18-ubuntu2404` →
+- [x] Supprimer la branche morte `EVL_DEFINE_VULKAN_LAYERS`
+- [x] Supprimer la branche morte `EVL_BUILD_SHARED`, et le bloc Qt mort de
+      `test/CMakeLists.txt` (`EVL_QT_DIR` n'existe plus)
+- [x] ~~`depmanager.yml`~~ : rien à retirer, `vulkan_sdk` est une entrée unique qui
+      fournit headers + loader
+- [x] `ci/PresetsParameters.json` : `builder-clang18-ubuntu2404` →
       `builder-clang-llvm22-ubuntu2404` (6 occurrences : `linux-clang-debug`,
       `linux-clang-tidy`, 4 sanitizers)
       ⚠️ **l'image `clang18` n'est plus générée** par `generator.py` du dépôt DockerImages
-- [ ] Absorber les nouveaux diagnostics **clang 22** vs clang 18 sous
-      `-Werror -Weverything` (`cmake/BaseConfig.cmake`)
-- [ ] Éventuellement relever `EVL_CLANG_MINIMAL` (actuellement 18) dans `BaseConfig.cmake`
-- [ ] **Supprimer le chemin Qt mort de `source/main.cpp`** : `USE_QT` n'est défini
+- [x] Absorber les nouveaux diagnostics **clang 22** — **aucun** : clang 22.1.3 compile
+      propre sous `-Werror -Weverything` (risque R3 levé)
+- [x] ~~Relever `EVL_CLANG_MINIMAL`~~ : inutile, clang 18.1.3 compile toujours — le
+      minimum déclaré reste honnête
+- [x] **Supprimer le chemin Qt mort de `source/main.cpp`** *(+ le réglage `general/use_imgui`,
+      et `main` retourne désormais `EXIT_FAILURE` sur `State::Error`)* : `USE_QT` n'est défini
       nulle part (ni CMake, ni presets) et `source/gui_qt/` **n'existe plus** — les
       blocs des lignes 9-27 et 63-82 incluent des en-têtes absents.
       ⚠️ Effet de bord réel : `main.cpp:53` lit
       `getValue<bool>("general/use_imgui", false)`, donc **un fichier de réglages
       contenant `use_imgui: false` fait sortir l'application en `EXIT_FAILURE`**
       au démarrage. Supprimer la branche et le réglage.
-- [ ] Renommer l'option `RSH_USE_PYTHON_VENV` (préfixe d'un autre projet) ou la
+- [ ] *(phase 2)* Renommer l'option `RSH_USE_PYTHON_VENV` (préfixe d'un autre projet) ou la
       supprimer avec `cmake/Python.cmake` en phase 2
-- [ ] Mettre `CLAUDE.md` à jour (liste des dépendances, version Clang)
+- [x] Mettre `CLAUDE.md` à jour (point d'entrée, version Clang du CI)
 - [ ] Doc développeur : noter dans le dépôt le nouveau flux de build
       (CMake pilote Conan) une fois la phase 4 passée
 
+> **Régression trouvée et corrigée** : `find_package(VulkanHeaders)` était appelé mais
+> sa cible **jamais liée** — le chemin d'en-têtes arrivait par accident via
+> `VulkanUtilityLibraries`. En retirant celui-ci, la compilation est tombée sur le
+> Vulkan **système** de l'image (1.3), d'où `VK_API_VERSION_1_4 was not declared`.
+> `Vulkan::Headers` est désormais lié explicitement. À reproduire en phase 4.
+
 **Validation**
-- [ ] `linux-gcc-debug` : configure + build + `ctest` OK
-- [ ] `linux-clang-debug` : configure + build + `ctest` OK
+- [x] `linux-gcc-debug` : configure + build + `ctest` OK
+- [x] `linux-clang-debug` : configure + build + `ctest` OK (clang 22 **et** clang 18)
 - [ ] L'application démarre et affiche une partie
 
 ---
@@ -477,7 +487,7 @@ des continuations.
 |---|---|---|---|
 | R1 | `compiler.cppstd` dans un profil ⇒ tout se reconstruit | 4 | ne pas le déclarer ; vérifier au log |
 | R2 | `IMGUI_API` non exporté en DLL MinGW | 6 | passer imgui en statique (phase 9) |
-| R3 | clang 22 + `-Weverything` ⇒ vague de nouveaux warnings | 1 | traité sous DepManager, cause isolée |
+| ~~R3~~ | ~~clang 22 + `-Weverything`~~ | 1 | **levé** : aucun nouveau diagnostic |
 | R4 | `xorg/system` échoue faute de `-dev` X11 | 4 | l'erreur nomme le paquet ; `libglfw3-dev` devrait suffire |
 | R5 | MinGW entièrement `--build=missing` | 6 | cache `~/.conan2` persistant, coût unique |
 | R6 | `CMakeConfigDeps` expérimental (« subject to breaking changes ») | 4 | épingler la version de Conan dans `poetry.lock` |

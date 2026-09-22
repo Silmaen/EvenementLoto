@@ -6,25 +6,12 @@
  * All modification must get authorization from the author.
  */
 
-#ifdef USE_QT
-#include <QApplication>
-#include <QCommandLineParser>
-#endif
 #include <core/Log.h>
 #include <core/Settings.h>
 #include <core/utilities.h>
 #include <gui/Application.h>
-#ifdef USE_QT
-#include <gui_qt/MainWindow.h>
-#include <gui_qt/baseDefinitions.h>
-#endif
 
 #include <magic_enum/magic_enum.hpp>
-
-#ifdef USE_QT
-using namespace evl::gui;
-#endif
-using namespace std::filesystem;
 
 auto main(int iArgc, char* iArgv[]) -> int {
 #ifdef EVL_DEBUG
@@ -48,44 +35,15 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	log_info("Démarrage de l'application {} version {} créée par {}", evl::EVL_APP, evl::EVL_VERSION,
 			 evl::EVL_AUTHOR_STR);
 	log_info("Chemin d'exécution : {}", evl::core::getExecPath().string());
-	int ret = 0;
 
-	if (settings->getValue<bool>("general/use_imgui", false)) {
-		log_info("Utilisation de l'interface ImGui");
-		// Startup
-		auto app = evl::gui::createApplication(iArgc, iArgv);
-		// Runtime
-		app->run();
-		// Shutdown
-		app.reset();
-	} else {
+	auto app = evl::gui::createApplication(iArgc, iArgv);
+	app->run();
+	const int ret = app->getState() == evl::gui::Application::State::Error ? EXIT_FAILURE : EXIT_SUCCESS;
+	app.reset();
 
-#ifdef USE_QT
-		log_info("Utilisation de l'interface Qt");
-		const QApplication app(iArgc, iArgv);
-		QCommandLineParser parser;
-		parser.setApplicationDescription(QCoreApplication::applicationName());
-		parser.addHelpOption();
-		parser.addVersionOption();
-		parser.process(app);
-		QCoreApplication::setOrganizationName(QString::fromStdString(evl::EVL_AUTHOR_STR));
-		QCoreApplication::setApplicationName(QString::fromStdString(evl::EVL_APP));
-		QCoreApplication::setApplicationVersion(QString::fromStdString(evl::EVL_VERSION));
-		MainWindow window;
-		window.syncSettings();
-		window.show();
-		//NOLINTNEXTLINE
-		ret = app.exec();
-#else
-		log_error("L'application n'a pas été compilée avec le support de Qt, impossible de démarrer l'interface "
-				  "graphique.");
-		ret = EXIT_FAILURE;
-#endif
-	}
 	log_info("Sortie de l'application {} Avec le code {}", evl::EVL_APP, ret);
 	log_info("---------------------------------------------------------------------------------------");
 	evl::core::leaveSettings();
-	// Destroy the logger
 	evl::Log::invalidate();
 	return ret;
 }
