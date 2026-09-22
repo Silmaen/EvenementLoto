@@ -37,4 +37,14 @@ CMakeUserPresets.json
 Doxyfile
 .env
 .venv
-/TeamCity_EvenementLoto_20260921_200637.zip
+
+# Python
+__pycache__/
+*.pyc
+
+# TeamCity
+TeamCity_*.zip
+.teamcity/target
+
+# Application log, written next to the binary
+exec.log
