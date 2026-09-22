@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 migration : phases 0 à 5 (Linux) + 7 partielle — stabilité : S0 à S3, S4 partielle
+**État global** : 🟩 migration : phases 0 à 5 + 11 (Linux), 7 quasi complète — stabilité : S0 à S3, S5, S6, S4 partielle
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -196,10 +196,10 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
       `test/CMakeLists.txt` (`EVL_QT_DIR` n'existe plus)
 - [x] ~~`depmanager.yml`~~ : rien à retirer, `vulkan_sdk` est une entrée unique qui
       fournit headers + loader
-- [x] `ci/PresetsParameters.json` : `builder-clang18-ubuntu2404` →
-      `builder-clang-llvm22-ubuntu2404` (6 occurrences : `linux-clang-debug`,
-      `linux-clang-tidy`, 4 sanitizers)
-      ⚠️ **l'image `clang18` n'est plus générée** par `generator.py` du dépôt DockerImages
+- [x] `ci/PresetsParameters.json` : noms d'images réconciliés. Les images ont depuis été
+      réorganisées en trois couches (`base` / `builder` / `devel`) sans le compilateur
+      dans le nom : **les 7 presets Linux pointent maintenant sur `builder-ubuntu2404`**,
+      qui contient gcc **et** clang.
 - [x] Absorber les nouveaux diagnostics **clang 22** — **aucun** : clang 22.1.3 compile
       propre sous `-Werror -Weverything` (risque R3 levé)
 - [x] ~~Relever `EVL_CLANG_MINIMAL`~~ : inutile, clang 18.1.3 compile toujours — le
@@ -321,7 +321,8 @@ mêmes `.so` qu'avant (`libimgui.so`, `libglfw.so.3.4`, `libspdlog.so.1.17.0`,
 - [x] `source/gui/CMakeLists.txt` : `stb_image`→`stb`, `NanoSVG`→`nanosvg`, `ImGui`→`imgui`
 - [x] Cible `EvenementLoto_imgui_bindings` (backends + `imgui_stdlib`), includes en
       `SYSTEM` et `CXX_CLANG_TIDY` vidé
-- [x] `copy_shared_libraries()` fonctionne avec les cibles importées de Conan (R8 levé)
+- [x] `copy_shared_libraries()` **réécrite** — voir la phase 11 : sous Conan elle ne
+      copiait en réalité rien (les cibles `INTERFACE IMPORTED` n'ont pas de `LOCATION`)
 
 ### Profils : ce que CMake pousse à Conan
 
@@ -344,9 +345,8 @@ la version reste toujours celle que CMake utilise réellement.
 3. **Conan isole son `pkgconf`**, donc les `.pc` système devenaient invisibles et
    `vulkan-loader` ne trouvait plus `x11`. `cmake/Conan.cmake` interroge le
    `pkg-config` système (`--variable pc_path`) et le transmet via `[buildenv]`.
-4. **`vulkan-loader` WSI** : `with_wsi_xcb` et `with_wsi_wayland` exigent
-   `libxcb1-dev` et `libwayland-dev`, absents. Mis à `False`, ce qui est **cohérent**
-   avec glfw construit en X11 seul. ⚠️ voir « Image Docker » ci-dessous.
+4. **`vulkan-loader` WSI** : d'abord limité à xlib faute de paquets système, puis
+   **complété (xlib + xcb + wayland)** une fois l'image enrichie — voir la phase 11.
 5. **`CMAKE_MAP_IMPORTED_CONFIG_DEBUG Release`** dans `Vulkan.cmake` (hérité du SDK
    DepManager qui n'avait que du Release) empêchait CMake de résoudre
    `IMPORTED_LOCATION` du loader. Supprimé : Conan construit un vrai Debug.
@@ -440,10 +440,9 @@ Coût unique grâce au cache persistant.
 - [ ] TeamCity : retirer `poetry run dmgr remote add …` du runner « Tool Dependencies »
       (le runner ne garde que `PythonRequirements` + `DefineVariables`)
 - [ ] TeamCity : supprimer les paramètres racine `remote_url`, `remote_login`, `remote_passwd`
-- [ ] **Dépôt `CI/DockerImages`** : retirer `depmanager` du
-      `pip install --break-system-packages … depmanager gcovr` de
-      `ci_images/install/_common/builder.sh` (et `gcovr`, désormais fourni par `poetry.lock`)
-- [ ] Reconstruire et publier `builder-gcc14-ubuntu2404` et `builder-clang-llvm22-ubuntu2404`
+- [x] **Dépôt `CI/DockerImages`** : `pip install … depmanager gcovr` retiré de
+      `_common/builder.sh`
+- [x] Images reconstruites et publiées *(fait côté dépôt DockerImages)*
 - [x] Mettre à jour `CLAUDE.md` (sections « Dependency management », « External
       Dependencies », « Python Dependencies », « Build System », `conan/`, cibles)
 - [ ] Mettre à jour `README.md`
@@ -541,7 +540,7 @@ des continuations.
 | R5 | MinGW entièrement `--build=missing` | 6 | cache `~/.conan2` persistant, coût unique |
 | ~~R6~~ | `CMakeConfigDeps` expérimental | 4 | **sans objet** : la release 0.19.0 utilise `CMakeDeps`, stable |
 | R7 | Venv Poetry partagé entre images gcc et clang du même agent | 2 | même version de Python ; sinon deux venv cohabitent |
-| ~~R8~~ | `copy_shared_libraries()` et cibles importées Conan | 4 | **levé** : fonctionne, l'archive CPack est identique |
+| ~~R8~~ | `copy_shared_libraries()` et cibles importées Conan | 4/11 | **résolu autrement** : la fonction ne copiait rien sous Conan ; remplacée par `TARGET_RUNTIME_DLLS` (Windows) — sous Linux le rpath de build et `GET_RUNTIME_DEPENDENCIES` suffisent |
 
 ---
 
@@ -607,6 +606,85 @@ ctest --test-dir output/build/linux-gcc-release --output-on-failure
 # Via la CI (identique en local et sur l'agent)
 poetry run python3 -u ci_action.py Build linux-gcc-debug
 ```
+
+---
+
+## Phase 11 — Vulkan complet et Wayland
+
+**Faite.** X11 reste supporté, mais Wayland devient la cible principale.
+
+- [x] `vulkan-loader` : `with_wsi_xlib`, `with_wsi_xcb` **et** `with_wsi_wayland` à `True`
+      — le loader livré annonce bien `VK_KHR_xlib_surface`, `VK_KHR_xcb_surface` et
+      `VK_KHR_wayland_surface`
+- [x] `glfw` : `with_x11` **et** `with_wayland` à `True` ; la plateforme est choisie à
+      l'exécution. Conan construit en plus `wayland`, `xkbcommon`, `wayland-protocols`,
+      `libffi`, `libxml2`, `expat`
+- [x] `[platform_requires] xorg/system` **supprimé** des profils : c'était un
+      contournement qui masquait aussi les `.pc` système à meson, et faisait échouer
+      `xkbcommon` (`xcb-xkb >= 1.10 not found`)
+- [x] **Profils séparés host/build** : `conan/config/profiles/linux-build` (gcc) est
+      utilisé pour le contexte *build*. Sans cela `flex` échouait
+      (« no acceptable C compiler found in $PATH ») car l'image clang n'a aucun
+      compilateur C natif, et `tools.build:compiler_executables` n'atteint pas les
+      recettes autotools. Bénéfice supplémentaire : les paquets d'outils sont partagés
+      entre les profils gcc et clang.
+- [x] `copy_shared_libraries()` réécrite : `$<TARGET_RUNTIME_DLLS>` sous Windows, rien
+      sous Linux. ⚠️ **le chemin Windows n'est pas testé** (phase 6).
+
+### Le code de l'application doit aussi être Wayland-compatible
+
+Construire glfw avec Wayland ne suffit pas : **Wayland interdit à un client de connaître
+ou de fixer la position de ses propres fenêtres**. Deux conséquences ont été traitées.
+
+- [x] `ImGuiConfigFlags_ViewportsEnable` (`MainWindow.cpp:114`) n'est plus activé sous
+      Wayland : une fenêtre ImGui détachée devient une fenêtre système qu'il faut
+      positionner, ce que le protocole refuse. Dear ImGui ne supporte pas le
+      multi-viewport sur Wayland.
+- [x] `getMonitorsInfo()` n'appelle plus `glfwGetWindowPos()` sous Wayland (qui échoue
+      avec `GLFW_FEATURE_UNAVAILABLE` et remplit le journal d'erreurs GLFW) :
+      l'écran de contrôle est déduit de l'écran principal. Le comportement observable
+      est le même qu'avant — c'était correct *par accident*, `windowPos` restant à
+      `{0,0}` — mais c'est maintenant explicite.
+- [x] `glfwGetPlatform()` est journalisé au démarrage (« Serveur d'affichage : … »)
+- [ ] Vérifier le plein écran de la vue d'affichage sur un second écran en session
+      Wayland *(`glfwSetWindowMonitor` est supporté, à valider en vrai)*
+- [x] Images reconstruites et publiées, avec une nouvelle organisation en trois
+      couches : `base-ubuntu2404` (exécution), `builder-ubuntu2404` (gcc **et** clang,
+      toutes les libs `-dev`), `devel-ubuntu2404` (+ debuggers). Ubuntu 22.04 et 26.04
+      sont également couvertes.
+- [x] `ci/PresetsParameters.json` aligné : les 7 presets Linux utilisent
+      `builder-ubuntu2404`
+
+### Rien à embarquer pour Wayland
+
+`glfw` 3.4 charge `libwayland-client.so.0`, `libwayland-cursor.so.0`,
+`libxkbcommon.so.0`, `libX11.so.6` et `libX11-xcb.so.1` par **`dlopen` au soname** :
+aucune entrée `NEEDED`. Les paquets Conan `wayland`/`xkbcommon` ne servent donc qu'à la
+compilation, et l'archive livrée n'a pas à les contenir — le système de l'utilisateur
+les fournit, en session X11 comme en session Wayland.
+
+### Paquets requis côté images — **présents**
+
+Vérifié dans `builder-ubuntu2404` publiée : gcc 14.2.0, clang 22.1.8, cmake 4.4.3,
+poetry 2.5.1, `lld`, `mold`, et `pkg-config` répond pour `x11`, `xcb`, **`xcb-xkb`**,
+`x11-xcb`, `wayland-client`, `xkeyboard-config` et **`libdecor-0`**.
+
+**Couche `builder`** : jeu X11/XCB complet pour `xorg/system`, `libwayland-dev`,
+`libdecor-0-dev`, et **gcc à côté de clang** pour le profil de build. Le
+`pip install depmanager gcovr` a disparu *(item de la phase 7)*.
+
+**Couche `base`** : `libwayland-client0`, `libwayland-cursor0`, `libwayland-egl1`,
+`libwayland-server0`, `xkb-data` et **`libdecor-0-0`** — ce dernier est indispensable,
+glfw le charge par `dlopen` pour décorer ses fenêtres Wayland (sans lui, pas de barre
+de titre sous GNOME).
+
+**Validation**
+- [x] `linux-gcc-debug`, `linux-gcc-release` : build + `ctest`
+- [x] `linux-clang-debug`, `linux-clang-tidy`, 4 sanitizers : build + `ctest`
+- [x] `linux-clang-release` : build + `cpack`, archive complète
+- [x] Les trois extensions WSI présentes dans le loader livré
+- [x] 45 symboles Wayland dans le `libglfw.so` construit
+- [ ] Démarrage réel en session Wayland *(non vérifiable sans écran)*
 
 ---
 ---
@@ -769,60 +847,39 @@ Chemins qui peuvent lancer, tous réels : `create_directories()`
 
 ## Phase S5 — Autosave déclenché par les événements métier
 
-🟠 **P1.** `autoSave()` sort si moins de 10 s se sont écoulées
-(`Application.cpp:255`). Un tirage suivi d'un crash dans les 10 s est perdu — et
-c'est le moment le plus sensible : l'écart entre « le numéro annoncé aux joueurs »
-et « le numéro enregistré » est un litige en puissance.
+**Faite.** L'écart entre « le numéro annoncé aux joueurs » et « le numéro enregistré »
+est désormais nul.
 
-- [ ] Déclencher aussi la sauvegarde **sur mutation d'état**, en plus du rythme
-      périodique : tirage, annulation de tirage, fin de sous-partie, fin de partie,
-      démarrage / arrêt de l'événement
-- [ ] Conserver un garde-fou de fréquence minimale pour éviter les rafales
-      *(le fichier est petit, mais l'écriture reste synchrone dans la boucle de rendu)*
-- [ ] Sauvegarde forcée **avant toute sortie**, y compris sortie sur erreur
-      *(aujourd'hui `autoSave()` est appelé en fin de frame `Application.cpp:133` :
-      si l'erreur survient au milieu du rendu, on sort sans sauvegarde finale)*
-- [ ] Mesurer le coût de l'écriture pour vérifier qu'elle ne provoque pas de
-      saccade visible sur l'affichage joueurs
-
-**Validation**
-- [ ] `kill -9` immédiatement après un tirage ⇒ le tirage est présent dans `rescue.lev`
-- [ ] Aucune saccade perceptible sur la vue plein écran pendant une sauvegarde
-
----
+- [x] `Application::saveProgress()` (public, force la sauvegarde) appelé après chaque
+      mutation : tirage, annulation de tirage, changement d'état de partie
+      (`RandomPickAction`, `CancelPickAction`, `GameNextActions`)
+- [x] `autoSave(bool iForce)` : le garde-fou de 10 s reste pour le rythme périodique
+- [x] Sauvegarde forcée **avant toute sortie**, boucle principale comme chemin d'erreur
+- [x] `reportError()` sauvegarde, et ne le fait qu'à la première transition vers `Error`
+- [ ] Mesurer le coût de l'écriture sur la fluidité d'affichage *(fichier petit, mais
+      l'écriture reste synchrone dans la boucle)*
 
 ## Phase S6 — Robustesse GPU et session longue
 
-🟠 **P1.** Sur 4 h avec un vidéoprojecteur, une réinitialisation de pilote GPU
-n'est pas hypothétique.
+**Faite pour l'essentiel.** Plus aucun gel possible, et tout incident GPU laisse une
+partie récupérable.
 
-- [ ] **`VK_ERROR_DEVICE_LOST` n'est pas traité.** `checkVkResult`
-      (`VulkanContext.cpp:480`) journalise puis appelle `reportError()`, ce qui passe
-      `m_state` à `Error` et fait sortir la boucle — sans sauvegarde finale (→ S5) et
-      sans tentative de récupération.
-  - [ ] minimum : sauvegarde forcée avant la sortie, et message expliquant que la
-        partie est récupérable au redémarrage
-  - [ ] idéal : recréer device + swapchain sur `DEVICE_LOST`
-- [ ] **Attente GPU infinie** : `vkWaitForFences(..., UINT64_MAX)`
-      (`VulkanContext.cpp:~505`), avec le commentaire *« wait indefinitely instead of
-      periodically checking »*. Si le GPU se bloque, l'application **gèle
-      définitivement** : pas de crash, pas de log, pas de sortie — le cas le plus
-      pénible en salle. → timeout fini (quelques secondes) avec escalade vers
-      « sauvegarde + arrêt propre ».
-- [ ] Vérifier les retours non testés à l'initialisation
-      (`vkEnumerateInstanceExtensionProperties`, `VulkanContext::init`)
-- [ ] Vérifier le comportement sur débranchement / rebranchement de l'écran
-      secondaire pendant une partie *(le chemin swapchain `OUT_OF_DATE` est déjà
-      traité, `VulkanContext.cpp:498` et `:567` — reste à le valider en vrai)*
-- [ ] Test d'endurance : session de 4 h+ avec tirages automatiques, surveillance de
-      la mémoire (RSS) et du nombre de handles Vulkan
+- [x] `VK_ERROR_DEVICE_LOST` traité à part, avec un message explicite
+      (« La carte graphique a été réinitialisée. ») au lieu du message générique
+- [x] **Sauvegarde forcée avant la sortie sur erreur** (via `reportError`, phase S5) :
+      l'incident devient récupérable au redémarrage grâce à S3
+- [x] **Plus d'attente infinie** : `vkWaitForFences` passe de `UINT64_MAX` à **5 s**, et
+      un dépassement est traité comme un GPU bloqué (journal `critical` + sortie propre)
+      au lieu d'un gel silencieux pour le reste de l'après-midi
+- [x] `vkAcquireNextImageKHR` passe de `UINT64_MAX` à **2 s** ; un dépassement
+      reconstruit la swapchain, ce qui est la récupération normale
+- [x] Retour de `vkEnumerateInstanceExtensionProperties` (premier appel) vérifié
+- [ ] Recréer device + swapchain sur `DEVICE_LOST` *(récupération dans le processus ;
+      demanderait de recharger toutes les textures — laissé ouvert)*
+- [ ] Débranchement/rebranchement de l'écran secondaire en cours de partie
+      *(le chemin `OUT_OF_DATE` est traité, reste à valider en vrai)*
+- [ ] Test d'endurance 4 h+ avec tirages automatiques, suivi du RSS et des handles
 - [ ] Session d'endurance sous `linux-sanitizer-address` et `linux-sanitizer-leak`
-
-**Validation**
-- [ ] 4 h sans crash, sans gel, RSS stable
-- [ ] Perte de device simulée ⇒ sauvegarde effectuée et message clair
-
----
 
 ## Phase S7 — Format de fichier portable
 

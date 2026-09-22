@@ -59,6 +59,7 @@ void GameNextActions::onExecute() {
 		round->getType() != core::GameRound::Type::Pause && round->drawsCount() == 0) {
 		Application::get().getRng().resetPick();
 	}
+	Application::get().saveProgress();
 }
 
 RandomPickAction::RandomPickAction() { setIconName("dice"); }
@@ -68,6 +69,7 @@ void RandomPickAction::onExecute() {
 	if (!event.canDraw())
 		return;
 	event.getCurrentGameRound()->addPickedNumber(Application::get().getRng().pick());
+	Application::get().saveProgress();
 	log_trace("Random pick action executed.");
 }
 
@@ -79,6 +81,7 @@ void CancelPickAction::onExecute() {
 		return;
 	event.getCurrentGameRound()->removeLastPick();
 	Application::get().getRng().popNum();
+	Application::get().saveProgress();
 	log_trace("Cancel pick action executed.");
 }
 

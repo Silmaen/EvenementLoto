@@ -34,11 +34,13 @@ class EvenementLotoConan(ConanFile):
         "yaml-cpp/*:shared": False,
         "nfd/*:shared": False,
         "gtest/*:shared": False,
-        # WSI kept aligned with glfw, which is built for X11 only. Enabling xcb or
-        # wayland also requires libxcb1-dev / libwayland-dev in the build image.
+        # Wayland and X11 are both supported: glfw picks the platform at runtime, and
+        # the loader carries every WSI backend.
+        "glfw/*:with_x11": True,
+        "glfw/*:with_wayland": True,
         "vulkan-loader/*:with_wsi_xlib": True,
-        "vulkan-loader/*:with_wsi_xcb": False,
-        "vulkan-loader/*:with_wsi_wayland": False,
+        "vulkan-loader/*:with_wsi_xcb": True,
+        "vulkan-loader/*:with_wsi_wayland": True,
     }
 
     def requirements(self):

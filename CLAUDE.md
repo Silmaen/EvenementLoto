@@ -69,11 +69,21 @@ Author: Silmaen
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
+### Robustness
+
+- Vulkan waits are bounded: 2 s to acquire a swapchain image (rebuild on timeout), 5 s
+  for a frame fence (a stuck GPU reports an error instead of freezing forever)
+- `VK_ERROR_DEVICE_LOST` is reported with its own message; any fatal Vulkan error saves
+  the game before leaving the loop
+- `Application::saveProgress()` is called after every change of the game state (draw,
+  cancelled draw, round change), on top of the 10 s periodic autosave
+
 ## Build System
 
 - **CMake 3.24+** with CMake Presets (`CMakePresets.json` includes Linux, MinGW, and CI presets)
 - **C++ Standard**: C++23 (`CMAKE_CXX_STANDARD 23`)
-- **Supported compilers**: GCC 14+, Clang 18+ (CI builds with GCC 14 and Clang 22)
+- **Supported compilers**: GCC 14+, Clang 18+ (CI builds with GCC 14 and Clang 22 from
+  the same `builder-ubuntu2404` image)
 - **Supported platforms**: Linux, Windows (MinGW)
 - **Dependency management**: [Conan 2](https://conan.io) driven by CMake through
   [cmake-conan](https://github.com/conan-io/cmake-conan) `0.19.0` (`conanfile.py`, `conan/`)
@@ -86,10 +96,26 @@ glfw 3.4, gtest 1.17.0, imgui 1.92.9b-docking, jsoncpp 1.9.6, magic_enum 0.9.7,
 nanosvg cci.20231025, nfd 1.2.1, spdlog 1.17.0, stb cci.20240531,
 vulkan-headers/vulkan-loader 1.4.350.0, yaml-cpp 0.8.0
 
+Plus `wayland` and `xkbcommon`, pulled in by glfw for its Wayland backend (build time
+only: glfw `dlopen`s them by soname at runtime).
+
 All come from ConanCenter except `nfd` (nativefiledialog-extended), which is not
 published there and is built from the in-tree recipe in `conan/local-recipes/`.
-X11 is declared as provided by the platform, so the build image must carry the X11
-development packages.
+
+Linux builds run in `registry.argawaen.net/builder/builder-ubuntu2404`, which carries
+**both gcc 14 and clang 22** plus the full X11/XCB development set expected by
+`xorg/system`, the Wayland and libdecor headers and `xkb-data`. Having gcc beside clang
+matters: the **build** profile (`conan/config/profiles/linux-build`) always uses gcc,
+because the autotools based build tools Conan compiles (flex, m4, libiconv…) expect a
+native toolchain, and gcc matches the prebuilt tool packages, which are then shared
+between the gcc and clang host profiles.
+
+Both display servers are supported: glfw is built with `with_x11` and `with_wayland`,
+and picks the platform at runtime; `vulkan-loader` carries the xlib, xcb and wayland
+WSI backends. `MainWindow` reads the platform with `glfwGetPlatform()` and adapts: on
+Wayland the ImGui multi-viewport flag stays off and the monitor hosting the control
+window is deduced from the primary monitor, because the protocol does not let a client
+know or set its own window position.
 
 ### Python Dependencies (via Poetry)
 

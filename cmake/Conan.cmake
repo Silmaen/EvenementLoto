@@ -15,10 +15,27 @@ endif ()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(CONAN_HOST_PROFILE "windows-mingw-${conanCompiler}")
+    set(CONAN_BUILD_PROFILE "${CONAN_HOST_PROFILE}")
 else ()
     set(CONAN_HOST_PROFILE "linux-${conanCompiler}")
+    # The build tools Conan has to compile (flex, m4, libiconv...) are autotools based
+    # and expect a native toolchain; building them with gcc also matches the prebuilt
+    # tool packages, so they are shared between the gcc and clang host profiles.
+    set(CONAN_BUILD_PROFILE "linux-build")
+    find_program(CONAN_BUILD_C_COMPILER gcc REQUIRED)
+    find_program(CONAN_BUILD_CXX_COMPILER g++ REQUIRED)
+    execute_process(COMMAND ${CONAN_BUILD_C_COMPILER} -dumpversion
+            OUTPUT_VARIABLE buildCompilerVersion
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            RESULT_VARIABLE conanResult)
+    if (NOT conanResult EQUAL 0)
+        message(FATAL_ERROR "Unable to read the version of ${CONAN_BUILD_C_COMPILER}")
+    endif ()
+    string(REGEX MATCH "^[0-9]+" buildCompilerVersion "${buildCompilerVersion}")
+    set(ENV{EVL_BUILD_COMPILER_VERSION} "${buildCompilerVersion}")
+    set(ENV{EVL_BUILD_C_COMPILER} "${CONAN_BUILD_C_COMPILER}")
+    set(ENV{EVL_BUILD_CXX_COMPILER} "${CONAN_BUILD_CXX_COMPILER}")
 endif ()
-set(CONAN_BUILD_PROFILE "${CONAN_HOST_PROFILE}")
 
 # Read back by the profiles: they hold the policy, CMake holds the toolchain.
 string(REGEX MATCH "^[0-9]+" conanCompilerVersion "${CMAKE_CXX_COMPILER_VERSION}")
@@ -91,4 +108,4 @@ if (NOT previousRecipesHash STREQUAL localRecipesHash)
     file(WRITE "${localRecipesStamp}" "${localRecipesHash}")
 endif ()
 
-message(STATUS "Conan profile: ${CONAN_HOST_PROFILE} (${conanCompiler} ${conanCompilerVersion})")
+message(STATUS "Conan profiles: host=${CONAN_HOST_PROFILE} (${conanCompiler} ${conanCompilerVersion}) build=${CONAN_BUILD_PROFILE}")

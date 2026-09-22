@@ -33,6 +33,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME}
         ${CMAKE_PROJECT_NAME}_lib
         ${CMAKE_PROJECT_NAME}_ui
 )
+copy_shared_libraries(${CMAKE_PROJECT_NAME})
 if (CMAKE_SYSTEM_NAME MATCHES "Windows" AND CMAKE_BUILD_TYPE MATCHES "Release")
     set_target_properties(${CMAKE_PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif ()

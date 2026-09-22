@@ -31,6 +31,11 @@
 
 namespace evl::gui {
 
+namespace {
+/// Period of the periodic autosave, in seconds.
+constexpr double g_autoSavePeriodSeconds = 10.0;
+}// namespace
+
 Application* Application::m_instance = nullptr;
 
 Application::Application() {
@@ -151,7 +156,11 @@ void Application::run() {
 
 void Application::reportError(const std::string& iMessage) {
 	log_error("Application reported error: {}", iMessage);
+	if (m_state == State::Error)
+		return;
 	m_state = State::Error;
+	// Whatever went wrong, the game must be resumable at the next start.
+	autoSave(true);
 }
 
 auto Application::getTheme() const -> const Theme& { return m_theme; }
@@ -256,12 +265,12 @@ void Application::setDisplayPreview(const bool iDisplay) {
 	}
 }
 
-void Application::autoSave() {
+void Application::autoSave(const bool iForce) {
 	const auto status = m_currentEvent.getStatus();
 	if (status == core::Event::Status::Invalid || status == core::Event::Status::Finished)
 		return;
 	const auto now = core::clock::now();
-	if (core::durationSeconds(now - m_lastAutoSave) < 10.0)
+	if (!iForce && core::durationSeconds(now - m_lastAutoSave) < g_autoSavePeriodSeconds)
 		return;
 	m_lastAutoSave = now;
 	if (!core::saveRescue(m_currentEvent)) {

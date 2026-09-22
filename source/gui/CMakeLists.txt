@@ -25,4 +25,3 @@ message(STATUS "Found nfd: ${nfd_DIR}")
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui PRIVATE nfd::nfd)
 
 target_link_vulkan(${CMAKE_PROJECT_NAME}_ui PUBLIC)
-copy_shared_libraries(${CMAKE_PROJECT_NAME}_ui)
