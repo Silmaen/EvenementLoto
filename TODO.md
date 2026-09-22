@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 migration : phases 0 à 5 + 11 (Linux), 7 quasi complète — stabilité : S0 à S6
+**État global** : 🟩 migration : phases 0 à 5, 8 et 11 (Linux), 7 quasi complète — stabilité : S0 à S6
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -40,7 +40,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 9. [Phase 6 — MinGW](#phase-6--mingw)
 10. [Phase 7 — Suppression de DepManager](#phase-7--suppression-de-depmanager)
 11. [Phase 8 — CI TeamCity en Kotlin DSL](#phase-8--ci-teamcity-en-kotlin-dsl)
-12. [Phase 9 — Tout en statique](#phase-9--tout-en-statique-optionnel)
+12. [Phase 9 — Tout en statique](#phase-9--tout-en-statique)
 13. [Phase 10 — Retrait de nfd](#phase-10--retrait-de-nfd-au-profit-dun-sélecteur-intégré)
 14. [Risques ouverts](#risques-ouverts)
 15. [Annexes](#annexes)
@@ -70,7 +70,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 | D4 | Doxygen | **Reste une dépendance externe** de l'image Docker. Pas de `tool_requires`. | 2026-09-21 |
 | D5 | Python | **Poetry gère les venv ET les dépendances**, conan inclus. Suppression du bricolage `.env` / `VENV_PATH`. | 2026-09-21 |
 | D6 | nfd | **Recette Conan locale** pour démarrer (`local-recipes-index`), puis retrait complet de la dépendance en phase 10. | 2026-09-21 |
-| D7 | Liaison | Phase 4 **reproduit à l'identique** le découpage shared/static de `depmanager.yml`. La bascule tout-statique est une phase séparée (9). | 2026-09-21 |
+| D7 | Liaison | Phase 4 **reproduit à l'identique** le découpage shared/static de `depmanager.yml`. La bascule tout-statique est une phase séparée (9). *Révisé le 2026-09-22 : phase 9 faite, tout est statique sauf le loader Vulkan — c'était la condition pour que l'édition de liens MinGW aboutisse.* | 2026-09-21 |
 | D8 | CI | **Kotlin DSL**, versionné au niveau du projet *Evenement Loto*. Le projet racine reste géré par l'UI (c'est là que remonte la clé SSH). | 2026-09-21 |
 | D9 | Remote Conan | **Aucun**. `--build=missing` + cache `~/.conan2` persistant via le montage `/home/user`. | 2026-09-21 |
 | D10 | Copilot | Retiré du projet. | 2026-09-21 |
@@ -412,23 +412,80 @@ de l'analyseur statique tombaient dans `nanosvg.h` alors qu'ils ne nous concerne
 
 ## Phase 6 — MinGW
 
-⚠️ **ConanCenter ne publie pas de binaires pour MinGW** → tout en `--build=missing`.
-Coût unique grâce au cache persistant.
+**Faite.** Agent Windows natif (décision : on garde le natif, MinGW et non clang-cl).
+Les deux configurations passent : `WindowsX64_Gcc` et `WindowsX64_Clang` rapportent
+`Tests passed: 109`, comme les sept configurations Linux.
 
-- [ ] `cmake/CMakePresetsMinGW.json` : `CONAN_HOST_PROFILE` par preset
-- [ ] `windows-gcc-debug` : configure + build + `ctest`
-- [ ] `windows-clang-debug` : configure + build + `ctest`
-- [ ] `windows-gcc-release` / `windows-clang-release` : build + `cpack`
-- [ ] ⚠️ **`IMGUI_API` en DLL sous MinGW** : vérifier que la recette CCI d'imgui en
-      `shared=True` exporte correctement les symboles. Si non → imgui en statique
-      (voir phase 9, qui supprime le problème : les backends étant compilés dans `_ui`,
-      tout reste du même côté de la frontière)
-- [ ] Vérifier que les DLL MinGW (`libgcc_s_seh-1`, `libstdc++-6`, `libwinpthread-1`)
-      sont toujours copiées (`cmake/BaseConfig.cmake`, cible `_SuperBase`)
-- [ ] `install(CODE …)` avec `GET_RUNTIME_DEPENDENCIES` : vérifier la résolution des
-      DLL issues du cache Conan (`source/CMakeLists.txt`)
+- [x] Résolution du graphe Conan validée pour les deux profils Windows, **depuis Linux**
+      (`conan graph info`) : 17 nœuds en gcc, 16 en clang, aucune recette ne refuse
+      MinGW, aucun conflit de version
+- [x] `cmake/CMakePresetsMinGW.json` : rien à changer, `CONAN_HOST_PROFILE` est choisi
+      par `cmake/Conan.cmake` d'après le compilateur détecté
+- [x] **Interblocage corrigé dans `ci/utils/run.py`** (voir ci-dessous) — confirmé :
+      `conan install` résout et construit désormais toutes les dépendances Windows,
+      `Configuring done (122.9s)`
+- [x] Étape *Tool Dependencies* : une ligne commentée avec `#` faisait échouer le
+      script `cmd` sous Windows (`'#' n'est pas reconnu…`). Aucune syntaxe de
+      commentaire n'est portable entre bash et cmd : la ligne doit être supprimée.
+- [x] **Trois échecs Windows corrigés**, tous issus de chemins non exécutables depuis
+      Linux :
+  1. `ci/utils/run.py` : interblocage sur les tubes (voir ci-dessous) ;
+  2. `$<TARGET_RUNTIME_DLLS>` appliqué à des bibliothèques statiques ;
+  3. `Log.cpp` : `getLogPath()` renvoie un `std::filesystem::path`, qui se convertit
+     en `std::wstring` sous Windows, alors que le `filename_t` de spdlog est un
+     `std::string` (`wchar_filenames=False`). Corrigé par `.string()`.
+- [x] ⚠️ **`IMGUI_API` en DLL sous MinGW (risque R2) : confirmé et résolu.** Les 82
+      symboles `undefined reference to __imp__Z…ImGui_Impl…` disaient tout : `imgui` en
+      partagé marque `IMGUI_API` en `dllimport` pour les consommateurs, alors que les
+      backends que **nous** compilons n'exportent rien. **`imgui` passe en statique**,
+      ce qui donne aussi un exemplaire unique de ses globales dans l'exécutable — la
+      préoccupation d'origine. `libimgui.so` disparaît de l'archive livrée.
+- [x] `windows-gcc-debug` : configure + build + `ctest` — 109 tests
+- [x] `windows-clang-debug` : configure + build + `ctest` — 109 tests
+- [x] `windows-clang-release` + `cpack` : l'archive livrée ne contient plus que
+      `EvenementLoto.exe` (4,1 Mo), les trois runtimes MinGW et `vulkan-1.dll`.
+      *`windows-gcc-release` n'est pas construit : comme sous Linux, une seule
+      configuration déploie (`run_deploy` dans `ci/PresetsParameters.json`).*
+- [x] Copie des DLL MinGW vérifiée dans l'archive (`libgcc_s_seh-1.dll`,
+      `libstdc++-6.dll`, `libwinpthread-1.dll`)
+- [x] **Dernier échec : `evl_gui_test_UTests` s'arrêtait sur `0xc0000135`**
+      (`STATUS_DLL_NOT_FOUND`) alors que les 93 tests de `evl_lib_test` passaient.
+      `glfw3.dll` manquait à côté des exécutables : la cible importée que `CMakeDeps`
+      déclare pour glfw n'expose pas d'`IMPORTED_LOCATION` sous MinGW, donc
+      `$<TARGET_RUNTIME_DLLS>` ne la voyait pas. Réglé par la phase 9 (tout en
+      statique), qui supprime la question au lieu de rafistoler la plomberie.
+- [x] `$<TARGET_RUNTIME_DLLS>` : **corrigé**. Il n'accepte que les cibles exécutable,
+      partagée ou module, alors que `copy_shared_libraries()` était appelée sur les
+      bibliothèques **statiques** `_lib` et `_ui` — d'où quatre `CMake Error` sous
+      Windows. Les DLL vont désormais à côté de l'exécutable et de chaque exécutable
+      de test (sans quoi ils ne démarreraient pas), et la fonction sort d'elle-même
+      si la cible n'est pas d'un type qui accepte des DLL à côté.
 
----
+### L'interblocage : `conan install` figé sous Windows
+
+Les deux builds Windows sont restés bloqués à l'étape *Build*, **1 h 35 sans une seule
+ligne de sortie**, jusqu'à annulation manuelle. La cause était dans notre code, pas
+dans Conan.
+
+`ci/utils/run.py` avait deux chemins : sous Linux une boucle `select()` qui drainait les
+deux flux, sous Windows une lecture **séquentielle** — `for line in process.stdout` puis
+`for line in process.stderr`. Or `conan install` écrit toute sa progression sur
+**stderr** (avec `--format=json`, stdout ne porte que le JSON, 629 Ko). Le tampon du
+tube stderr se remplit, CMake bloque en écriture, `conan install` se fige
+définitivement.
+
+Ça n'était jamais apparu avant parce que DepManager produisait bien moins de sortie que
+la construction à froid de toutes les dépendances par Conan.
+
+Corrigé en drainant les deux flux **en parallèle, un thread chacun**, sur les deux
+plateformes. Cela supprime la fourche Linux/Windows, la dépendance à `fcntl`/`select`, et
+au passage une course sur l'état global du détecteur de niveau de log — désormais une
+instance par flux.
+
+> **Fausse piste, pour mémoire** : j'avais d'abord cru à un simple problème de
+> visibilité et ajouté `ECHO_OUTPUT_VARIABLE` au `conan_provider.cmake` vendoré. Le test
+> a montré que, avec `--format=json`, stdout ne contient **que** le JSON : ce correctif
+> aurait déversé 629 Ko de JSON dans chaque log. Annulé.
 
 ## Phase 7 — Suppression de DepManager
 
@@ -436,9 +493,10 @@ Coût unique grâce au cache persistant.
 - [x] Supprimer `depmanager.yml`
 - [x] `pyproject.toml` : retirer `depmanager = "^0.5.1"`
 - [x] `poetry.lock` : régénérer
-- [ ] TeamCity : retirer `poetry run dmgr remote add …` du runner « Tool Dependencies »
-      (le runner ne garde que `PythonRequirements` + `DefineVariables`)
-- [ ] TeamCity : supprimer les paramètres racine `remote_url`, `remote_login`, `remote_passwd`
+- [x] TeamCity : `poetry run dmgr remote add …` retiré du runner « Tool Dependencies »
+      *(fait dans le DSL Kotlin, phase 8)*
+- [ ] TeamCity : supprimer les paramètres racine `remote_url`, `remote_login`,
+      `remote_passwd` *(projet racine, géré par l'interface)*
 - [x] **Dépôt `CI/DockerImages`** : `pip install … depmanager gcovr` retiré de
       `_common/builder.sh`
 - [x] Images reconstruites et publiées *(fait côté dépôt DockerImages)*
@@ -450,41 +508,94 @@ Coût unique grâce au cache persistant.
 
 ## Phase 8 — CI TeamCity en Kotlin DSL
 
-**Méthode** : ne pas écrire `.teamcity/` à la main. Dans l'UI :
-*Project Settings → Versioned Settings → Synchronization enabled, format Kotlin*.
-TeamCity génère `pom.xml` + `settings.kts` avec la bonne version de DSL pour le
-serveur (**2026.2**) et remplace chaque secret par un jeton `credentialsJSON:<uuid>`.
+**Faite.** `.teamcity/settings.kts` (format portable) + `.teamcity/pom.xml` repris
+verbatim de l'export du serveur, et `.teamcity/README.md` pour la procédure.
 
-- [ ] Activer les Versioned Settings au niveau du projet *Evenement Loto*
-- [ ] Récupérer le `.teamcity/` généré, **vérifier qu'aucun secret n'est en clair**
-- [ ] Refactoriser `settings.kts` : une `data class` + une liste des cibles, une
-      boucle qui produit les 9 `BuildType` depuis le template partagé
-- [ ] Vérifier que `ci/PresetsParameters.json` reste la **source de vérité unique**
-      pour `run_tests` / `run_coverage` / `run_deploy` / `run_documentation` /
-      `release_preset` / `docker_image` (poussés à l'exécution par l'action `DefineVariables`)
-- [ ] Ne **pas** dupliquer cette table dans le DSL
-- [ ] Vérifier que les 11 runners du template « Global Build » sont fidèlement reproduits,
-      conditions incluses (`run_tests`, `run_coverage`, `release_preset != ""`)
-- [ ] Vérifier les extensions : commit-status-publisher GitHub, xml-report-plugin
-      (gtest, `output/build/**/test/*_Report.xml`), perfmon, InvestigationsAutoAssigner
-- [ ] Vérifier les onglets de rapport (Coverage.zip, Documentation.zip, static-analysis.zip)
-- [ ] Comparer un build avant/après sur la même révision
+- [x] Squelette obtenu depuis le serveur (*Versioned Settings → Download settings in
+      Kotlin format*), qui fixe `version = "2026.2"` et les coordonnées du plugin Maven
+- [x] Aucun secret dans le dépôt : le projet racine reste géré par l'interface et porte
+      les paramètres partagés, la connexion GitHub App et la clé SSH. Le VCS root ne
+      référence la clé que **par son nom**.
+- [x] Les 9 configurations sont produites par une fabrique `presetBuild()` : elles ne
+      diffèrent que par `cmake_preset`
+- [x] **`id` posés explicitement** (`RelativeId("LotoBranch_Build_LinuxX64_Gcc")`, …) et
+      identiques à ceux du serveur — les changer ferait perdre l'historique de build
+- [x] `ci/PresetsParameters.json` reste la source de vérité unique ; le DSL ne duplique
+      ni `run_tests`, ni `run_coverage`, ni `release_preset`, ni `docker_image`
+- [x] Les 11 étapes du template sont reproduites, conditions incluses
+- [x] Extensions conservées : `investigationsAutoAssigner`, `xmlReport` (gtest,
+      `output/build/**/test/*_Report.xml`), `perfmon`, `github-bridge`
+- [x] Pas de trigger VCS : le déclenchement vient du pont GitHub App
+      (`triggerOnBranch`, `triggerOnPrReady`), comme sur le serveur
+- [ ] Activer la synchronisation (*Versioned Settings → use settings from VCS*) et
+      comparer un build avant/après sur la même révision
 
----
+### Validation : le DSL compile et régénère le XML
 
-## Phase 9 — Tout en statique (optionnel)
+Compilé dans un conteneur `maven:3.9-eclipse-temurin-21`
+(`mvn teamcity-configs:generate`), puis le XML produit a été comparé fichier par fichier
+à l'export du serveur. **8 des 16 fichiers sont strictement identiques**, et les 8 autres
+ne diffèrent que par les nettoyages voulus :
 
-**Séparée volontairement de la phase 4** : ne pas changer deux variables à la fois.
+- la ligne `dmgr remote add` de l'étape « Tool Dependencies » *(phase 7)* ;
+- le paramètre `WatchBranchFilter`, plus référencé depuis la disparition du trigger VCS ;
+- `disabled-settings` renvoyant à `BUILD_EXT_7` et `TRIGGER_2`, deux identifiants qui
+  n'existent plus ;
+- les `perfmon` redéclarés par configuration alors que le template les fournit déjà.
 
-- [ ] `conanfile.py` : `shared=False` partout sauf `vulkan-loader`
+### Deux pièges rencontrés
+
+1. **Un `object` de script Kotlin ne peut pas capturer l'instance du script**, donc pas
+   appeler une fonction de niveau script (« captures the script class instance »). Tout
+   est donc déclaré en `val` avec un `id` explicite, ce qui est de toute façon plus sûr
+   pour l'historique.
+2. **L'export Kotlin du serveur perd des réglages.** Il a laissé tomber
+   `ignoreKnownHosts`, `agentCleanFilesPolicy` et `submoduleCheckout` sur le VCS root —
+   or sans `ignoreKnownHosts` l'agent refuserait la clé d'hôte de GitHub — ainsi que
+   quatre paramètres du pont GitHub (`annotateDiff`, `publishChecks`, `triggerOnBranch`,
+   `triggerOnPrReady`) et le `triggerOnPrDraft` propre aux deux configurations Clang.
+   Tous rétablis explicitement, ce qui rend le XML régénéré fidèle.
+
+## Phase 9 — Tout en statique
+
+**Faite**, et pas par choix esthétique : les deux échecs Windows de la phase 6 étaient
+deux symptômes du même problème.
+
+1. `imgui` partagé marque `IMGUI_API` en `dllimport` pour ses consommateurs, alors que
+   les backends que l'on compile soi-même n'exportent rien — 82 symboles `__imp_…`
+   manquants à l'édition de liens MinGW.
+2. `glfw` partagé n'a jamais déposé sa DLL à côté des exécutables de test : sa cible
+   importée n'expose pas d'`IMPORTED_LOCATION` exploitable par `$<TARGET_RUNTIME_DLLS>`
+   sous MinGW, et `evl_gui_test_UTests` mourait en `0xc0000135`
+   (`STATUS_DLL_NOT_FOUND`).
+
+Le projet produit **un seul exécutable** à partir de bibliothèques statiques : rien ne
+justifiait de livrer des DLL, et l'état global d'ImGui n'existe plus qu'en un exemplaire.
+
+- [x] `conanfile.py` : `shared=False` partout sauf `vulkan-loader`
       (`package_type = "shared-library"` par nature)
-- [ ] Garde-fou dans `cmake/Conan.cmake` : si `BUILD_SHARED_LIBS` est activé,
-      `imgui`/`glfw`/`spdlog` **doivent** repasser en `shared=True`
-      *(le risque d'état global dupliqué n'existe que si `_lib`/`_ui` deviennent partagées)*
-- [ ] Simplifier `copy_shared_libraries()` (`cmake/UtilityFunctions.cmake:17`)
-- [ ] Simplifier les blocs `GET_RUNTIME_DEPENDENCIES` (`source/CMakeLists.txt`)
-- [ ] Revalider l'install et CPack sur les 4 plateformes
-- [ ] Vérifier la taille du binaire et le temps de démarrage
+- [x] Garde-fou : inutile. `BUILD_SHARED_LIBS` n'est jamais activé et `_lib`/`_ui` sont
+      statiques par construction — c'est justement ce qui rend la bascule sûre.
+      *(si `_lib`/`_ui` devenaient un jour partagées, repasser `imgui` en `shared=True`)*
+- [x] `copy_shared_libraries()` : **conservée**. Elle reste nécessaire sous Windows pour
+      `vulkan-1.dll` et les runtimes MinGW (`libgcc_s_seh-1`, `libstdc++-6`,
+      `libwinpthread-1`).
+- [x] Blocs `GET_RUNTIME_DEPENDENCIES` : **conservés**, pour `libvulkan.so.1` sous Linux.
+- [x] Revalider l'install et CPack
+- [x] Vérifier la taille du binaire : 3,9 Mo en release (statique, sans les données)
+
+**Effet de bord traité** : `xorg/system` déclare l'intégralité de X11 dans ses
+`system_libs`. glfw statique faisait donc enregistrer **68 `DT_NEEDED`** à l'exécutable,
+dont une soixantaine de bibliothèques jamais appelées (`libXaw.so.7`, `libXv.so.1`,
+`libXRes.so.1`, `libxkbfile.so.1`…) — absentes d'un bureau standard, l'application
+aurait refusé de démarrer. `-Wl,--as-needed`
+(`cmake/BaseConfig.cmake:127`) ramène le compte à **10** : `libvulkan`, `libgtk-3`,
+`libgdk-3`, `libgobject`, `libglib` et la libc. Tout ce qui touche au serveur
+d'affichage (X11, XCB, Wayland, xkbcommon) est chargé en `dlopen` par soname par glfw,
+donc fourni par l'hôte — c'est exactement ce qu'il faut pour la pile compositeur.
+
+L'archive CPack ne contient plus que l'exécutable, `libvulkan.so.1*`, `data/` et
+`resources/`, et le binaire installé porte un `RPATH` réduit à `$ORIGIN`.
 
 ---
 
@@ -533,13 +644,14 @@ des continuations.
 | # | Risque | Phase | Atténuation |
 |---|---|---|---|
 | ~~R1~~ | `compiler.cppstd` ⇒ reconstruction depuis les sources | 4 | **confirmé et assumé** : `cppstd` est obligatoire (spdlog, gtest), 7 paquets construits, cache persistant |
-| R2 | `IMGUI_API` non exporté en DLL MinGW | 6 | passer imgui en statique (phase 9) |
+| ~~R2~~ | `IMGUI_API` non exporté en DLL MinGW | 6 | **confirmé puis résolu** : imgui en statique |
 | ~~R3~~ | ~~clang 22 + `-Weverything`~~ | 1 | **levé** : aucun nouveau diagnostic |
 | ~~R4~~ | `xorg/system` échoue faute de `-dev` X11 | 4 | **levé** via `[platform_requires]` + pont `PKG_CONFIG_PATH` |
 | R5 | MinGW entièrement `--build=missing` | 6 | cache `~/.conan2` persistant, coût unique |
 | ~~R6~~ | `CMakeConfigDeps` expérimental | 4 | **sans objet** : la release 0.19.0 utilise `CMakeDeps`, stable |
 | R7 | Venv Poetry partagé entre images gcc et clang du même agent | 2 | même version de Python ; sinon deux venv cohabitent |
-| ~~R8~~ | `copy_shared_libraries()` et cibles importées Conan | 4/11 | **résolu autrement** : la fonction ne copiait rien sous Conan ; remplacée par `TARGET_RUNTIME_DLLS` (Windows) — sous Linux le rpath de build et `GET_RUNTIME_DEPENDENCIES` suffisent |
+| ~~R8~~ | `copy_shared_libraries()` et cibles importées Conan | 4/9 | **résolu** : réécrite autour de `TARGET_RUNTIME_DLLS`, puis vidée de son enjeu par la phase 9. La cible importée de glfw n'exposait pas d'`IMPORTED_LOCATION` sous MinGW, donc sa DLL n'était jamais copiée (`0xc0000135` sur les tests) ; en statique il ne reste que `vulkan-1.dll`. La commande est désormais un `true` quand la liste est vide, sinon `copy_if_different` échoue faute de source |
+| ~~R9~~ | `system_libs` de `xorg/system` propagés par glfw statique | 9 | **résolu** : `-Wl,--as-needed`, 68 → 10 `DT_NEEDED` |
 
 ---
 

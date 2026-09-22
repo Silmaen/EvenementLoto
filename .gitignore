@@ -44,6 +44,7 @@ __pycache__/
 
 # TeamCity
 TeamCity_*.zip
+projectSettings.zip
 .teamcity/target
 
 # Application log, written next to the binary
