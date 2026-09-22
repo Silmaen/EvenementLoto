@@ -4,6 +4,8 @@ import jetbrains.buildServer.configs.kotlin.buildFeatures.investigationsAutoAssi
 import jetbrains.buildServer.configs.kotlin.buildFeatures.xmlReport
 import jetbrains.buildServer.configs.kotlin.buildSteps.ScriptBuildStep
 import jetbrains.buildServer.configs.kotlin.buildSteps.script
+import jetbrains.buildServer.configs.kotlin.triggers.VcsTrigger
+import jetbrains.buildServer.configs.kotlin.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.vcs.GitVcsRoot
 
 /*
@@ -66,6 +68,22 @@ val globalBuild = Template {
 
     vcs {
         root(githubLoto)
+    }
+
+    // The bridge plugin enqueues builds from pull request events only: its webhook
+    // controller ignores `push`, and `branchTrigger.enabled` has no runtime consumer in
+    // 1.10.0. Without this trigger a push to main would build nothing at all. Scoped to
+    // main, so pull requests stay the bridge's job and nothing is built twice.
+    triggers {
+        vcs {
+            id = "vcsTrigger"
+            branchFilter = """
+                +:main
+                +:refs/heads/main
+            """.trimIndent()
+            enableQueueOptimization = true
+            quietPeriodMode = VcsTrigger.QuietPeriodMode.DO_NOT_USE
+        }
     }
 
     steps {
@@ -344,8 +362,8 @@ project {
             +:refs/heads/(Feature/*)
             +:refs/heads/(Experiment/*)
         """.trimIndent())
-        // Builds are triggered by the GitHub App bridge, on branch pushes and on pull
-        // requests marked ready, instead of a VCS trigger.
+        // Pull requests are built by the GitHub App bridge; branch pushes are not, so
+        // main relies on the template's VCS trigger.
         param("teamcity.github.bridge.repo", "Silmaen/EvenementLoto")
         param("teamcity.github.bridge.connectionId", "PROJECT_EXT_5")
         param("teamcity.github.bridge.prBuildRef", "branch")
