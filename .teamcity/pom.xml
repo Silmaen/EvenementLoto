@@ -44,7 +44,17 @@
         <groupId>org.jetbrains.kotlin</groupId>
         <version>${kotlin.version}</version>
 
-        <configuration/>
+        <!-- The DSL is split to mirror the project hierarchy; every directory holding
+             .kt files has to be listed here or the compiler never sees them. -->
+        <configuration>
+          <sourceDirs>
+            <sourceDir>${basedir}</sourceDir>
+            <sourceDir>${basedir}/common</sourceDir>
+            <sourceDir>${basedir}/quality</sourceDir>
+            <sourceDir>${basedir}/build</sourceDir>
+            <sourceDir>${basedir}/packaging</sourceDir>
+          </sourceDirs>
+        </configuration>
         <executions>
           <execution>
             <id>compile</id>
