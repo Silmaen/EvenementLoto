@@ -1,10 +1,6 @@
 #
 #
-# load custom Environment variables
-include(Environment)
-# Python setup (including virtual env if requested)
-include(Python)
-# Setup Poetry, and sync python dependencies
+# Poetry provides the python tooling (conan, gcovr) and puts it in PATH
 include(Poetry)
 # Initialize Dependency Manager
 include(Depmanager)

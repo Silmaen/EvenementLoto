@@ -8,7 +8,7 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 phases 0 et 1 faites
+**État global** : 🟩 phases 0, 1 et 2 faites
 **Dernière mise à jour** : 2026-09-21
 
 ---
@@ -210,8 +210,7 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
       `getValue<bool>("general/use_imgui", false)`, donc **un fichier de réglages
       contenant `use_imgui: false` fait sortir l'application en `EXIT_FAILURE`**
       au démarrage. Supprimer la branche et le réglage.
-- [ ] *(phase 2)* Renommer l'option `RSH_USE_PYTHON_VENV` (préfixe d'un autre projet) ou la
-      supprimer avec `cmake/Python.cmake` en phase 2
+- [x] *(fait en phase 2)* Option `RSH_USE_PYTHON_VENV` supprimée avec `cmake/Python.cmake`
 - [x] Mettre `CLAUDE.md` à jour (point d'entrée, version Clang du CI)
 - [ ] Doc développeur : noter dans le dépôt le nouveau flux de build
       (CMake pilote Conan) une fois la phase 4 passée
@@ -233,28 +232,34 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 
 **Encore sous DepManager.**
 
-- [ ] `pyproject.toml` : ajouter `conan = "^2.32"` au groupe `build`
-- [ ] `cmake/Poetry.cmake` : `option(EVL_USE_POETRY … ON)`
+- [x] `pyproject.toml` : ajouter `conan = "^2.32"` au groupe `build` (verrouillé sur **2.32.0**)
+- [x] `cmake/Poetry.cmake` : `option(EVL_USE_POETRY … ON)`
       ⚠️ **actuellement OFF et aucun preset ne l'active → le `poetry sync` ne tourne jamais**
-- [ ] `cmake/Poetry.cmake` : récupérer le chemin du venv via `poetry env info --path`
+- [x] `cmake/Poetry.cmake` : récupérer le chemin du venv via `poetry env info --path`
       et préfixer `ENV{PATH}` avec son `bin/` (ou `Scripts/` sous Windows)
-- [ ] Forcer les venv **hors du projet** (`virtualenvs.in-project = false`,
-      `POETRY_CACHE_DIR` sous `$HOME`)
+- [x] Forcer les venv **hors du projet** via `POETRY_VIRTUALENVS_IN_PROJECT=false`
+      posé par `Poetry.cmake` (pas de config poetry globale modifiée)
+
+> **Piège rencontré** : un `.venv/` traînait à la racine, créé quand le projet était
+> monté sur `/source/personnel/EvenementLoto` (le chemin du vieux `.env`). Poetry
+> réutilise un `.venv` existant, et ses scripts portaient un shebang mort
+> (`#!/source/personnel/…/python`) ⇒ `depmanager: cannot execute`. Le `.venv` a été
+> supprimé ; avec `POETRY_VIRTUALENVS_IN_PROJECT=false` chaque environnement a
+> désormais son venv sous son propre `$HOME`.
       ⚠️ le VCS root TeamCity a `agentCleanFilesPolicy=ALL_UNTRACKED` +
       `agentCleanPolicy=ALWAYS` → **un `.venv` in-project serait effacé à chaque build**.
       `$HOME` est déjà monté de façon persistante (`-v …/user:/home/user -e HOME=/home/user`).
-- [ ] Supprimer `cmake/Python.cmake` et son `include(Python)` dans `BaseConfig.cmake`
-      *(sous réserve de la vérification de phase 0 sur `Python3_EXECUTABLE`)*
-- [ ] Supprimer `.env` + `cmake/Environment.cmake` + `include(Environment)` si
-      `VENV_PATH` était leur seul usage *(à vérifier : `.env` ne contient que `VENV_PATH`)*
-- [ ] Conserver `RSH_USE_PYTHON_VENV` ? → non, supprimé avec `Python.cmake`
-      *(à noter : l'option est préfixée `RSH_` et non `EVL_`, résidu d'un autre projet)*
+- [x] Supprimer `cmake/Python.cmake` et son `include(Python)` dans `BaseConfig.cmake`
+- [x] Supprimer `.env` + `cmake/Environment.cmake` + `include(Environment)`
+      *(vérifié : `VENV_PATH` était le seul contenu et le seul usage)*
+- [x] `RSH_USE_PYTHON_VENV` supprimée avec `Python.cmake`
 
 **Validation**
-- [ ] `poetry sync --no-root` s'exécute bien au configure, sur hôte et en conteneur
-- [ ] `conan --version` ≥ 2.25 est résolu depuis le venv Poetry
-- [ ] `gcovr --version` ≥ 8.5 résolu depuis le venv (exigence de `CoverageConfig.cmake`)
-- [ ] Le venv survit à deux builds TeamCity consécutifs
+- [x] `poetry sync --no-root` s'exécute bien au configure **en conteneur**
+      *(hôte non testé : builds natifs interdits)*
+- [x] `conan --version` ≥ 2.25 résolu depuis le venv Poetry — **2.32.0**
+- [x] `gcovr --version` ≥ 8.5 résolu depuis le venv — **8.6** (et `depmanager` 0.5.2)
+- [ ] Le venv survit à deux builds TeamCity consécutifs *(non testable en local)*
 
 ---
 
