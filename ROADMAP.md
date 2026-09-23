@@ -22,3 +22,6 @@ dans le fichier `TODO.md` du dépôt.
 * Possibilité de passer l'étape de saisie du gagnant.
 * Édition des lots sous forme de liste d'articles.
 * Choix de la police de caractère.
+* Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
+  détachable, aperçu en mono-écran.
+* Icône et nom de l'application sous Wayland, via l'app-id et un fichier `.desktop`.

@@ -129,6 +129,14 @@ public:
 	 * @param iIconName The icon file name.
 	 */
 	void setIcon(const std::string& iIconName) const;
+
+	/**
+	 * @brief Ferme la frame en cours sans la rendre.
+	 *
+	 * À appeler quand une image a échoué : une frame ouverte par `newFrame()` doit être
+	 * fermée, sinon la suivante déclenche le contrôle de cohérence d'ImGui.
+	 */
+	static void abandonFrame();
 	/**
 	 * @brief Event handler.
 	 * @param[in,out] ioEvent The Event to react.

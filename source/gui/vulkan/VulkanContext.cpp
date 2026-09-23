@@ -10,6 +10,7 @@
 #include "VulkanContext.h"
 #include "core/Log.h"
 #include "core/defines.h"
+#include "core/utilities.h"
 #include "gui/Application.h"
 
 #include <backends/imgui_impl_vulkan.h>
@@ -299,14 +300,76 @@ VulkanContext::~VulkanContext() { reset(); }
  * plusieurs heures. Un pilote comme llvmpipe signifie presque toujours que le
  * périphérique graphique n'est pas accessible, pas qu'il est absent.
  */
+namespace {
+
+/// Human name of a device type, for the log.
+auto deviceTypeName(const VkPhysicalDeviceType iType) -> std::string_view {
+	switch (iType) {
+		case VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU:
+			return "carte dédiée";
+		case VK_PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU:
+			return "puce intégrée";
+		case VK_PHYSICAL_DEVICE_TYPE_VIRTUAL_GPU:
+			return "périphérique virtuel";
+		case VK_PHYSICAL_DEVICE_TYPE_CPU:
+			return "rendu logiciel";
+		case VK_PHYSICAL_DEVICE_TYPE_OTHER:
+		case VK_PHYSICAL_DEVICE_TYPE_MAX_ENUM:
+			break;
+	}
+	// Both compilers have to be satisfied: clang wants every enumerator listed rather
+	// than a `default`, gcc wants a reachable return after the switch.
+	return "type inconnu";
+}
+
+}// namespace
+
+auto VulkanContext::selectPhysicalDevice() const -> VkPhysicalDevice {
+	uint32_t count = 0;
+	if (vkEnumeratePhysicalDevices(m_data.instance, &count, nullptr) != VK_SUCCESS || count == 0) {
+		log_critical("[vulkan] Aucun périphérique graphique énuméré.");
+		return VK_NULL_HANDLE;
+	}
+	std::vector<VkPhysicalDevice> devices(count);
+	if (vkEnumeratePhysicalDevices(m_data.instance, &count, devices.data()) != VK_SUCCESS)
+		return VK_NULL_HANDLE;
+
+	// Every candidate is logged, not only the winner. A machine with two graphics
+	// devices is the normal case, and the question one asks afterwards is never "which
+	// did it take" but "which could it have taken" — a device missing from this list is
+	// a driver or a permission problem, not a bad choice.
+	const auto wanted = core::getSettings()->getValue<std::string>("gui/vulkan_device");
+	VkPhysicalDevice chosen = VK_NULL_HANDLE;
+	VkPhysicalDevice discrete = VK_NULL_HANDLE;
+	for (const auto& device: devices) {
+		VkPhysicalDeviceProperties properties{};
+		vkGetPhysicalDeviceProperties(device, &properties);
+		const std::string name{static_cast<const char*>(properties.deviceName)};
+		log_info("[vulkan] Candidat : {} ({})", name, deviceTypeName(properties.deviceType));
+		if (!wanted.empty() && chosen == VK_NULL_HANDLE && name.contains(wanted))
+			chosen = device;
+		if (discrete == VK_NULL_HANDLE && properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+			discrete = device;
+	}
+
+	if (chosen != VK_NULL_HANDLE) {
+		log_info("[vulkan] Périphérique imposé par le réglage 'gui/vulkan_device' = '{}'.", wanted);
+		return chosen;
+	}
+	if (!wanted.empty())
+		log_warn("[vulkan] Aucun périphérique ne correspond à 'gui/vulkan_device' = '{}'.", wanted);
+	// A dedicated card first, which is what a projector wants for a whole afternoon.
+	return discrete != VK_NULL_HANDLE ? discrete : devices.front();
+}
+
 void VulkanContext::logSelectedDevice() const {
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(m_data.physicalDevice, &properties);
-	log_info("[vulkan] Périphérique : {} (pilote {}.{}.{}, API {}.{}.{})",
-			 static_cast<const char*>(properties.deviceName), VK_API_VERSION_MAJOR(properties.driverVersion),
-			 VK_API_VERSION_MINOR(properties.driverVersion), VK_API_VERSION_PATCH(properties.driverVersion),
-			 VK_API_VERSION_MAJOR(properties.apiVersion), VK_API_VERSION_MINOR(properties.apiVersion),
-			 VK_API_VERSION_PATCH(properties.apiVersion));
+	log_info("[vulkan] Périphérique retenu : {} ({}, pilote {}.{}.{}, API {}.{}.{})",
+			 static_cast<const char*>(properties.deviceName), deviceTypeName(properties.deviceType),
+			 VK_API_VERSION_MAJOR(properties.driverVersion), VK_API_VERSION_MINOR(properties.driverVersion),
+			 VK_API_VERSION_PATCH(properties.driverVersion), VK_API_VERSION_MAJOR(properties.apiVersion),
+			 VK_API_VERSION_MINOR(properties.apiVersion), VK_API_VERSION_PATCH(properties.apiVersion));
 	if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU) {
 		log_warn("[vulkan] Rendu logiciel : le périphérique graphique n'est pas accessible.");
 		log_warn("[vulkan] L'affichage fonctionnera, mais trop lentement pour une séance.");
@@ -382,7 +445,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 	}
 
 	// Select Physical Device (GPU)
-	m_data.physicalDevice = ImGui_ImplVulkanH_SelectPhysicalDevice(m_data.instance);
+	m_data.physicalDevice = selectPhysicalDevice();
 	assert(m_data.physicalDevice != VK_NULL_HANDLE);
 	logSelectedDevice();
 

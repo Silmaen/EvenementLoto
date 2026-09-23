@@ -5,6 +5,36 @@ add_custom_target(All_Tests)
 # googletest
 find_package(GTest REQUIRED)
 
+# The GUI tests instantiate the application, so they need a display. `xvfb-run` gives
+# them a virtual one and Vulkan falls back on lavapipe, which is all they need — they
+# check the loop, not the pixels. Without it the whole GUI suite could only ever be run
+# by hand, which is why `test_Application.cpp` sat commented out for a year.
+if ((${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER) AND NOT WIN32)
+    find_library(SANITIZER_KEEPS_DRIVER_LOADED NAMES vulkan_lvp)
+    if (SANITIZER_KEEPS_DRIVER_LOADED)
+        message(STATUS "GUI tests will keep ${SANITIZER_KEEPS_DRIVER_LOADED} loaded for the leak check")
+    endif ()
+endif ()
+
+if (NOT WIN32)
+    find_program(XVFB_RUN xvfb-run)
+    if (XVFB_RUN)
+        message(STATUS "GUI tests will run under ${XVFB_RUN}")
+    else ()
+        message(WARNING "xvfb-run not found: the GUI tests need a display to pass")
+    endif ()
+endif ()
+
+# Each sanitizer that has known findings outside our code gets its suppression file
+# here, once, rather than at every place a test is run.
+set(sanitizerEnv "")
+if (${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER)
+    list(APPEND sanitizerEnv "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/lsan_suppressions.txt")
+endif ()
+if (${PROJECT_PREFIX}_ENABLE_THREAD_SANITIZER)
+    list(APPEND sanitizerEnv "TSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/tsan_suppressions.txt")
+endif ()
+
 foreach (child ${children})
     if (${child} MATCHES "test_helper")
         continue()
@@ -37,21 +67,37 @@ foreach (child ${children})
                 target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_ui)
             endif ()
             copy_shared_libraries(${${child}_exe})
-            set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
+            set(testLauncher "")
+            if (${child} MATCHES "gui" AND SANITIZER_KEEPS_DRIVER_LOADED)
+                # The Vulkan ICD is dlopen'd by the loader and unloaded at
+                # vkDestroyInstance, taking its allocations out of reach: LeakSanitizer
+                # then reports them from an <unknown module>, which no suppression can
+                # name. Keeping the software driver loaded makes them reachable again —
+                # and proves they were never leaks. The signal is kept for our own code:
+                # this is exactly how the surface no longer freed since ImGui 1.92.6 was
+                # caught.
+                set(testLauncher ${CMAKE_COMMAND} -E env LD_PRELOAD=${SANITIZER_KEEPS_DRIVER_LOADED})
+            endif ()
+            if (${child} MATCHES "gui" AND XVFB_RUN)
+                # -a picks a free display number, so parallel builds on one agent do not
+                # fight over :99.
+                set(testLauncher ${XVFB_RUN} -a ${testLauncher})
+            endif ()
+            set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${testLauncher} ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
             add_test(${PROJECT_PREFIX_LOWER}_${child}_UTests ${${PROJECT_PREFIX_LOWER}_${child}_test_command})
             set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES TIMEOUT 3600)
-            if (${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER)
+            if (sanitizerEnv)
                 set_tests_properties(${PROJECT_PREFIX_LOWER}_${child}_UTests PROPERTIES
-                        ENVIRONMENT "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/lsan_suppressions.txt")
+                        ENVIRONMENT "${sanitizerEnv}")
             endif ()
             add_dependencies(All_Tests ${${child}_exe})
-            if (${PROJECT_PREFIX}_ENABLE_ADDRESS_SANITIZER OR ${PROJECT_PREFIX}_ENABLE_LEAK_SANITIZER)
+            if (sanitizerEnv)
                 add_custom_command(TARGET All_Tests POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E env "LSAN_OPTIONS=suppressions=${CMAKE_SOURCE_DIR}/lsan_suppressions.txt" ${${child}_exe}
+                        COMMAND ${CMAKE_COMMAND} -E env ${sanitizerEnv} ${testLauncher} ${${child}_exe}
                         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
             else ()
                 add_custom_command(TARGET All_Tests POST_BUILD
-                        COMMAND ${${child}_exe}
+                        COMMAND ${testLauncher} ${${child}_exe}
                         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
             endif ()
         endif ()

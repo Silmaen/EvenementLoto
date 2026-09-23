@@ -126,10 +126,11 @@ Application::~Application() {
 void Application::renderFrame() {
 	checkActionEnable();
 	m_mainWindow.newFrame();
-	if (m_state != State::Running)
+	// From here on the frame is open: every way out has to close it.
+	if (m_state != State::Running || m_cachedDisplayView == nullptr) {
+		MainWindow::abandonFrame();
 		return;
-	if (m_cachedDisplayView == nullptr)
-		return;
+	}
 	if (isDisplayNeeded()) {
 		if (!m_cachedDisplayView->visibility())
 			log_debug("Show Display view.");
@@ -161,10 +162,12 @@ void Application::run() {
 			consecutiveFailures = 0;
 		} catch (const std::exception& e) {
 			++consecutiveFailures;
+			MainWindow::abandonFrame();
 			log_error("Exception pendant le rendu ({}/{}) : {}", consecutiveFailures, g_maxConsecutiveFrameFailures,
 					  e.what());
 		} catch (...) {
 			++consecutiveFailures;
+			MainWindow::abandonFrame();
 			log_error("Exception inconnue pendant le rendu ({}/{}).", consecutiveFailures,
 					  g_maxConsecutiveFrameFailures);
 		}
