@@ -58,7 +58,7 @@ execute_process(COMMAND ${CONAN_COMMAND} config install "${PROJECT_SOURCE_DIR}/c
         OUTPUT_VARIABLE conanOutput
         ERROR_VARIABLE conanOutput)
 if (NOT conanResult EQUAL 0)
-    message(FATAL_ERROR "Conan config install failed:\n${conanOutput}")
+    message(FATAL_ERROR "'${CONAN_COMMAND} config install' failed (${conanResult}):\n${conanOutput}")
 endif ()
 
 # nativefiledialog-extended is not on ConanCenter, it comes from an in-tree recipe.
@@ -68,7 +68,7 @@ execute_process(COMMAND ${CONAN_COMMAND} remote add --force --type=local-recipes
         OUTPUT_VARIABLE conanOutput
         ERROR_VARIABLE conanOutput)
 if (NOT conanResult EQUAL 0)
-    message(FATAL_ERROR "Unable to register the local recipe index:\n${conanOutput}")
+    message(FATAL_ERROR "'${CONAN_COMMAND} remote add' failed (${conanResult}):\n${conanOutput}")
 endif ()
 
 # A local-recipes-index revision does not follow the recipe content, so an edited

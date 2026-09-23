@@ -16,7 +16,6 @@
 namespace {
 
 auto run(int iArgc, char* iArgv[]) -> int {
-	evl::core::initializeUtilities(iArgc, iArgv);
 	evl::core::loadSettings();
 	evl::core::mergeDefaultSettings();
 	const auto settings = evl::core::getSettings();
@@ -65,6 +64,11 @@ auto main(int iArgc, char* iArgv[]) -> int {
 	// Nothing must escape: an uncaught exception would terminate the process without a
 	// trace, in the middle of a game.
 	try {
+		// Before the logger: the log file sits beside the executable, and its path is
+		// only known once this has run. Initialising the logger first opened
+		// `exec.log` relative to the current directory — wherever the launcher
+		// happened to leave it — which is exactly how a crash trace gets lost.
+		evl::core::initializeUtilities(iArgc, iArgv);
 #ifdef EVL_DEBUG
 		evl::Log::init(evl::Log::Level::Trace);
 #else

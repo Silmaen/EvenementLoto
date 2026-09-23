@@ -164,6 +164,16 @@ private:
 	bool m_windowSetupDone = false;
 	/// True on a Wayland session, where a client cannot position its own windows.
 	bool m_wayland = false;
+
+	/**
+	 * @brief Choisit le serveur d'affichage avant l'initialisation de GLFW.
+	 *
+	 * Wayland interdit à un client de placer ses propres fenêtres, or la vue
+	 * d'affichage détachée doit aller sur le second écran — c'est tout l'intérêt de la
+	 * version « docking » d'ImGui ici. X11, via XWayland en session Wayland, le permet,
+	 * donc il est préféré sauf réglage contraire (`gui/display_server`).
+	 */
+	static void selectPlatform();
 	/// Setup Vulkan window.
 	void setupVulkanWindow(int iWidth, int iHeight);
 	/// Cleanup Vulkan window.

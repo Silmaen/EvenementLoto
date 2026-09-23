@@ -10,6 +10,7 @@
 #include "Application.h"
 #include "MainWindow.h"
 #include "core/Log.h"
+#include "core/utilities.h"
 #include "vulkan/VulkanContext.h"
 
 #define GLFW_INCLUDE_NONE
@@ -49,8 +50,25 @@ MainWindow::MainWindow() = default;
 MainWindow::~MainWindow() = default;
 
 
+void MainWindow::selectPlatform() {
+	const auto requested = core::getSettings()->getValue<std::string>("gui/display_server", "x11");
+	if (requested == "auto") {
+		log_info("Serveur d'affichage : choix laissé à GLFW.");
+		return;
+	}
+	const auto wanted = requested == "wayland" ? GLFW_PLATFORM_WAYLAND : GLFW_PLATFORM_X11;
+	if (glfwPlatformSupported(wanted) != 0) {
+		glfwInitHint(GLFW_PLATFORM, wanted);
+		return;
+	}
+	log_warn("Serveur d'affichage '{}' indisponible, choix laissé à GLFW.", requested);
+	if (wanted == GLFW_PLATFORM_X11)
+		log_warn("Sans X11, les fenêtres détachées ne pourront pas être placées sur un autre écran.");
+}
+
 void MainWindow::init(const MainWindowOptions& iOptions) {
 	m_options = iOptions;
+	selectPlatform();
 	glfwSetErrorCallback(glfwErrorCallback);
 	if (glfwInit() == 0) {
 		Application::get().reportError("Failed to initialize GLFW");

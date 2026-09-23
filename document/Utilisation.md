@@ -29,6 +29,23 @@ mais il est possible de le modifier pour chaque événement.
 **Il est recommandé d'adapter le thème le Jour de la manifestation avec le vidéoprojecteur utilisé, et dans
 l'environnement de jeu pour que les couleurs soient bien visibles.**
 
+#### Écran d'affichage sur un second écran (Linux)
+
+L'écran d'affichage des numéros est une fenêtre détachable, destinée à être envoyée en plein écran sur le
+vidéoprojecteur. Sous Linux, cela n'est possible qu'avec le serveur d'affichage **X11** : le protocole Wayland
+interdit à une application de choisir l'écran et la position de ses propres fenêtres.
+
+Le logiciel demande donc X11 par défaut, y compris dans une session Wayland, où il passe par XWayland. Le réglage
+`gui/display_server` du fichier `config.yml` permet de changer ce choix :
+
+| Valeur | Effet |
+|---|---|
+| `x11` (défaut) | fenêtres détachables, second écran utilisable |
+| `wayland` | Wayland natif, **fenêtres détachables désactivées** |
+| `auto` | laisse la bibliothèque graphique décider |
+
+Le journal indique à chaque démarrage quel serveur d'affichage est utilisé.
+
 ### Réglage événement
 
 Il faut ensuite créer un événement, en cliquant sur "Fichier" > "Nouveau". Un événement est une collection de parties,
