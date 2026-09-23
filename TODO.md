@@ -860,9 +860,12 @@ chaîne de dépendances existe : rien n'atteint les analyses si le style, les qu
 builds et les quatre sanitizers ne sont pas passés.
 
 - [ ] Ajouter au ruleset « main merging » une règle `required_status_checks` avec
-      exactement :
-      `TeamCity / Evenement Loto / Analysis / Clang-Tidy` et
-      `TeamCity / Evenement Loto / Analysis / Static Analyzer`
+      exactement `Analysis / Clang-Tidy` et `Analysis / Static Analyzer`
+      *(noms raccourcis, voir la phase 15)*
+- [ ] **Dans cet ordre** : d'abord merger le retrait du préfixe, attendre que les checks
+      apparaissent sous leur nouveau nom, *puis* écrire la règle. Une règle qui nomme un
+      check inexistant bloque toute pull request, et l'ancien nom disparaît dès que le
+      paramètre est appliqué
 
 ---
 
@@ -892,6 +895,30 @@ Demandé le 2026-09-23.
       besoin de son propre `triggerOnPrDraft`
 - [x] Conséquence voulue : seules les deux analyses sont à exiger avant un merge,
       puisqu'elles sont en fin de chaîne
+
+## Phase 15 — Noms des checks GitHub
+
+- [x] `teamcity.github.bridge.checkName.stripPrefix` = `TeamCity / Evenement Loto` sur
+      le projet. GitHub n'affiche plus l'ascendance mais la fin du nom :
+      `Analysis / Clang-Tidy` au lieu de
+      `TeamCity / Evenement Loto / Analysis / Clang-Tidy`
+- [x] Le retrait est conservateur côté plugin : si le préfixe ne correspond pas
+      **exactement**, rien n'est retiré, et un résultat vide laisse le nom complet. Une
+      valeur périmée après un renommage de projet ne peut donc pas déformer les noms
+
+Les treize noms deviennent : `Code Style`, `Build Linux x64 / GCC`,
+`Build Linux x64 / Clang`, `Build Windows x64 / GCC`, `Build Windows x64 / Clang`,
+`Sanitizers / Sanitizer Address`, `… / Leak`, `… / Thread`, `… / Undefined Behavior`,
+`Analysis / Clang-Tidy`, `Analysis / Static Analyzer`, `Package / Linux x64`,
+`Package / Windows x64`.
+
+⚠️ **Renommer un check n'est pas cosmétique** : GitHub identifie une ligne par
+`(nom, head_sha)`. Deux conséquences à l'application :
+
+* une pull request ouverte à ce moment-là recevra de **nouvelles lignes**, les anciennes
+  restant affichées comme obsolètes ;
+* toute règle de protection qui nomme un ancien check se met à bloquer — d'où l'ordre
+  imposé plus haut.
 
 ## Validation manuelle — la séance de tests à faire
 
