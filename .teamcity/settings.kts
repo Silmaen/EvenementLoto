@@ -75,13 +75,17 @@ project {
     subProject(packaging)
 
     // Declared, because the order of the calls above is not what TeamCity displays: it
-    // keeps an order of its own, which the UI lets one drag around. What reads the code
-    // first, then what runs it, then the builds, then what ships.
+    // keeps an order of its own, which the UI lets one drag around.
+    //
+    // The order **is** the dependency chain, read top to bottom: the builds, then the
+    // sanitizers that need them, then the analyses that need those, then what ships.
+    // `Code Style` opens the chain but is a configuration and not a sub-project, so
+    // TeamCity shows it in its own block rather than in this list.
     subProjectsOrder = arrayListOf(
-            RelativeId("LotoBranch_Analysis"),
-            RelativeId("LotoBranch_Sanitizers"),
             RelativeId("LotoBranch_Build_LinuxX64"),
             RelativeId("LotoBranch_Build_WindowsX64"),
+            RelativeId("LotoBranch_Sanitizers"),
+            RelativeId("LotoBranch_Analysis"),
             RelativeId("LotoBranch_Package"),
     )
 }

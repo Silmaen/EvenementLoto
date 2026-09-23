@@ -8,9 +8,9 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.script
  * It sits at the root of the project rather than under a `Quality` folder: it gates
  * every other configuration, so that is where one should trip over it first.
  *
- * The only configuration that also runs on **draft** pull requests. It costs seconds
- * and a formatting slip is precisely what one wants to hear about early, while the
- * heavy builds wait for the pull request to be marked ready.
+ * It gates every other configuration, so a draft pull request reaches it anyway: the
+ * two Clang builds a draft triggers depend on it, and the chain pulls it in. No need to
+ * trigger it a second time on its own.
  *
  * `code-style` is not a CMake preset — nothing is configured here. It is the key
  * `ci/PresetsParameters.json` uses to hand out the docker image, and without an entry
@@ -42,6 +42,6 @@ val codeStyle = BuildType {
     }
 
     features {
-        githubBridge(triggerOnPrDraft = true)
+        githubBridge()
     }
 }

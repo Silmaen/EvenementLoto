@@ -2,7 +2,8 @@ import jetbrains.buildServer.configs.kotlin.*
 
 val windowsGcc = presetBuild("LotoBranch_Build_WindowsX64_Gcc", "GCC", "windows-gcc-debug")
 
-val windowsClang = presetBuild("LotoBranch_Build_WindowsX64_Clang", "Clang", "windows-clang-debug")
+val windowsClang = presetBuild("LotoBranch_Build_WindowsX64_Clang", "Clang", "windows-clang-debug",
+                               onDraft = true)
 
 val windowsX64 = Project {
     id = RelativeId("LotoBranch_Build_WindowsX64")

@@ -1,35 +1,28 @@
 import jetbrains.buildServer.configs.kotlin.*
 
+/// What must be green before an analysis runs: the whole chain below it.
+private val analysisGates = listOf(sanitizerAddress, sanitizerLeak, sanitizerThread, sanitizerUndefinedBehavior)
+
 // The id is the one the compile-time clang-tidy configuration already had: the check is
 // the same, better run, and its build history is worth keeping.
-val clangTidy = analysisBuild("LotoBranch_Build_LinuxX64_ClangTidy", "Clang-Tidy", "tidy",
-                              onDiff = false)
+val clangTidy = analysisBuild("LotoBranch_Build_LinuxX64_ClangTidy", "Clang-Tidy", "tidy", analysisGates)
 
-val clangTidyDiff = analysisBuild("LotoBranch_Build_Quality_ClangTidyDiff", "Clang-Tidy (diff)",
-                                  "tidy", onDiff = true)
-
-val staticAnalyzer = analysisBuild("LotoBranch_Build_Quality_StaticAnalyzer", "Static Analyzer",
-                                   "analyzer", onDiff = false)
-
-val staticAnalyzerDiff = analysisBuild("LotoBranch_Build_Quality_StaticAnalyzerDiff",
-                                       "Static Analyzer (diff)", "analyzer", onDiff = true)
+val staticAnalyzer =
+        analysisBuild("LotoBranch_Build_Quality_StaticAnalyzer", "Static Analyzer", "analyzer", analysisGates)
 
 /**
- * The two analyses, each in both scopes. Kept apart from the sanitizers: one reads the
- * code, the other runs it.
+ * The two analyses. Kept apart from the sanitizers: one reads the code, the other runs
+ * it — and these two are the last links of the chain, so they are the ones a merge waits
+ * for.
  */
 val analysis = Project {
     id = RelativeId("LotoBranch_Analysis")
     name = "Analysis"
 
-    buildType(clangTidyDiff)
-    buildType(staticAnalyzerDiff)
     buildType(clangTidy)
     buildType(staticAnalyzer)
 
     buildTypesOrder = arrayListOf(
-            clangTidyDiff,
-            staticAnalyzerDiff,
             clangTidy,
             staticAnalyzer,
     )
