@@ -12,6 +12,7 @@
 #include "actions/Action.h"
 #include "core/Log.h"
 #include "core/RandomNumberGenerator.h"
+#include "core/Rescue.h"
 #include "event/KeyCodes.h"
 #include "views/Popups.h"
 #include "views/View.h"
@@ -87,6 +88,22 @@ public:
 	 * to the players and a number written to disk must stay null.
 	 */
 	void saveProgress() { autoSave(true); }
+
+	/**
+	 * @brief Archive the rescue file, the game being safe in the user's own file now.
+	 *
+	 * Called after an explicit save. Archived rather than deleted, like a declined
+	 * recovery: `core::pruneRescueArchives` is what keeps that from piling up.
+	 */
+	static void forgetRescue() { core::archiveRescue(); }
+
+	/**
+	 * @brief Tell the organizer something went wrong, on screen and not only in the log.
+	 * @param[in] iTitle The window title.
+	 * @param[in] iMessage What to tell them.
+	 * @param[in] iDetail A second line, often the path involved.
+	 */
+	void tell(const std::string& iTitle, const std::string& iMessage, const std::string& iDetail = {}) const;
 
 	/**
 	 * @brief Request Error report.

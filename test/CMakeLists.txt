@@ -29,7 +29,8 @@ foreach (child ${children})
             # only real files in versions 3, 4 and 6 we have, and the backward
             # compatibility of the reader is exactly what they check.
             target_compile_definitions(${${child}_exe} PRIVATE
-                    ${PROJECT_PREFIX}_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/data")
+                    ${PROJECT_PREFIX}_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/data"
+                    ${PROJECT_PREFIX}_TEST_REFERENCE_FILE="${CMAKE_SOURCE_DIR}/test/lib_test/reference-v7.lev")
             target_link_libraries(${${child}_exe} GTest::gtest)
             target_link_libraries(${${child}_exe} ${CMAKE_PROJECT_NAME}_lib)
             if (${child} MATCHES "gui")

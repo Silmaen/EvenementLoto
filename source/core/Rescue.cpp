@@ -27,6 +27,9 @@ auto rescueCandidates() -> std::vector<std::filesystem::path> {
 	return {current, std::filesystem::path{current}.concat(".1")};
 }
 
+/// Prefix the archived files carry, and what identifies them when pruning.
+constexpr std::string_view g_rescueArchivePrefix = "rescue-";
+
 auto isResumable(const Event& iEvent) -> bool {
 	const auto status = iEvent.getStatus();
 	return status != Event::Status::Invalid && status != Event::Status::Finished;
@@ -113,13 +116,44 @@ void archiveRescue() {
 		if (!exists(candidate, error))
 			continue;
 		auto archived = candidate;
-		archived.replace_filename(std::format("rescue-{}-{}", stamp, candidate.filename().string()));
+		archived.replace_filename(std::format("{}{}-{}", g_rescueArchivePrefix, stamp, candidate.filename().string()));
 		rename(candidate, archived, error);
 		if (error)
 			log_warn("Impossible d'archiver '{}' : {}", candidate.string(), error.message());
 		else
 			log_info("Fichier de secours archivé sous '{}'.", archived.string());
 	}
+	pruneRescueArchives();
+}
+
+auto pruneRescueArchives(const std::size_t iKeep) -> std::size_t {
+	const auto directory = rescueDirectory();
+	if (directory.empty())
+		return 0;
+	std::error_code error;
+	if (!is_directory(directory, error))
+		return 0;
+
+	std::vector<std::filesystem::path> archives;
+	for (const auto& entry: std::filesystem::directory_iterator{directory, error}) {
+		if (entry.is_regular_file(error) && entry.path().filename().string().starts_with(g_rescueArchivePrefix))
+			archives.push_back(entry.path());
+	}
+	// The name carries a `%Y%m%d-%H%M%S` stamp, so sorting by name sorts by date.
+	std::ranges::sort(archives, std::greater{});
+
+	std::size_t deleted = 0;
+	for (std::size_t index = iKeep; index < archives.size(); ++index) {
+		if (remove(archives[index], error)) {
+			++deleted;
+			log_debug("Archive de secours supprimée : '{}'.", archives[index].string());
+		} else {
+			log_warn("Impossible de supprimer '{}' : {}", archives[index].string(), error.message());
+		}
+	}
+	if (deleted > 0)
+		log_info("{} archive(s) de secours supprimée(s), {} conservée(s).", deleted, iKeep);
+	return deleted;
 }
 
 }// namespace evl::core

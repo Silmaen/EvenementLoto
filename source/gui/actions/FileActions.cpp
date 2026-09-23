@@ -48,6 +48,9 @@ void LoadFileAction::onExecute() {
 	candidate.read(f, {});
 	if (!f.good()) {
 		log_error("Le fichier '{}' est incomplet ou corrompu, il n'a pas été chargé.", file.string());
+		app.tell("Fichier illisible",
+				 "Ce fichier est incomplet ou corrompu, il n'a pas été chargé. La partie en cours est intacte.",
+				 file.string());
 		return;
 	}
 	app.getCurrentEvent() = candidate;
@@ -78,8 +81,13 @@ void SaveFileAction::onExecute() {
 	if (!core::writeFileAtomically(file,
 								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
 		log_error("Failed to save file '{}'.", file.string());
+		app.tell("Enregistrement impossible",
+				 "Le fichier n'a pas pu être écrit. La partie n'est pas perdue : "
+				 "la sauvegarde de secours continue.",
+				 file.string());
 		return;
 	}
+	Application::forgetRescue();
 	log_info("File '{}' saved successfully.", file.string());
 }
 
@@ -100,9 +108,14 @@ void SaveAsFileAction::onExecute() {
 	if (!core::writeFileAtomically(file,
 								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
 		log_error("Failed to save file '{}'.", file.string());
+		app.tell("Enregistrement impossible",
+				 "Le fichier n'a pas pu être écrit. La partie n'est pas perdue : "
+				 "la sauvegarde de secours continue.",
+				 file.string());
 		return;
 	}
 	app.getCurrentFile() = file;
+	Application::forgetRescue();
 	log_info("File '{}' saved successfully.", file.string());
 }
 

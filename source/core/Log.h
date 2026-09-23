@@ -56,6 +56,14 @@ public:
 	static void setVerbosityLevel(const Level& iLevel);
 
 	/**
+	 * @brief Journalise en tête de session la build qui tourne.
+	 *
+	 * Un rapport d'incident ne vaut pas grand-chose sans savoir quel binaire l'a
+	 * produit.
+	 */
+	static void logSessionHeader();
+
+	/**
 	 * @brief Destroy the logger.
 	 */
 	static void invalidate();
