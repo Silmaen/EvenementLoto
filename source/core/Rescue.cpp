@@ -52,9 +52,7 @@ auto ageInSeconds(const std::filesystem::path& iPath) -> double {
 
 }// namespace
 
-auto rescueDirectory() -> std::filesystem::path {
-	return getSettings()->getValue<std::filesystem::path>("general/data_location");
-}
+auto rescueDirectory() -> std::filesystem::path { return getDataLocation(); }
 
 auto saveRescue(const Event& iEvent) -> bool {
 	const auto directory = rescueDirectory();

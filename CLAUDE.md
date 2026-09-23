@@ -30,6 +30,8 @@ Author: Silmaen
 - `conan/` - Conan profiles and `global.conf` (`conan/config/`) and the in-tree recipe
   index (`conan/local-recipes/`)
 - `document/` - User documentation (in French)
+- `CHANGELOG.md` / `ROADMAP.md` - what is released and what is planned, one line each.
+  `TODO.md` holds the detail of the work in progress.
 - `data/` - Runtime data files
 
 ### Key Domain Classes (namespace `evl::core`)
@@ -111,11 +113,14 @@ native toolchain, and gcc matches the prebuilt tool packages, which are then sha
 between the gcc and clang host profiles.
 
 Both display servers are supported: glfw is built with `with_x11` and `with_wayland`,
-and picks the platform at runtime; `vulkan-loader` carries the xlib, xcb and wayland
-WSI backends. `MainWindow` reads the platform with `glfwGetPlatform()` and adapts: on
-Wayland the ImGui multi-viewport flag stays off and the monitor hosting the control
-window is deduced from the primary monitor, because the protocol does not let a client
-know or set its own window position.
+and `vulkan-loader` carries the xlib, xcb and wayland WSI backends.
+
+**X11 is asked for by default**, XWayland included, through `glfwInitHint(GLFW_PLATFORM,
+…)` in `MainWindow::selectPlatform()` — the setting `gui/display_server` takes `x11`,
+`wayland` or `auto`. The reason is not nostalgia: the detached display view has to go
+fullscreen on a second screen, and Wayland forbids a client from choosing where its own
+windows land. On Wayland the ImGui multi-viewport flag therefore stays off and the
+monitor hosting the control window is deduced from the primary monitor.
 
 ### Python Dependencies (via Poetry)
 

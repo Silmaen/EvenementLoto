@@ -291,6 +291,28 @@ VulkanContext::VulkanContext() { m_data = {}; }
 VulkanContext::~VulkanContext() { reset(); }
 
 
+/**
+ * @brief Journalise le périphérique retenu, et prévient s'il est logiciel.
+ *
+ * Sans cette ligne, un rendu logiciel ne se voit qu'à la lenteur : l'affichage tient
+ * encore, mais il n'a plus rien à voir avec ce qu'un vidéoprojecteur demande pendant
+ * plusieurs heures. Un pilote comme llvmpipe signifie presque toujours que le
+ * périphérique graphique n'est pas accessible, pas qu'il est absent.
+ */
+void VulkanContext::logSelectedDevice() const {
+	VkPhysicalDeviceProperties properties{};
+	vkGetPhysicalDeviceProperties(m_data.physicalDevice, &properties);
+	log_info("[vulkan] Périphérique : {} (pilote {}.{}.{}, API {}.{}.{})",
+			 static_cast<const char*>(properties.deviceName), VK_API_VERSION_MAJOR(properties.driverVersion),
+			 VK_API_VERSION_MINOR(properties.driverVersion), VK_API_VERSION_PATCH(properties.driverVersion),
+			 VK_API_VERSION_MAJOR(properties.apiVersion), VK_API_VERSION_MINOR(properties.apiVersion),
+			 VK_API_VERSION_PATCH(properties.apiVersion));
+	if (properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_CPU) {
+		log_warn("[vulkan] Rendu logiciel : le périphérique graphique n'est pas accessible.");
+		log_warn("[vulkan] L'affichage fonctionnera, mais trop lentement pour une séance.");
+	}
+}
+
 void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 	VkResult err = VK_SUCCESS;
 #ifdef IMGUI_IMPL_VULKAN_USE_VOLK
@@ -362,6 +384,7 @@ void VulkanContext::init(const std::vector<const char*>& iInstanceExtensions) {
 	// Select Physical Device (GPU)
 	m_data.physicalDevice = ImGui_ImplVulkanH_SelectPhysicalDevice(m_data.instance);
 	assert(m_data.physicalDevice != VK_NULL_HANDLE);
+	logSelectedDevice();
 
 	// Select graphics queue family
 	m_data.queueFamily = ImGui_ImplVulkanH_SelectQueueFamilyIndex(m_data.physicalDevice);

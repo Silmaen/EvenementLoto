@@ -29,6 +29,13 @@ void initializeUtilities([[maybe_unused]] int iArgc, char* iArgv[]) {
 
 auto getExecPath() -> std::filesystem::path { return g_baseExecPath; }
 
+auto getDataLocation() -> std::filesystem::path {
+	const auto configured = getSettings()->getValue<std::string>("general/data_location");
+	if (configured.empty())
+		return g_baseExecPath / "data";
+	return std::filesystem::path{configured};
+}
+
 auto getConfigFile() -> std::filesystem::path { return g_baseExecPath / "config.yml"; }
 
 auto getSettings() -> std::shared_ptr<Settings> {
@@ -48,8 +55,15 @@ void mergeDefaultSettings() {
 		if (!g_settings->contains("general/log_level")) {
 			g_settings->setValue("general/log_level", std::string("info"));
 		}
+		if (!g_settings->contains("gui/display_server")) {
+			// x11 by default, XWayland included: it is the only way a detached window
+			// can be placed on a chosen screen. `wayland` or `auto` are the other
+			// values.
+			g_settings->setValue("gui/display_server", std::string("x11"));
+		}
 		if (!g_settings->contains("general/data_location")) {
-			g_settings->setValue("general/data_location", g_baseExecPath / "data");
+			// A string, like everything the YAML backend can write back.
+			g_settings->setValue("general/data_location", (g_baseExecPath / "data").string());
 		}
 	}
 }

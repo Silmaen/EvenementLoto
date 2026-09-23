@@ -34,6 +34,18 @@ auto getExecPath() -> std::filesystem::path;
 auto getConfigFile() -> std::filesystem::path;
 
 /**
+ * @brief Get the configured data location, never empty.
+ *
+ * The settings are backed by YAML and every non-numeric value comes back as a
+ * `std::string`: reading this one as a `std::filesystem::path` throws `bad_any_cast`
+ * and silently yields an empty path — which is how the rescue save stopped happening
+ * at all. One accessor, so the type cannot drift apart again.
+ *
+ * @return The configured location, or the default beside the executable.
+ */
+auto getDataLocation() -> std::filesystem::path;
+
+/**
  * @brief Load settings from file into the Settings singleton.
  */
 void loadSettings();

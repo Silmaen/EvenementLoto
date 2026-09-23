@@ -49,3 +49,5 @@ projectSettings.zip
 
 # Application log, written next to the binary
 exec.log
+# Written beside the working directory by ImGui, holds the window layout.
+imgui.ini

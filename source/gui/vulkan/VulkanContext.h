@@ -144,6 +144,11 @@ public:
 
 private:
 	/**
+	 * @brief Journalise le périphérique retenu, et prévient s'il est logiciel.
+	 */
+	void logSelectedDevice() const;
+
+	/**
 	 * @brief Default constructor.
 	 */
 	explicit VulkanContext();

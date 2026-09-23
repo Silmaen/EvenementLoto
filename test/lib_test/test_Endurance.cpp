@@ -24,7 +24,10 @@ public:
 		m_path = fs::temp_directory_path() / "evl-endurance";
 		remove_all(m_path);
 		create_directories(m_path);
-		getSettings()->setValue("general/data_location", m_path);
+		// A string, which is what the YAML backend hands back after a reload. Storing a
+		// path here made the fixture test a configuration that never occurs, and that is
+		// how the rescue save could stop working entirely without a test noticing.
+		getSettings()->setValue("general/data_location", m_path.string());
 	}
 	~EnduranceArea() { remove_all(m_path); }
 

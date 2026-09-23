@@ -21,7 +21,10 @@ public:
 		m_path = fs::temp_directory_path() / fs::path{std::format("evl-rescue-{}", ++s_counter)};
 		remove_all(m_path);
 		create_directories(m_path);
-		getSettings()->setValue("general/data_location", m_path);
+		// A string, which is what the YAML backend hands back after a reload. Storing a
+		// path here made the fixture test a configuration that never occurs, and that is
+		// how the rescue save could stop working entirely without a test noticing.
+		getSettings()->setValue("general/data_location", m_path.string());
 	}
 	~RescueArea() { remove_all(m_path); }
 
@@ -68,6 +71,25 @@ TEST(Rescue, SaveThenFindAndLoad) {
 	ASSERT_TRUE(loadRescue(info.path, restored));
 	EXPECT_EQ(restored.getName(), event.getName());
 	EXPECT_EQ(restored.getStatus(), event.getStatus());
+}
+
+TEST(Rescue, SaveWorksWithTheLocationStoredAsAString) {
+	// The regression that hid behind a type: the settings are backed by YAML, so a path
+	// comes back as a `std::string` on every run after the first. Read as a
+	// `std::filesystem::path` it yielded an empty directory and the rescue save did
+	// nothing at all — silently, apart from one warning line.
+	const RescueArea area;
+	getSettings()->setValue("general/data_location", area.path().string());
+	EXPECT_EQ(rescueDirectory(), area.path());
+	EXPECT_TRUE(saveRescue(makeRunningEvent()));
+	EXPECT_TRUE(exists(area.path() / g_rescueFileName));
+}
+
+TEST(Rescue, LocationFallsBackWhenUnset) {
+	const RescueArea area;
+	getSettings()->remove("general/data_location");
+	// Never empty: an unset location must not mean "do not save".
+	EXPECT_FALSE(rescueDirectory().empty());
 }
 
 TEST(Rescue, NothingToFindOnAnEmptyArea) {

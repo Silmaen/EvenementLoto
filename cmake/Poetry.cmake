@@ -43,6 +43,30 @@ if (NOT poetryResult EQUAL 0 OR NOT EXISTS "${${PROJECT_PREFIX}_VENV_DIR}")
     message(FATAL_ERROR "Unable to locate the Poetry virtual environment.")
 endif ()
 
+# Every tool below comes from this virtual environment, which lives under $HOME, and
+# find_program() caches an absolute path. The same build directory opened from the IDE,
+# from a terminal and from a CI agent sees three different homes, so an entry cached
+# under one of them points nowhere in the next — and execute_process() on a missing
+# program fails with **no output at all**, which turns a trivial problem into an
+# unreadable one. Drop the stale entries here, once, rather than guarding every use.
+set(venvTools CONAN_COMMAND GCOVR CLANG_TIDY_EXECUTABLE)
+if (DEFINED ${PROJECT_PREFIX}_CACHED_VENV_DIR
+        AND NOT ${PROJECT_PREFIX}_CACHED_VENV_DIR STREQUAL "${${PROJECT_PREFIX}_VENV_DIR}")
+    message(STATUS "Virtual environment moved from '${${PROJECT_PREFIX}_CACHED_VENV_DIR}': "
+            "dropping the cached tool paths.")
+    foreach (tool ${venvTools})
+        unset(${tool} CACHE)
+    endforeach ()
+endif ()
+foreach (tool ${venvTools})
+    if (${tool} AND NOT EXISTS "${${tool}}")
+        message(STATUS "${tool} was cached at '${${tool}}', which no longer exists: looking again.")
+        unset(${tool} CACHE)
+    endif ()
+endforeach ()
+set(${PROJECT_PREFIX}_CACHED_VENV_DIR "${${PROJECT_PREFIX}_VENV_DIR}"
+        CACHE INTERNAL "Virtual environment the cached tool paths came from")
+
 if (WIN32)
     set(venvBinDir "${${PROJECT_PREFIX}_VENV_DIR}/Scripts")
     set(pathSeparator ";")

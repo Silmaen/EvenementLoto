@@ -67,7 +67,7 @@ auto FileDialog::openFile(const std::string_view& iFilter) -> std::filesystem::p
 	std::filesystem::path resultPath;
 	auto ff = parseFilter(iFilter);
 	if (m_lastPath.empty() || !exists(m_lastPath))
-		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
+		m_lastPath = core::getDataLocation();
 
 	std::string mLast = m_lastPath.string();
 	if (!exists(m_lastPath))
@@ -116,7 +116,7 @@ auto FileDialog::saveFile([[maybe_unused]] const std::string_view& iFilter) -> s
 	std::filesystem::path resultPath;
 	auto ff = parseFilter(iFilter);
 	if (m_lastPath.empty() || !exists(m_lastPath))
-		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
+		m_lastPath = core::getDataLocation();
 	std::string mLast = m_lastPath.string();
 	if (!exists(m_lastPath))
 		mLast = core::getExecPath().string();
@@ -162,7 +162,7 @@ auto FileDialog::selectFolder() -> std::filesystem::path {
 	nfdu8char_t* outPath = nullptr;
 	std::filesystem::path resultPath;
 	if (m_lastPath.empty() || !exists(m_lastPath))
-		m_lastPath = core::getSettings()->getValue<std::filesystem::path>("general/data_location", core::getExecPath());
+		m_lastPath = core::getDataLocation();
 
 	std::string mLast = m_lastPath.string();
 	if (!exists(m_lastPath))
