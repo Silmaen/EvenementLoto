@@ -77,6 +77,30 @@ void Log::init(const Level& iLevel) {
 	setVerbosityLevel(iLevel);
 	// Also in release: the last seconds before a crash are the interesting ones.
 	spdlog::flush_every(std::chrono::seconds(1U));
+	logSessionHeader();
+}
+
+void Log::logSessionHeader() {
+	// First lines of every session: an incident report is worth little without knowing
+	// which build produced it. The log is appended and rotated, so this is also what
+	// separates one afternoon from the next in the file.
+	log_info("=== EvenementLoto {}.{}.{} ===", EVL_MAJOR, EVL_MINOR, EVL_PATCH);
+#ifdef __clang__
+	log_info("Compilateur : clang {}.{}.{}", __clang_major__, __clang_minor__, __clang_patchlevel__);
+#elifdef __GNUC__
+	log_info("Compilateur : gcc {}.{}.{}", __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#else
+	log_info("Compilateur : inconnu");
+#endif
+#ifdef EVL_PLATFORM_WINDOWS
+	log_info("Plateforme : Windows");
+#elifdef EVL_PLATFORM_LINUX
+	log_info("Plateforme : Linux");
+#else
+	log_info("Plateforme : inconnue");
+#endif
+	log_info("Version de sauvegarde : {}", core::getSaveVersion());
+	log_info("Journal : '{}'", getLogPath().string());
 }
 
 void Log::setVerbosityLevel(const Level& iLevel) {

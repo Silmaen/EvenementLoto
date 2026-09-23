@@ -161,6 +161,34 @@ TEST(Serialization, RandomBytesAreRejected) {
 	}
 }
 
+TEST(Serialization, WritingIsDeterministic) {
+	// Same event, same bytes. This is what makes a reference file possible, and it is
+	// also the cheapest way to notice that something uncontrolled — a clock, a hash
+	// order, an uninitialised field — slipped into the format.
+	EXPECT_EQ(serialize(makeEvent()), serialize(makeEvent()));
+}
+
+TEST(Serialization, MatchesTheReferenceFile) {
+	// `test/lib_test/reference-v7.lev` was produced once by the GCC x64 build and is
+	// checked in. Comparing against it is what makes the format verifiably portable:
+	// every toolchain the CI runs — Clang, MinGW GCC, MinGW Clang, and an arm64 build
+	// the day there is one — checks the very same bytes, with nothing to orchestrate.
+	//
+	// Should this fail after a deliberate format change, bump the save version and
+	// regenerate the file, keeping the old one as a compatibility fixture.
+	std::ifstream reference(EVL_TEST_REFERENCE_FILE, std::ios::in | std::ios::binary);
+	ASSERT_TRUE(reference.is_open()) << EVL_TEST_REFERENCE_FILE;
+	const std::string expected{std::istreambuf_iterator<char>(reference), std::istreambuf_iterator<char>()};
+	EXPECT_EQ(serialize(makeEvent()), expected);
+
+	// And it reads back, which is the other half of the promise.
+	std::istringstream stream(expected, std::ios::in | std::ios::binary);
+	Event restored;
+	restored.read(stream, {});
+	EXPECT_TRUE(stream.good());
+	EXPECT_EQ(restored.getName(), makeEvent().getName());
+}
+
 TEST(Serialization, MagicIsPresent) {
 	const auto buffer = serialize(makeEvent());
 	ASSERT_GT(buffer.size(), g_bodyOffset);

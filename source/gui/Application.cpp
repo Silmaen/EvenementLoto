@@ -24,6 +24,7 @@
 #include "views/HelpView.h"
 #include "views/MainView.h"
 #include "views/MenuBar.h"
+#include "views/MessagePopup.h"
 #include "views/RescuePopup.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
@@ -72,6 +73,7 @@ Application::Application() {
 	m_popups.push_back(std::make_shared<views::EventConfigPopups>());
 	m_popups.push_back(std::make_shared<views::GameRoundConfigPopups>());
 	m_popups.push_back(std::make_shared<views::PopupRescue>());
+	m_popups.push_back(std::make_shared<views::PopupMessage>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -178,6 +180,11 @@ void Application::run() {
 	autoSave(true);
 }
 
+void Application::tell(const std::string& iTitle, const std::string& iMessage, const std::string& iDetail) const {
+	if (const auto popup = std::dynamic_pointer_cast<views::PopupMessage>(getPopup("popup_message")))
+		popup->show(iTitle, iMessage, iDetail);
+}
+
 void Application::reportError(const std::string& iMessage) {
 	log_error("Application reported error: {}", iMessage);
 	if (m_state == State::Error)
@@ -265,6 +272,8 @@ void Application::checkActionEnable() const {
 		if (m_cachedStartGame)
 			m_cachedStartGame->disable();
 	}
+	// `Finished` and nothing else, on purpose: a game in progress cannot be interrupted.
+	// This is a deliberate rule, not an oversight — please do not "fix" it.
 	if (status == core::Event::Status::Finished) {
 		if (m_cachedStopGame)
 			m_cachedStopGame->enable();

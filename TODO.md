@@ -983,7 +983,8 @@ part avec une main dans le dos.
 - [x] Politique retenue : **5 Mo × 5 fichiers** (25 Mo au plus)
 - [x] `spdlog::flush_every(1s)` n'était actif **qu'en debug** — activé aussi en release,
       car les dernières secondes avant un crash sont les seules qui comptent
-- [ ] Journaliser en en-tête de session le compilateur et la plateforme
+- [x] Journaliser en en-tête de session la version, le compilateur, la plateforme, la
+      version de sauvegarde et le chemin du journal (`Log::logSessionHeader`)
       *(la version et le chemin d'exécution le sont déjà)*
 
 **Validation**
@@ -1031,7 +1032,11 @@ aucun changement de l'interface `Serializable`, et les appelants testent `good()
 - [x] `Event::read`, `GameRound::read` et `SubGameRound::read` réécrites
 - [x] `Event::getStatusStr()` n'utilise plus de `.at()` non gardé *(fait en phase 5,
       via les tables `constexpr` de `EnumLabel.h`)*
-- [ ] `FileActions::LoadFileAction` : exploiter l'échec de lecture pour prévenir
+- [x] `FileActions::LoadFileAction` : l'échec de lecture prévient désormais à l'écran,
+      via `views::PopupMessage` et `Application::tell()` — un échec écrit seulement dans
+      le journal est un échec que personne ne voit pendant une partie. Idem pour un
+      enregistrement qui n'aboutit pas
+- [x] ~~exploiter l'échec de lecture pour prévenir
       l'utilisateur *(la lecture est sûre, il reste à afficher l'erreur)*
 
 **Validation** — `test/lib_test/test_Serialization.cpp`, 7 tests
@@ -1056,9 +1061,12 @@ relu. `source/core/Rescue.h/.cpp` porte la logique, testable hors interface, et
       un refus par erreur n'est pas définitif
 - [x] Documenté dans `document/Utilisation.md`, section « En cas d'incident »
       *(doc utilisateur, intégrée à l'aide de l'application)*
-- [ ] Nettoyer les archives au-delà de N *(elles s'accumulent aujourd'hui)*
-- [ ] Après une reprise acceptée, supprimer le fichier de secours à la première
-      sauvegarde explicite *(il est conservé pour l'instant, ce qui est le côté sûr)*
+- [x] `pruneRescueArchives()` : les 10 fichiers les plus récents sont conservés, le
+      reste est supprimé. Appelé par `archiveRescue()`, donc à chaque archivage
+- [x] La sauvegarde explicite **archive** le fichier de secours
+      (`Application::forgetRescue`) : la partie est en sûreté dans le fichier de
+      l'utilisateur, mais un archivage reste réversible là où une suppression ne l'est
+      pas — et l'élagage ci-dessus borne l'accumulation
 
 **Validation** — `test/lib_test/test_Rescue.cpp`, 6 tests
 - [x] Enregistrement, détection puis rechargement d'une partie en cours
@@ -1133,8 +1141,26 @@ partie récupérable.
       demanderait de recharger toutes les textures — laissé ouvert)*
 - [ ] Débranchement/rebranchement de l'écran secondaire en cours de partie
       *(le chemin `OUT_OF_DATE` est traité, reste à valider en vrai)*
-- [ ] Test d'endurance 4 h+ avec tirages automatiques, suivi du RSS et des handles
-- [ ] Session d'endurance sous `linux-sanitizer-address` et `linux-sanitizer-leak`
+- [x] Banc d'endurance : `test/lib_test/test_Endurance.cpp`, désactivé par défaut
+      (`DISABLED_`, durée par `EVL_ENDURANCE_SECONDS`). Il rejoue l'après-midi qui
+      compte — un numéro tiré, la partie sauvegardée atomiquement, le fichier relu — et
+      surveille le RSS et les descripteurs
+- [x] Mesuré : **258 139 tirages-sauvegardes et 5 162 relectures en 20 s**, RSS
+      10 400 → 10 736 KiB (plateau), descripteurs 5 → 5. Soit environ 12 900
+      sauvegardes/seconde soit, en 20 secondes, plusieurs centaines de fois la charge
+      d'un après-midi réel
+- [ ] Run de 4 h en horloge murale — **décidé le 2026-09-23 : pas dans l'environnement
+      de développement.** La charge est déjà couverte plusieurs centaines de fois par le
+      banc ci-dessus ; ce qui reste à observer est lié au temps lui-même (rotation du
+      journal, dérive d'horloge) et se voit mieux sur la machine qui animera l'après-midi.
+      Le banc est là pour ça :
+      `EVL_ENDURANCE_SECONDS=14400 evl_lib_test_unit_test --gtest_also_run_disabled_tests
+      --gtest_filter='*Endurance*'`
+- [x] Session d'endurance sous les deux sanitizers. **LeakSanitizer propre** :
+      13 108 → 13 608 KiB sur 421 233 cycles. AddressSanitizer ne signale **aucune
+      fuite** non plus, mais son RSS grimpe à 355 MiB : sa quarantaine retient les blocs
+      libérés par construction, donc la mesure mémoire n'y veut rien dire. L'assertion
+      RSS est exemptée sous ASan, et le test le documente
 
 ## Phase S7 — Format de fichier portable
 
@@ -1163,8 +1189,11 @@ génération précédente au lieu d'en charger la moitié.
 - [x] Un octet modifié est détecté par la somme de contrôle
 - [x] Un fichier de version 6 sans cadre se relit toujours
 - [x] Un fichier qui n'est pas un `.lev` est rejeté sur son nombre magique
-- [ ] Un `.lev` écrit par la build GCC x64 relu par la build Clang x64 et ARM64
-      *(les largeurs sont désormais fixes, reste à le faire tourner)*
+- [x] Réglé plus fort qu'attendu : la sérialisation est **déterministe** (test), donc
+      `test/lib_test/reference-v7.lev` est figé dans le dépôt et comparé **octet pour
+      octet**. Chaque toolchain de la CI — clang, MinGW gcc, MinGW clang, et un arm64 le
+      jour où il y en aura — vérifie les mêmes octets, sans rien à orchestrer. Vérifié
+      identique sous gcc et clang x64
 
 ### La version 6 était ambiguë — corrigé
 
@@ -1199,23 +1228,28 @@ alors que `data/super_loto.lev`, également version 6, écrit son status sur **1
 
 🟡 **P2.** Rien de bloquant, mais autant le traiter en passant sur les fichiers.
 
-- [ ] `Event.cpp:99` et `:105` : `m_organizerLogo.string()` et `m_logo.string()` sont
-      appelés **dans la boucle d'écriture**. `path::string()` retourne par valeur :
-      une `std::string` temporaire est construite à chaque itération → O(n²)
-      allocations. Sortir l'appel de la boucle.
-- [ ] Remplacer les boucles octet par octet de `read`/`write` par des lectures et
-      écritures en bloc *(plus rapide et plus simple à borner)*
-- [ ] `Application.cpp:183` (`checkActionEnable`) : `stop_game` n'est activé que si le
-      statut est `Finished`. **Question métier** : est-ce voulu qu'on ne puisse pas
-      interrompre une partie en cours ? Si l'animateur doit tout arrêter en urgence,
-      c'est un problème.
-- [ ] `Application.cpp:262` : la logique
-      `if (!exists(...) && !empty()) … else if (!is_directory(...))` fonctionne, mais
-      par accident pour le cas « chemin vide ». À réécrire lisiblement.
-- [ ] Couverture : `gcovr.cfg` exclut `gui/utils`, `gui/views`, `gui/actions`,
-      `MainWindow`, `Application`. Or **`Application.cpp` et `FileActions.cpp`
-      contiennent l'autosave et les sauvegardes** — le code le plus critique du projet
-      n'est pas mesuré. Revoir le périmètre après S1–S5.
+- [x] Les `path::string()` temporaires dans la boucle d'écriture : disparus avec
+      `writeString` (phase S7), un seul appel par champ
+- [x] Les boucles octet par octet de `read`/`write` : **zéro restante**, remplacées par
+      les écritures en bloc de `StreamWrite.h` (phase S7)
+- [x] `stop_game` n'est activable qu'au statut `Finished` : **voulu**, tranché le
+      2026-09-23 — on n'interrompt pas une partie en cours. La règle est désormais écrite
+      à l'endroit du code, pour que personne ne la « corrige » en croyant à un oubli.
+- [x] La logique `if (!exists(...) && !empty()) … else if (!is_directory(...))` : le
+      bloc entier a été remplacé par `core::saveRescue()` en S1/S3, qui traite le
+      dossier vide et le non-dossier explicitement
+- [x] Couverture : périmètre resserré à ce qui ne peut pas tourner sans fenêtre ni GPU
+      (`.*test.*|.*MainWindow.*|.*gui/vulkan.*|.*third_party.*`). `Application`,
+      `gui/actions`, `gui/views` et `gui/utils` sont désormais **mesurés**, et le constat
+      est net : `FileActions.cpp`, `GameActions.cpp` et `Application.cpp` sont à **0 %**.
+      Un chiffre nul qu'on voit vaut mieux qu'une absence de chiffre. La logique critique
+      elle-même a migré dans `core/` en S1–S3 et y est couverte (`Rescue.cpp` 89 % de
+      lignes)
+- [x] **Bug trouvé en mesurant** : `ci/actions/coverage.py` lançait `gcovr` sur `.`,
+      donc sur **tous** les répertoires de build. Avec deux presets instrumentés, gcovr
+      mélangeait les profils gcc et clang et échouait sur le conflit de version
+      (`'B11*'` contre `'B42*'`). Invisible en CI, où il n'y a qu'un build par agent.
+      Pointé sur le répertoire du preset
 
 ---
 

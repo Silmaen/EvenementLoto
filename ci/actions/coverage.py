@@ -37,7 +37,10 @@ class Coverage(BaseAction):
                     f'{get_build_dir(preset) / "Coverage" / "index.html"}',
                     "--gcov-executable",
                     f"{gcov_executable}",
-                    ".",
+                    # The preset's build directory, not the whole tree: several
+                    # coverage-enabled presets can coexist, and gcovr would then mix
+                    # gcc and clang profile data and fail on the version mismatch.
+                    f"{get_build_dir(preset)}",
                 ]
             )
             if exit_code != 0:

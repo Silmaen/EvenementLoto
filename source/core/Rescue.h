@@ -61,11 +61,24 @@ struct RescueInfo {
  */
 [[nodiscard]] auto findRescue() -> std::optional<RescueInfo>;
 
+/// How many archived rescue files are kept. One archiving makes up to two of them, the
+/// current generation and the previous one.
+constexpr std::size_t g_maxRescueArchives = 10;
+
 /**
- * @brief Move the rescue files aside with a timestamp.
+ * @brief Move the rescue files aside with a timestamp, then prune the old archives.
  *
- * Declining a recovery must not be irreversible: the files are kept, renamed.
+ * Declining a recovery must not be irreversible: the files are kept, renamed. They are
+ * not kept forever either, or the data directory grows for the rest of the machine's
+ * life.
  */
 void archiveRescue();
+
+/**
+ * @brief Delete the oldest archived rescue files, keeping the newest ones.
+ * @param[in] iKeep How many files to keep.
+ * @return How many files were deleted.
+ */
+auto pruneRescueArchives(std::size_t iKeep = g_maxRescueArchives) -> std::size_t;
 
 }// namespace evl::core
