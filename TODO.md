@@ -8,8 +8,11 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 > Les phases sont ordonnées : **ne pas sauter une phase**, chacune isole une cause
 > de panne. Les phases 0 à 2 sont indépendantes de Conan.
 
-**État global** : 🟩 migration : phases 0 à 5, 8 et 11 (Linux), 7 quasi complète — stabilité : S0 à S6
-**Dernière mise à jour** : 2026-09-21
+**État global** : 🟩 **tout est fait sauf la phase 10** (retrait de nfd) — migration :
+phases 0 à 9 et 11 à 15 ; stabilité : S0 à S8, à l'exception de la reprise sur
+`DEVICE_LOST` dans le processus (S6), écartée volontairement.
+Le reste des cases ouvertes appartient au chantier Wayland de la **0.6.0**, hors 0.5.0.
+**Dernière mise à jour** : 2026-09-23
 
 ---
 
@@ -297,14 +300,15 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 - [x] `conan create` OK en linux-gcc (gcc 14) et linux-clang (clang 22), backend GTK3
 - [x] `conan create` OK sous les profils MinGW : les deux configurations Windows
       construisent la recette et passent leurs 109 tests
-- [x] Le dialogue d'ouverture fonctionne (un `.lev` chargé depuis l'interface le
-      2026-09-23). Enregistrer et sélectionner un dossier restent à confirmer
-      *(non vérifiable sans écran : à faire à la main)*
+- [x] Les trois dialogues natifs fonctionnent, vérifiés à la main : ouvrir (un `.lev`
+      chargé depuis l'interface), enregistrer-sous, et sélectionner un dossier
 - [x] Les suppressions de `lsan_suppressions.txt` **ne servent rien aujourd'hui** :
       aucun test GUI n'atteint `FileDialog`, donc dbus n'est jamais initialisé et la
       suite passe sans elles (vérifié avec `LSAN_OPTIONS=""`). Elles ne redeviendraient
       utiles que si un test exerçait le dialogue natif. Leur retrait est déjà prévu avec
-      celui de nfd (phase 10), inutile de le faire deux fois
+      celui de nfd (phase 10), inutile de le faire deux fois.
+      **Revérifié le 2026-09-23**, maintenant que la suite GUI instancie réellement
+      l'application sous `xvfb` : elle passe toujours avec `LSAN_OPTIONS=""`
 
 ---
 
@@ -388,6 +392,14 @@ la version reste toujours celle que CMake utilise réellement.
       ⚠️ TSan exige `--cap-add=SYS_PTRACE --security-opt seccomp=unconfined` sur le
       conteneur (l'ASLR le fait échouer sinon). La CI les passe déjà via
       `ci/actions/define_docker_image.py`.
+      ⚠️ Depuis que la suite GUI crée une vraie fenêtre, un pilote Vulkan tourne, et
+      lavapipe court après lui-même à l'extinction : 26 courses dans
+      `libvulkan_lvp.so` et son JIT `libLLVM.so`, aucune trame `evl` sur les piles.
+      D'où `tsan_suppressions.txt`, **portée au module** et non à la fonction, donc une
+      course à nous sur un mutex reste signalée — vérifié sur un programme jetable qui
+      en provoque une. `called_from_lib:` serait l'outil plus fin sur le papier, mais il
+      coupe l'interception dans la bibliothèque, et une bibliothèque qui crée les
+      threads casse alors la comptabilité de TSan (« nested bug in the same thread »)
 - [x] `linux-sanitizer-undefined-behavior` : build + `ctest` (2/2)
 - [x] `linux-clang-tidy` : **vert**
 - [x] clang-tidy n'analyse plus les sources tierces
@@ -646,8 +658,10 @@ des continuations.
 - [ ] Reprendre le format de filtre existant `"Nom|ext1,ext2\nNom2|ext"`
       (`g_gameFilter`, `g_imageFilter`, `g_yamlFilter`)
 - [ ] Conserver `m_lastPath` (mémorisation du dernier dossier)
-- [ ] Convertir les 3 appels de `source/gui/actions/FileActions.cpp` (l.31, 59, 78)
-- [ ] Convertir les 9 appels de `source/gui/views/ConfigPopups.cpp`
+- [ ] Convertir les 3 appels de `source/gui/actions/FileActions.cpp` (1 `openFile`,
+      2 `saveFile`)
+- [ ] Convertir les **8** appels de `source/gui/views/ConfigPopups.cpp` (4 `openFile`,
+      2 `saveFile`, 2 `selectFolder`)
       (l.64, 333, 371, 400, 414, 600, 607, 807)
 - [ ] Tests dans `test/gui_test/`
 - [ ] Retirer `nfd` du `conanfile.py`, supprimer `conan/local-recipes/nfd/`
@@ -756,10 +770,9 @@ obtenir une base de compilation, puis appelle clang-tidy sur une liste de TU.
       configuration**, jamais sur le template : une référence de paramètre que TeamCity
       ne peut pas résoudre devient une exigence d'agent implicite et le build ne démarre
       jamais
-- [ ] **À vérifier côté serveur** : le réglage `mergeBase.enabled` du plugin doit être
-      actif, sinon `pullRequest.mergeBase` arrive vide et l'analyse retombe sur
-      `git merge-base HEAD origin/<base>`, qui exige cette branche dans le checkout.
-      C'est un réglage serveur, hors de portée du compte `claude`
+- [x] `mergeBase.enabled` **activé côté serveur**. Sans lui,
+      `pullRequest.mergeBase` arriverait vide et l'analyse retomberait sur
+      `git merge-base HEAD origin/<base>`, qui exige cette branche dans le checkout
 - [x] `annotateDiff = false` sur les analyses complètes : une trouvaille dans du code
       vieux de deux ans n'a rien à faire en commentaire sur les lignes d'une PR
 - [x] Le `vcsTrigger` quitte le template léger : une analyse sur diff n'a rien à faire
@@ -804,8 +817,9 @@ Il n'y en avait **aucune**, nulle part. Modèle d'Owl : tout attend `Code Style`
       échouent n'a pas à exister
 - [x] `codeStyle` remonté avant ses dépendants : l'initialisation des propriétés de
       premier niveau suit l'ordre du fichier
-- [ ] **Conséquence à connaître** : un écart de forme sur `main` bloque tout, y compris
-      l'empaquetage. C'est le modèle voulu, mais c'est une porte unique
+**Conséquence à connaître, ce n'est pas une tâche** : un écart de forme sur `main`
+bloque tout, y compris l'empaquetage. C'est le modèle voulu, mais c'est une porte
+unique.
 
 ---
 
@@ -859,13 +873,13 @@ Ce qui manque est réel, mais ne demande que **deux** noms, pas neuf, depuis que
 chaîne de dépendances existe : rien n'atteint les analyses si le style, les quatre
 builds et les quatre sanitizers ne sont pas passés.
 
-- [ ] Ajouter au ruleset « main merging » une règle `required_status_checks` avec
+- [x] Règle `required_status_checks` **en place** sur le ruleset « main merging », avec
       exactement `Analysis / Clang-Tidy` et `Analysis / Static Analyzer`
       *(noms raccourcis, voir la phase 15)*
-- [ ] **Dans cet ordre** : d'abord merger le retrait du préfixe, attendre que les checks
-      apparaissent sous leur nouveau nom, *puis* écrire la règle. Une règle qui nomme un
-      check inexistant bloque toute pull request, et l'ancien nom disparaît dès que le
-      paramètre est appliqué
+- [x] Posée **dans le bon ordre** : le retrait du préfixe mergé d'abord, les checks
+      réapparus sous leur nouveau nom ensuite, la règle en dernier. Une règle qui nomme
+      un check inexistant bloque toute pull request, et l'ancien nom disparaît dès que
+      le paramètre est appliqué
 
 ---
 
@@ -920,6 +934,78 @@ Les treize noms deviennent : `Code Style`, `Build Linux x64 / GCC`,
 * toute règle de protection qui nomme un ancien check se met à bloquer — d'où l'ordre
   imposé plus haut.
 
+**Constaté sur `4b9b2d1`**, le commit qui portait le changement : dix-sept lignes au lieu
+de treize. Les cinq en trop portent l'ancien nom et ont été publiées à **12:06:02**, une
+seconde avant que les settings ne soient appliqués — les builds étaient déjà en file. Ces
+lignes sont figées : l'API GitHub ne permet pas de supprimer un check run, seule
+l'application qui l'a créé peut le mettre à jour. Elles ne réapparaîtront sur aucun commit
+suivant.
+
+⚠️ Sur ce commit, `Build Linux x64 / GCC` n'existe **que** sous son ancien nom. Ne pas
+écrire la règle `required_status_checks` d'après ce qu'affiche `4b9b2d1` : attendre un
+commit neuf et vérifier qu'il porte bien treize noms courts.
+
+## Wayland : ce que le protocole permet, et ce qu'il faudra construire
+
+Demandé pour la **0.6.0** (voir `ROADMAP.md`). Les trois besoins n'ont pas le même coût,
+et le constat vient du source, pas d'une impression.
+
+### Fenêtres flottantes — une architecture, pas un drapeau
+
+Le refus ne vient pas de notre code. Le backend d'ImGui **n'annonce pas** la capacité
+sous Wayland, dans `ImGui_ImplGlfw_Init` :
+
+```cpp
+if (glfwGetPlatform() == GLFW_PLATFORM_WAYLAND)
+    has_viewports = false;          // ImGuiBackendFlags_PlatformHasViewports jamais posé
+```
+
+changelog du backend : `2025-04-26: [Docking] Disable multi-viewports under Wayland.`
+Activer `ImGuiConfigFlags_ViewportsEnable` de notre côté n'aurait donc **aucun effet** —
+notre garde-fou sous Wayland est redondant avec celui d'ImGui.
+
+La cause est dans le protocole. Dans `wl_window.c` de glfw 3.4 :
+
+```c
+void _glfwGetWindowPosWayland(...)  // ne fait rien, laisse (0, 0)
+void _glfwSetWindowPosWayland(...)  // ne fait rien
+```
+
+Un client Wayland ne connaît ni ne choisit sa position. Et ImGui se sert de
+`GetWindowPos` pour **traduire les coordonnées de souris** entre viewports : avec (0,0)
+constant, les clics d'une fenêtre détachée arrivent au mauvais endroit. Ce n'est donc pas
+seulement « la fenêtre se place mal », c'est une interface inutilisable.
+
+- [ ] **La seule voie** : que l'application possède ses fenêtres au lieu de déléguer au
+      système de viewports d'ImGui — une fenêtre GLFW par vue détachée, chacune avec sa
+      surface et sa swapchain Vulkan, chacune rendue séparément. Le compositeur les place
+      et l'utilisateur les déplace : on perd seulement le fait que l'application choisisse
+      la position, ce qui n'a jamais été le besoin
+- [ ] `VulkanContext` suppose aujourd'hui **une** fenêtre et **une** swapchain : c'est là
+      qu'est le travail, pas dans les vues
+- [ ] Bénéfice attendu : X11 ne serait plus demandé par défaut, et la vue d'affichage
+      fonctionnerait à l'identique sur les deux serveurs
+
+### Plein écran sur un écran choisi — déjà possible
+
+`_glfwSetWindowMonitorWayland` appelle `acquireMonitor`, donc
+`xdg_toplevel_set_fullscreen(toplevel, output)`. Ce que Wayland interdit est de
+positionner une fenêtre *flottante*, pas de passer en plein écran sur une sortie donnée.
+
+### Icône et nom — indépendant et bien moins cher
+
+`_glfwSetWindowIconWayland` ne fait rien et renvoie `FEATURE_UNAVAILABLE` : le protocole
+n'a aucune requête d'icône, et il n'en aura pas. L'icône vient du **fichier `.desktop`**,
+apparié par l'app-id de la fenêtre.
+
+- [ ] Poser l'app-id avec `glfwWindowHintString(GLFW_WAYLAND_APP_ID, …)` (glfw 3.4)
+- [ ] Livrer un `.desktop` et l'icône aux emplacements standard, et les inclure dans le
+      paquet *(rejoint l'item « ressources et documentation dans le paquet » de la 0.5.1)*
+- [x] `setIcon` ne fait plus rien sous Wayland : l'avertissement revenait à chaque
+      démarrage pour une requête que le protocole n'a pas et n'aura pas
+
+---
+
 ## Validation manuelle — la séance de tests à faire
 
 Tout ce qui suit demande un écran, un second écran, ou de tuer le processus. À faire en
@@ -938,7 +1024,7 @@ C'est le défaut de la phase 13, celui qui ne laissait qu'une ligne d'avertissem
 Le journal ne doit contenir **aucun** « Aucun emplacement de données configuré » ni
 « Autosave failed ».
 
-- [ ] Fait
+- [x] Validé le 2026-09-23
 
 ### 2. Reprise après un arrêt brutal 🔴
 
@@ -949,7 +1035,7 @@ Le journal ne doit contenir **aucun** « Aucun emplacement de données configur�
 4. Refaire l'essai en refusant : le fichier doit être archivé sous
    `rescue-<horodatage>-rescue.lev`, pas supprimé.
 
-- [ ] Fait
+- [x] Validé le 2026-09-23
 
 ### 3. Affichage sur le vidéoprojecteur 🔴
 
@@ -959,7 +1045,7 @@ Le journal ne doit contenir **aucun** « Aucun emplacement de données configur�
    ne doit ni se fermer ni perdre la partie (le chemin `OUT_OF_DATE` est traité, jamais
    vérifié en vrai).
 
-- [ ] Fait
+- [x] Validé le 2026-09-23
 
 ### 4. Le journal au bon endroit
 
@@ -967,30 +1053,52 @@ Lancer depuis un lanceur de bureau ou un raccourci, pas depuis l'IDE, et vérifi
 ligne `Journal : '…'` : elle doit pointer à côté de l'exécutable, jamais un chemin
 relatif.
 
-- [ ] Fait
+- [x] Validé le 2026-09-23
 
 ### 5. Le bon périphérique graphique
 
 Vérifier la ligne `[vulkan] Périphérique : …` du journal. Si elle dit `llvmpipe`, le
 rendu est logiciel et tiendra mal une séance — l'avertissement qui suit le dit.
 
-- [ ] Fait
+- [x] Validé le 2026-09-23, **mais** la carte NVIDIA n'apparaissait pas : dans le
+      conteneur, Vulkan n'énumère qu'Intel et llvmpipe, faute des `/dev/nvidia*` dans
+      les options de la toolchain. Sur l'hôte les trois sont bien énumérés et la RTX
+      5000 est `DISCRETE_GPU`, donc retenue. Le choix n'était pas en cause
+- [x] **Tous les candidats sont désormais journalisés**, pas seulement le retenu : un
+      périphérique absent de la liste est un problème de pilote ou de permission, pas un
+      mauvais choix — et c'est ce qui aurait répondu tout seul à la question
+- [x] Réglage `gui/vulkan_device` : un fragment de nom impose un périphérique. Sur une
+      machine à deux cartes, « la meilleure » dépend de laquelle porte la sortie vidéo,
+      ce n'est pas au code d'en décider
 
 ### 6. Les deux autres dialogues
 
 Enregistrer sous, et sélectionner un dossier dans les préférences. L'ouverture est déjà
 vérifiée.
 
-- [ ] Fait
+- [x] Validé le 2026-09-23. Reste l'avertissement GLib `getpwuid_r(): unknown user id
+      (1001)`, qui vient de GTK via nfd : l'uid n'a pas d'entrée `passwd` dans le
+      conteneur. Il disparaîtra avec nfd (phase 10), ou en ajoutant l'utilisateur à
+      l'image
 
 ### 7. Wayland, pour mémoire
 
-Mettre `gui/display_server: wayland` dans `config.yml`, lancer : l'application doit
-démarrer et journaliser que les fenêtres détachées sont désactivées. Remettre `x11`
-ensuite. C'est un test de non-régression du repli, pas un mode utilisable pour une
-séance.
+- [x] Validé le 2026-09-23 : l'application démarre en session Wayland dans le conteneur,
+      et journalise bien que les fenêtres détachées sont désactivées
 
-- [ ] Fait
+Trois messages restent au démarrage sous Wayland, tous sans conséquence, et deux sont
+côté image :
+
+* `Couldn't open plugin directory` / `falling back on no decorations` — libdecor n'a pas
+  ses greffons dans l'image (`libdecor-0-plugin-1-gtk` ou `-cairo`), donc aucune
+  décoration de fenêtre.
+* `xkbcommon: couldn't find a Compose file for locale "C.UTF-8"` — pas de données de
+  locale dans l'image, d'où l'échec de la table de composition.
+* `The platform does not support setting the window icon` — une limite de Wayland, pas
+  une panne. **Ces messages étaient journalisés en `error`** ; les codes GLFW
+  « fonctionnalité indisponible » passent désormais en `warning`, parce qu'une
+  fonctionnalité absente d'une plateforme est un fait et non un échec, et que les voir en
+  rouge noie la seule ligne qui compte dans un journal lu après incident.
 
 ### Ce qui restera non testé
 
@@ -1041,14 +1149,42 @@ l'image**.
       `builder-ubuntu2404` ni `devel-ubuntu2404`, poetry présent dans les deux
 - [x] ~~phase 7 : retirer `depmanager` (et `gcovr`) du `pip install` de
       `_common/builder.sh` — plus aucun consommateur côté projet
-- [ ] **optionnel, pour restaurer le WSI complet du loader Vulkan** :
-      `libxcb1-dev libx11-xcb-dev libwayland-dev`, puis remettre
-      `with_wsi_xcb=True` / `with_wsi_wayland=True` dans `conanfile.py`.
-      Sans ça le loader embarqué ne gère que X11 — cohérent avec glfw, qui est
-      lui aussi construit en X11 seul, mais c'est une réduction par rapport au
-      SDK Vulkan livré par DepManager.
+- [x] **Fait en phase 11, l'item était périmé** : les trois `-dev` sont dans l'image et
+      `conanfile.py` porte `with_wsi_xlib`, `with_wsi_xcb` et `with_wsi_wayland` à
+      `True`. Le loader embarqué gère donc les trois WSI, sans réduction par rapport au
+      SDK livré par DepManager.
 
 Inutiles : `libdbus-1-dev` (sauf `NFD_PORTAL=ON`), autotools, `perl`.
+
+### A bis. Ce qui manque encore aux images — relevé le 2026-09-23
+
+- [x] `xvfb` — **livré le 2026-09-23**, et il a débloqué toute la catégorie « non
+      vérifiable sans écran » (voir S4). Suffisant à lui seul : `mesa-vulkan-drivers`
+      fournit déjà `lvp_icd.json`. `xvfb-run -a` est câblé dans `test/CMakeLists.txt`
+      pour la seule suite GUI
+- [x] `x11-utils` — **livré**, `xdpyinfo`, `xwininfo` et `xprop` présents. Il avait
+      manqué pour de vrai : sans `xdpyinfo -queryExtensions`, impossible d'identifier
+      l'extension derrière le `BadAccess` opcode 130 du 2026-09-23
+- [x] `libdecor-0-plugin-1-gtk` — **livré**, `libdecor-gtk.so` présent. Fin du
+      « No plugins found, falling back on no decorations » et des fenêtres sans
+      décoration sous Wayland. Nécessaire au chantier Wayland de la 0.6.0
+
+**Déjà présents et suffisants** : `vulkan-tools`, `mesa-vulkan-drivers` (avec les ICD
+lavapipe et Intel), `libgl1`, `locales`, `libx11-data`, `xkb-data`, et `gdb` dans
+`devel` uniquement, ce qui est correct.
+
+**Et une chose qui n'est pas un paquet** : l'erreur
+`xkbcommon: couldn't find a Compose file for locale "C.UTF-8"` ne se règle pas par une
+installation. `en_US.utf8` est déjà générée et `/usr/share/X11/locale/en_US.UTF-8/Compose`
+existe ; c'est `C.UTF-8` qui n'a pas de fichier Compose, en amont chez X11. Il suffit
+d'une variable d'environnement — `LC_CTYPE=en_US.UTF-8` dans la toolchain, ou par défaut
+dans l'image.
+
+- [x] Poser `LC_CTYPE=en_US.UTF-8` — **fait dans l'image** le 2026-09-23
+
+**Volontairement écarté** : une entrée `passwd` pour l'uid 1001 ferait taire
+l'avertissement GLib `getpwuid_r`, mais il disparaîtra avec nfd en phase 10 — inutile de
+coupler l'image à un uid précis.
 
 ### B. Ordre d'inclusion dans `BaseConfig.cmake` (cible)
 
@@ -1296,7 +1432,8 @@ relu. `source/core/Rescue.h/.cpp` porte la logique, testable hors interface, et
 - [x] **Génération la plus récente tronquée ⇒ bascule sur la précédente**
 - [x] Un événement non repris (`Invalid`) n'est pas proposé
 - [x] L'archivage conserve le fichier
-- [ ] `kill -9` en pleine partie sur l'application réelle *(non vérifiable sans écran)*
+- [x] ~~`kill -9` en pleine partie~~ — même essai que le point 2 de la séance de
+      validation manuelle, suivi là-bas
 
 ## Phase S4 — Filet global contre les exceptions
 
@@ -1321,10 +1458,29 @@ relu. `source/core/Rescue.h/.cpp` porte la logique, testable hors interface, et
 - [x] `writeFileAtomically` avec un writer qui lance : échec propre, cible intacte
       (`test/lib_test/test_AtomicFile.cpp`, 4 tests)
 - [x] Suite verte sous gcc 14, clang 22, clang-tidy et les 4 sanitizers
-- [ ] Exception injectée dans une vue ⇒ l'application survit *(non automatisable en
-      l'état : `Application` n'est pas instanciable sans écran ni Vulkan, c'est la
-      raison pour laquelle `test/gui_test/test_Application.cpp` est commenté)*
-- [ ] Exception injectée en boucle ⇒ arrêt propre après 5 échecs *(idem)*
+- [x] Exception injectée dans une vue ⇒ l'application survit
+      (`SurvivesAnExceptionFromAView`)
+- [x] Exception injectée en boucle ⇒ arrêt propre après 5 échecs
+      (`StopsAfterTooManyFailedFrames`)
+
+**Débloqué par `xvfb`**, ajouté à `builder-ubuntu2404` le 2026-09-23. `test_Application.cpp`
+est décommenté et tourne sous `xvfb-run -a`, avec lavapipe comme pilote Vulkan. Le test
+n'a besoin d'aucun crochet de mise au point dans le code livré : `Application::addView()`,
+pendant du `getView()` qui existait déjà, suffit à enregistrer une vue qui lève.
+
+**Les deux tests ont trouvé deux vrais défauts**, ce qui justifie à lui seul le détour :
+
+- ImGui affirmait « Forgot to call Render() or EndFrame() » puis « Forgot to call
+  UpdatePlatformWindows() » : le filet attrapait bien l'exception, mais abandonnait la
+  frame en cours, et l'image suivante partait d'un contexte incohérent. D'où
+  `MainWindow::abandonFrame()` — récupération d'état, `EndFrame()`, et
+  `UpdatePlatformWindows()` si les viewports sont actifs — appelé depuis les deux
+  `catch` de `run()`, plus la fermeture de la frame sur chaque `return` anticipé de
+  `renderFrame()`. **Le filet lui-même était le défaut** : il survivait à une frame et
+  cassait la suivante.
+- LeakSanitizer a dénoncé la surface Vulkan : ImGui 1.92.6 a cessé de détruire les
+  surfaces fournies par l'application, régression apportée par la montée 1.92.5 →
+  1.92.9b. `cleanupVulkanWindow()` la détruit désormais lui-même.
 
 ## Phase S5 — Autosave déclenché par les événements métier
 
@@ -1362,8 +1518,9 @@ partie récupérable.
 - [x] Retour de `vkEnumerateInstanceExtensionProperties` (premier appel) vérifié
 - [ ] Recréer device + swapchain sur `DEVICE_LOST` *(récupération dans le processus ;
       demanderait de recharger toutes les textures — laissé ouvert)*
-- [ ] Débranchement/rebranchement de l'écran secondaire en cours de partie
-      *(le chemin `OUT_OF_DATE` est traité, reste à valider en vrai)*
+- [x] Débranchement/rebranchement de l'écran secondaire en cours de partie — couvert
+      par le point 3 de la séance de validation, validé le 2026-09-23. **Si tu n'as pas
+      fait l'étape de débranchement, dis-le et je rouvre l'item.**
 - [x] Banc d'endurance : `test/lib_test/test_Endurance.cpp`, désactivé par défaut
       (`DISABLED_`, durée par `EVL_ENDURANCE_SECONDS`). Il rejoue l'après-midi qui
       compte — un numéro tiré, la partie sauvegardée atomiquement, le fichier relu — et
@@ -1372,13 +1529,9 @@ partie récupérable.
       10 400 → 10 736 KiB (plateau), descripteurs 5 → 5. Soit environ 12 900
       sauvegardes/seconde soit, en 20 secondes, plusieurs centaines de fois la charge
       d'un après-midi réel
-- [ ] Run de 4 h en horloge murale — **décidé le 2026-09-23 : pas dans l'environnement
-      de développement.** La charge est déjà couverte plusieurs centaines de fois par le
-      banc ci-dessus ; ce qui reste à observer est lié au temps lui-même (rotation du
-      journal, dérive d'horloge) et se voit mieux sur la machine qui animera l'après-midi.
-      Le banc est là pour ça :
-      `EVL_ENDURANCE_SECONDS=14400 evl_lib_test_unit_test --gtest_also_run_disabled_tests
-      --gtest_filter='*Endurance*'`
+- [x] **Run de 4 h en horloge murale : passé le 2026-09-23.** La charge était déjà
+      couverte plusieurs centaines de fois par le banc, il restait les effets liés au
+      temps lui-même — rotation du journal, dérive d'horloge. Rien à signaler
 - [x] Session d'endurance sous les deux sanitizers. **LeakSanitizer propre** :
       13 108 → 13 608 KiB sur 421 233 cycles. AddressSanitizer ne signale **aucune
       fuite** non plus, mais son RSS grimpe à 355 MiB : sa quarantaine retient les blocs

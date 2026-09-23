@@ -55,6 +55,12 @@ void mergeDefaultSettings() {
 		if (!g_settings->contains("general/log_level")) {
 			g_settings->setValue("general/log_level", std::string("info"));
 		}
+		if (!g_settings->contains("gui/vulkan_device")) {
+			// Empty: a dedicated card is preferred on its own. A fragment of a device
+			// name imposes one, which is what a machine with two graphics devices
+			// needs — the better card is the one carrying the video output.
+			g_settings->setValue("gui/vulkan_device", std::string(""));
+		}
 		if (!g_settings->contains("gui/display_server")) {
 			// x11 by default, XWayland included: it is the only way a detached window
 			// can be placed on a chosen screen. `wayland` or `auto` are the other

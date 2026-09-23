@@ -137,6 +137,17 @@ public:
 	void requestClose();
 
 	/**
+	 * @brief Ajoute une vue à celles rendues à chaque image.
+	 *
+	 * Pendant du `getView` ci-dessous. C'est ce qui rend le filet à exceptions
+	 * vérifiable : un test enregistre une vue qui lève, et observe que l'application y
+	 * survit — sans qu'aucun crochet de mise au point ne subsiste dans le code livré.
+	 *
+	 * @param[in] iView La vue à ajouter.
+	 */
+	void addView(const std::shared_ptr<views::View>& iView) { m_views.push_back(iView); }
+
+	/**
 	 * @brief Get a view by name.
 	 * @param iName The view name.
 	 * @return The view pointer or nullptr if not found.

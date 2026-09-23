@@ -289,4 +289,10 @@ All domain objects inherit from `Serializable` and implement:
 - Test helper header: `test/TestMainHelper.h`
 - `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted
 - `test_Rescue.cpp` checks the interrupted-game save, detection and fallback
-- Sanitizer suppressions: `lsan_suppressions.txt` (suppresses known libdbus leaks for Address/Leak sanitizer presets)
+- Sanitizer suppressions: `lsan_suppressions.txt` (known libdbus leaks, Address/Leak
+  presets) and `tsan_suppressions.txt` (races inside lavapipe and its LLVM JIT, which
+  run because the GUI tests create a real window). Both are scoped so a finding in our
+  own code is still reported
+- The GUI suite needs a display: `ctest` runs it under `xvfb-run -a`, with lavapipe as
+  the Vulkan driver. `test_Application.cpp` exercises the render loop and the exception
+  net, registering a throwing view through `Application::addView()`

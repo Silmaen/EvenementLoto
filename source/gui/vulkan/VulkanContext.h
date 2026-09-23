@@ -149,6 +149,18 @@ private:
 	void logSelectedDevice() const;
 
 	/**
+	 * @brief Choisit le périphérique graphique, en journalisant tous les candidats.
+	 *
+	 * Une carte dédiée d'abord, ce qu'un vidéoprojecteur demande pour un après-midi.
+	 * Le réglage `gui/vulkan_device` impose un périphérique par fragment de son nom :
+	 * sur une machine à deux cartes, « la meilleure » dépend de laquelle porte la
+	 * sortie vidéo, et ce n'est pas au code d'en décider.
+	 *
+	 * @return Le périphérique retenu, ou `VK_NULL_HANDLE`.
+	 */
+	[[nodiscard]] auto selectPhysicalDevice() const -> VkPhysicalDevice;
+
+	/**
 	 * @brief Default constructor.
 	 */
 	explicit VulkanContext();

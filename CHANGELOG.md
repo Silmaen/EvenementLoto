@@ -12,6 +12,7 @@ fonctionnelle.
 * CI TeamCity décrite dans le dépôt en Kotlin DSL, découpée par sous-projet.
 * Nouveaux contrôles CI : style du code, clang-tidy et analyseur statique sur le diff,
   paquet prêt à exécuter isolé.
+* Tests d'interface exécutés sans écran, filet à exceptions vérifié par injection.
 * Sauvegardes atomiques, deux générations conservées.
 * Reprise d'une partie interrompue proposée au démarrage.
 * Lecture défensive du format binaire : aucun fichier tronqué n'est accepté.

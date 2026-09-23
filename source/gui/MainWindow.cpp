@@ -20,6 +20,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>// NOLINT
 #include <imgui.h>
+#include <imgui_internal.h>
 
 
 // memory fonts...
@@ -38,7 +39,21 @@ namespace {
 
 std::shared_ptr<ImGui_ImplVulkanH_Window> g_mainWindowData;
 
-void glfwErrorCallback(int iError, const char* iDescription) { log_error("GLFW Error {}: {}", iError, iDescription); }
+void glfwErrorCallback(const int iError, const char* iDescription) {
+	// "This platform cannot do that" is a fact, not a failure. Wayland reports three of
+	// them at every start — the window icon, the cursor, the window position — and
+	// logging those as errors buries the one line that matters in a log read after an
+	// incident.
+	switch (iError) {
+		case GLFW_FEATURE_UNAVAILABLE:
+		case GLFW_FEATURE_UNIMPLEMENTED:
+		case GLFW_CURSOR_UNAVAILABLE:
+			log_warn("GLFW {}: {}", iError, iDescription);
+			return;
+		default:
+			log_error("GLFW Error {}: {}", iError, iDescription);
+	}
+}
 
 void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__, __LINE__); }
 
@@ -235,6 +250,13 @@ void MainWindow::cleanupVulkanWindow() {
 		return;
 	const auto vkData = vulkan::VulkanContext::get().getVkData();
 	ImGui_ImplVulkanH_DestroyWindow(vkData.instance, vkData.device, g_mainWindowData.get(), vkData.allocator);
+	// Ours to destroy since ImGui 1.92.6, which stopped doing it on the grounds that the
+	// surface is user provided — we create it with glfwCreateWindowSurface. Nobody freed
+	// it between that version and this line.
+	if (g_mainWindowData->Surface != VK_NULL_HANDLE) {
+		vkDestroySurfaceKHR(vkData.instance, g_mainWindowData->Surface, vkData.allocator);
+		g_mainWindowData->Surface = VK_NULL_HANDLE;
+	}
 	m_windowSetupDone = false;
 }
 
@@ -374,6 +396,29 @@ void MainWindow::newFrame() {
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+}
+
+void MainWindow::abandonFrame() {
+	// A frame opened by newFrame() must be closed even when nothing was drawn, or the
+	// next NewFrame() trips ImGui's sanity check — an assert in a debug build, an
+	// undefined state in a release one. Catching the exception was never enough on its
+	// own.
+	//
+	// The recovery first unwinds whatever Begin/PushID the view left open before
+	// throwing, then the frame is ended without being rendered.
+	if (ImGui::GetCurrentContext() == nullptr)
+		return;
+	const ImGuiContext& context = *ImGui::GetCurrentContext();
+	if (!context.WithinFrameScope)
+		return;
+	ImGui::ErrorRecoveryTryToRecoverState(&context.StackSizesInNewFrame);
+	ImGui::EndFrame();
+	// With multi-viewport on, ImGui also expects the platform windows to be updated
+	// after every EndFrame, and checks it at the next NewFrame. They are updated but
+	// not rendered: the frame is being thrown away, there is nothing worth drawing in
+	// it, and drawing from a view that just threw is exactly what we are avoiding.
+	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) != 0)
+		ImGui::UpdatePlatformWindows();
 }
 
 void MainWindow::render(const math::vec4& iClearColor) {
@@ -594,6 +639,12 @@ void MainWindow::onEvent(event::Event& ioEvent) {
 }
 
 void MainWindow::setIcon(const std::string& iIconName) const {
+	if (m_wayland) {
+		// Wayland has no request for a window icon and will not get one: the icon comes
+		// from the `.desktop` entry matched by the application id. Calling anyway only
+		// logged a warning at every start.
+		return;
+	}
 	auto* glfwWindow = static_cast<GLFWwindow*>(m_window);
 	auto pix = Application::get().getTextureLibrary().getRawPixels(iIconName);
 	GLFWimage img;

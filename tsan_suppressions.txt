@@ -1,0 +1,17 @@
+# ThreadSanitizer suppressions
+# Known races in system libraries (not from project code).
+
+# The GUI tests create a real window, so a Vulkan driver runs. Under xvfb that driver
+# is lavapipe, which renders on a pool of `llvmpipe-*` worker threads and compiles
+# shaders with the LLVM JIT. Both race on their own state at teardown: the pool is
+# destroyed while a worker still holds its mutex. Nothing in `evl` is on those stacks
+# — only the `vkCreateInstance` call that started the pool — and there is no lock we
+# could take to fix someone else's teardown.
+#
+# Suppressed by module rather than by function, so a race of ours on a mutex is still
+# reported: we never have code inside these two. `called_from_lib` would be the
+# narrower tool on paper, but it stops TSan intercepting inside the library at all,
+# and a library that creates the threads then breaks its bookkeeping ("nested bug in
+# the same thread").
+race:libvulkan_lvp.so
+race:libLLVM.so
