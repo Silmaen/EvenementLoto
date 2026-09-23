@@ -10,7 +10,9 @@
 
 namespace evl::core {
 
-constexpr uint16_t g_currentSaveVersion = 6;
+// 7: the file opens with a magic and ends with a checksum, lengths and dates are
+// written on an explicit fixed width. Files from 6 and below are still read.
+constexpr uint16_t g_currentSaveVersion = 7;
 
 namespace {
 

@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #pragma once
+#include "FileFormat.h"
 #include "GameRound.h"
 #include "Serializable.h"
 #include "Statistics.h"
@@ -44,9 +45,9 @@ public:
 	/**
 	 * @brief Lecture depuis un stream
 	 * @param iBs Le stream d’entrée.
-	 * @param iFileVersion La version du fichier à lire
+	 * @param iContext Ce que le lecteur sait du fichier parcouru.
 	 */
-	void read(std::istream& iBs, int iFileVersion) override;
+	void read(std::istream& iBs, const ReadContext& iContext) override;
 
 	/**
 	 * @brief Écriture dans un stream.
@@ -410,6 +411,22 @@ private:
 	time_point m_end;
 
 	/// Le chemin de base de l’événement
+	/**
+	 * @brief Tentative de lecture complète du corps, dans un contexte donné.
+	 * @param[in] iFrame Le cadre déjà validé.
+	 * @param[in] iContext Le contexte à essayer.
+	 * @return Vrai si le corps a été lu en entier.
+	 */
+	auto readWith(const FileFrame& iFrame, const ReadContext& iContext) -> bool;
+
+	/**
+	 * @brief Lecture du corps du fichier, une fois son cadre validé.
+	 * @param[in,out] iBs Le stream positionné sur le corps.
+	 * @param[in] iContext Ce que le lecteur sait du fichier parcouru.
+	 * @return Vrai si le corps a été lu en entier.
+	 */
+	auto readBody(std::istream& iBs, const ReadContext& iContext) -> bool;
+
 	std::filesystem::path m_basePath;
 
 	/// status change

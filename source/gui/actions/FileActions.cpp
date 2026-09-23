@@ -35,11 +35,22 @@ void LoadFileAction::onExecute() {
 		return;
 	}
 	auto& app = Application::get();
-	app.getCurrentFile() = file;
-
 	std::ifstream f(file, std::ios::in | std::ios::binary);
-	app.getCurrentEvent().setBasePath(file);
-	app.getCurrentEvent().read(f, 0);
+	if (!f.is_open()) {
+		log_error("Impossible d'ouvrir '{}'.", file.string());
+		return;
+	}
+	// Read into a candidate: a file that turns out to be truncated or corrupted must
+	// not leave the application holding half an event, and the message must not claim
+	// success. The current event is only replaced once the read is known complete.
+	core::Event candidate;
+	candidate.setBasePath(file);
+	candidate.read(f, {});
+	if (!f.good()) {
+		log_error("Le fichier '{}' est incomplet ou corrompu, il n'a pas été chargé.", file.string());
+		return;
+	}
+	app.getCurrentEvent() = candidate;
 	app.getCurrentFile() = file;
 	log_info("File '{}' loaded successfully.", file.string());
 }

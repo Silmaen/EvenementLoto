@@ -77,7 +77,7 @@ auto loadRescue(const std::filesystem::path& iPath, Event& oEvent) -> bool {
 	}
 	Event candidate;
 	candidate.setBasePath(iPath);
-	candidate.read(file, 0);
+	candidate.read(file, {});
 	if (!file.good()) {
 		log_warn("Le fichier de secours '{}' est incomplet ou corrompu.", iPath.string());
 		return false;

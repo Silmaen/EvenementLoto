@@ -165,9 +165,9 @@ public:
 	/**
 	 * @brief Lecture depuis un stream
 	 * @param iBs Le stream d’entrée.
-	 * @param iFileVersion La version du fichier à lire
+	 * @param iContext Ce que le lecteur sait du fichier parcouru.
 	 */
-	void read(std::istream& iBs, int iFileVersion) override;
+	void read(std::istream& iBs, const ReadContext& iContext) override;
 
 	/**
 	 * @brief Écriture dans un stream.

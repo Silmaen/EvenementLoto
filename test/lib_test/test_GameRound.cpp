@@ -198,7 +198,7 @@ TEST(GameRound, serialize) {
 	GameRound gr2;
 	std::ifstream fileRead;
 	fileRead.open(file, std::ios::in | std::ios::binary);
-	gr2.read(fileRead, getSaveVersion());
+	gr2.read(fileRead, {.version = getSaveVersion(), .wideEnums = false});
 	fileRead.close();
 
 	EXPECT_EQ(gr2.getType(), GameRound::Type::Enfant);

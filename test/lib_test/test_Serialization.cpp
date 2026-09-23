@@ -7,9 +7,12 @@
 #include "../TestMainHelper.h"
 
 #include "core/Event.h"
+#include "core/FileFormat.h"
 #include "core/StreamRead.h"
 
+#include <array>
 #include <cstring>
+#include <fstream>
 #include <random>
 #include <sstream>
 
@@ -38,11 +41,24 @@ auto serialize(const Event& iEvent) -> std::string {
 	return stream.str();
 }
 
+/// Offset of the first byte of the body in a framed buffer.
+constexpr std::size_t g_bodyOffset = 4 + sizeof(uint16_t);
+
+/// Re-sign a buffer whose body was altered on purpose.
+///
+/// Without this, every patched byte would be caught by the checksum and the tests below
+/// would all pass for that one reason, never exercising the check they are named after.
+void reSign(std::string& ioBuffer) {
+	const auto payload = std::string_view{ioBuffer}.substr(0, ioBuffer.size() - sizeof(uint32_t));
+	const auto sum = crc32(payload);
+	std::memcpy(ioBuffer.data() + ioBuffer.size() - sizeof(uint32_t), &sum, sizeof(sum));
+}
+
 /// Read a buffer and tell whether the reader considered it complete.
 auto tryRead(const std::string& iBuffer) -> bool {
 	std::istringstream stream(iBuffer, std::ios::in | std::ios::binary);
 	Event event;
-	event.read(stream, 0);
+	event.read(stream, {});
 	return stream.good();
 }
 
@@ -55,13 +71,72 @@ TEST(Serialization, RoundTrip) {
 
 	std::istringstream stream(buffer, std::ios::in | std::ios::binary);
 	Event restored;
-	restored.read(stream, 0);
+	restored.read(stream, {});
 	EXPECT_TRUE(stream.good());
 	EXPECT_EQ(restored.getName(), original.getName());
 	EXPECT_EQ(restored.getOrganizerName(), original.getOrganizerName());
 	EXPECT_EQ(restored.getLocation(), original.getLocation());
 	EXPECT_EQ(restored.getRules(), original.getRules());
 	EXPECT_EQ(restored.sizeRounds(), original.sizeRounds());
+}
+
+TEST(Serialization, PreviousVersionStillReads) {
+	// A version 6 file: no magic, no checksum, the version as the first field. The body
+	// itself is unchanged — lengths were already eight bytes and dates already counted
+	// nanoseconds on this platform, which is what makes the fixed widths a spelling out
+	// rather than a migration.
+	const auto framed = serialize(makeEvent());
+	ASSERT_GT(framed.size(), g_bodyOffset + sizeof(uint32_t));
+	const auto body = framed.substr(g_bodyOffset, framed.size() - g_bodyOffset - sizeof(uint32_t));
+	constexpr uint16_t legacyVersion = 6;
+	std::string legacy(sizeof(legacyVersion), '\0');
+	std::memcpy(legacy.data(), &legacyVersion, sizeof(legacyVersion));
+	legacy += body;
+
+	std::istringstream stream(legacy, std::ios::in | std::ios::binary);
+	Event restored;
+	restored.read(stream, {});
+	EXPECT_TRUE(stream.good());
+	EXPECT_EQ(restored.getName(), makeEvent().getName());
+	EXPECT_EQ(restored.sizeRounds(), makeEvent().sizeRounds());
+}
+
+/// What each file delivered in data/ is expected to contain.
+struct ShippedFile {
+	std::string_view file;///< name inside data/
+	std::string_view name;///< event name
+	std::string_view organizer;///< organizer name
+	std::size_t rounds;///< number of game rounds
+};
+
+/// The four files, in versions 3, 4 and 6 — and one of the two version 6 files writes
+/// its enumerations on four bytes while the other writes them on one.
+constexpr std::array<ShippedFile, 4> g_shippedFiles{{
+		{"loto_sou.lev", "Le loto du Sou des écoles", "Sou des écoles de Genay", 9},
+		{"loto_sou_2.lev", "Le loto du Sou des écoles", "Sou des écoles de Genay", 11},
+		{"super_loto.lev", "Bingo des Familles", "Le Comité des Cons", 5},
+		{"test_sou.lev", "loto du sou", "Sou des écoles", 1},
+}};
+
+TEST(Serialization, ShippedFilesStillRead) {
+	// The real thing, not a hand-made buffer. Checking the content and not merely that
+	// the read reported success: a misparse can walk a file to its end and hand back
+	// nonsense, which is exactly what reading an old event must never do.
+	const fs::path dataDir{EVL_TEST_DATA_DIR};
+	ASSERT_TRUE(is_directory(dataDir)) << dataDir.string();
+	for (const auto& expected: g_shippedFiles) {
+		const auto path = dataDir / expected.file;
+		ASSERT_TRUE(exists(path)) << path.string();
+		std::ifstream file(path, std::ios::in | std::ios::binary);
+		ASSERT_TRUE(file.is_open()) << path.string();
+		Event event;
+		event.setBasePath(path);
+		event.read(file, {});
+		EXPECT_TRUE(file.good()) << expected.file;
+		EXPECT_EQ(event.getName(), expected.name) << expected.file;
+		EXPECT_EQ(event.getOrganizerName(), expected.organizer) << expected.file;
+		EXPECT_EQ(event.sizeRounds(), expected.rounds) << expected.file;
+	}
 }
 
 TEST(Serialization, EmptyStreamIsRejected) { EXPECT_FALSE(tryRead("")); }
@@ -86,29 +161,53 @@ TEST(Serialization, RandomBytesAreRejected) {
 	}
 }
 
+TEST(Serialization, MagicIsPresent) {
+	const auto buffer = serialize(makeEvent());
+	ASSERT_GT(buffer.size(), g_bodyOffset);
+	EXPECT_TRUE(buffer.starts_with(g_fileMagic));
+	uint16_t version = 0;
+	std::memcpy(&version, buffer.data() + g_fileMagic.size(), sizeof(version));
+	EXPECT_EQ(version, getSaveVersion());
+}
+
+TEST(Serialization, ForeignFileIsRejectedOnItsMagic) {
+	// Long enough to look plausible, and not a save file.
+	EXPECT_FALSE(tryRead(std::string(512, 'x')));
+}
+
+TEST(Serialization, AlteredByteIsCaughtByTheChecksum) {
+	auto buffer = serialize(makeEvent());
+	ASSERT_GT(buffer.size(), g_bodyOffset + 1);
+	// Not re-signed: this is exactly what the checksum is for.
+	buffer[g_bodyOffset + 1] = static_cast<char>(buffer[g_bodyOffset + 1] ^ 0x01);
+	EXPECT_FALSE(tryRead(buffer));
+}
+
 TEST(Serialization, FutureVersionIsRejected) {
 	auto buffer = serialize(makeEvent());
-	ASSERT_GE(buffer.size(), sizeof(uint16_t));
+	ASSERT_GT(buffer.size(), g_bodyOffset);
 	const auto future = static_cast<uint16_t>(getSaveVersion() + 1U);
-	std::memcpy(buffer.data(), &future, sizeof(future));
+	std::memcpy(buffer.data() + g_fileMagic.size(), &future, sizeof(future));
+	reSign(buffer);
 	EXPECT_FALSE(tryRead(buffer));
 }
 
 TEST(Serialization, OutOfRangeStatusIsRejected) {
 	auto buffer = serialize(makeEvent());
-	ASSERT_GT(buffer.size(), sizeof(uint16_t));
-	// The status sits right after the version and is not a declared enumerator here.
-	buffer[sizeof(uint16_t)] = static_cast<char>(0x7F);
+	ASSERT_GT(buffer.size(), g_bodyOffset);
+	// The status opens the body and is not a declared enumerator here.
+	buffer[g_bodyOffset] = static_cast<char>(0x7F);
+	reSign(buffer);
 	EXPECT_FALSE(tryRead(buffer));
 }
 
 TEST(Serialization, AbsurdLengthIsRejected) {
 	auto buffer = serialize(makeEvent());
-	constexpr auto statusSize = sizeof(Event::Status);
-	constexpr auto lengthOffset = sizeof(uint16_t) + statusSize;
-	ASSERT_GT(buffer.size(), lengthOffset + sizeof(std::string::size_type));
-	// First length of the stream: the organizer name.
-	const auto absurd = static_cast<std::string::size_type>(g_maxSerializedLength + 1U);
+	constexpr auto lengthOffset = g_bodyOffset + sizeof(Event::Status);
+	ASSERT_GT(buffer.size(), lengthOffset + sizeof(uint64_t));
+	// First length of the body: the organizer name.
+	const auto absurd = static_cast<uint64_t>(g_maxSerializedLength + 1U);
 	std::memcpy(buffer.data() + lengthOffset, &absurd, sizeof(absurd));
+	reSign(buffer);
 	EXPECT_FALSE(tryRead(buffer));
 }

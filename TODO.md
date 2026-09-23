@@ -1138,28 +1138,62 @@ partie récupérable.
 
 ## Phase S7 — Format de fichier portable
 
-🟠 **P1.** `oBs.write(reinterpret_cast<const char*>(&m_start), sizeof(m_start))` sur
-des `time_point`, et les longueurs écrites en `sizeof(std::string::size_type)`. La
-représentation dépend du compilateur et de l'architecture. Vos images CI proposent
-`linux/arm64` (`docker_build_platform`) et vous compilez en GCC **et** Clang : un
-`.lev` n'est pas garanti interchangeable.
+**Faite**, version de sauvegarde **7**. Un fichier s'ouvre sur un nombre magique `EVL1`
+suivi de la version, et se termine par un CRC-32 vérifié **avant** qu'un seul champ ne
+soit interprété — c'est ce qui permet d'écarter un `rescue.lev` tronqué au profit de la
+génération précédente au lieu d'en charger la moitié.
 
-- [ ] Écrire toutes les longueurs en largeur fixe (`uint64_t`)
-- [ ] Écrire les dates en `int64_t` d'epoch plutôt qu'en dump brut de `time_point`
-- [ ] Écrire les énumérations en largeur fixe explicite
-- [ ] Incrémenter `getSaveVersion()` et **conserver la lecture des versions
-      antérieures** *(le mécanisme de version existe déjà, il suffit de s'en servir)*
-- [ ] Ajouter un nombre magique en tête de fichier pour rejeter tôt un fichier
-      qui n'est pas un `.lev`
-- [ ] Envisager une somme de contrôle en queue, pour détecter une corruption
-      **avant** de tenter la lecture *(utile pour la bascule S1 vers `rescue.lev.1`)*
+- [x] Toutes les longueurs en `uint64_t` (`writeLength`, `readLength`)
+- [x] Les dates en `int64_t` de nanosecondes depuis l'epoch, unité **nommée** au lieu
+      du dump brut d'un `time_point` dont la représentation appartient à la
+      bibliothèque standard
+- [x] Les énumérations : **rien à faire**, toutes les énumérations sérialisées déclarent
+      déjà `: uint8_t`, donc une largeur fixe et explicite
+- [x] `getSaveVersion()` passe à 7, la lecture des versions antérieures est conservée
+- [x] Nombre magique en tête, pour rejeter tôt un fichier qui n'est pas un `.lev`
+- [x] Somme de contrôle CRC-32 en queue, vérifiée avant la lecture du corps
+- [x] **Bug corrigé au passage** : `LoadFileAction` annonçait « loaded successfully »
+      sans jamais regarder l'état du stream. Un fichier corrompu laissait
+      l'application avec un événement à moitié lu. La lecture se fait maintenant dans
+      un candidat, qui ne remplace l'événement courant qu'une fois complète.
 
 **Validation**
-- [ ] Un `.lev` écrit par la build GCC x64 se relit par la build Clang x64 et ARM64
-- [ ] Un fichier d'une version antérieure se relit toujours
-- [ ] Une somme de contrôle invalide est détectée sans lire le corps du fichier
+- [x] Aller-retour, troncature à chaque offset, octets aléatoires, version future,
+      énumérateur hors bornes, longueur absurde — 12 tests
+- [x] Un octet modifié est détecté par la somme de contrôle
+- [x] Un fichier de version 6 sans cadre se relit toujours
+- [x] Un fichier qui n'est pas un `.lev` est rejeté sur son nombre magique
+- [ ] Un `.lev` écrit par la build GCC x64 relu par la build Clang x64 et ARM64
+      *(les largeurs sont désormais fixes, reste à le faire tourner)*
 
----
+### La version 6 était ambiguë — corrigé
+
+Découvert en relisant les `.lev` livrés : trois des quatre ne se lisaient plus. Les
+énumérations avaient été passées à `: uint8_t` **sans incrémenter `getSaveVersion()`**,
+si bien que deux mises en page portaient le numéro 6. Preuve à l'octet sur
+`data/test_sou.lev` :
+
+```
+02 00 00 00  0f 00 00 00 00 00 00 00  "Sou des écoles"
+^^ status sur 4 octets              ^^ longueur sur 8 octets
+```
+
+alors que `data/super_loto.lev`, également version 6, écrit son status sur **1** octet.
+
+- [x] `ReadContext` remplace le `int iFileVersion` de `Serializable::read` : la version
+      seule ne suffisait pas à décrire le fichier parcouru
+- [x] `readEnum` sait lire une énumération sur quatre octets, et **borne la valeur**
+      avant conversion — un champ de quatre octets portant ce que le type sous-jacent
+      ne peut pas représenter n'est pas une mise en page ancienne, c'est une corruption
+- [x] `Event::read` tente la lecture en étroit puis, pour une version ≤ 6, retente en
+      large. La discrimination est fiable sans deviner : lu en étroit, le premier champ
+      de `test_sou.lev` donne une longueur de 251 658 240 que la borne existante rejette
+- [x] Les quatre fichiers livrés se relisent, **et leur contenu est vérifié** : nom,
+      organisateur et nombre de parties sont désormais assertés fichier par fichier.
+      Un mauvais décodage peut parcourir un fichier jusqu'au bout et rendre n'importe
+      quoi — c'est précisément ce qu'ouvrir un vieil événement ne doit pas faire
+- [x] Les marqueurs `//----UNCOVER----` des branches « version < 4 » retirés : ces
+      branches sont maintenant réellement exercées par les fichiers livrés
 
 ## Phase S8 — Qualité et cohérence
 

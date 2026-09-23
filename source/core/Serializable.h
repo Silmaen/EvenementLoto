@@ -7,6 +7,7 @@
  */
 #pragma once
 #include "../baseDefine.h"
+#include "ReadContext.h"
 #include <json/json.h>
 #include <yaml-cpp/yaml.h>
 
@@ -30,9 +31,9 @@ public:
 	/**
 	 * @brief Lecture depuis un stream
 	 * @param iBs Le stream d’entrée.
-	 * @param iFileVersion La version du fichier à lire
+	 * @param iContext Ce que le lecteur sait du fichier parcouru.
 	 */
-	virtual void read(std::istream& iBs, int iFileVersion) = 0;
+	virtual void read(std::istream& iBs, const ReadContext& iContext) = 0;
 
 	/**
 	 * @brief Écriture dans un stream.

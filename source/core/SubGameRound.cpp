@@ -9,6 +9,8 @@
 
 #include "SubGameRound.h"
 
+#include "StreamWrite.h"
+
 #include "EnumLabel.h"
 #include "StreamRead.h"
 
@@ -66,52 +68,40 @@ void SubGameRound::nextStatus() {
 	}
 }
 
-void SubGameRound::read(std::istream& iBs, const int iFileVersion) {
-	if (std::cmp_greater(iFileVersion, getSaveVersion())) {
+void SubGameRound::read(std::istream& iBs, const ReadContext& iContext) {
+	if (iContext.version > getSaveVersion()) {
 		iBs.setstate(std::ios::failbit);
 		return;
 	}
-	if (!readEnum(iBs, m_type))
+	if (!readEnum(iBs, m_type, iContext.wideEnums))
 		return;
-	if (iFileVersion >= 4 && !readEnum(iBs, m_status))
+	if (iContext.version >= 4 && !readEnum(iBs, m_status, iContext.wideEnums))
 		return;
-	if (iFileVersion < 4) {//----UNCOVER----
-		uint32_t hasWinner = 0;//----UNCOVER----
-		if (!readRaw(iBs, hasWinner))//----UNCOVER----
-			return;//----UNCOVER----
-		m_winner = hasWinner != 0 ? "gagnant" : "";//----UNCOVER----
+	if (iContext.version < 4) {
+		uint32_t hasWinner = 0;
+		if (!readRaw(iBs, hasWinner))
+			return;
+		m_winner = hasWinner != 0 ? "gagnant" : "";
 	} else if (!readRaw(iBs, m_pricesValue) || !readString(iBs, m_winner)) {
 		return;
 	}
 	if (!readString(iBs, m_prices))
 		return;
-	if (iFileVersion > 3 && !readVector(iBs, m_draws))
+	if (iContext.version > 3 && !readVector(iBs, m_draws))
 		return;
-	if (iFileVersion > 5 && (!readRaw(iBs, m_start) || !readRaw(iBs, m_end)))
+	if (iContext.version > 5 && (!readTimePoint(iBs, m_start) || !readTimePoint(iBs, m_end)))
 		return;
 }
 
 void SubGameRound::write(std::ostream& iBs) const {
-	iBs.write(reinterpret_cast<const char*>(&m_type), sizeof(Type));
-	iBs.write(reinterpret_cast<const char*>(&m_status), sizeof(Status));
-	iBs.write(reinterpret_cast<const char*>(&m_pricesValue), sizeof(double));
-	//---------------
-	std::string::size_type l0 = m_winner.size();
-	iBs.write(reinterpret_cast<char*>(&l0), sizeof(std::string::size_type));
-	for (std::string::size_type i = 0; i < l0; i++)
-		iBs.write(reinterpret_cast<const char*>(&m_winner[i]), sizeof(std::string::value_type));
-	//---------------
-	std::string::size_type l = m_prices.size();
-	iBs.write(reinterpret_cast<char*>(&l), sizeof(std::string::size_type));
-	for (std::string::size_type i = 0; i < l; i++)
-		iBs.write(reinterpret_cast<const char*>(&m_prices[i]), sizeof(std::string::value_type));
-	// --------------
-	draws_type::size_type ld = m_draws.size();
-	iBs.write(reinterpret_cast<const char*>(&ld), sizeof(draws_type::size_type));
-	for (draws_type::size_type i = 0; i < ld; ++i)
-		iBs.write(reinterpret_cast<const char*>(&(m_draws[i])), sizeof(draws_type::value_type));
-	iBs.write(reinterpret_cast<const char*>(&m_start), sizeof(m_start));
-	iBs.write(reinterpret_cast<const char*>(&m_end), sizeof(m_end));
+	writeEnum(iBs, m_type);
+	writeEnum(iBs, m_status);
+	writeRaw(iBs, m_pricesValue);
+	writeString(iBs, m_winner);
+	writeString(iBs, m_prices);
+	writeVector(iBs, m_draws);
+	writeTimePoint(iBs, m_start);
+	writeTimePoint(iBs, m_end);
 }
 
 auto SubGameRound::toJson() const -> Json::Value {
