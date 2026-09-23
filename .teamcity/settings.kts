@@ -62,6 +62,15 @@ project {
         param("teamcity.github.bridge.prTrigger.enabled", "true")
         param("teamcity.github.bridge.branchTrigger.enabled", "true")
         param("teamcity.github.bridge.annotations.enabled", "true")
+        // What GitHub shows for each check: the tail of the name, not the ancestry.
+        // `TeamCity / Evenement Loto / Analysis / Clang-Tidy` becomes
+        // `Analysis / Clang-Tidy`, which is what fits in the merge box.
+        //
+        // The prefix must match **exactly** — the plugin strips nothing otherwise,
+        // deliberately, so a stale value after a project rename does nothing rather
+        // than mangling the name. And renaming a check is not cosmetic: GitHub keys a
+        // row on (name, head_sha) and a protection rule names it literally.
+        param("teamcity.github.bridge.checkName.stripPrefix", "TeamCity / Evenement Loto")
     }
 
     // The gate, at the root: no `Quality` folder around it. That level carried nothing
