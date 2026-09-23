@@ -9,7 +9,8 @@ import jetbrains.buildServer.configs.kotlin.buildSteps.script
  * server: the portable DSL identifies a configuration by its id, and a new id would
  * lose its build history.
  */
-fun presetBuild(idValue: String, buildName: String, cmakePreset: String) = BuildType {
+fun presetBuild(idValue: String, buildName: String, cmakePreset: String,
+                onDraft: Boolean = false, gates: List<BuildType> = listOf(codeStyle)) = BuildType {
     id = RelativeId(idValue)
     name = buildName
     templates(globalBuild)
@@ -18,60 +19,58 @@ fun presetBuild(idValue: String, buildName: String, cmakePreset: String) = Build
         param("cmake_preset", cmakePreset)
     }
 
+    if (onDraft) {
+        features {
+            githubBridge(triggerOnPrDraft = true)
+        }
+    }
+
     dependencies {
-        after(codeStyle)
+        after(*gates.toTypedArray())
     }
 }
 
 /**
  * clang-tidy, and the same binary restricted to the static analyzer checks.
  *
- * Two knobs, both parameters, so one factory covers the four configurations — tool ×
- * scope — and a manual run can widen a gate to the whole codebase without a second
- * configuration existing for it. See `ci/actions/analysis.py` for what they do.
+ * **One configuration per tool**, not one per scope: the scope is decided at run time by
+ * `ci/actions/analysis.py`, from the pull request number the bridge publishes. Inside a
+ * pull request the analysis is a gate — it looks at what changed, a changed header
+ * pulling in every translation unit that includes it, and a finding fails the build so
+ * the bridge pins it on the diff line it belongs to. Anywhere else it surveys the whole
+ * codebase and only warns, because a finding elsewhere is not this commit's fault.
  *
- * The two scopes differ in kind, not in degree:
- *
- *  - **on diff** is the gate. It analyses only what the pull request changed, a changed
- *    header pulling in every translation unit that includes it, and a finding fails the
- *    build so the bridge pins it on the diff line it belongs to. Ready pull requests
- *    only, and no push: a diff against `main` taken on `main` is empty.
- *  - **full** scans everything on `main`, and only warns. A finding elsewhere in the
- *    codebase is not this pull request's problem, and failing over it would teach
- *    everyone to ignore the gate. It does not annotate either.
+ * These two configurations sit at the **end of the dependency chain**, which is what
+ * makes them the only ones worth requiring before a merge: nothing reaches them unless
+ * the style, every build and every sanitizer went green first.
  *
  * The base of the diff is the pull request's own merge base, which the bridge publishes
  * — GitHub's answer to "where did this branch start", not ours, and the very range the
  * bridge places its annotations against. The target branch comes along as the fallback.
- * These overrides live here and never in the template: a parameter reference TeamCity
+ * These references live here and never in the template: a parameter reference TeamCity
  * cannot resolve turns into an implicit agent requirement, and the build would then
  * never start.
  *
  * @param idValue The configuration id, kept explicit like every other one.
  * @param buildName The configuration name, as it reads on the server.
  * @param tool `tidy` or `analyzer`.
- * @param onDiff True for the pull request gate, false for the full scan on main.
+ * @param gates What must be green first.
  */
-fun analysisBuild(idValue: String, buildName: String, tool: String, onDiff: Boolean) = BuildType {
+fun analysisBuild(idValue: String, buildName: String, tool: String, gates: List<BuildType>) = BuildType {
     id = RelativeId(idValue)
     name = buildName
     templates(toolBuild)
 
-    if (!onDiff) {
-        triggers {
-            mainBranchOnly()
-        }
+    triggers {
+        mainBranchOnly()
     }
 
     params {
         param("cmake_preset", "linux-analysis")
         param("analysis.tool", tool)
-        param("analysis.mode", if (onDiff) "diff" else "full")
-        param("analysis.onFindings", if (onDiff) "fail" else "warn")
-        param("analysis.merge-base",
-              if (onDiff) "%teamcity.github.bridge.pullRequest.mergeBase%" else "")
-        param("analysis.base.branch",
-              if (onDiff) "%teamcity.github.bridge.pullRequest.targetBranch%" else "main")
+        param("analysis.pullRequest", "%teamcity.github.bridge.pullRequest.number%")
+        param("analysis.merge-base", "%teamcity.github.bridge.pullRequest.mergeBase%")
+        param("analysis.base.branch", "%teamcity.github.bridge.pullRequest.targetBranch%")
     }
 
     steps {
@@ -80,8 +79,7 @@ fun analysisBuild(idValue: String, buildName: String, tool: String, onDiff: Bool
             id = "Analyse"
             scriptContent = "poetry run python3 -u ci_action.py Analysis %cmake_preset% " +
                             "--tool %analysis.tool% " +
-                            "--mode %analysis.mode% " +
-                            "--on-findings %analysis.onFindings% " +
+                            "--pull-request '%analysis.pullRequest%' " +
                             "--merge-base '%analysis.merge-base%' " +
                             "--base '%analysis.base.branch%'"
             dockerImage = "%docker_image%"
@@ -92,11 +90,11 @@ fun analysisBuild(idValue: String, buildName: String, tool: String, onDiff: Bool
     }
 
     features {
-        githubBridge(triggerOnPrReady = onDiff, annotateDiff = onDiff)
+        githubBridge()
     }
 
     dependencies {
-        after(codeStyle)
+        after(*gates.toTypedArray())
     }
 }
 

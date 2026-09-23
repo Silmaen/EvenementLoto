@@ -157,19 +157,26 @@ Les deux parties sont **indépendantes** et peuvent avancer en parallèle.
 - [x] `.gitignore` : ajouter `.teamcity/target/` (et `__pycache__/`) (sortie de build du DSL Kotlin)
 - [x] Vérifier qu'aucun export TeamCity n'est déjà dans l'historique Git — **aucun**
       (`git log --all --diff-filter=A --name-only | grep -i zip`)
-- [ ] **Rotation des secrets** exportés en clair ou en `zxx` (brouillage réversible) :
-  - [ ] clé privée SSH `github connexion` (était en clair dans le zip)
-  - [ ] clé privée + client secret + webhook secret de la GitHub App « Owl »
-  - [ ] `github_access_token` (paramètre racine + celui du commit-status-publisher)
-  - [ ] `deploy_passwd`, `remote_passwd`
-- [ ] Remonter la clé SSH au projet racine TeamCity *(décidé : cohérent avec D8,
+- [x] **Rotation des secrets** exportés en clair ou en `zxx` (brouillage réversible),
+      faite le 2026-09-23 :
+  - [x] clé privée SSH `github connexion` (était en clair dans le zip) — la clé
+        publique du serveur est désormais une ed25519
+  - [x] clé privée + client secret + webhook secret de la GitHub App « Owl »
+  - [x] `github_access_token` (paramètre racine + celui du commit-status-publisher)
+  - [x] `deploy_passwd`, `remote_passwd`
+- [x] Clé SSH au projet racine TeamCity, **vérifié** : `_Root` la porte et les projets
+      la voient par héritage, aucun doublon *(décidé : cohérent avec D8,
       le root reste géré par l'UI)*
 - [x] Supprimer `.github/copilot-instructions.md` *(contenu déjà couvert intégralement
       par `CLAUDE.md` : tabulations, commentaires en anglais, préfixes `m_`/`i`/`o`/`io`,
       trailing return types, `log_error`/`log_warn`/`log_info`)*
 - [x] Supprimer les `.idea/copilot.data.migration.*.xml` en local
       *(4 fichiers, déjà non suivis : `.idea/.gitignore` contient `copilot.*`)*
-- [ ] Désactiver Copilot côté GitHub (Settings → Copilot / Code security) — **manuel**
+- [x] **Vérifié le 2026-09-23, rien à faire côté GitHub** : aucun fichier `copilot`
+      suivi, aucun des deux rulesets ne demande de revue Copilot
+      (`automatic_copilot_code_review_enabled` absent de la règle `pull_request`), et le
+      code scanning n'est pas configuré, donc pas d'Autofix. Le reste est un réglage de
+      **compte** (github.com/settings/copilot), pas de dépôt
 - [x] Vérifier si `Python3_EXECUTABLE` est utilisé quelque part — **non**, seul usage :
       son propre `message(STATUS)` dans `cmake/Python.cmake:25` ⇒ suppression en phase 2
       → si non, `find_package(Python3)` (`cmake/Python.cmake:3`) sera supprimé en phase 2
@@ -225,7 +232,8 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 **Validation**
 - [x] `linux-gcc-debug` : configure + build + `ctest` OK
 - [x] `linux-clang-debug` : configure + build + `ctest` OK (clang 22 **et** clang 18)
-- [ ] L'application démarre et affiche une partie
+- [x] L'application démarre et affiche une partie — première exécution réelle le
+      2026-09-23
 
 ---
 
@@ -260,7 +268,7 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
       *(hôte non testé : builds natifs interdits)*
 - [x] `conan --version` ≥ 2.25 résolu depuis le venv Poetry — **2.32.0**
 - [x] `gcovr --version` ≥ 8.5 résolu depuis le venv — **8.6** (et `depmanager` 0.5.2)
-- [ ] Le venv survit à deux builds TeamCity consécutifs *(non testable en local)*
+- [x] Le venv survit à deux builds TeamCity consécutifs — confirmé à l'usage
 
 ---
 
@@ -287,10 +295,16 @@ gestionnaire de paquets. Cette phase supprime à elle seule 11 dépendances.
 
 **Validation**
 - [x] `conan create` OK en linux-gcc (gcc 14) et linux-clang (clang 22), backend GTK3
-- [ ] `conan create` OK sous les profils MinGW *(phase 6)*
-- [ ] Les dialogues s'ouvrent réellement (ouvrir, enregistrer, sélectionner un dossier)
+- [x] `conan create` OK sous les profils MinGW : les deux configurations Windows
+      construisent la recette et passent leurs 109 tests
+- [x] Le dialogue d'ouverture fonctionne (un `.lev` chargé depuis l'interface le
+      2026-09-23). Enregistrer et sélectionner un dossier restent à confirmer
       *(non vérifiable sans écran : à faire à la main)*
-- [ ] Les suppressions de `lsan_suppressions.txt` sont toujours pertinentes *(phase 5)*
+- [x] Les suppressions de `lsan_suppressions.txt` **ne servent rien aujourd'hui** :
+      aucun test GUI n'atteint `FileDialog`, donc dbus n'est jamais initialisé et la
+      suite passe sans elles (vérifié avec `LSAN_OPTIONS=""`). Elles ne redeviendraient
+      utiles que si un test exerçait le dialogue natif. Leur retrait est déjà prévu avec
+      celui de nfd (phase 10), inutile de le faire deux fois
 
 ---
 
@@ -363,7 +377,8 @@ la version reste toujours celle que CMake utilise réellement.
       avec les mêmes `.so` qu'avant la migration
 - [x] Les en-têtes tiers ne déclenchent pas `-Weverything` (cibles `IMPORTED` ⇒ `SYSTEM`)
 - [x] Un `cmake --preset` sur un cache Conan vide fonctionne (bootstrap complet)
-- [ ] L'application démarre et charge une partie *(non vérifiable sans écran)*
+- [x] L'application démarre et charge une partie — `super_loto.lev` chargé puis partie
+      démarrée, le 2026-09-23
 
 ## Phase 5 — Presets qualité
 
@@ -495,8 +510,12 @@ instance par flux.
 - [x] `poetry.lock` : régénérer
 - [x] TeamCity : `poetry run dmgr remote add …` retiré du runner « Tool Dependencies »
       *(fait dans le DSL Kotlin, phase 8)*
-- [ ] TeamCity : supprimer les paramètres racine `remote_url`, `remote_login`,
-      `remote_passwd` *(projet racine, géré par l'interface)*
+- [x] **Sans objet.** `remote_url`, `remote_login`, `remote_passwd` et
+      `github_access_token` vivent sur le projet racine et servent à **d'autres
+      projets** ; ils n'ont donc pas à disparaître. Ce que la phase 7 exigeait est
+      vérifié : plus aucune référence dans le dépôt, et aucune dans les étapes de build
+      du projet. Ce qu'on voit dans la liste des paramètres du projet est la vue
+      **héritée** du racine, comme pour la clé SSH
 - [x] **Dépôt `CI/DockerImages`** : `pip install … depmanager gcovr` retiré de
       `_common/builder.sh`
 - [x] Images reconstruites et publiées *(fait côté dépôt DockerImages)*
@@ -525,10 +544,15 @@ verbatim de l'export du serveur, et `.teamcity/README.md` pour la procédure.
 - [x] Les 11 étapes du template sont reproduites, conditions incluses
 - [x] Extensions conservées : `investigationsAutoAssigner`, `xmlReport` (gtest,
       `output/build/**/test/*_Report.xml`), `perfmon`, `github-bridge`
-- [x] Pas de trigger VCS : le déclenchement vient du pont GitHub App
-      (`triggerOnBranch`, `triggerOnPrReady`), comme sur le serveur
-- [ ] Activer la synchronisation (*Versioned Settings → use settings from VCS*) et
-      comparer un build avant/après sur la même révision
+- [x] ~~Pas de trigger VCS~~ — **faux, corrigé le 2026-09-22** : le pont ne met en file
+      que sur événements de pull request, son contrôleur webhook ignore `push`. `main` a
+      donc un `vcsTrigger` limité à `+:main` (voir 12.0)
+- [x] Synchronisation activée, et **vérifiée** : le statut du projet dit « Changes from
+      VCS are applied to project settings », format kotlin
+- [x] ~~Comparer un build avant/après sur la même révision~~ — **sans objet** : le mode
+      a été passé à *always use current settings*, donc un build de branche ne charge
+      jamais les settings du VCS. Ce qui le remplace est le diff du XML généré contre
+      celui de `main`, fait à chaque changement du DSL
 
 ### Validation : le DSL compile et régénère le XML
 
@@ -785,6 +809,171 @@ Il n'y en avait **aucune**, nulle part. Modèle d'Owl : tout attend `Code Style`
 
 ---
 
+## Phase 13 — Défauts trouvés à la première exécution réelle
+
+Le 2026-09-23, première exécution depuis la migration. Quatre défauts, dont deux
+graves, qu'aucun test ne pouvait attraper.
+
+- [x] **L'autosave ne fonctionnait plus du tout.** Les réglages sont stockés en YAML et
+      le lecteur ne produit que des `std::string` ; le code relisait
+      `general/data_location` en `std::filesystem::path`, donc `std::any_cast` échouait
+      et rendait un chemin **vide**. Aucune sauvegarde de secours n'était écrite, avec
+      pour seule trace une ligne d'avertissement. Tout passe maintenant par
+      `core::getDataLocation()`, qui lit une chaîne et ne rend jamais vide
+- [x] **Pourquoi aucun test ne l'a vu** : le fixture de `test_Rescue.cpp` posait la
+      valeur comme un `path`. Il validait donc une configuration qui n'existe jamais en
+      production. Corrigé, plus deux tests sur le cas réel
+- [x] **Régression de la phase 11** : le support Wayland avait basculé l'application sur
+      Wayland, où les fenêtres détachées sont impossibles — or c'est précisément ce qui
+      envoie l'affichage sur le vidéoprojecteur. X11 est demandé par défaut, XWayland
+      compris (`MainWindow::selectPlatform`, réglage `gui/display_server`)
+- [x] **Le journal s'ouvrait dans le répertoire courant** : `main` initialisait le
+      logger avant `initializeUtilities`, donc `getExecPath()` était encore vide et le
+      chemin absolu devenait relatif. Lancé depuis un menu, la trace du plantage était
+      perdue — l'inverse de ce que S0 promettait
+- [x] Le périphérique Vulkan est journalisé, avec un avertissement explicite s'il est
+      logiciel : un rendu llvmpipe ne se voit sinon qu'à la lenteur, un après-midi
+- [x] **Chemins d'outils périmés dans le cache CMake** : `find_program` met en cache un
+      chemin absolu dans le venv Poetry, donc sous `$HOME`. Le même répertoire de build
+      ouvert depuis l'IDE, un terminal et un agent CI voit trois `$HOME` différents, et
+      `execute_process` sur un programme absent échoue **sans aucune sortie**.
+      `cmake/Poetry.cmake` invalide les entrées mortes, en un seul endroit
+
+**Hors application, côté poste** — la toolchain CLion « Docker Owl » ne donnait à l'uid
+1001 aucun groupe supplémentaire : pas d'accès à `/dev/dri`, donc rendu llvmpipe, donc
+présentation via MIT-SHM, donc `BadAccess` du serveur X. `--privileged` ne contourne pas
+le contrôle de permission sur le fichier DRM. Corrigé par
+`--ipc host --group-add video --group-add 990`.
+
+---
+
+## Protection de `main` — deux checks à exiger
+
+**Correction d'une affirmation fausse de ma part** : j'avais dit que `main` n'avait
+aucune protection de branche. C'est inexact — elle est protégée par un **ruleset**
+(« main merging »), et l'ancien endpoint `/branches/main/protection` renvoie 404 pour
+les rulesets, ce qui m'a trompé. Le ruleset impose déjà : pas de suppression, pas de
+force-push, historique linéaire, passage par une pull request en squash uniquement.
+
+Ce qui manque est réel, mais ne demande que **deux** noms, pas neuf, depuis que la
+chaîne de dépendances existe : rien n'atteint les analyses si le style, les quatre
+builds et les quatre sanitizers ne sont pas passés.
+
+- [ ] Ajouter au ruleset « main merging » une règle `required_status_checks` avec
+      exactement :
+      `TeamCity / Evenement Loto / Analysis / Clang-Tidy` et
+      `TeamCity / Evenement Loto / Analysis / Static Analyzer`
+
+---
+
+## Phase 14 — Chaîne de dépendances et portée des analyses
+
+Demandé le 2026-09-23.
+
+- [x] **Une seule configuration par outil** au lieu de deux. La portée n'est plus un
+      paramètre de configuration mais une décision d'exécution : `ci_action.py Analysis`
+      lit le numéro de pull request publié par le pont et choisit `diff` + constat
+      bloquant à l'intérieur d'une PR, `full` + constat consultatif ailleurs.
+      `Clang-Tidy (diff)` et `Static Analyzer (diff)` disparaissent
+- [x] Chaîne : `Code Style` → les quatre builds → les quatre sanitizers → les deux
+      analyses. Une dépendance en échec rend le dépendant en échec, il n'est pas
+      seulement sauté
+- [x] Les sanitizers attendent les deux builds **Clang**, sur les deux plateformes : ce
+      sont ceux dont ils dérivent, et ils sont eux-mêmes Clang uniquement. Un Windows
+      cassé arrête donc bien la chaîne
+- [x] Les builds **GCC restent hors chaîne** : ils tournent sur chaque pull request et
+      publient leur propre résultat, mais faire attendre quatre vagues sur un second
+      compilateur allongerait chaque PR pour rien
+- [x] Les **Package** ne tournent que sur `main` : `triggerOnPrReady = false`, pas de
+      brouillon, et un `vcsTrigger` limité à `+:main`. Une dépendance ne tire que vers
+      l'amont, donc un build Clang déclenché par une PR ne les entraîne pas
+- [x] Sur une PR **brouillon**, seuls les deux builds Clang (Linux et Windows) sont
+      déclenchés. `Code Style` y arrive quand même, par la dépendance, donc il n'a plus
+      besoin de son propre `triggerOnPrDraft`
+- [x] Conséquence voulue : seules les deux analyses sont à exiger avant un merge,
+      puisqu'elles sont en fin de chaîne
+
+## Validation manuelle — la séance de tests à faire
+
+Tout ce qui suit demande un écran, un second écran, ou de tuer le processus. À faire en
+une session, dans cet ordre : les trois premiers sont ceux qui comptent vraiment.
+
+### 1. L'autosave écrit réellement 🔴
+
+C'est le défaut de la phase 13, celui qui ne laissait qu'une ligne d'avertissement.
+
+1. Régler le répertoire de données dans les préférences, puis **relancer** l'application
+   (le bug n'apparaissait qu'après un rechargement des réglages depuis `config.yml`).
+2. Ouvrir un événement, démarrer une partie, tirer trois numéros.
+3. Vérifier que `rescue.lev` existe dans ce répertoire, horodaté à l'instant.
+4. Tirer un numéro de plus, vérifier que l'horodatage bouge et que `rescue.lev.1` apparaît.
+
+Le journal ne doit contenir **aucun** « Aucun emplacement de données configuré » ni
+« Autosave failed ».
+
+- [ ] Fait
+
+### 2. Reprise après un arrêt brutal 🔴
+
+1. En pleine partie, après une dizaine de numéros, `kill -9` sur le processus.
+2. Relancer : la fenêtre de reprise doit proposer l'événement, avec **le bon nombre de
+   numéros tirés** et une ancienneté cohérente.
+3. Accepter : la partie reprend au même point.
+4. Refaire l'essai en refusant : le fichier doit être archivé sous
+   `rescue-<horodatage>-rescue.lev`, pas supprimé.
+
+- [ ] Fait
+
+### 3. Affichage sur le vidéoprojecteur 🔴
+
+1. Second écran branché, détacher la vue d'affichage et la passer en plein écran dessus.
+2. Vérifier que la grille reste lisible et que l'écran de contrôle reste utilisable.
+3. Débrancher le second écran **en cours de partie**, puis le rebrancher : l'application
+   ne doit ni se fermer ni perdre la partie (le chemin `OUT_OF_DATE` est traité, jamais
+   vérifié en vrai).
+
+- [ ] Fait
+
+### 4. Le journal au bon endroit
+
+Lancer depuis un lanceur de bureau ou un raccourci, pas depuis l'IDE, et vérifier la
+ligne `Journal : '…'` : elle doit pointer à côté de l'exécutable, jamais un chemin
+relatif.
+
+- [ ] Fait
+
+### 5. Le bon périphérique graphique
+
+Vérifier la ligne `[vulkan] Périphérique : …` du journal. Si elle dit `llvmpipe`, le
+rendu est logiciel et tiendra mal une séance — l'avertissement qui suit le dit.
+
+- [ ] Fait
+
+### 6. Les deux autres dialogues
+
+Enregistrer sous, et sélectionner un dossier dans les préférences. L'ouverture est déjà
+vérifiée.
+
+- [ ] Fait
+
+### 7. Wayland, pour mémoire
+
+Mettre `gui/display_server: wayland` dans `config.yml`, lancer : l'application doit
+démarrer et journaliser que les fenêtres détachées sont désactivées. Remettre `x11`
+ensuite. C'est un test de non-régression du repli, pas un mode utilisable pour une
+séance.
+
+- [ ] Fait
+
+### Ce qui restera non testé
+
+L'injection d'exception dans une vue (S4) n'est pas déclenchable depuis l'interface : il
+faudrait un `throw` temporaire dans une vue pour vérifier que l'application survit, puis
+un `throw` permanent pour vérifier l'arrêt propre après cinq échecs. À faire avec un
+correctif jetable, ou à laisser de côté.
+
+---
+
 ## Risques ouverts
 
 | # | Risque | Phase | Atténuation |
@@ -821,7 +1010,9 @@ l'image**.
 
 À changer :
 
-- [ ] phase 7 : retirer `depmanager` (et `gcovr`) du `pip install` de
+- [x] **Vérifié le 2026-09-23** : plus aucun paquet pip `depmanager` ni `gcovr` dans
+      `builder-ubuntu2404` ni `devel-ubuntu2404`, poetry présent dans les deux
+- [x] ~~phase 7 : retirer `depmanager` (et `gcovr`) du `pip install` de
       `_common/builder.sh` — plus aucun consommateur côté projet
 - [ ] **optionnel, pour restaurer le WSI complet du loader Vulkan** :
       `libxcb1-dev libx11-xcb-dev libwayland-dev`, puis remettre
@@ -903,8 +1094,10 @@ ou de fixer la position de ses propres fenêtres**. Deux conséquences ont été
       est le même qu'avant — c'était correct *par accident*, `windowPos` restant à
       `{0,0}` — mais c'est maintenant explicite.
 - [x] `glfwGetPlatform()` est journalisé au démarrage (« Serveur d'affichage : … »)
-- [ ] Vérifier le plein écran de la vue d'affichage sur un second écran en session
-      Wayland *(`glfwSetWindowMonitor` est supporté, à valider en vrai)*
+- [x] **Tranché par l'usage** : sous Wayland les fenêtres détachées sont désactivées,
+      donc la vue d'affichage ne peut pas aller sur un second écran. C'est X11 qui est
+      demandé par défaut (réglage `gui/display_server`), et les fenêtres détachées y
+      sortent bien — confirmé le 2026-09-23
 - [x] Images reconstruites et publiées, avec une nouvelle organisation en trois
       couches : `base-ubuntu2404` (exécution), `builder-ubuntu2404` (gcc **et** clang,
       toutes les libs `-dev`), `devel-ubuntu2404` (+ debuggers). Ubuntu 22.04 et 26.04
@@ -941,7 +1134,8 @@ de titre sous GNOME).
 - [x] `linux-clang-release` : build + `cpack`, archive complète
 - [x] Les trois extensions WSI présentes dans le loader livré
 - [x] 45 symboles Wayland dans le `libglfw.so` construit
-- [ ] Démarrage réel en session Wayland *(non vérifiable sans écran)*
+- [x] Démarrage réel en session Wayland vérifié le 2026-09-23 : l'application démarre,
+      charge une partie et s'arrête proprement
 
 ---
 ---
@@ -1119,8 +1313,10 @@ est désormais nul.
       n'avait jamais été appliqué (un remplacement silencieux avait échoué). En place
       depuis S4.*
 - [x] `reportError()` sauvegarde, et ne le fait qu'à la première transition vers `Error`
-- [ ] Mesurer le coût de l'écriture sur la fluidité d'affichage *(fichier petit, mais
-      l'écriture reste synchrone dans la boucle)*
+- [x] Coût mesuré sur un build release, via le banc d'endurance : **396 144
+      sauvegardes en 15 s**, soit **38 µs** par cycle tirage + écriture atomique. À 60
+      images par seconde une image dure 16 667 µs, donc l'écriture synchrone coûte
+      **0,23 %** d'une image. Aucune raison de la sortir de la boucle
 
 ## Phase S6 — Robustesse GPU et session longue
 

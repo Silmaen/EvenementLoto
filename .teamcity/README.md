@@ -36,6 +36,18 @@ L'ordre d'affichage n'est pas celui des appels `subProject()` / `buildType()` : 
 garde un ordre propre, qu'il faut déclarer avec `subProjectsOrder` et `buildTypesOrder`.
 Le premier accepte des `RelativeId`, le second exige les instances de `BuildType`.
 
+Cet ordre **est** la chaîne de dépendances, lue de haut en bas :
+
+```
+Code Style  →  Build Linux x64 · Build Windows x64  →  Sanitizers  →  Analysis     Package
+                    (Clang dans la chaîne, GCC à côté)
+```
+
+`Code Style` ouvre la chaîne mais c'est une configuration, pas un sous-projet : TeamCity
+l'affiche donc dans son propre bloc et non dans cette liste. `Package` est en fin de
+liste mais hors chaîne : il ne dépend que du style et du build Clang de sa plateforme, et
+ne tourne que sur `main`.
+
 ## Ce qui n'est pas ici
 
 Le **projet racine** reste géré depuis l'interface. Il porte les paramètres partagés

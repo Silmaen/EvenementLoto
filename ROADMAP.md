@@ -5,7 +5,7 @@ Une ligne par élément. Ce qui est livré passe dans [CHANGELOG.md](CHANGELOG.m
 La version en développement est **0.5.0**, intercalée comme version de transition vers
 Conan : elle ne porte pas de nouveauté fonctionnelle, son contenu est dans le changelog.
 Les travaux d'outillage et de stabilité qu'elle regroupe ont leur propre suivi, détaillé,
-dans [TODO.md](TODO.md).
+dans le fichier `TODO.md` du dépôt.
 
 ## 0.5.1
 

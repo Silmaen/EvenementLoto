@@ -63,16 +63,25 @@ class Analysis(BaseAction):
         )
         parser.add_argument(
             "--mode",
-            choices=("full", "diff"),
-            default="full",
-            help="full: every translation unit. diff: only the ones the change "
-            "touches, a changed header pulling in every unit that includes it.",
+            choices=("auto", "full", "diff"),
+            default="auto",
+            help="auto: diff inside a pull request, full elsewhere. full: every "
+            "translation unit. diff: only the ones the change touches, a changed "
+            "header pulling in every unit that includes it.",
         )
         parser.add_argument(
             "--on-findings",
-            choices=("warn", "fail"),
-            default="warn",
-            help="warn: report and stay green. fail: a finding fails the build.",
+            choices=("auto", "warn", "fail"),
+            default="auto",
+            help="auto: fail on a diff, warn on a full scan. warn: report and stay "
+            "green. fail: a finding fails the build.",
+        )
+        parser.add_argument(
+            "--pull-request",
+            default="",
+            metavar="NUMBER",
+            help="the pull request being built, as the bridge publishes it. Empty "
+            "outside a pull request, which is what `auto` reads.",
         )
         parser.add_argument(
             "--merge-base",
@@ -90,10 +99,28 @@ class Analysis(BaseAction):
         )
         parsed = parser.parse_args(options)
         self.tool = parsed.tool
-        self.mode = parsed.mode
-        self.on_findings = parsed.on_findings
         self.merge_base = parsed.merge_base.strip()
         self.base = parsed.base.strip() or "main"
+
+        # One configuration, two jobs. Inside a pull request the analysis is a gate: it
+        # looks at what changed and a finding is an error. Anywhere else it is a survey
+        # of the whole codebase, and a finding elsewhere is not this commit's fault.
+        insidePullRequest = parsed.pull_request.strip() != ""
+        self.mode = parsed.mode
+        if self.mode == "auto":
+            self.mode = "diff" if insidePullRequest else "full"
+        self.on_findings = parsed.on_findings
+        if self.on_findings == "auto":
+            self.on_findings = "fail" if self.mode == "diff" else "warn"
+        log.info(
+            f"Analyse : {self.tool}, portée {self.mode}, "
+            f"constat {'bloquant' if self.on_findings == 'fail' else 'consultatif'}"
+            + (
+                f", pull request {parsed.pull_request.strip()}"
+                if insidePullRequest
+                else ""
+            )
+        )
         return self
 
     def run(self, preset: str) -> int:
