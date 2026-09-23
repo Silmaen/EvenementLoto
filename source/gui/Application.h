@@ -148,6 +148,17 @@ public:
 	void addView(const std::shared_ptr<views::View>& iView) { m_views.push_back(iView); }
 
 	/**
+	 * @brief Ajoute un popup à ceux rendus à chaque image.
+	 *
+	 * Pendant du `addView` ci-dessus, et pour la même raison : c'est ce qui rend
+	 * vérifiable le cas le plus délicat du navigateur de fichiers, une demande émise
+	 * depuis l'intérieur d'un popup, qui doit s'y empiler et non le chasser.
+	 *
+	 * @param[in] iPopup Le popup à ajouter.
+	 */
+	void addPopup(const std::shared_ptr<views::Popup>& iPopup) { m_popups.push_back(iPopup); }
+
+	/**
 	 * @brief Get a view by name.
 	 * @param iName The view name.
 	 * @return The view pointer or nullptr if not found.

@@ -16,3 +16,16 @@
 namespace fs = std::filesystem;
 
 constexpr auto g_logLv = evl::Log::Level::Off;
+
+/// True where the application cannot be given a display.
+///
+/// On Linux `ctest` runs the GUI suite under `xvfb-run`, so it really runs. The TeamCity
+/// Windows agent is a service with no desktop session and no software Vulkan, so the
+/// window could not be created there — better to say so than to fail for a reason that
+/// has nothing to do with the code. Remove this the day that agent has a session.
+constexpr auto g_needsDisplay =
+#ifdef EVL_PLATFORM_WINDOWS
+		true;
+#else
+		false;
+#endif

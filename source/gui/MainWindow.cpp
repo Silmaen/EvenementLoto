@@ -89,6 +89,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		Application::get().reportError("Failed to initialize GLFW");
 		return;
 	}
+	m_stage = Stage::Glfw;
 	m_wayland = glfwGetPlatform() == GLFW_PLATFORM_WAYLAND;
 	log_info("Serveur d'affichage : {}", m_wayland ? "Wayland" : "X11");
 
@@ -104,6 +105,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		return;
 	}
 	m_window = window;
+	m_stage = Stage::Window;
 	if (glfwVulkanSupported() == 0) {
 		Application::get().reportError("GLFW: Vulkan Not Supported");
 		return;
@@ -137,12 +139,14 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		glfwGetFramebufferSize(window, &w, &h);
 		g_mainWindowData->Surface = surface;
 		setupVulkanWindow(w, h);
+		m_stage = Stage::Vulkan;
 	}
 
 	// Setup Dear ImGui context
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+		m_stage = Stage::ImGuiContext;
 		ImGuiIO& io = ImGui::GetIO();
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;// Enable Keyboard Controls
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;// Enable Gamepad Controls
@@ -196,6 +200,7 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 											   .CustomShaderVertCreateInfo = {},
 											   .CustomShaderFragCreateInfo = {}};
 		ImGui_ImplVulkan_Init(&init_info);
+		m_stage = Stage::Backends;
 	}
 	if (Application::get().getState() == Application::State::Error)
 		return;
@@ -338,25 +343,39 @@ void MainWindow::setCallbacks() {
 }
 
 void MainWindow::close() {
-	const auto vkData = vulkan::VulkanContext::get().getVkData();
-	const auto err = vkDeviceWaitIdle(vkData.device);
-	vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
-	ImGui_ImplVulkan_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
-	ImGui::DestroyContext();
-
-	cleanupVulkanWindow();
-	g_mainWindowData.reset();
-	vulkan::VulkanContext::get().reset();
-
-	auto* window = static_cast<GLFWwindow*>(m_window);
-	glfwDestroyWindow(window);
-	glfwTerminate();
+	// Taken down in the reverse order it was set up, and only as far as it got: a start
+	// that failed on the display server has no Vulkan device to wait on and no backend
+	// to shut down. Doing it anyway turned a clean `EXIT_FAILURE` into a segmentation
+	// fault, and the organizer into someone who had to read a stack trace.
+	if (m_stage >= Stage::Backends) {
+		if (const auto vkData = vulkan::VulkanContext::get().getVkData(); vkData.device != VK_NULL_HANDLE) {
+			const auto err = vkDeviceWaitIdle(vkData.device);
+			vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
+		}
+		ImGui_ImplVulkan_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+	}
+	if (m_stage >= Stage::ImGuiContext)
+		ImGui::DestroyContext();
+	if (m_stage >= Stage::Vulkan) {
+		cleanupVulkanWindow();
+		g_mainWindowData.reset();
+		vulkan::VulkanContext::get().reset();
+	}
+	if (m_stage >= Stage::Window) {
+		glfwDestroyWindow(static_cast<GLFWwindow*>(m_window));
+		m_window = nullptr;
+	}
+	if (m_stage >= Stage::Glfw)
+		glfwTerminate();
+	m_stage = Stage::Nothing;
 }
 
 auto MainWindow::shouldClose() const -> bool {
-	auto* window = static_cast<GLFWwindow*>(m_window);
-	return glfwWindowShouldClose(window) != 0;
+	// No window is a reason to stop, not a reason to ask GLFW about a null one.
+	if (m_window == nullptr)
+		return true;
+	return glfwWindowShouldClose(static_cast<GLFWwindow*>(m_window)) != 0;
 }
 
 void MainWindow::newFrame() {

@@ -61,9 +61,8 @@ void MainConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("...##SearchFolder")) {
-			if (const auto path = utils::FileDialog::selectFolder(); !path.empty()) {
-				m_data.dataLocation = path;
-			}
+			utils::FileDialog::selectFolder(
+					[this](const std::filesystem::path& iPath) -> void { m_data.dataLocation = iPath; });
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Parcourir...");
@@ -330,9 +329,8 @@ void EventConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("...##SearchEventLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
-				m_event.setLogo(path);
-			}
+			utils::FileDialog::openFile(utils::g_imageFilter,
+										[this](const std::filesystem::path& iPath) -> void { m_event.setLogo(iPath); });
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Parcourir...");
@@ -368,9 +366,9 @@ void EventConfigPopups::onPopupUpdate() {
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("...##SearchOrgaLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			if (const auto path = utils::FileDialog::openFile(utils::g_imageFilter); !path.empty()) {
-				m_event.setOrganizerLogo(path.string());
-			}
+			utils::FileDialog::openFile(utils::g_imageFilter, [this](const std::filesystem::path& iPath) -> void {
+				m_event.setOrganizerLogo(iPath.string());
+			});
 		}
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Parcourir...");
@@ -397,32 +395,32 @@ void EventConfigPopups::onPopupUpdate() {
 
 		// Boutons Import/Export
 		if (ImGui::Button("Import", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			if (const auto path = utils::FileDialog::openFile(utils::g_yamlFilter); !path.empty()) {
+			utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
 				try {
-					if (YAML::Node node = YAML::LoadFile(path.string()); node["rules"]) {
+					if (YAML::Node node = YAML::LoadFile(iPath.string()); node["rules"]) {
 						m_event.setRules(node["rules"].as<std::string>());
 					} else {
-						log_warn("No 'rules' field found in file: {}", path.string());
+						log_warn("No 'rules' field found in file: {}", iPath.string());
 					}
 				} catch (const YAML::Exception& e) { log_error("Failed to load YAML file: {}", e.what()); }
-			}
+			});
 		}
 		ImGui::SameLine();
 		const float exportOffset = ImGui::GetContentRegionAvail().x - g_buttonWidth;
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + exportOffset);
 		if (ImGui::Button("Export", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			if (const auto path = utils::FileDialog::saveFile(utils::g_yamlFilter); !path.empty()) {
+			utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
 				try {
 					YAML::Node node;
 					node["rules"] = m_event.getRules();
-					if (std::ofstream fout(path); !fout.is_open()) {
-						log_error("Failed to open file for writing: {}", path.string());
+					if (std::ofstream fout(iPath); !fout.is_open()) {
+						log_error("Failed to open file for writing: {}", iPath.string());
 					} else {
 						fout << node;
 						fout.close();
 					}
 				} catch (const YAML::Exception& e) { log_error("Failed to save YAML file: {}", e.what()); }
-			}
+			});
 		}
 	}
 	ImGui::EndChild();
@@ -597,16 +595,16 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		ImGui::SameLine();
 		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
 			// Action import
-			if (const auto path = utils::FileDialog::openFile(utils::g_yamlFilter); !path.empty()) {
-				m_event.importYaml(path);
-			}
+			utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+				m_event.importYaml(iPath);
+			});
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
 			// Action export
-			if (const auto path = utils::FileDialog::saveFile(utils::g_yamlFilter); !path.empty()) {
-				m_event.exportYaml(path);
-			}
+			utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+				m_event.exportYaml(iPath);
+			});
 		}
 	}
 	ImGui::EndChild();
@@ -804,9 +802,13 @@ void GameRoundConfigPopups::renderThirdColumn() {
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("...##BrowseDiapo")) {
-					if (const auto path = utils::FileDialog::selectFolder(); !path.empty()) {
-						currentRound->setDiapo(path.string(), delay);
-					}
+					utils::FileDialog::selectFolder([this, delay](const std::filesystem::path& iPath) -> void {
+						// The round is resolved again: the iterator held this frame would
+						// be stale by the time the organizer has picked a directory.
+						if (const auto round = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
+							round != m_event.endRounds())
+							round->setDiapo(iPath.string(), delay);
+					});
 				}
 				if (ImGui::IsItemHovered())
 					ImGui::SetTooltip("Parcourir...");

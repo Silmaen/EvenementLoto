@@ -4,8 +4,8 @@
 
 ### Réglages globaux
 
-La première chose à faire est de régler les paramètres globaux du logiciel. Ces paramètres sont accessibles via le
-menu "Préférences" dans la barre de menu.
+La première chose à faire est de régler les paramètres globaux du logiciel. Ces paramètres sont accessibles par le
+menu "Paramètres" > "Général", ou par le bouton "Préférences" de la barre d'outils.
 ![preferences.png](images/preferences.png)
 
 La fenêtre se présente comme:
@@ -36,15 +36,45 @@ vidéoprojecteur. Sous Linux, cela n'est possible qu'avec le serveur d'affichage
 interdit à une application de choisir l'écran et la position de ses propres fenêtres.
 
 Le logiciel demande donc X11 par défaut, y compris dans une session Wayland, où il passe par XWayland. Le réglage
-`gui/display_server` du fichier `config.yml` permet de changer ce choix :
+**gui/display_server**, dans le fichier **config.yml** placé à côté du programme, permet de changer ce choix :
 
 | Valeur | Effet |
 |---|---|
-| `x11` (défaut) | fenêtres détachables, second écran utilisable |
-| `wayland` | Wayland natif, **fenêtres détachables désactivées** |
-| `auto` | laisse la bibliothèque graphique décider |
+| **x11** (défaut) | fenêtres détachables, second écran utilisable |
+| **wayland** | Wayland natif, **fenêtres détachables désactivées** |
+| **auto** | laisse la bibliothèque graphique décider |
 
 Le journal indique à chaque démarrage quel serveur d'affichage est utilisé.
+
+#### Carte graphique utilisée
+
+Au démarrage, le journal liste les cartes graphiques trouvées et indique celle qui a été retenue. Une carte dédiée est
+préférée, et si aucune n'est disponible le logiciel se rabat sur un rendu **logiciel** : il le signale alors par un
+avertissement, car l'affichage fonctionnera mais trop lentement pour une séance.
+
+Sur une machine qui en porte plusieurs, le réglage **gui/vulkan_device** de **config.yml** impose un choix. Il suffit
+d'un fragment du nom tel que le journal l'écrit, par exemple **NVIDIA** ou **Intel**. Laissé vide, le logiciel décide
+seul.
+
+### Choisir un fichier ou un dossier
+
+Partout où le logiciel demande un fichier ou un dossier — ouvrir un événement,
+l'enregistrer, choisir un logo, un règlement, un répertoire de diaporama — la même
+fenêtre s'ouvre. Elle est dessinée par le logiciel lui-même : elle suit donc le thème,
+et ne passe jamais derrière l'écran d'affichage.
+
+* **Le chemin, en haut**, se parcourt à rebours : cliquer sur l'un de ses éléments
+  remonte directement à ce niveau, même de plusieurs crans d'un coup.
+* **À gauche**, les cinq derniers fichiers et dossiers utilisés, puis l'arborescence des
+  dossiers. Cliquer sur un nom s'y rend, la flèche déplie sans bouger.
+* **Le champ « Chemin »** sert à deux choses. Quelques lettres réduisent la liste aux
+  noms qui commencent ainsi ; un chemin complet mène ailleurs. La touche
+  **Tabulation** complète ce qui est tapé, et **Entrée** ouvre ce qui est désigné.
+* **Le type**, en bas, filtre sur les formats attendus. « Tous les fichiers » est
+  toujours proposé : les formats qui ne sont pas prévus apparaissent alors en grisé,
+  et restent sélectionnables — à vos risques.
+* À l'enregistrement, le nom se saisit en bas, et remplacer un fichier existant demande
+  confirmation.
 
 ### Réglage événement
 
@@ -143,12 +173,12 @@ vous assurer que les lots sont correctement remplis et affichés. Il est importa
 correctement affichés pour les participants, car cela peut avoir un impact sur leur motivation à jouer, et sur le succès
 de l'événement.
 
-![reglage_parties_lots_apercu.png](images/reglage_parties_apercu.png)
+![reglage_parties_apercu.png](images/reglage_parties_apercu.png)
 
 ## Déroulement d'un événement
 
-Une fois les parties configurées, il est temps de démarrer l'événement. Pour cela, il suffit de cliquer sur le bouton "
-Démarrer l'événement" dans la barre d'outils.
+Une fois les parties configurées, il est temps de démarrer l'événement. Pour cela, il suffit de cliquer sur le bouton
+"Commencer" de la barre d'outils, ou sur "Fichier" > "Commencer".
 
 ![demarrer.png](images/demarrer.png)
 
@@ -165,8 +195,9 @@ permet aux participants de suivre le déroulement de l'événement, de voir les 
 
 S'il n'y a qu'un seul écran de disponible, la fenêtre de contrôle et la fenêtre d'affichage seront affichées sur le
 même écran, avec la fenêtre de contrôle et une fenêtre d'affichage plus petite. Si deux écrans sont disponibles, la
-fenêtre de contrôle sera affichée sur l'écran principal, et la fenêtre d'affichage sera affichée sur l'écran secondaire
-en plein écran (si plus que deux écrans il sera possible de choisir quel écran sert d'affichage).
+fenêtre de contrôle sera affichée sur l'écran principal, et la fenêtre d'affichage sur l'écran secondaire en plein
+écran. L'écran utilisé se choisit dans l'écran de contrôle, section "Affichage" : une liste déroulante nomme les
+écrans disponibles, et une case "Plein écran" les active. Avec un seul écran, le plein écran reste désactivé.
 
 ### Écran de contrôle
 
@@ -196,17 +227,23 @@ Bonne chance pour votre événement, et n'hésitez pas à nous faire part de vos
 ## En cas d'incident
 
 Pendant toute la durée d'un événement, le logiciel enregistre automatiquement la partie en cours dans un fichier de
-secours, placé dans le dossier de données choisi dans les réglages globaux. Cet enregistrement a lieu au moins toutes
-les dix secondes, et l'ancienne version est conservée : il y a donc toujours deux sauvegardes disponibles.
+secours, placé dans le dossier de données choisi dans les réglages globaux. Cet enregistrement a lieu après **chaque**
+changement — un numéro tiré, un numéro annulé, un changement de partie — et de toute façon toutes les dix secondes.
+L'écart entre le numéro annoncé aux joueurs et le numéro enregistré est donc nul. L'ancienne version est conservée : il
+y a toujours deux sauvegardes disponibles.
 
 Si le logiciel s'arrête brutalement (coupure de courant, plantage), il suffit de le relancer : au démarrage, il détecte
 la partie interrompue et propose de la reprendre. La fenêtre indique le nom de l'événement, le nombre de numéros déjà
 tirés et le moment du dernier enregistrement, pour permettre de vérifier qu'il s'agit bien de la bonne partie.
 
-- **Reprendre la partie** recharge l'événement à l'endroit exact où il s'était arrêté. Il faut ensuite l'enregistrer
+* **Reprendre la partie** recharge l'événement à l'endroit exact où il s'était arrêté. Il faut ensuite l'enregistrer
   normalement pour conserver la suite dans le fichier habituel.
-- **Ignorer** démarre sur un événement vierge. Le fichier de secours n'est pas supprimé pour autant : il est simplement
+* **Ignorer** démarre sur un événement vierge. Le fichier de secours n'est pas supprimé pour autant : il est simplement
   renommé avec la date et l'heure, et reste donc récupérable si le refus était une erreur.
 
 Si le fichier de secours le plus récent est illisible, parce que l'arrêt a eu lieu pendant son écriture, le logiciel
 propose automatiquement la sauvegarde précédente.
+
+Il en va de même pour vos propres fichiers : un fichier tronqué ou abîmé est **refusé** et signalé à l'écran, au lieu
+d'être chargé à moitié. La partie en cours reste intacte. Les fichiers enregistrés par les versions précédentes du
+logiciel se relisent normalement.

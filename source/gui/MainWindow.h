@@ -160,6 +160,25 @@ private:
 	MainWindowOptions m_options{};
 	/// Native window pointer.
 	void* m_window{};
+
+	/**
+	 * @brief How far `init()` got, so `close()` undoes exactly that and no more.
+	 *
+	 * `init()` gives up at the first step that fails — no display server, no window, no
+	 * Vulkan — and the application then leaves through `main()`'s `EXIT_FAILURE`. It
+	 * must not leave through a segmentation fault in a teardown that assumed the start
+	 * had succeeded.
+	 */
+	enum struct Stage : uint8_t {
+		Nothing,///< Not even GLFW is up.
+		Glfw,///< `glfwInit` succeeded.
+		Window,///< The window exists.
+		Vulkan,///< The Vulkan context, the surface and the swapchain exist.
+		ImGuiContext,///< The ImGui context exists.
+		Backends,///< The GLFW and Vulkan backends are initialised.
+	};
+	/// What has been set up, and therefore what has to be taken down.
+	Stage m_stage = Stage::Nothing;
 	/// Swap chain rebuild flag.
 	bool m_swapChainRebuild = false;
 	/// Current theme.

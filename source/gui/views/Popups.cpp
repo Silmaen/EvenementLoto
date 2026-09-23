@@ -10,6 +10,7 @@
 #include "Popups.h"
 
 #include "baseDefine.h"
+#include "gui/utils/FileDialog.h"
 
 #include <imgui.h>
 
@@ -26,9 +27,14 @@ void Popup::onUpdate() {
 		m_shouldOpen = false;
 	}
 	if (ImGui::BeginPopupModal(popupTitle.c_str(), nullptr, ImGuiWindowFlags_None)) {
-		//if (ImGui::BeginPopup(popupTitle.c_str(), ImGuiPopupFlags_None)) {
-		onPopupUpdate();
+		{
+			// A file request made from here is drawn from here too, a few lines below:
+			// a modal opened at the root level would dismiss this one.
+			const utils::FileDialog::OwnerScope owner{this};
+			onPopupUpdate();
+		}
 		ImGui::SetItemDefaultFocus();
+		utils::FileDialog::draw(this);
 		ImGui::EndPopup();
 	}
 }

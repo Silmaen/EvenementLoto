@@ -18,6 +18,7 @@
 #include "core/Rescue.h"
 #include "core/utilities.h"
 #include "event/AppEvent.h"
+#include "gui/utils/FileDialog.h"
 #include "views/ConfigPopups.h"
 #include "views/DisplayView.h"
 #include "views/HelpPopups.h"
@@ -119,8 +120,15 @@ Application::Application() {
 
 Application::~Application() {
 	log_info("Shutting down application.");
+	// A pending file request holds a continuation that captured a view or a popup: it
+	// must not outlive them.
+	utils::FileDialog::cancel();
 	// Cleanup
 	m_mainWindow.close();
+	// Forgotten here, `instanced()` would keep answering true and `get()` would hand
+	// out a reference to an object that is gone.
+	if (m_instance == this)
+		m_instance = nullptr;
 }
 
 void Application::renderFrame() {
@@ -142,6 +150,9 @@ void Application::renderFrame() {
 	}
 	for (const auto& view: m_views) { view->update(); }
 	for (const auto& popup: m_popups) { popup->update(); }
+	// A request made from a menu or a toolbar belongs to nobody in particular, so it is
+	// drawn here, at the root level.
+	utils::FileDialog::draw(nullptr);
 	m_mainWindow.render(m_theme.windowBackground);
 	autoSave();
 }
