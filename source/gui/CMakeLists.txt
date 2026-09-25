@@ -20,8 +20,4 @@ set_target_properties(${CMAKE_PROJECT_NAME}_ui PROPERTIES FOLDER "core_libs")
 
 target_link_libraries(${CMAKE_PROJECT_NAME}_ui PUBLIC ${CMAKE_PROJECT_NAME}_third_party)
 
-find_package(nfd REQUIRED)
-message(STATUS "Found nfd: ${nfd_DIR}")
-target_link_libraries(${CMAKE_PROJECT_NAME}_ui PRIVATE nfd::nfd)
-
 target_link_vulkan(${CMAKE_PROJECT_NAME}_ui PUBLIC)

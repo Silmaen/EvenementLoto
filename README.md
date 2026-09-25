@@ -13,6 +13,8 @@ presets définis dans `CMakePresets.json`.
 
 ### Variables de construction
 
+* `EVL_TESTING` construit les tests unitaires (activé par défaut).
+* `EVL_PACKAGING` active la génération du paquet par CPack (activé par défaut).
 * `EVL_ENABLE_COVERAGE` active ou non le calcul de la couverture de code.
   (nécessite `gcovr` voir dépendances)
 * `EVL_ENABLE_CLANG_TIDY` active ou non l’utilisation de clang-tidy durant la compilation.
@@ -37,9 +39,6 @@ il n’y a aucune commande à lancer avant.
   CMake qui lui transmet le compilateur et sa version.
     * glfw, imgui, jsoncpp, yaml-cpp, spdlog, magic_enum, stb, nanosvg,
       vulkan-headers, vulkan-loader, googletest — depuis ConanCenter
-    * `nfd` ([nativefiledialog-extended](https://github.com/btzy/nativefiledialog-extended))
-      n’est pas publié sur ConanCenter : il est construit depuis la recette du dépôt,
-      dans `conan/local-recipes/`
 * **Doxygen** 1.9.1 ou supérieur, avec le module `dot` (paquet graphviz), pour la
   documentation de code. Non indispensable à la génération du logiciel, mais pouvoir
   produire une documentation reste fondamental.
@@ -64,8 +63,11 @@ Le programme a été correctement compilé avec :
     * gcc 14
     * clang 18 et 22
 
-Sous Linux, X11 et Wayland sont tous deux supportés : la plateforme est choisie au
-démarrage.
+Sous Linux, X11 et Wayland sont tous deux supportés, mais **X11 est demandé par
+défaut**, XWayland compris : le protocole Wayland interdit à une application de placer
+ses propres fenêtres, donc d’envoyer l’écran d’affichage sur le vidéoprojecteur. Le
+réglage `gui/display_server` change ce choix ; voir
+[Utilisation](document/Utilisation.md).
 
 ## Versions
 

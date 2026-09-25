@@ -15,6 +15,58 @@
 
 namespace evl::gui::actions {
 
+namespace {
+
+/// Read a game file into the current event, replacing it only once the read is whole.
+void loadFrom(const std::filesystem::path& iFile) {
+	if (iFile.empty() || !exists(iFile)) {
+		log_trace("Load file action canceled.");
+		return;
+	}
+	auto& app = Application::get();
+	std::ifstream f(iFile, std::ios::in | std::ios::binary);
+	if (!f.is_open()) {
+		log_error("Impossible d'ouvrir '{}'.", iFile.string());
+		return;
+	}
+	// Read into a candidate: a file that turns out to be truncated or corrupted must
+	// not leave the application holding half an event, and the message must not claim
+	// success. The current event is only replaced once the read is known complete.
+	core::Event candidate;
+	candidate.setBasePath(iFile);
+	candidate.read(f, {});
+	if (!f.good()) {
+		log_error("Le fichier '{}' est incomplet ou corrompu, il n'a pas été chargé.", iFile.string());
+		app.tell("Fichier illisible",
+				 "Ce fichier est incomplet ou corrompu, il n'a pas été chargé. La partie en cours est intacte.",
+				 iFile.string());
+		return;
+	}
+	app.getCurrentEvent() = candidate;
+	app.getCurrentFile() = iFile;
+	log_info("File '{}' loaded successfully.", iFile.string());
+}
+
+/// Write the current event, and make it the current file.
+void saveTo(const std::filesystem::path& iFile) {
+	auto& app = Application::get();
+	app.getCurrentEvent().setBasePath(iFile);
+	if (!core::writeFileAtomically(iFile,
+								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
+		log_error("Failed to save file '{}'.", iFile.string());
+		app.tell("Enregistrement impossible",
+				 "Le fichier n'a pas pu être écrit. La partie n'est pas perdue : "
+				 "la sauvegarde de secours continue.",
+				 iFile.string());
+		return;
+	}
+	app.getCurrentFile() = iFile;
+	Application::forgetRescue();
+	log_info("File '{}' saved successfully.", iFile.string());
+}
+
+}// namespace
+
 NewFileAction::NewFileAction() { setIconName("new-file"); }
 NewFileAction::~NewFileAction() = default;
 void NewFileAction::onExecute() {
@@ -29,33 +81,8 @@ LoadFileAction::LoadFileAction() { setIconName("folder_open"); }
 LoadFileAction::~LoadFileAction() = default;
 void LoadFileAction::onExecute() {
 	log_trace("Load file action executed.");
-	const auto file = utils::FileDialog::openFile(utils::g_gameFilter);
-	if (file.empty() || !exists(file)) {
-		log_trace("Load file action canceled.");
-		return;
-	}
-	auto& app = Application::get();
-	std::ifstream f(file, std::ios::in | std::ios::binary);
-	if (!f.is_open()) {
-		log_error("Impossible d'ouvrir '{}'.", file.string());
-		return;
-	}
-	// Read into a candidate: a file that turns out to be truncated or corrupted must
-	// not leave the application holding half an event, and the message must not claim
-	// success. The current event is only replaced once the read is known complete.
-	core::Event candidate;
-	candidate.setBasePath(file);
-	candidate.read(f, {});
-	if (!f.good()) {
-		log_error("Le fichier '{}' est incomplet ou corrompu, il n'a pas été chargé.", file.string());
-		app.tell("Fichier illisible",
-				 "Ce fichier est incomplet ou corrompu, il n'a pas été chargé. La partie en cours est intacte.",
-				 file.string());
-		return;
-	}
-	app.getCurrentEvent() = candidate;
-	app.getCurrentFile() = file;
-	log_info("File '{}' loaded successfully.", file.string());
+	utils::FileDialog::openFile(utils::g_gameFilter,
+								[](const std::filesystem::path& iFile) -> void { loadFrom(iFile); });
 }
 
 
@@ -63,32 +90,16 @@ SaveFileAction::SaveFileAction() { setIconName("save"); }
 SaveFileAction::~SaveFileAction() = default;
 void SaveFileAction::onExecute() {
 	log_trace("Save file action executed.");
-	auto& app = Application::get();
-	auto file = app.getCurrentFile();
-	if (file.empty() || !exists(file)) {
-		if (file.empty()) {
-			log_trace("No current file, prompting Save As dialog.");
-		} else {
-			log_trace("Current file '{}' does not exist, prompting Save As dialog.", file.string());
-		}
-		file = utils::FileDialog::saveFile(utils::g_gameFilter);
-		if (file.empty()) {
-			log_trace("Save file action canceled.");
-			return;
-		}
-	}
-	app.getCurrentEvent().setBasePath(file);
-	if (!core::writeFileAtomically(file,
-								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
-		log_error("Failed to save file '{}'.", file.string());
-		app.tell("Enregistrement impossible",
-				 "Le fichier n'a pas pu être écrit. La partie n'est pas perdue : "
-				 "la sauvegarde de secours continue.",
-				 file.string());
+	const auto file = Application::get().getCurrentFile();
+	if (!file.empty() && exists(file)) {
+		saveTo(file);
 		return;
 	}
-	Application::forgetRescue();
-	log_info("File '{}' saved successfully.", file.string());
+	if (file.empty())
+		log_trace("No current file, prompting Save As dialog.");
+	else
+		log_trace("Current file '{}' does not exist, prompting Save As dialog.", file.string());
+	utils::FileDialog::saveFile(utils::g_gameFilter, [](const std::filesystem::path& iFile) -> void { saveTo(iFile); });
 }
 
 
@@ -96,27 +107,7 @@ SaveAsFileAction::SaveAsFileAction() { setIconName("save-as"); }
 SaveAsFileAction::~SaveAsFileAction() = default;
 void SaveAsFileAction::onExecute() {
 	log_trace("SaveAs file action executed.");
-	auto& app = Application::get();
-	auto file = app.getCurrentFile();
-	auto newfile = utils::FileDialog::saveFile(utils::g_gameFilter);
-	if (newfile.empty()) {
-		log_trace("Save file action canceled.");
-		return;
-	}
-	file = newfile;
-	app.getCurrentEvent().setBasePath(file);
-	if (!core::writeFileAtomically(file,
-								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
-		log_error("Failed to save file '{}'.", file.string());
-		app.tell("Enregistrement impossible",
-				 "Le fichier n'a pas pu être écrit. La partie n'est pas perdue : "
-				 "la sauvegarde de secours continue.",
-				 file.string());
-		return;
-	}
-	app.getCurrentFile() = file;
-	Application::forgetRescue();
-	log_info("File '{}' saved successfully.", file.string());
+	utils::FileDialog::saveFile(utils::g_gameFilter, [](const std::filesystem::path& iFile) -> void { saveTo(iFile); });
 }
 
 QuitAction::QuitAction() = default;

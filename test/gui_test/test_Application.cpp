@@ -8,7 +8,9 @@
 #include "../TestMainHelper.h"
 #include "gui/Application.h"
 
+#include <cstdlib>
 #include <stdexcept>
+#include <string>
 
 using namespace evl::gui;
 
@@ -34,19 +36,6 @@ private:
 	uint32_t m_remaining = 0;
 	uint32_t m_thrown = 0;
 };
-
-/// True where the application cannot be given a display.
-///
-/// On Linux `ctest` runs this suite under `xvfb-run`, so it really runs. The TeamCity
-/// Windows agent is a service with no desktop session and no software Vulkan, so the
-/// window could not be created there — better to say so than to fail for a reason that
-/// has nothing to do with the code. Remove this the day that agent has a session.
-constexpr auto g_needsDisplay =
-#ifdef EVL_PLATFORM_WINDOWS
-		true;
-#else
-		false;
-#endif
 
 }// namespace
 
@@ -95,3 +84,28 @@ TEST(gui_Application, StopsAfterTooManyFailedFrames) {
 	// It gave up early, long before the frame limit.
 	EXPECT_LT(view->thrown(), 100U);
 }
+
+#ifndef EVL_PLATFORM_WINDOWS
+TEST(gui_Application, LeavesCleanlyWhenThereIsNoDisplay) {
+	// What the first real launch did: started from a session without the X authority,
+	// GLFW could not open the display. Reporting the error was right. What followed was
+	// not: the teardown walked over a Vulkan device that had never been created, and
+	// the process died on a signal instead of returning EXIT_FAILURE.
+	const auto* display = std::getenv("DISPLAY");
+	const std::string saved = display == nullptr ? std::string{} : display;
+	ASSERT_EQ(unsetenv("DISPLAY"), 0);
+	{
+		const auto app = createApplication(0, nullptr);
+		ASSERT_NE(app, nullptr);
+		// Reported, not hidden: main() turns this into EXIT_FAILURE.
+		EXPECT_EQ(app->getState(), Application::State::Error);
+		// The destructor runs at the end of this scope. That is where it used to crash.
+	}
+	// And the instance is forgotten, so nothing can reach the object that just went.
+	EXPECT_FALSE(Application::instanced());
+	if (!saved.empty()) {
+		// Braced: the macro expands to an if/else of its own.
+		ASSERT_EQ(setenv("DISPLAY", saved.c_str(), 1), 0);
+	}
+}
+#endif

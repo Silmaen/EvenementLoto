@@ -6,6 +6,7 @@
  * All modification must get authorization from the author.
  */
 #include "utilities.h"
+#include "Log.h"
 #include "pch.h"
 
 namespace evl::core {
@@ -46,7 +47,17 @@ auto getSettings() -> std::shared_ptr<Settings> {
 
 void loadSettings() {
 	const auto settings = getSettings();
-	settings->fromFile(getConfigFile());
+	const auto path = getConfigFile();
+	std::error_code error;
+	const bool present = exists(path, error) && !error;
+	settings->fromFile(path);
+	if (present)
+		return;
+	// First start: the defaults are written out right away, so the organizer has a file
+	// to read and edit instead of having to guess which keys exist.
+	mergeDefaultSettings();
+	saveSettings();
+	log_info("Réglages par défaut enregistrés dans '{}'.", path.string());
 }
 
 void mergeDefaultSettings() {
@@ -66,6 +77,11 @@ void mergeDefaultSettings() {
 			// can be placed on a chosen screen. `wayland` or `auto` are the other
 			// values.
 			g_settings->setValue("gui/display_server", std::string("x11"));
+		}
+		if (!g_settings->contains("gui/recent_paths")) {
+			// The recently used files and folders, newline separated: the YAML backend
+			// writes strings, and five paths do not deserve a structure.
+			g_settings->setValue("gui/recent_paths", std::string(""));
 		}
 		if (!g_settings->contains("general/data_location")) {
 			// A string, like everything the YAML backend can write back.

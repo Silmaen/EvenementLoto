@@ -1,7 +1,0 @@
-sources:
-  "1.4.0":
-    url: "https://github.com/btzy/nativefiledialog-extended/archive/refs/tags/v1.4.0.tar.gz"
-    sha256: "38116050495cd7de77a91d6d8d59c1aa0a0848c56daa60029bd5b59f3c897229"
-  "1.2.1":
-    url: "https://github.com/btzy/nativefiledialog-extended/archive/refs/tags/v1.2.1.tar.gz"
-    sha256: "443697a857c4efacbe08cdaf5182724fa9d9b9a79b8feff2a1601bde1df46b07"

@@ -51,3 +51,9 @@ projectSettings.zip
 exec.log
 # Written beside the working directory by ImGui, holds the window layout.
 imgui.ini
+
+# The interrupted game is written next to the executable, or into the data directory
+# when that is where it points. It belongs to a run, never to the repository.
+rescue.lev*
+rescue-*.lev*
+config.yml

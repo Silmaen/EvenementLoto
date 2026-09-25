@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.4.1**.
+EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.5.0**.
 
 Author: Silmaen
 
@@ -16,7 +16,13 @@ Author: Silmaen
   - `source/gui/views/` - View components (MainView, DisplayView, HelpView, MenuBar, ToolBar, StatusBar, ConfigPopups, HelpPopups)
   - `source/gui/actions/` - Action handlers (FileActions, GameActions, SettingsActions, HelpActions)
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
-  - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers)
+  - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers).
+    `FileDialog` is the in-app file browser: requests carry a continuation, and the
+    browser is drawn inside the scope of whoever asked, so it stacks on an open popup
+    instead of dismissing it. Two panes (recent paths and a directory tree, then the
+    listing), a clickable path bar, one box that both filters the directory and accepts
+    a whole path with Tab completion, and a catch-all filter whose undeclared formats
+    are greyed rather than hidden
   - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
 - `source/third_party/` - Single translation unit instantiating the header-only third
   parties, excluded from the project warnings and from clang-tidy
@@ -27,11 +33,9 @@ Author: Silmaen
 - `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation)
 - `cmake/` - CMake modules (BaseConfig, Conan, conan_provider, Vulkan, Sanitizers,
   Coverage, Poetry, UtilityFunctions, DocumentationConfig) + preset fragments
-- `conan/` - Conan profiles and `global.conf` (`conan/config/`) and the in-tree recipe
-  index (`conan/local-recipes/`)
+- `conan/` - Conan profiles and `global.conf` (`conan/config/`)
 - `document/` - User documentation (in French)
-- `CHANGELOG.md` / `ROADMAP.md` - what is released and what is planned, one line each.
-  `TODO.md` holds the detail of the work in progress.
+- `CHANGELOG.md` / `ROADMAP.md` - what is released and what is planned, one line each
 - `data/` - Runtime data files
 
 ### Key Domain Classes (namespace `evl::core`)
@@ -69,7 +73,7 @@ Author: Silmaen
 - `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups, RescuePopup (resume an interrupted game)
 - `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
-- `utils/` - FileDialog (open/save/folder dialogs), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
+- `utils/` - FileDialog (the ImGui file browser: `openFile`/`saveFile`/`selectFolder`, each taking a continuation; `OwnerScope` marks who is drawing; the pure parts — `parseFilters`, `matches`, `isDeclared`, `listEntries`, `resolveTarget`, `breadcrumb`, `splitQuery`, `commonPrefix`, `recentPaths` — are public so they can be tested without a window), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
 ### Robustness
 
@@ -95,14 +99,13 @@ Author: Silmaen
 ### External Dependencies (via Conan)
 
 glfw 3.4, gtest 1.17.0, imgui 1.92.9b-docking, jsoncpp 1.9.6, magic_enum 0.9.7,
-nanosvg cci.20231025, nfd 1.2.1, spdlog 1.17.0, stb cci.20240531,
+nanosvg cci.20231025, spdlog 1.17.0, stb cci.20240531,
 vulkan-headers/vulkan-loader 1.4.350.0, yaml-cpp 0.8.0
 
 Plus `wayland` and `xkbcommon`, pulled in by glfw for its Wayland backend (build time
 only: glfw `dlopen`s them by soname at runtime).
 
-All come from ConanCenter except `nfd` (nativefiledialog-extended), which is not
-published there and is built from the in-tree recipe in `conan/local-recipes/`.
+All come from ConanCenter: there is no in-tree recipe and no extra remote any more.
 
 Linux builds run in `registry.argawaen.net/builder/builder-ubuntu2404`, which carries
 **both gcc 14 and clang 22** plus the full X11/XCB development set expected by
@@ -289,10 +292,10 @@ All domain objects inherit from `Serializable` and implement:
 - Test helper header: `test/TestMainHelper.h`
 - `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted
 - `test_Rescue.cpp` checks the interrupted-game save, detection and fallback
-- Sanitizer suppressions: `lsan_suppressions.txt` (known libdbus leaks, Address/Leak
-  presets) and `tsan_suppressions.txt` (races inside lavapipe and its LLVM JIT, which
-  run because the GUI tests create a real window). Both are scoped so a finding in our
-  own code is still reported
+- Sanitizer suppressions: `tsan_suppressions.txt` (races inside lavapipe and its LLVM
+  JIT, which run because the GUI tests create a real window), scoped by module so a
+  finding in our own code is still reported. `lsan_suppressions.txt` is now empty, the
+  libdbus leaks having left with the native dialogs
 - The GUI suite needs a display: `ctest` runs it under `xvfb-run -a`, with lavapipe as
   the Vulkan driver. `test_Application.cpp` exercises the render loop and the exception
   net, registering a throwing view through `Application::addView()`

@@ -2,7 +2,7 @@
 
 Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 
-## 0.5.0 — en développement
+## 0.5.0 — 25 septembre 2026
 
 Version de transition vers Conan : outillage, CI et stabilité, sans nouveauté
 fonctionnelle.
@@ -13,6 +13,16 @@ fonctionnelle.
 * Nouveaux contrôles CI : style du code, clang-tidy et analyseur statique sur le diff,
   paquet prêt à exécuter isolé.
 * Tests d'interface exécutés sans écran, filet à exceptions vérifié par injection.
+* Sélecteur de fichiers dessiné dans l'application : plus de dialogue système, plus de
+  fenêtre qui passe derrière l'affichage plein écran.
+* Dernière dépendance hors ConanCenter retirée : tout vient du dépôt public.
+* Un démarrage qui échoue se termine proprement au lieu de planter à l'extinction.
+* Réglages par défaut écrits au premier lancement, au lieu d'une erreur dans le journal.
+* Ressources et documentation incluses dans le paquet, sans la partie de secours du développeur.
+* Documentation d'utilisation revue : sélecteur de fichiers, choix de la carte graphique,
+  chemins de menu corrigés.
+* Menu d'aide en français, comme le reste de l'application.
+* Arborescence du sélecteur : un dossier voisin au nom proche ne se déplie plus à tort.
 * Sauvegardes atomiques, deux générations conservées.
 * Reprise d'une partie interrompue proposée au démarrage.
 * Lecture défensive du format binaire : aucun fichier tronqué n'est accepté.

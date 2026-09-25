@@ -87,6 +87,12 @@ if (EXISTS "${CMAKE_SOURCE_DIR}/data")
     install(DIRECTORY "${CMAKE_SOURCE_DIR}/data/"
             DESTINATION data
             PATTERN ".git" EXCLUDE
+            # The interrupted game a developer's run left behind must never ship: the
+            # archive would offer a stranger's game for recovery on its first start.
+            PATTERN "rescue*" EXCLUDE
+            # Nor the settings and the log, which name paths from another machine.
+            PATTERN "config.yml" EXCLUDE
+            PATTERN "*.log" EXCLUDE
     )
 endif ()
 # When Documetation will be ready, just include it into the build process

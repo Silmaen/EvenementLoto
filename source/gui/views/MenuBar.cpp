@@ -65,8 +65,8 @@ void MenuBar::onUpdate() {
 			defineMenuItem("Parties", "game_settings");
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Help")) {
-			defineMenuItem("A propos", "about");
+		if (ImGui::BeginMenu("Aide")) {
+			defineMenuItem("À propos", "about");
 			ImGui::Separator();
 			defineMenuItem("Aide", "help");
 			ImGui::EndMenu();

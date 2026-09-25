@@ -21,6 +21,14 @@ Settings::Settings() = default;
 Settings::~Settings() = default;
 
 void Settings::fromFile(const std::filesystem::path& iPath) {
+	std::error_code error;
+	// No settings yet is the normal state of a first start, and reporting it as an
+	// error sends the organizer looking for a fault that is not there. Only a file that
+	// exists and cannot be read is one.
+	if (!exists(iPath, error) || error) {
+		log_warn("Aucun réglage enregistré dans '{}', les valeurs par défaut s'appliquent.", iPath.string());
+		return;
+	}
 	try {
 		const YAML::Node root = YAML::LoadFile(iPath.string());
 

@@ -2,16 +2,14 @@
 
 Une ligne par élément. Ce qui est livré passe dans [CHANGELOG.md](CHANGELOG.md).
 
-La version en développement est **0.5.0**, intercalée comme version de transition vers
-Conan : elle ne porte pas de nouveauté fonctionnelle, son contenu est dans le changelog.
-Les travaux d'outillage et de stabilité qu'elle regroupe ont leur propre suivi, détaillé,
-dans le fichier `TODO.md` du dépôt.
+La **0.5.0**, intercalée comme version de transition vers Conan, est livrée : elle ne
+portait pas de nouveauté fonctionnelle, son contenu est dans le changelog. La prochaine
+version est la **0.5.1**.
 
 ## 0.5.1
 
 * Délai de réactivation des boutons de tirage, réglable, pour donner le tempo.
 * Onglet présentateur reprenant en réduit ce qui est à l'écran.
-* Ressources et documentation incluses dans le paquet.
 
 ## 0.6.0
 
@@ -25,3 +23,4 @@ dans le fichier `TODO.md` du dépôt.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
   détachable, aperçu en mono-écran.
 * Icône et nom de l'application sous Wayland, via l'app-id et un fichier `.desktop`.
+* Reprise d'un périphérique Vulkan perdu sans redémarrer l'application.

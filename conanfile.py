@@ -32,7 +32,6 @@ class EvenementLotoConan(ConanFile):
         "spdlog/*:use_std_fmt": True,
         "jsoncpp/*:shared": False,
         "yaml-cpp/*:shared": False,
-        "nfd/*:shared": False,
         "gtest/*:shared": False,
         # Wayland and X11 are both supported: glfw picks the platform at runtime, and
         # the loader carries every WSI backend.
@@ -52,7 +51,6 @@ class EvenementLotoConan(ConanFile):
         self.requires("glfw/3.4")
         self.requires("stb/cci.20240531")
         self.requires("nanosvg/cci.20231025")
-        self.requires("nfd/1.2.1")
         self.requires("vulkan-headers/1.4.350.0")
         self.requires("vulkan-loader/1.4.350.0")
 
