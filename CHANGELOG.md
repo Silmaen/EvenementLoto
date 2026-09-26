@@ -6,6 +6,8 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 
 * Nom des archives de livraison suffixé par la plateforme : `linux64`, `win64`.
 * Délai de réactivation des commandes de tirage, réglable, pour donner le tempo.
+* Onglet « Présentateur » montrant en réduit ce que voient les joueurs.
+* Un panneau d'affichage trop étroit ne fait plus échouer l'assertion de mise en page.
 
 ## 0.5.0 — 25 septembre 2026
 

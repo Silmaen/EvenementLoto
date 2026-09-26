@@ -160,8 +160,13 @@ void adaptTextToRegion(const std::string& iText, const TextAdaptOptions& iOption
 	const float scaleX = numberSize.x / numberTextSize.x;
 	const float scaleY = numberSize.y / numberTextSize.y;
 	const float scale = std::min(scaleX, scaleY) * 0.9f;// 90% of the available space
-	if (scale <= 0.0f)
-		return;// No need to scale up
+	if (scale <= 0.0f) {
+		// Nothing can be written in a degenerate region. An item still has to follow the
+		// caller's cursor move, otherwise ImGui cannot grow the parent.
+		if (iOptions.drawText)
+			ImGui::Dummy({0.0f, 0.0f});
+		return;
+	}
 	ImGui::SetWindowFontScale(scale);
 	if (iOptions.hCenter) {
 		const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;

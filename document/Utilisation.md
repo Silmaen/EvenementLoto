@@ -208,6 +208,9 @@ fenêtre de contrôle sera affichée sur l'écran principal, et la fenêtre d'af
 
 ### Écran de contrôle
 
+L'onglet "Présentateur" du panneau de gauche montre, en réduit et au format de l'écran choisi, exactement ce que voient
+les joueurs. Il sert quand le vidéoprojecteur est derrière soi, ou en répétition avant l'ouverture des portes.
+
 L'écran de contrôle principal affiche les informations suivantes :
 
 ![control.png](images/control.png)

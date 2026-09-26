@@ -7,8 +7,10 @@
  */
 #include "../TestMainHelper.h"
 #include "gui/Application.h"
+#include "gui/views/DisplayView.h"
 
 #include <cstdlib>
+#include <imgui.h>
 #include <stdexcept>
 #include <string>
 
@@ -35,6 +37,33 @@ public:
 private:
 	uint32_t m_remaining = 0;
 	uint32_t m_thrown = 0;
+};
+
+/// A view drawing the display miniature, the path the presenter tab takes.
+class MiniatureView final : public views::View {
+public:
+	void onUpdate() override {
+		const auto display = std::static_pointer_cast<views::DisplayView>(Application::get().getView("display_window"));
+		if (display == nullptr)
+			return;
+		// An explicit size, like the tab that hosts the miniature for real: an
+		// auto-fitting window would have ImGui complain about the cursor moves the
+		// display layout makes.
+		ImGui::SetNextWindowSize({360.0f, 240.0f});
+		if (ImGui::Begin("MiniatureHost")) {
+			// Deliberately cramped: at this size the display panels end up with regions
+			// too small to write in, which is the case that used to trip ImGui.
+			display->renderInline({320.0f, 180.0f});
+			++m_drawn;
+		}
+		ImGui::End();
+	}
+
+	[[nodiscard]] auto getName() const -> std::string override { return "miniature_view"; }
+	[[nodiscard]] auto drawn() const -> uint32_t { return m_drawn; }
+
+private:
+	uint32_t m_drawn = 0;
 };
 
 }// namespace
@@ -109,3 +138,27 @@ TEST(gui_Application, LeavesCleanlyWhenThereIsNoDisplay) {
 	}
 }
 #endif
+
+TEST(gui_Application, DrawsTheDisplayMiniature) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// A running game, so the miniature draws the grid and not the empty-state message.
+	auto& event = app->getCurrentEvent();
+	event.setName("mini");
+	event.setOrganizerName("organisateur");
+	event.pushGameRound(evl::core::GameRound{});
+	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::Ready);
+	event.nextState();
+	event.nextState();
+	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
+
+	const auto view = std::make_shared<MiniatureView>();
+	app->addView(view);
+	app->setMaxFrame(3);
+	app->run();
+	// Drawn every frame, and the loop never had to catch anything.
+	EXPECT_EQ(view->drawn(), 3U);
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+}

@@ -128,6 +128,10 @@ void MainView::renderLeftPanel() const {
 				renderDrawnNumbersTab();
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Présentateur")) {
+				renderPresenterTab();
+				ImGui::EndTabItem();
+			}
 			if (ImGui::BeginTabItem("Statistiques")) {
 				renderStatisticsTab();
 				ImGui::EndTabItem();
@@ -207,6 +211,15 @@ void MainView::renderDrawnNumbersTab() const {
 	}
 	if (manualDisabled)
 		ImGui::EndDisabled();
+}
+
+void MainView::renderPresenterTab() {
+	const auto displayView = std::static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
+	if (displayView == nullptr) {
+		ImGui::TextDisabled("Affichage indisponible");
+		return;
+	}
+	displayView->renderInline(utils::imVec2ToVec2(ImGui::GetContentRegionAvail()));
 }
 
 void MainView::renderRightPanel() const {

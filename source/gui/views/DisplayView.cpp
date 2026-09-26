@@ -25,21 +25,15 @@ namespace evl::gui::views {
 
 namespace {
 
-void renderTitle(const std::string& iTitle, const math::vec2& iRegion, const float iExtraScale = 1.0f) {
-	// Part title
-	const auto gui_settings = core::getSettings()->extract("gui");
-	ImGui::SetCursorPosY(iRegion.y() * 0.05f);
-
-	if (const auto scale = gui_settings.getValue("title_scale", 4.0f) * iExtraScale; scale > 0.0f) {
-		ImGui::SetWindowFontScale(scale);
-	}
-	const ImVec2 titleSize = ImGui::CalcTextSize(iTitle.c_str());
-	ImGui::SetCursorPosX((iRegion.x() - titleSize.x) * 0.5f);
-	ImGui::Text("%s", iTitle.c_str());
-	ImGui::SetWindowFontScale(1.0f);
-}
-
 void drawImage(const std::string& iTextureName, const math::vec2& iPosition, const math::vec2& iSize) {
+	// A cursor move must be followed by an item, or ImGui cannot grow the parent and
+	// says so through an assertion. When the region is degenerate — a panel squeezed by
+	// a small window — that item is a Dummy rather than nothing at all.
+	if (iSize.x() <= 0.0f || iSize.y() <= 0.0f) {
+		ImGui::SetCursorPos({iPosition.x(), iPosition.y()});
+		ImGui::Dummy({0.0f, 0.0f});
+		return;
+	}
 	auto& app = Application::get();
 	const auto& texLib = app.getTextureLibrary();
 
@@ -145,63 +139,110 @@ void DisplayView::onUpdate() {
 	}
 	m_lastFullscreen = m_fullscreen;
 	if (ImGui::Begin("DisplayView", nullptr, flags)) {
-		// Render based on event status
-		if (m_previewMode) {
-			const auto currentRound = m_currentEvent.getGameRound(static_cast<uint32_t>(m_previewRound));
-			if (currentRound == m_currentEvent.endRounds()) {
-				ImGui::TextDisabled("Invalid round to preview");
-				return;
-			}
-			if (currentRound->getType() == core::GameRound::Type::Pause) {
-				renderEventPause();
-			} else {
-				m_currentDiapoIndex = 0;
-				m_totalDiapoImages = 0;
-				m_diapoChanged = core::clock::now();
-				renderRoundReady();
-			}
-		} else {
-			switch (m_currentEvent.getStatus()) {
-				case core::Event::Status::Ready:
-				case core::Event::Status::EventStarting:
-					renderEventStart();
-					break;
-				case core::Event::Status::GameRunning:
-					if (const auto currentRound = m_currentEvent.getCurrentGameRound();
-						currentRound->getStatus() == core::GameRound::Status::Running) {
-						if (currentRound->getType() == core::GameRound::Type::Pause) {
-							renderEventPause();
-						} else {
-							m_currentDiapoIndex = 0;
-							m_totalDiapoImages = 0;
-							m_diapoChanged = core::clock::now();
-							if (currentRound->getCurrentSubRound()->getStatus() ==
-								core::SubGameRound::Status::PreScreen) {
-								renderRoundReady();
-							} else {
-								renderRoundRunning();
-							}
-						}
-					} else {
-						renderRoundEnd();
-					}
-					break;
-				case core::Event::Status::DisplayRules:
-					renderEventRules();
-					break;
-				case core::Event::Status::EventEnding:
-					renderEventEnd();
-					break;
-				case core::Event::Status::Invalid:
-				case core::Event::Status::MissingParties:
-				case core::Event::Status::Finished:
-					ImGui::TextDisabled("Invalid event state");
-					break;
-			}
-		}
+		renderContent();
 	}
 	ImGui::End();
 	style = style_backup;
+}
+
+void DisplayView::setFontScale(const float iScale) const { ImGui::SetWindowFontScale(iScale * m_contentScale); }
+
+void DisplayView::renderTitle(const std::string& iTitle, const math::vec2& iRegion, const float iExtraScale) const {
+	// Part title
+	const auto gui_settings = core::getSettings()->extract("gui");
+	ImGui::SetCursorPosY(iRegion.y() * 0.05f);
+
+	if (const auto scale = gui_settings.getValue("title_scale", 4.0f) * iExtraScale; scale > 0.0f) {
+		setFontScale(scale);
+	}
+	const ImVec2 titleSize = ImGui::CalcTextSize(iTitle.c_str());
+	ImGui::SetCursorPosX((iRegion.x() - titleSize.x) * 0.5f);
+	ImGui::Text("%s", iTitle.c_str());
+	setFontScale(1.0f);
+}
+
+void DisplayView::renderInline(const math::vec2& iSize) {
+	auto& app = Application::get();
+	const auto monitors = app.getMonitorsInfo();
+	if (monitors.empty() || iSize.x() <= 0.0f || iSize.y() <= 0.0f)
+		return;
+	m_currentEvent = app.getCurrentEvent();
+	loadEventImages(m_currentEvent);
+
+	const auto& target = monitors[m_monitorId < monitors.size() ? m_monitorId : 0];
+	const math::vec2 screen{static_cast<float>(target.workAreaSize.x()), static_cast<float>(target.workAreaSize.y())};
+	// The miniature keeps the projector's aspect ratio: a faithful reduction, letterboxed
+	// in the region the tab gives it, and the same factor drives every font scale.
+	const float fit = std::min(iSize.x() / screen.x(), iSize.y() / screen.y());
+	const math::vec2 frame{screen.x() * fit, screen.y() * fit};
+
+	auto& style = ImGui::GetStyle();
+	const auto style_backup = style;
+	applyCommonStyle();
+	m_contentScale = fit;
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + (iSize.x() - frame.x()) * 0.5f);
+	if (ImGui::BeginChild("DisplayMiniature", {frame.x(), frame.y()}, ImGuiChildFlags_Borders)) {
+		renderContent();
+	}
+	ImGui::EndChild();
+	m_contentScale = 1.0f;
+	style = style_backup;
+}
+
+void DisplayView::renderContent() {
+	// Render based on event status
+	if (m_previewMode) {
+		const auto currentRound = m_currentEvent.getGameRound(static_cast<uint32_t>(m_previewRound));
+		if (currentRound == m_currentEvent.endRounds()) {
+			ImGui::TextDisabled("Invalid round to preview");
+			return;
+		}
+		if (currentRound->getType() == core::GameRound::Type::Pause) {
+			renderEventPause();
+		} else {
+			m_currentDiapoIndex = 0;
+			m_totalDiapoImages = 0;
+			m_diapoChanged = core::clock::now();
+			renderRoundReady();
+		}
+	} else {
+		switch (m_currentEvent.getStatus()) {
+			case core::Event::Status::Ready:
+			case core::Event::Status::EventStarting:
+				renderEventStart();
+				break;
+			case core::Event::Status::GameRunning:
+				if (const auto currentRound = m_currentEvent.getCurrentGameRound();
+					currentRound->getStatus() == core::GameRound::Status::Running) {
+					if (currentRound->getType() == core::GameRound::Type::Pause) {
+						renderEventPause();
+					} else {
+						m_currentDiapoIndex = 0;
+						m_totalDiapoImages = 0;
+						m_diapoChanged = core::clock::now();
+						if (currentRound->getCurrentSubRound()->getStatus() == core::SubGameRound::Status::PreScreen) {
+							renderRoundReady();
+						} else {
+							renderRoundRunning();
+						}
+					}
+				} else {
+					renderRoundEnd();
+				}
+				break;
+			case core::Event::Status::DisplayRules:
+				renderEventRules();
+				break;
+			case core::Event::Status::EventEnding:
+				renderEventEnd();
+				break;
+			case core::Event::Status::Invalid:
+			case core::Event::Status::MissingParties:
+			case core::Event::Status::Finished:
+				ImGui::TextDisabled("Invalid event state");
+				break;
+		}
+	}
 }
 
 void DisplayView::renderEventStart() const {
@@ -238,11 +279,11 @@ void DisplayView::renderEventStart() const {
 	// Event title
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + contentHeight * 0.05f);
 	if (const float scale = gui_settings.getValue("title_scale", 4.0f); scale > 0.f)
-		ImGui::SetWindowFontScale(scale);
+		setFontScale(scale);
 	const ImVec2 titleSize = ImGui::CalcTextSize(m_currentEvent.getName().c_str());
 	ImGui::SetCursorPosX((contentWidth - titleSize.x) * 0.5f);
 	ImGui::Text("%s", m_currentEvent.getName().c_str());
-	ImGui::SetWindowFontScale(1.0);
+	setFontScale(1.0);
 
 	// Event logo (centered, large area)
 	const float logoAreaHeight = contentHeight * 0.5f;
@@ -335,9 +376,9 @@ void DisplayView::renderRoundReady() const {
 	if (ImGui::BeginChild("RoundInfoFrame", {frameWidth, frameHeight}, ImGuiChildFlags_Borders)) {
 		// SubRound prices
 		if (price_scale > 0.0f)
-			ImGui::SetWindowFontScale(price_scale);
+			setFontScale(price_scale);
 		ImGui::Text("%s", currentSubRound->getPrices().c_str());
-		ImGui::SetWindowFontScale(1.0f);
+		setFontScale(1.0f);
 
 		// Value area at bottom of frame
 		ImGui::SetCursorPosY(frameHeight - valueHeight);
@@ -348,9 +389,9 @@ void DisplayView::renderRoundReady() const {
 		// Value display
 		ImGui::SetCursorPosX((frameWidth - valueSize.x * value_scale) * 0.5f);
 		if (value_scale > 0.0f)
-			ImGui::SetWindowFontScale(value_scale);
+			setFontScale(value_scale);
 		ImGui::Text("%s", valueText.c_str());
-		ImGui::SetWindowFontScale(1.0f);
+		setFontScale(1.0f);
 	}
 	ImGui::EndChild();
 
@@ -381,12 +422,12 @@ void DisplayView::renderRoundRunning() const {
 	ImGui::SetCursorPosY(region.y() * 0.05f);
 	const std::string title = std::format("{} - {}", currentRound->getName(), currentSubRound->getTypeStr());
 	if (const auto scale = gui_settings.getValue("title_scale", 4.0f); scale > 0.0f) {
-		ImGui::SetWindowFontScale(scale);
+		setFontScale(scale);
 	}
 	const ImVec2 titleSize = ImGui::CalcTextSize(title.c_str());
 	ImGui::SetCursorPosX((region.x() - titleSize.x) * 0.5f);
 	ImGui::Text("%s", title.c_str());
-	ImGui::SetWindowFontScale(1.0f);
+	setFontScale(1.0f);
 
 	// Grid area on left, info on right
 	const float leftPanelWidth = ImGui::GetContentRegionAvail().x * 0.8f;
@@ -440,9 +481,9 @@ void DisplayView::renderRoundRunning() const {
 				const float scaleX = buttonSize.x / textSize.x;
 				const float scaleY = buttonSize.y / textSize.y;
 				if (const float scale = std::min(scaleX, scaleY) * gridTextScale; scale > 0.f)
-					ImGui::SetWindowFontScale(scale);
+					setFontScale(scale);
 				ImGui::Button(label.c_str(), buttonSize);
-				ImGui::SetWindowFontScale(1.0f);
+				setFontScale(1.0f);
 				ImGui::PopStyleColor();
 			}
 		}
@@ -492,9 +533,9 @@ void DisplayView::renderRoundRunning() const {
 			ImGui::Text("Durée partie");
 			ImGui::Separator();
 			if (timeScale > 0.0f)
-				ImGui::SetWindowFontScale(timeScale);
+				setFontScale(timeScale);
 			ImGui::Text("%s", core::formatDuration(elapsed).c_str());
-			ImGui::SetWindowFontScale(1.0f);
+			setFontScale(1.0f);
 			ImGui::EndGroup();
 
 			ImGui::SameLine();
@@ -504,9 +545,9 @@ void DisplayView::renderRoundRunning() const {
 			ImGui::Text("Heure");
 			ImGui::Separator();
 			if (timeScale > 0.0f)
-				ImGui::SetWindowFontScale(timeScale);
+				setFontScale(timeScale);
 			ImGui::Text("%s", core::formatClockNoSecond(now).c_str());
-			ImGui::SetWindowFontScale(1.0f);
+			setFontScale(1.0f);
 			ImGui::EndGroup();
 
 			ImGui::EndChild();
@@ -548,9 +589,9 @@ void DisplayView::renderRoundRunning() const {
 		}
 		ImGui::BeginGroup();
 		if (price_scale > 0.0f)
-			ImGui::SetWindowFontScale(price_scale);
+			setFontScale(price_scale);
 		ImGui::Text("%s", all_prices.c_str());
-		ImGui::SetWindowFontScale(1.0f);
+		setFontScale(1.0f);
 		ImGui::EndGroup();
 
 		ImGui::SameLine();
@@ -558,12 +599,12 @@ void DisplayView::renderRoundRunning() const {
 		ImGui::SetCursorPosX(currentWidth - valueSize - style.WindowPadding.x);
 		ImGui::BeginGroup();
 		if (value_scale > 0.0f)
-			ImGui::SetWindowFontScale(value_scale * 0.5f);
+			setFontScale(value_scale * 0.5f);
 		ImGui::Text("Valeur");
 		if (value_scale > 0.0f)
-			ImGui::SetWindowFontScale(value_scale);
+			setFontScale(value_scale);
 		ImGui::Text("%s", priceText.c_str());
-		ImGui::SetWindowFontScale(1.0f);
+		setFontScale(1.0f);
 		ImGui::EndGroup();
 	}
 	ImGui::EndChild();
@@ -579,12 +620,12 @@ void DisplayView::renderRoundEnd() const {
 			  {ImGui::GetContentRegionAvail().x * 0.1f, ImGui::GetContentRegionAvail().x * 0.1f});
 
 
-	ImGui::SetWindowFontScale(1.5f);
+	setFontScale(1.5f);
 	const ImVec2 msgSize = ImGui::CalcTextSize("Veuillez démarquer vos cartons.");
 	ImGui::SetCursorPos({(ImGui::GetContentRegionAvail().x - msgSize.x) * 0.5f,
 						 ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.15f});
 	ImGui::Text("Veuillez démarquer vos cartons.");
-	ImGui::SetWindowFontScale(1.0f);
+	setFontScale(1.0f);
 
 	ImGui::SetCursorPos({0, ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.3f});
 	if (ImGui::BeginChild("EndLogo", {0, 0}, ImGuiChildFlags_None)) {
@@ -633,9 +674,9 @@ void DisplayView::renderEventPause() {
 			scale = 1.0f;
 		}
 		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - msgSize.x * scale) * 0.5f);
-		ImGui::SetWindowFontScale(scale);
+		setFontScale(scale);
 		ImGui::Text("Une buvette est à votre disposition");
-		ImGui::SetWindowFontScale(1.0f);
+		setFontScale(1.0f);
 	}
 }
 

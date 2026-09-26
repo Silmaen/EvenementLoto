@@ -47,6 +47,7 @@ private:
 	void renderStatisticsTab() const;
 	void renderEventInfo() const;
 	void renderDrawnNumbersTab() const;
+	static void renderPresenterTab();
 	void renderCommandsTab() const;
 	void renderBottomPanel();
 	void renderBottomConfigPanel();
