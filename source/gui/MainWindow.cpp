@@ -57,6 +57,9 @@ void glfwErrorCallback(const int iError, const char* iDescription) {
 
 void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__, __LINE__); }
 
+/// L'identité de l'application pour le bureau, égale au nom du fichier `.desktop`.
+constexpr const char* g_applicationId = "EvenementLoto";
+
 }// namespace
 
 
@@ -95,6 +98,13 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 
 	// Create window with Vulkan context
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	// L'identité de l'application, telle que le bureau la reconnaît : sous Wayland
+	// l'app-id est le seul lien avec le fichier `.desktop`, donc avec l'icône et le nom
+	// affichés ; sous X11 c'est la classe WM qui joue ce rôle. Les deux valent
+	// `EvenementLoto`, comme le nom du fichier `.desktop` livré dans `resources/desktop`.
+	glfwWindowHintString(GLFW_WAYLAND_APP_ID, g_applicationId);
+	glfwWindowHintString(GLFW_X11_CLASS_NAME, g_applicationId);
+	glfwWindowHintString(GLFW_X11_INSTANCE_NAME, g_applicationId);
 	const float main_scale =
 			ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());// Valid on GLFW 3.3+ only
 	GLFWwindow* window = glfwCreateWindow(static_cast<int>(static_cast<float>(m_options.size.x()) * main_scale),

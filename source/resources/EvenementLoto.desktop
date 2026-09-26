@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Événement Loto
+GenericName=Loto associatif
+Comment=Organiser et animer un loto associatif
+Exec=EvenementLoto
+Icon=EvenementLoto
+Terminal=false
+Categories=Game;
+Keywords=loto;bingo;quine;carton;
+StartupWMClass=EvenementLoto

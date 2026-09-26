@@ -305,6 +305,19 @@ qui s'est joué jusque-là.
 
 Bonne chance pour votre événement, et n'hésitez pas à nous faire part de vos retours pour améliorer le logiciel !
 
+## Intégration au bureau (Linux)
+
+L'archive livrée est portable : elle s'extrait où l'on veut et se lance directement. Pour que l'application apparaisse
+dans le menu du bureau avec son nom et son icône, deux fichiers sont fournis dans le dossier resources/desktop :
+
+1. Copier EvenementLoto.png dans ~/.local/share/icons/
+2. Copier EvenementLoto.desktop dans ~/.local/share/applications/, puis y corriger la ligne Exec pour y mettre le
+   chemin complet du programme extrait.
+
+Sous Wayland c'est ce fichier qui donne à la fenêtre son nom et son icône : le protocole n'autorise pas une application
+à les demander elle-même, le compositeur les prend dans l'entrée de bureau qu'il reconnaît par l'identifiant de
+l'application. Sans ces deux fichiers, la fenêtre reste sans icône.
+
 ## En cas d'incident
 
 Pendant toute la durée d'un événement, le logiciel enregistre automatiquement la partie en cours dans un fichier de
