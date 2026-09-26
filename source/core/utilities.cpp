@@ -13,7 +13,11 @@ namespace evl::core {
 
 // 7: the file opens with a magic and ends with a checksum, lengths and dates are
 // written on an explicit fixed width. Files from 6 and below are still read.
-constexpr uint16_t g_currentSaveVersion = 7;
+// 8: the prizes of a sub-round are a list of articles — designation, donor, value,
+// attractiveness, child compatibility — instead of a multi-line string with one value
+// for the lot. A file from 7 and below has its string split into articles, the whole
+// value carried by the first one.
+constexpr uint16_t g_currentSaveVersion = 8;
 
 namespace {
 

@@ -175,6 +175,21 @@ différentes phases de la partie.
 
 ![reglage_parties_lots.png](images/reglage_parties_lots.png)
 
+Les lots se saisissent **article par article**. "Ajouter un lot" crée une ligne, et chaque ligne porte :
+
+* la **désignation** de l'article, c'est elle qui s'affiche aux joueurs ;
+* le **donateur**, facultatif, pour le remercier au micro ;
+* la **valeur** en euros ; la valeur totale de la phase est leur somme, elle n'est plus saisie à la main ;
+* l'**attrait**, de 0 à 5 : l'envie que l'article suscite, indépendamment de son prix — un jambon fait souvent plus
+  d'effet qu'un objet plus cher ;
+* la case **enfant**, décochée pour ce qui n'a pas sa place dans une partie enfant.
+
+Une phase déjà commencée n'est plus modifiable : la liste s'affiche alors en lecture seule.
+
+Un fichier enregistré avec une version antérieure se relit sans rien faire : chaque ligne de l'ancienne liste devient un
+article, et la valeur de l'ensemble est portée par le premier. Il suffit de la répartir sur les articles si on veut le
+détail.
+
 Vous pouvez utiliser le mode Aperçu pour voir à quoi ressemblera l'affichage des lots à gagner pour les participants, et
 vous assurer que les lots sont correctement remplis et affichés. Il est important de vérifier que les lots à gagner sont
 correctement affichés pour les participants, car cela peut avoir un impact sur leur motivation à jouer, et sur le succès
