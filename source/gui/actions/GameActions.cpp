@@ -131,4 +131,14 @@ void ReportAction::onExecute() {
 	}
 }
 
+CatalogueAction::CatalogueAction() { setIconName("puzzle"); }
+CatalogueAction::~CatalogueAction() = default;
+void CatalogueAction::onExecute() {
+	if (const auto popup = Application::get().getPopup("popup_catalogue")) {
+		popup->open();
+	} else {
+		log_warn("Popup 'popup_catalogue' not found.");
+	}
+}
+
 }// namespace evl::gui::actions

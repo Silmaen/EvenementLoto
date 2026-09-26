@@ -19,6 +19,7 @@
 #include "core/utilities.h"
 #include "event/AppEvent.h"
 #include "gui/utils/FileDialog.h"
+#include "views/CataloguePopup.h"
 #include "views/ConfigPopups.h"
 #include "views/DisplayView.h"
 #include "views/HelpPopups.h"
@@ -85,6 +86,7 @@ Application::Application() {
 	m_popups.push_back(std::make_shared<views::PopupWinners>());
 	m_popups.push_back(std::make_shared<views::PopupQuickGame>());
 	m_popups.push_back(std::make_shared<views::PopupReport>());
+	m_popups.push_back(std::make_shared<views::PopupCatalogue>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -107,6 +109,7 @@ Application::Application() {
 	m_actions.push_back(std::make_shared<actions::WinnersAction>());
 	m_actions.push_back(std::make_shared<actions::QuickGameAction>());
 	m_actions.push_back(std::make_shared<actions::ReportAction>());
+	m_actions.push_back(std::make_shared<actions::CatalogueAction>());
 
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);

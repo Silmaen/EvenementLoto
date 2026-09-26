@@ -60,8 +60,7 @@ foreach (child ${children})
             # compatibility of the reader is exactly what they check.
             target_compile_definitions(${${child}_exe} PRIVATE
                     ${PROJECT_PREFIX}_TEST_DATA_DIR="${CMAKE_SOURCE_DIR}/data"
-                    ${PROJECT_PREFIX}_TEST_REFERENCE_FILE="${CMAKE_SOURCE_DIR}/test/lib_test/reference-v8.lev"
-                    ${PROJECT_PREFIX}_TEST_REFERENCE_FILE_V7="${CMAKE_SOURCE_DIR}/test/lib_test/reference-v7.lev"
+                    ${PROJECT_PREFIX}_TEST_REFERENCE_DIR="${CMAKE_SOURCE_DIR}/test/lib_test"
                     # The shipped user documentation, checked against the parser that
                     # renders it inside the application.
                     ${PROJECT_PREFIX}_TEST_DOC_FILE="${CMAKE_SOURCE_DIR}/document/Utilisation.md"

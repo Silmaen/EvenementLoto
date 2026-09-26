@@ -12,6 +12,7 @@
 
 #include <array>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <random>
 #include <sstream>
@@ -88,22 +89,39 @@ static auto readFile(const std::filesystem::path& iPath) -> std::string {
 	return std::string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 }
 
-TEST(Serialization, PreviousVersionStillReads) {
-	// The version 7 reference, kept as a fixture once version 8 changed the body: a
-	// relabelled copy of the current body would only ever test itself.
+/// The reference file of the current save version, and the fixtures of the older ones.
+///
+/// Every format change adds a file here and keeps the previous ones: a relabelled copy
+/// of the current body would only ever test itself.
+constexpr std::string_view g_currentReference = "reference-v9.lev";
+constexpr std::array<std::string_view, 2> g_legacyReferences{{"reference-v7.lev", "reference-v8.lev"}};
+
+/// The path of a reference file.
+static auto referencePath(const std::string_view iName) -> std::filesystem::path {
+	return std::filesystem::path{EVL_TEST_REFERENCE_DIR} / iName;
+}
+
+TEST(Serialization, PreviousVersionsStillRead) {
 	const auto expected = makeEvent();
-	const auto reference = readFile(EVL_TEST_REFERENCE_FILE_V7);
-	ASSERT_FALSE(reference.empty()) << EVL_TEST_REFERENCE_FILE_V7;
+	for (const auto& name: g_legacyReferences) {
+		const auto path = referencePath(name);
+		const auto reference = readFile(path);
+		ASSERT_FALSE(reference.empty()) << path.string();
 
-	std::istringstream stream(reference, std::ios::in | std::ios::binary);
-	Event restored;
-	restored.read(stream, {});
-	EXPECT_TRUE(stream.good());
-	EXPECT_EQ(restored.getName(), expected.getName());
-	EXPECT_EQ(restored.sizeRounds(), expected.sizeRounds());
+		std::istringstream stream(reference, std::ios::in | std::ios::binary);
+		Event restored;
+		restored.read(stream, {});
+		EXPECT_TRUE(stream.good()) << name;
+		EXPECT_EQ(restored.getName(), expected.getName()) << name;
+		EXPECT_EQ(restored.sizeRounds(), expected.sizeRounds()) << name;
+	}
+}
 
-	// And the same body without its frame, labelled version 6, which is how the files
+TEST(Serialization, AnUnframedBodyStillReads) {
+	// The version 7 body without its frame, labelled version 6, which is how the files
 	// from before the magic are laid out.
+	const auto expected = makeEvent();
+	const auto reference = readFile(referencePath("reference-v7.lev"));
 	ASSERT_GT(reference.size(), g_bodyOffset + sizeof(uint32_t));
 	const auto body = reference.substr(g_bodyOffset, reference.size() - g_bodyOffset - sizeof(uint32_t));
 	constexpr uint16_t legacyVersion = 6;
@@ -187,15 +205,16 @@ TEST(Serialization, WritingIsDeterministic) {
 }
 
 TEST(Serialization, MatchesTheReferenceFile) {
-	// `test/lib_test/reference-v7.lev` was produced once by the GCC x64 build and is
+	// `test/lib_test/reference-v9.lev` was produced once by the GCC x64 build and is
 	// checked in. Comparing against it is what makes the format verifiably portable:
 	// every toolchain the CI runs — Clang, MinGW GCC, MinGW Clang, and an arm64 build
 	// the day there is one — checks the very same bytes, with nothing to orchestrate.
 	//
 	// Should this fail after a deliberate format change, bump the save version and
 	// regenerate the file, keeping the old one as a compatibility fixture.
-	const std::string expected = readFile(EVL_TEST_REFERENCE_FILE);
-	ASSERT_FALSE(expected.empty()) << EVL_TEST_REFERENCE_FILE;
+	const auto path = referencePath(g_currentReference);
+	const std::string expected = readFile(path);
+	ASSERT_FALSE(expected.empty()) << path.string();
 	EXPECT_EQ(serialize(makeEvent()), expected);
 
 	// And it reads back, which is the other half of the promise.

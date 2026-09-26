@@ -55,6 +55,12 @@ Author: Silmaen
   articles, the whole value carried by the first
 - `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
   what the popup shows and what is written to disk
+- `Distribution` - `distributePrizes()`: spreads the event's prize catalogue over its
+  sub-rounds. Two climbs superimposed — quine < two quines < full card inside a round,
+  and each round heavier than the last up to the final climax. Value and attractiveness
+  are each normalised before being mixed, in the proportion `DistributionSettings` says.
+  Idempotent: it always starts from the whole catalogue and never touches a sub-round
+  that is no longer editable
 - `Serializable` - Abstract base for binary stream, JSON (jsoncpp), and YAML (yaml-cpp) serialization
 - `Settings` - Application settings (key-value store)
 - `Statistics` - Draw statistics tracking
@@ -69,10 +75,16 @@ Author: Silmaen
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
-Save format **8**: the prizes of a sub-round are a list of articles instead of a
-multi-line string with one value. Files from versions 3 to 7 still read.
-`test/lib_test/reference-v8.lev` is the checked-in byte reference every toolchain is
-compared against, `reference-v7.lev` the compatibility fixture.
+`Event::getCatalogue()` holds every article the organizer has, entered in one go and
+independent of the rounds. It stays the master list: a distributed article is **copied**
+into the sub-round, so a `.lev` file is complete on its own and the distribution can be
+run again.
+
+Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
+multi-line string with one value; **9** added the event catalogue. Files from versions 3
+to 8 still read. `test/lib_test/reference-v9.lev` is the checked-in byte reference every
+toolchain is compared against, and `reference-v7.lev` / `reference-v8.lev` are the
+compatibility fixtures — every format change adds one and keeps the previous ones.
 
 ### Math Utilities (namespace `evl::math`)
 
@@ -100,9 +112,10 @@ compared against, `reference-v7.lev` the compatibility fixture.
   DisplayView (`renderInline()` draws its content scaled down in the current window),
   HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups,
   HelpPopups, RescuePopup (resume an interrupted game), WinnerPopups (ask who won, settle
-  a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup
+  a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup,
+  CataloguePopup (the prize catalogue and the distribution tool)
 - `actions/` - Action base, FileActions, GameActions (draw, cancel, next step, winners,
-  quick game, report), SettingsActions, HelpActions
+  quick game, report, catalogue), SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (the ImGui file browser: `openFile`/`saveFile`/`selectFolder`, each taking a continuation; `OwnerScope` marks who is drawing; the pure parts — `parseFilters`, `matches`, `isDeclared`, `listEntries`, `resolveTarget`, `breadcrumb`, `splitQuery`, `commonPrefix`, `recentPaths` — are public so they can be tested without a window), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
@@ -334,6 +347,10 @@ All domain objects inherit from `Serializable` and implement:
 - `test_Prize.cpp` checks the article model, its bounds and the pre-version-8 migration
 - `test_Report.cpp` checks the end-of-event report, including that a designation holding
   a pipe cannot break a Markdown table
+- `test_Distribution.cpp` checks the automatic distribution as properties rather than as
+  fixed output: value rising inside a round and across the event, appeal able to outweigh
+  price, a children's round only getting what it may, idempotence, and a round under way
+  keeping its prizes
 - The user documentation is itself under test: `test_markdownParser.cpp` fails on any
   markdown the in-app renderer cannot draw — inline code with backticks in particular
 - Sanitizer suppressions: `tsan_suppressions.txt` (races inside lavapipe and its LLVM

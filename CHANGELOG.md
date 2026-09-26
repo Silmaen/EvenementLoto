@@ -24,8 +24,15 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   livré avec son icône.
 * Périphérique graphique perdu : le rendu, les textures et les glyphes se refont entre
   deux images, sans quitter ni perdre la partie, trois tentatives au plus.
-* Format de sauvegarde 8 ; les fichiers des versions 3 à 7 se relisent, leur valeur
-  de lot étant portée par le premier article.
+* Catalogue des lots de l'événement, saisi d'un bloc et indépendant des parties, par le
+  menu « Jeu » > « Catalogue des lots ».
+* Répartition automatique des lots : valeur croissante de la quine au carton plein, et
+  montée réglable au long de l'événement jusqu'à la dernière partie.
+* L'attrait d'un lot pèse dans la répartition à côté de son prix, dans la proportion voulue.
+* Une partie enfant ne reçoit que les articles marqués compatibles.
+* Répartition rejouable : les manches déjà entamées ne sont jamais touchées.
+* Format de sauvegarde 9 ; les fichiers des versions 3 à 8 se relisent, la valeur d'un
+  ancien lot étant portée par son premier article et le catalogue partant vide.
 
 ## 0.5.1 — 26 septembre 2026
 

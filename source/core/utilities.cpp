@@ -17,7 +17,9 @@ namespace evl::core {
 // attractiveness, child compatibility — instead of a multi-line string with one value
 // for the lot. A file from 7 and below has its string split into articles, the whole
 // value carried by the first one.
-constexpr uint16_t g_currentSaveVersion = 8;
+// 9: the event carries a catalogue of prizes, every article the organizer has, which
+// the distribution draws from. A file from 8 and below simply has an empty one.
+constexpr uint16_t g_currentSaveVersion = 9;
 
 namespace {
 

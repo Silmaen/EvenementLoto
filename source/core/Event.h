@@ -288,6 +288,30 @@ public:
 	auto insertGameRound(uint32_t iIndex, const GameRound& iRound) -> std::optional<uint32_t>;
 
 	/**
+	 * @brief Accès au catalogue des lots de l'événement.
+	 *
+	 * Tous les lots dont l'organisateur dispose, saisis d'un bloc et indépendamment des
+	 * parties : c'est la matière que la répartition puise ensuite. Un article affecté à
+	 * une manche y est recopié, de sorte qu'un fichier d'événement reste complet à lui
+	 * seul.
+	 *
+	 * @return Le catalogue.
+	 */
+	[[nodiscard]] auto getCatalogue() const -> const prizes_type& { return m_catalogue; }
+
+	/**
+	 * @brief Remplace le catalogue des lots.
+	 * @param iCatalogue Le nouveau catalogue.
+	 */
+	void setCatalogue(const prizes_type& iCatalogue) {
+		if (isFinished()) {
+			log_warn("Impossible de modifier le catalogue d'un événement terminé");
+			return;
+		}
+		m_catalogue = iCatalogue;
+	}
+
+	/**
 	 * @brief Le premier numéro de partie encore libre.
 	 * @return Le plus grand numéro utilisé, plus un.
 	 */
@@ -432,6 +456,9 @@ private:
 	/// Liste des parties de l’événement.
 	rounds_type m_gameRounds;
 
+	/// Tous les lots dont l'organisateur dispose, avant répartition.
+	prizes_type m_catalogue;
+
 	/// La date et heure de début de l’événement
 	time_point m_start;
 
@@ -454,6 +481,14 @@ private:
 	 * @return Vrai si le corps a été lu en entier.
 	 */
 	auto readBody(std::istream& iBs, const ReadContext& iContext) -> bool;
+
+	/**
+	 * @brief Lit le catalogue des lots, à partir de la version 9.
+	 * @param iBs Le stream d’entrée.
+	 * @param iContext Ce que le lecteur sait du fichier parcouru.
+	 * @return True si la lecture a réussi.
+	 */
+	auto readCatalogue(std::istream& iBs, const ReadContext& iContext) -> bool;
 
 	std::filesystem::path m_basePath;
 

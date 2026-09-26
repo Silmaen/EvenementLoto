@@ -273,4 +273,34 @@ private:
 	void onExecute() override;
 };
 
+/**
+ * @brief Class CatalogueAction: opens the prize catalogue and its distribution tool.
+ */
+class CatalogueAction final : public Action {
+public:
+	/**
+	 * @brief Default constructor.
+	 */
+	CatalogueAction();
+	/**
+	 * @brief Default destructor.
+	 */
+	~CatalogueAction() override;
+	CatalogueAction(const CatalogueAction&) = delete;
+	CatalogueAction(CatalogueAction&&) = delete;
+	auto operator=(const CatalogueAction&) -> CatalogueAction& = delete;
+	auto operator=(CatalogueAction&&) -> CatalogueAction& = delete;
+	/**
+	 * @brief Get the Name object.
+	 * @return The name.
+	 */
+	[[nodiscard]] auto getName() const -> std::string override { return "catalogue"; }
+
+private:
+	/**
+	 * @brief Execute the action.
+	 */
+	void onExecute() override;
+};
+
 }// namespace evl::gui::actions
