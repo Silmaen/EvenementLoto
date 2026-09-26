@@ -59,17 +59,21 @@ void GameNextActions::onExecute() {
 		round->getType() != core::GameRound::Type::Pause && round->drawsCount() == 0) {
 		Application::get().getRng().resetPick();
 	}
+	// A new phase starts with its controls armed, whatever the tempo of the last draw.
+	Application::get().clearDrawDelay();
 	Application::get().saveProgress();
 }
 
 RandomPickAction::RandomPickAction() { setIconName("dice"); }
 RandomPickAction::~RandomPickAction() = default;
 void RandomPickAction::onExecute() {
-	auto& event = Application::get().getCurrentEvent();
-	if (!event.canDraw())
+	auto& app = Application::get();
+	auto& event = app.getCurrentEvent();
+	if (!event.canDraw() || app.isDrawHeld())
 		return;
-	event.getCurrentGameRound()->addPickedNumber(Application::get().getRng().pick());
-	Application::get().saveProgress();
+	event.getCurrentGameRound()->addPickedNumber(app.getRng().pick());
+	app.notifyDraw();
+	app.saveProgress();
 	log_trace("Random pick action executed.");
 }
 
@@ -81,6 +85,7 @@ void CancelPickAction::onExecute() {
 		return;
 	event.getCurrentGameRound()->removeLastPick();
 	Application::get().getRng().popNum();
+	Application::get().clearDrawDelay();
 	Application::get().saveProgress();
 	log_trace("Cancel pick action executed.");
 }

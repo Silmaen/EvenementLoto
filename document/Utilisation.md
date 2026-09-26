@@ -29,6 +29,13 @@ mais il est possible de le modifier pour chaque événement.
 **Il est recommandé d'adapter le thème le Jour de la manifestation avec le vidéoprojecteur utilisé, et dans
 l'environnement de jeu pour que les couleurs soient bien visibles.**
 
+#### Délai de réactivation des tirages
+
+La section "Tirage" porte un délai, en secondes, pendant lequel les commandes de tirage restent bloquées après chaque
+numéro : le bouton de tirage aléatoire affiche le temps restant et la grille manuelle refuse les clics. C'est le tempo
+de l'annonce, le temps qu'il faut au numéro pour atteindre le fond de la salle. Zéro désactive le blocage. Annuler un
+tirage, ou changer de phase, réarme les commandes immédiatement.
+
 #### Écran d'affichage sur un second écran (Linux)
 
 L'écran d'affichage des numéros est une fenêtre détachable, destinée à être envoyée en plein écran sur le

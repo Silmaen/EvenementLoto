@@ -260,6 +260,35 @@ public:
 	auto getRng() -> core::RandomNumberGenerator& { return m_rng; }
 
 	/**
+	 * @brief Signal a number was just drawn, which starts the re-arm delay.
+	 *
+	 * The delay exists to give the tempo: a presenter who keeps a finger on the button
+	 * draws faster than the room can follow, and the announced number needs its time on
+	 * screen. `gui/draw_delay` holds it in seconds, zero meaning no delay at all.
+	 */
+	void notifyDraw() { m_lastDraw = core::clock::now(); }
+
+	/**
+	 * @brief Forget the last draw, so the next one is allowed right away.
+	 *
+	 * Cancelling a draw undoes the delay along with it: the presenter is correcting a
+	 * mistake, not setting the tempo.
+	 */
+	void clearDrawDelay() { m_lastDraw = core::g_epoch; }
+
+	/**
+	 * @brief How long before the draw controls come back.
+	 * @return The remaining delay in seconds, zero once drawing is allowed again.
+	 */
+	[[nodiscard]] auto getDrawDelayRemaining() const -> double;
+
+	/**
+	 * @brief Whether the draw controls are still held after the last draw.
+	 * @return True while the delay has not elapsed.
+	 */
+	[[nodiscard]] auto isDrawHeld() const -> bool { return getDrawDelayRemaining() > 0.0; }
+
+	/**
 	 * @brief Set display preview flag.
 	 * @param iDisplay The display preview flag.
 	 */
@@ -314,6 +343,9 @@ private:
 
 	/// Timestamp of the last autosave.
 	core::time_point m_lastAutoSave;
+
+	/// Timestamp of the last drawn number, `g_epoch` when the delay is not running.
+	core::time_point m_lastDraw = core::g_epoch;
 
 	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
 	std::shared_ptr<views::View> m_cachedDisplayView;
