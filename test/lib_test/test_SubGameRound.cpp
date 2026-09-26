@@ -57,6 +57,21 @@ TEST(SubGameRound, flow) {
 	EXPECT_EQ(partie.getDraws().size(), 3);
 }
 
+TEST(SubGameRound, editWinnerOnlyOnceFinished) {
+	SubGameRound partie(SubGameRound::Type::OneQuine, "un panier garni", 25.0);
+	// A name typed too fast, before the round is over: nothing to correct yet.
+	partie.editWinner("faute de frappe");
+	EXPECT_TRUE(partie.getWinner().empty());
+	partie.nextStatus();
+	partie.nextStatus();
+	partie.setWinner("Mme Dupond");
+	ASSERT_TRUE(partie.isFinished());
+	// Once the round is over the name can be fixed, and the round stays over.
+	partie.editWinner("Mme Dupont");
+	EXPECT_STREQ(partie.getWinner().c_str(), "Mme Dupont");
+	EXPECT_TRUE(partie.isFinished());
+}
+
 TEST(SubGameRound, serialize) {
 	SubGameRound partie(SubGameRound::Type::TwoQuines, "une moto", 152.12);
 	EXPECT_FALSE(partie.isFinished());

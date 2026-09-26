@@ -2,16 +2,13 @@
 
 Une ligne par élément. Ce qui est livré passe dans [CHANGELOG.md](CHANGELOG.md).
 
-La **0.5.1** est livrée, son contenu est dans le changelog. La prochaine version est la
-**0.6.0**.
+La version en cours de développement est la **0.6.0** ; la **0.5.1** est complète, son
+contenu est dans le changelog.
 
 ## 0.6.0
 
 * Affichage de la liste des lots sur l'écran présentateur pendant l'annonce.
 * Rapport de fin d'événement.
-* Édition des noms de gagnant après la fin d'une partie.
-* Départage des gagnants multiples, par tirage au sort ou saisie.
-* Possibilité de passer l'étape de saisie du gagnant.
 * Édition des lots sous forme de liste d'articles.
 * Partie improvisée : grille seule, insérable n'importe où dans un événement démarré,
   lots facultatifs saisis au dernier moment, comptée dans le rapport de fin.

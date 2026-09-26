@@ -163,6 +163,21 @@ public:
 	}
 
 	/**
+	 * @brief Corrige le nom du gagnant, sans toucher au déroulement.
+	 *
+	 * Le nom est saisi dans l'urgence de l'annonce ; le corriger après coup ne doit pas
+	 * relancer la manche. Seul le nom change, et seulement sur une manche terminée.
+	 * @param iWinner Le nom corrigé.
+	 */
+	void editWinner(const std::string& iWinner) {
+		if (m_status != Status::Done) {
+			log_warn("Impossible de corriger le gagnant d'une manche non terminée");
+			return;
+		}
+		m_winner = iWinner;
+	}
+
+	/**
 	 * @brief Lecture depuis un stream
 	 * @param iBs Le stream d’entrée.
 	 * @param iContext Ce que le lecteur sait du fichier parcouru.

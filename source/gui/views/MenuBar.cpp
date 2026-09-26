@@ -59,6 +59,10 @@ void MenuBar::onUpdate() {
 			defineMenuItem("Quitter", "quit_application");
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Jeu")) {
+			defineMenuItem("Gagnants", "winners");
+			ImGui::EndMenu();
+		}
 		if (ImGui::BeginMenu("Paramètres")) {
 			defineMenuItem("Général", "preferences");
 			defineMenuItem("Événement", "event_settings");

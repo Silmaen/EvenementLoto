@@ -29,6 +29,7 @@
 #include "views/RescuePopup.h"
 #include "views/StatusBar.h"
 #include "views/ToolBar.h"
+#include "views/WinnerPopups.h"
 
 
 namespace evl::gui {
@@ -75,6 +76,8 @@ Application::Application() {
 	m_popups.push_back(std::make_shared<views::GameRoundConfigPopups>());
 	m_popups.push_back(std::make_shared<views::PopupRescue>());
 	m_popups.push_back(std::make_shared<views::PopupMessage>());
+	m_popups.push_back(std::make_shared<views::PopupWinner>());
+	m_popups.push_back(std::make_shared<views::PopupWinners>());
 
 	// Create actions
 	m_actions.push_back(std::make_shared<actions::NewFileAction>());
@@ -94,6 +97,7 @@ Application::Application() {
 	m_actions.push_back(std::make_shared<actions::RandomPickAction>());
 	m_actions.push_back(std::make_shared<actions::CancelPickAction>());
 	m_actions.push_back(std::make_shared<actions::DisplayRulesAction>());
+	m_actions.push_back(std::make_shared<actions::WinnersAction>());
 
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);
