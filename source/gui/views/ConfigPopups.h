@@ -64,6 +64,8 @@ private:
 	 */
 	struct Data {
 		std::filesystem::path dataLocation{core::getExecPath() / "data"};
+		std::filesystem::path fontPath{};
+		float fontSize{20.0f};
 		float drawDelay{0.0f};
 		float titleScale{4.0f};
 		float valueScale{3.f};

@@ -107,6 +107,9 @@ Application::Application() {
 
 	m_theme.loadFromSettings(core::getSettings()->extract("theme"));
 	setTheme(m_theme);
+	// La police retenue au dernier lancement, honorée à la première image.
+	m_mainWindow.requestFont(core::getSettings()->getValue<std::string>("gui/font_path", {}),
+							 core::getSettings()->getValue<float>("gui/font_size", 20.0f));
 
 	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
 
@@ -226,6 +229,12 @@ auto Application::getDrawDelayRemaining() const -> double {
 		return 0.0;
 	const double elapsed = core::durationSeconds(core::clock::now() - m_lastDraw);
 	return std::max(0.0, delay - elapsed);
+}
+
+void Application::setFont(const std::filesystem::path& iPath, const float iSize) {
+	core::getSettings()->setValue("gui/font_path", iPath.string());
+	core::getSettings()->setValue("gui/font_size", iSize);
+	m_mainWindow.requestFont(iPath, iSize);
 }
 
 auto Application::getTheme() const -> const Theme& { return m_theme; }

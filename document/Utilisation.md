@@ -40,6 +40,12 @@ mais il est possible de le modifier pour chaque événement.
 **Il est recommandé d'adapter le thème le Jour de la manifestation avec le vidéoprojecteur utilisé, et dans
 l'environnement de jeu pour que les couleurs soient bien visibles.**
 
+#### Police d'interface
+
+La section "Police d'interface" permet de choisir un fichier de police (.ttf, .otf, .ttc) et sa taille. Le
+changement est immédiat, sans redémarrage. "Défaut" revient à la police embarquée. Un fichier qui n'est pas une police
+est refusé, avec un message dans le journal, et la police embarquée reprend sa place.
+
 #### Délai de réactivation des tirages
 
 La section "Tirage" porte un délai, en secondes, pendant lequel les commandes de tirage restent bloquées après chaque

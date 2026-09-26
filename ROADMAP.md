@@ -8,7 +8,6 @@ contenu est dans le changelog.
 ## 0.6.0
 
 * Habillages : retours d'usage sur « Ardoise » et « Salle », ajustements.
-* Choix de la police de caractère.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
   détachable, aperçu en mono-écran.
 * Icône et nom de l'application sous Wayland, via l'app-id et un fichier `.desktop`.

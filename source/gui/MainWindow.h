@@ -14,7 +14,11 @@
 #include "event/Event.h"
 #include "event/KeyCodes.h"
 
+#include <filesystem>
 #include <functional>
+#include <optional>
+#include <utility>
+#include <vector>
 
 namespace evl::gui {
 
@@ -106,6 +110,19 @@ public:
 	void setTheme(const Theme& iTheme);
 
 	/**
+	 * @brief Demande une autre police d'interface.
+	 *
+	 * La demande est notée et honorée au début de l'image suivante : vider l'atlas
+	 * pendant une image en cours invaliderait les glyphes que cette image est en train
+	 * de dessiner, et c'est justement depuis la fenêtre de réglages, en pleine image,
+	 * que la demande arrive.
+	 *
+	 * @param[in] iPath Le fichier de police, vide pour revenir à la police embarquée.
+	 * @param[in] iSize La taille en pixels.
+	 */
+	void requestFont(const std::filesystem::path& iPath, float iSize);
+
+	/**
 	 * @brief Define the Event Callback function.
 	 * @param iCallback The new callback function.
 	 */
@@ -185,6 +202,18 @@ private:
 	Theme m_currentTheme{};
 	/// Fonts loaded flag.
 	bool m_fontsLoaded = false;
+	/// La police demandée, honorée au début de l'image suivante.
+	std::optional<std::pair<std::filesystem::path, float>> m_fontRequest;
+	/// Les octets de la police chargée depuis un fichier, auxquels l'atlas renvoie.
+	std::vector<char> m_fontBytes;
+
+	/**
+	 * @brief Reconstruit l'atlas avec la police demandée, ou la police embarquée.
+	 *
+	 * Une police illisible ou introuvable n'est pas une raison d'arrêter la partie :
+	 * l'échec est signalé et la police embarquée reprend sa place.
+	 */
+	void applyFontRequest();
 	/// Minimum image count.
 	uint32_t m_minImageCount = 2;
 	/// Vulkan window setup done flag.
