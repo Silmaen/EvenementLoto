@@ -8,8 +8,6 @@ contenu est dans le changelog.
 ## 0.6.0
 
 * Rapport de fin d'événement.
-* Partie improvisée : grille seule, insérable n'importe où dans un événement démarré,
-  lots facultatifs saisis au dernier moment, comptée dans le rapport de fin.
 * Style des fenêtres revu : palette, typographie, densité et hiérarchie cohérentes.
 * Choix de la police de caractère.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille

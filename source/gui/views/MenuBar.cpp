@@ -60,6 +60,8 @@ void MenuBar::onUpdate() {
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Jeu")) {
+			defineMenuItem("Partie improvisée", "quick_game");
+			ImGui::Separator();
 			defineMenuItem("Gagnants", "winners");
 			ImGui::EndMenu();
 		}

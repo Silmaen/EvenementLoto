@@ -213,4 +213,34 @@ private:
 	void onExecute() override;
 };
 
+/**
+ * @brief Class QuickGameAction: opens the improvised round dialog.
+ */
+class QuickGameAction final : public Action {
+public:
+	/**
+	 * @brief Default constructor.
+	 */
+	QuickGameAction();
+	/**
+	 * @brief Default destructor.
+	 */
+	~QuickGameAction() override;
+	QuickGameAction(const QuickGameAction&) = delete;
+	QuickGameAction(QuickGameAction&&) = delete;
+	auto operator=(const QuickGameAction&) -> QuickGameAction& = delete;
+	auto operator=(QuickGameAction&&) -> QuickGameAction& = delete;
+	/**
+	 * @brief Get the Name object.
+	 * @return The name.
+	 */
+	[[nodiscard]] auto getName() const -> std::string override { return "quick_game"; }
+
+private:
+	/**
+	 * @brief Execute the action.
+	 */
+	void onExecute() override;
+};
+
 }// namespace evl::gui::actions

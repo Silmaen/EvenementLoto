@@ -8,9 +8,11 @@
 #pragma once
 #include "FileFormat.h"
 #include "GameRound.h"
+
 #include "Serializable.h"
 #include "Statistics.h"
 #include <filesystem>
+#include <optional>
 
 namespace evl::core {
 
@@ -270,6 +272,32 @@ public:
 	 * @param iRound La partie qu'il faut ajouter.
 	 */
 	void pushGameRound(const GameRound& iRound);
+
+	/**
+	 * @brief Insère une partie à la position demandée.
+	 *
+	 * La partie improvisée du jour : une partie ajoutée alors que l'événement est déjà
+	 * lancé, là où elle tombe. Elle ne peut pas passer devant la partie en cours ni
+	 * devant une partie déjà jouée — ce qui est derrière relève de l'histoire, pas du
+	 * programme.
+	 *
+	 * @param iIndex La position voulue, bornée à la plage autorisée.
+	 * @param iRound La partie à insérer.
+	 * @return La position réellement utilisée, rien si l'insertion est refusée.
+	 */
+	auto insertGameRound(uint32_t iIndex, const GameRound& iRound) -> std::optional<uint32_t>;
+
+	/**
+	 * @brief Le premier numéro de partie encore libre.
+	 * @return Le plus grand numéro utilisé, plus un.
+	 */
+	[[nodiscard]] auto nextFreeRoundId() const -> int;
+
+	/**
+	 * @brief Première position où une partie peut être insérée.
+	 * @return Zéro tant que l'événement est éditable, sinon juste après la partie en cours.
+	 */
+	[[nodiscard]] auto firstInsertableIndex() const -> uint32_t;
 
 	/**
 	 * @brief Supprime un round basé sur son index

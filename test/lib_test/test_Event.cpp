@@ -71,6 +71,48 @@ TEST(Event, DefinesAfterStart) {
 	EXPECT_EQ(evt.getCurrentGameRoundIndex(), 0);
 }
 
+TEST(Event, ImprovisedRoundGoesAfterTheRunningOne) {
+	Event evt;
+	evt.setName("loto");
+	evt.setOrganizerName("amicale");
+	evt.pushGameRound(GameRound(GameRound::Type::OneQuine));
+	evt.pushGameRound(GameRound(GameRound::Type::FullCard));
+	// Anywhere is allowed while nothing has started.
+	EXPECT_EQ(evt.firstInsertableIndex(), 0);
+	EXPECT_EQ(evt.insertGameRound(0, GameRound(GameRound::Type::Enfant)), 0);
+	EXPECT_EQ(evt.sizeRounds(), 3);
+	EXPECT_EQ(evt.getGameRound(0)->getType(), GameRound::Type::Enfant);
+
+	// Once the event is running, the first round is in play and out of reach.
+	evt.nextState();
+	evt.nextState();
+	ASSERT_EQ(evt.getStatus(), Event::Status::GameRunning);
+	ASSERT_EQ(evt.getCurrentGameRoundIndex(), 0);
+	EXPECT_EQ(evt.firstInsertableIndex(), 1);
+	// A position before the running round is clamped, not refused: the round is added
+	// where it can be, right behind the one being played.
+	EXPECT_EQ(evt.insertGameRound(0, GameRound(GameRound::Type::TwoQuines)), 1);
+	EXPECT_EQ(evt.getGameRound(1)->getType(), GameRound::Type::TwoQuines);
+	// And the round being played is still the one being played.
+	EXPECT_EQ(evt.getCurrentGameRoundIndex(), 0);
+	EXPECT_EQ(evt.getGameRound(0)->getType(), GameRound::Type::Enfant);
+
+	// At the end of the list is always allowed.
+	const auto last = static_cast<uint32_t>(evt.sizeRounds());
+	EXPECT_EQ(evt.insertGameRound(last + 10, GameRound(GameRound::Type::FullCard)), last);
+}
+
+TEST(Event, ImprovisedRoundTakesTheNextFreeNumber) {
+	Event evt;
+	evt.setName("loto");
+	evt.setOrganizerName("amicale");
+	EXPECT_EQ(evt.nextFreeRoundId(), 1);
+	GameRound first;
+	first.setId(3);
+	evt.pushGameRound(first);
+	EXPECT_EQ(evt.nextFreeRoundId(), 4);
+}
+
 TEST(Event, RoundManipulation) {
 	Event evt;
 	evt.nextState();

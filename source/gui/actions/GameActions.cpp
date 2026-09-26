@@ -111,4 +111,14 @@ void WinnersAction::onExecute() {
 	}
 }
 
+QuickGameAction::QuickGameAction() { setIconName("new-file"); }
+QuickGameAction::~QuickGameAction() = default;
+void QuickGameAction::onExecute() {
+	if (const auto popup = Application::get().getPopup("popup_quick_game")) {
+		popup->open();
+	} else {
+		log_warn("Popup 'popup_quick_game' not found.");
+	}
+}
+
 }// namespace evl::gui::actions
