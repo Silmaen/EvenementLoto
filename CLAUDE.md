@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.5.0**.
+EvenementLoto is a C++23 desktop application for managing "loto associatif" (French charity bingo) events. It handles event configuration, game rounds, number drawing, prize tracking, statistics, and full-screen display for players. Current version: **0.6.0** (in development).
 
 Author: Silmaen
 
@@ -13,10 +13,14 @@ Author: Silmaen
 - `source/core/` - Core library (`EvenementLoto_lib`): game logic, serialization, settings, logging, RNG, math utilities, statistics
 - `source/gui/` - GUI library (`EvenementLoto_ui`): ImGui/Vulkan-based interface (views, popups, actions, event handling, theming)
   - `source/gui/event/` - Event system (keyboard/mouse events, key codes, application events)
-  - `source/gui/views/` - View components (MainView, DisplayView, HelpView, MenuBar, ToolBar, StatusBar, ConfigPopups, HelpPopups)
+  - `source/gui/views/` - View components (MainView, DisplayView, HelpView, MenuBar,
+    ToolBar, StatusBar, ConfigPopups, HelpPopups, WinnerPopups, QuickGamePopup,
+    ReportPopup)
   - `source/gui/actions/` - Action handlers (FileActions, GameActions, SettingsActions, HelpActions)
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
-  - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering helpers).
+  - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering
+    helpers — `renderPrizeList` is shared by the round configuration and the improvised
+    round).
     `FileDialog` is the in-app file browser: requests carry a continuation, and the
     browser is drawn inside the scope of whoever asked, so it stacks on an open popup
     instead of dismissing it. Two panes (recent paths and a directory tree, then the
@@ -40,9 +44,17 @@ Author: Silmaen
 
 ### Key Domain Classes (namespace `evl::core`)
 
-- `Event` - Top-level event: contains organizer info, rules, logos, game rounds, status state machine
+- `Event` - Top-level event: contains organizer info, rules, logos, game rounds, status
+  state machine. `insertGameRound()` adds a round mid-event, never in front of the one
+  being played (`firstInsertableIndex()`), which is what makes an improvised round safe
 - `GameRound` - A single game round: type (OneQuine, TwoQuines, FullCard, combinations, Enfant, Inverse, Pause), sub-rounds, draws
-- `SubGameRound` - A sub-game within a round: type, draws, prize info, winner
+- `SubGameRound` - A sub-game within a round: type, draws, prizes, winner. `editWinner()`
+  fixes a name once the sub-round is over, without replaying anything
+- `Prize` - One prize article: designation, donor, value, attractiveness (0-5), child
+  compatibility. `prizesFromLegacy()` turns a pre-version-8 multi-line string into
+  articles, the whole value carried by the first
+- `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
+  what the popup shows and what is written to disk
 - `Serializable` - Abstract base for binary stream, JSON (jsoncpp), and YAML (yaml-cpp) serialization
 - `Settings` - Application settings (key-value store)
 - `Statistics` - Draw statistics tracking
@@ -57,6 +69,11 @@ Author: Silmaen
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
+Save format **8**: the prizes of a sub-round are a list of articles instead of a
+multi-line string with one value. Files from versions 3 to 7 still read.
+`test/lib_test/reference-v8.lev` is the checked-in byte reference every toolchain is
+compared against, `reference-v7.lev` the compatibility fixture.
+
 ### Math Utilities (namespace `evl::math`)
 
 - `vectors.h` - Generic `Vector<BaseType, Dim>` template (fixed-size array backed)
@@ -66,12 +83,26 @@ Author: Silmaen
 
 - `Application` - Singleton application class, manages views/popups/actions, Vulkan
   rendering, autosave (`rescue.lev` every 10s during active gameplay, atomic, two
-  generations) and the recovery prompt at startup
-- `MainWindow` - GLFW window management with Vulkan surface
-- `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in settings)
+  generations), the recovery prompt at startup, the draw re-arm delay
+  (`notifyDraw`/`isDrawHeld`, setting `gui/draw_delay`) and the interface font
+  (`setFont`, settings `gui/font_path` and `gui/font_size`)
+- `MainWindow` - GLFW window management with Vulkan surface. The desktop identity is set
+  at window creation (`GLFW_WAYLAND_APP_ID`, `GLFW_X11_CLASS_NAME`), matching the
+  `EvenementLoto.desktop` entry shipped in `resources/desktop`. A font request is honoured
+  at the start of the next frame, never inside an open one, and a file that is not an
+  `sfnt` is refused rather than handed to ImGui, which would assert
+- `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in
+  settings). Three presets — `Nuit` (the original), `Ardoise`, `Salle` — derived from a
+  five-colour palette by `applyPalette`, so the fifty ImGui colours stay coherent. A
+  preset is a starting point: the stored colours win, and `Réappliquer` goes back to them
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
-- `views/` - View, MainView, DisplayView, HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups, HelpPopups, RescuePopup (resume an interrupted game)
-- `actions/` - Action base, FileActions, GameActions, SettingsActions, HelpActions
+- `views/` - View, MainView (with a `Présentateur` tab drawing the display miniature),
+  DisplayView (`renderInline()` draws its content scaled down in the current window),
+  HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups,
+  HelpPopups, RescuePopup (resume an interrupted game), WinnerPopups (ask who won, settle
+  a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup
+- `actions/` - Action base, FileActions, GameActions (draw, cancel, next step, winners,
+  quick game, report), SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (the ImGui file browser: `openFile`/`saveFile`/`selectFolder`, each taking a continuation; `OwnerScope` marks who is drawing; the pure parts — `parseFilters`, `matches`, `isDeclared`, `listEntries`, `resolveTarget`, `breadcrumb`, `splitQuery`, `commonPrefix`, `recentPaths` — are public so they can be tested without a window), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
@@ -292,6 +323,11 @@ All domain objects inherit from `Serializable` and implement:
 - Test helper header: `test/TestMainHelper.h`
 - `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted
 - `test_Rescue.cpp` checks the interrupted-game save, detection and fallback
+- `test_Prize.cpp` checks the article model, its bounds and the pre-version-8 migration
+- `test_Report.cpp` checks the end-of-event report, including that a designation holding
+  a pipe cannot break a Markdown table
+- The user documentation is itself under test: `test_markdownParser.cpp` fails on any
+  markdown the in-app renderer cannot draw — inline code with backticks in particular
 - Sanitizer suppressions: `tsan_suppressions.txt` (races inside lavapipe and its LLVM
   JIT, which run because the GUI tests create a real window), scoped by module so a
   finding in our own code is still reported. `lsan_suppressions.txt` is now empty, the
