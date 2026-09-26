@@ -12,6 +12,8 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Liste détaillée des lots sur l'écran de contrôle, avec valeur et donateur.
 * Partie improvisée : ajoutée en cours d'événement, lots facultatifs, jamais devant
   la partie en cours.
+* Rapport de fin d'événement : parties, gagnants, lots, donateurs et statistiques,
+  affiché, copiable et enregistrable en Markdown.
 * Format de sauvegarde 8 ; les fichiers des versions 3 à 7 se relisent, leur valeur
   de lot étant portée par le premier article.
 

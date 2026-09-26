@@ -243,4 +243,34 @@ private:
 	void onExecute() override;
 };
 
+/**
+ * @brief Class ReportAction: opens the end-of-event report.
+ */
+class ReportAction final : public Action {
+public:
+	/**
+	 * @brief Default constructor.
+	 */
+	ReportAction();
+	/**
+	 * @brief Default destructor.
+	 */
+	~ReportAction() override;
+	ReportAction(const ReportAction&) = delete;
+	ReportAction(ReportAction&&) = delete;
+	auto operator=(const ReportAction&) -> ReportAction& = delete;
+	auto operator=(ReportAction&&) -> ReportAction& = delete;
+	/**
+	 * @brief Get the Name object.
+	 * @return The name.
+	 */
+	[[nodiscard]] auto getName() const -> std::string override { return "report"; }
+
+private:
+	/**
+	 * @brief Execute the action.
+	 */
+	void onExecute() override;
+};
+
 }// namespace evl::gui::actions

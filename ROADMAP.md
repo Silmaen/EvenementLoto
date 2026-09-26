@@ -7,7 +7,6 @@ contenu est dans le changelog.
 
 ## 0.6.0
 
-* Rapport de fin d'événement.
 * Style des fenêtres revu : palette, typographie, densité et hiérarchie cohérentes.
 * Choix de la police de caractère.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille

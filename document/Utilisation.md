@@ -276,6 +276,16 @@ Durant une partie les écrans organisateur et d'affichage devrait ressembler à 
 ![ecran_organisateur.png](images/ecran_organisateur.png)
 ![ecran_joueurs.png](images/ecran_joueurs.png)
 
+### Rapport de fin d'événement
+
+Le menu "Jeu" > "Rapport de fin d'événement" produit le compte rendu de la journée : l'événement et son organisateur,
+un résumé chiffré, le détail de chaque partie avec ses manches, ses lots et ses gagnants, la liste des donateurs à
+remercier, et les statistiques de tirage. Les pauses n'y figurent pas, les parties improvisées si.
+
+"Copier" met le rapport dans le presse-papier, "Enregistrer..." l'écrit dans un fichier Markdown. Ce qui s'affiche et ce
+qui s'enregistre sont le même texte. Le rapport se consulte à tout moment, pas seulement à la fin : il reflète alors ce
+qui s'est joué jusque-là.
+
 Bonne chance pour votre événement, et n'hésitez pas à nous faire part de vos retours pour améliorer le logiciel !
 
 ## En cas d'incident

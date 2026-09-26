@@ -63,6 +63,7 @@ void MenuBar::onUpdate() {
 			defineMenuItem("Partie improvisée", "quick_game");
 			ImGui::Separator();
 			defineMenuItem("Gagnants", "winners");
+			defineMenuItem("Rapport de fin d'événement", "report");
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Paramètres")) {
