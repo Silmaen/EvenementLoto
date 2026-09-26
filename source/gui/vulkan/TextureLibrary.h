@@ -82,6 +82,16 @@ public:
 	 */
 	[[nodiscard]] auto getRawPixels(const std::string& iName) const -> Pixels;
 
+	/**
+	 * @brief Recharge toutes les textures depuis leurs fichiers.
+	 *
+	 * Après la perte du périphérique graphique, les images n'existent plus : c'est
+	 * pourquoi la bibliothèque retient le chemin de chacune et non seulement son
+	 * identifiant. Les identifiants changent, ce qui n'a pas d'importance : ils sont
+	 * demandés par nom à chaque image.
+	 */
+	void reload();
+
 private:
 	/// Texture map.
 	std::unordered_map<std::string, uint64_t> m_textureMap;

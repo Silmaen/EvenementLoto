@@ -223,3 +223,37 @@ TEST(gui_Application, ChangesTheFontSizeAtRuntime) {
 	EXPECT_EQ(app->getState(), Application::State::Closed);
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
+
+TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// A game under way: what a lost graphics card must not take with it.
+	auto& event = app->getCurrentEvent();
+	event.setName("reprise");
+	event.setOrganizerName("organisateur");
+	event.pushGameRound(evl::core::GameRound{});
+	event.nextState();
+	event.nextState();
+	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
+
+	// A few frames, so textures and glyphs are really on the device before it goes.
+	app->setMaxFrame(2);
+	app->run();
+	ASSERT_EQ(app->getState(), Application::State::Closed);
+
+	// The rebuild, on a device in good health: that is the teardown and setup sequence
+	// being checked, without waiting for a card to fail.
+	app->setRunning();
+	EXPECT_TRUE(app->recoverRenderer());
+
+	// And it keeps rendering, with the event untouched.
+	app->setMaxFrame(3);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	EXPECT_EQ(app->getCurrentEvent().getStatus(), evl::core::Event::Status::GameRunning);
+	EXPECT_EQ(app->getCurrentEvent().getName(), "reprise");
+	// The icons were uploaded again, so the toolbar is not a row of blanks.
+	EXPECT_NE(app->getTextureLibrary().getTextureId("dice"), 0U);
+}

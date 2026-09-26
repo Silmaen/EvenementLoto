@@ -577,9 +577,11 @@ void VulkanContext::checkVkResult(const VkResult iErr, const char* iFile, int iL
 		return;
 	log_error("[vulkan] Error({}:{}): VkResult = {}", iFile, iLine, magic_enum::enum_name(iErr));
 	if (iErr == VK_ERROR_DEVICE_LOST) {
-		// Typically a driver reset. The state is saved on the way out, so relaunching
-		// offers to resume the game.
-		Application::get().reportError("La carte graphique a été réinitialisée.");
+		// Typically a driver reset. Everything that lives on the device is rebuilt
+		// between two frames, the game itself never having left memory. The save is
+		// taken on the way in all the same, and giving up remains the fallback when the
+		// rebuild does not take.
+		Application::get().requestRendererRecovery();
 		return;
 	}
 	if (iErr < 0)

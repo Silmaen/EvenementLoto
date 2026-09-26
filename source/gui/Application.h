@@ -121,6 +121,26 @@ public:
 	}
 
 	/**
+	 * @brief Demande la reconstruction du rendu, honorée entre deux images.
+	 *
+	 * Appelée depuis le contrôle des retours Vulkan, donc au milieu d'une image : la
+	 * reconstruction y détruirait ce que cette image est en train de dessiner. La
+	 * demande est donc notée et traitée par la boucle, image fermée.
+	 */
+	void requestRendererRecovery();
+
+	/**
+	 * @brief Reconstruit le rendu tout de suite.
+	 *
+	 * Appelable directement lorsqu'aucune image n'est ouverte, ce qui est aussi ce qui
+	 * rend la séquence de démontage et de remontage vérifiable sur un périphérique en
+	 * bon état, sans attendre qu'une carte graphique tombe.
+	 *
+	 * @return True si le rendu est reparti.
+	 */
+	auto recoverRenderer() -> bool;
+
+	/**
 	 * @brief Demande une autre police d'interface, et la retient dans les réglages.
 	 * @param[in] iPath Le fichier de police, vide pour la police embarquée.
 	 * @param[in] iSize La taille en pixels.
@@ -353,6 +373,11 @@ private:
 
 	/// Timestamp of the last drawn number, `g_epoch` when the delay is not running.
 	core::time_point m_lastDraw = core::g_epoch;
+
+	/// Une reconstruction du rendu attend la fin de l'image en cours.
+	bool m_recoveryRequested = false;
+	/// Reconstructions déjà tentées, pour ne pas y passer l'après-midi.
+	uint32_t m_recoveryCount = 0;
 
 	/// Cached pointers for hot-path access (avoid per-frame O(n) lookups).
 	std::shared_ptr<views::View> m_cachedDisplayView;

@@ -110,8 +110,16 @@ compared against, `reference-v7.lev` the compatibility fixture.
 
 - Vulkan waits are bounded: 2 s to acquire a swapchain image (rebuild on timeout), 5 s
   for a frame fence (a stuck GPU reports an error instead of freezing forever)
-- `VK_ERROR_DEVICE_LOST` is reported with its own message; any fatal Vulkan error saves
-  the game before leaving the loop
+- `VK_ERROR_DEVICE_LOST` asks for a renderer rebuild instead of giving up:
+  `Application::requestRendererRecovery()` notes it and saves, and the loop calls
+  `recoverRenderer()` **between two frames**, never inside one.
+  `MainWindow::recoverRenderer()` tears down the Vulkan backend, the swapchain and the
+  device, builds them again, reloads every texture from its path
+  (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context and the
+  GLFW backend are kept, so windows and tabs stay put. Three attempts at most, then the
+  game is saved and the application stops. `Application::recoverRenderer()` is public so
+  the sequence is exercised by the test suite on a healthy device
+- Any other fatal Vulkan error saves the game before leaving the loop
 - `Application::saveProgress()` is called after every change of the game state (draw,
   cancelled draw, round change), on top of the 10 s periodic autosave
 

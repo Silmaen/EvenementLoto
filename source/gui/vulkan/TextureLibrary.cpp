@@ -88,6 +88,15 @@ void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesys
 	log_trace("Loaded SVG texture: {} from {}", iName, iTexturePath.string());
 }
 
+void TextureLibrary::reload() {
+	// Une copie : `loadTexture` réécrit `m_texturePaths` au fil du rechargement.
+	const auto paths = m_texturePaths;
+	m_textureMap.clear();
+	m_texturePaths.clear();
+	for (const auto& [name, path]: paths) { loadTexture(name, path); }
+	log_info("{} texture(s) rechargée(s).", m_textureMap.size());
+}
+
 auto TextureLibrary::getTextureId(const std::string& iName) const -> uint64_t {
 	if (const auto it = m_textureMap.find(iName); it != m_textureMap.end()) {
 		// Verify that the texture is valid

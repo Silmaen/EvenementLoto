@@ -326,6 +326,11 @@ changement — un numéro tiré, un numéro annulé, un changement de partie —
 L'écart entre le numéro annoncé aux joueurs et le numéro enregistré est donc nul. L'ancienne version est conservée : il
 y a toujours deux sauvegardes disponibles.
 
+Si la carte graphique est réinitialisée en cours de séance — un pilote qui redémarre, une veille mal digérée — le
+logiciel refait tout ce qui en dépendait entre deux images : il ne quitte pas, la partie n'est pas perdue et les
+fenêtres restent où elles étaient. Une sauvegarde est prise au passage, par précaution. Au bout de trois incidents de
+ce genre, le logiciel préfère s'arrêter proprement : la machine a un vrai problème, et la partie est enregistrée.
+
 Si le logiciel s'arrête brutalement (coupure de courant, plantage), il suffit de le relancer : au démarrage, il détecte
 la partie interrompue et propose de la reprendre. La fenêtre indique le nom de l'événement, le nombre de numéros déjà
 tirés et le moment du dernier enregistrement, pour permettre de vérifier qu'il s'agit bien de la bonne partie.
