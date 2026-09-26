@@ -7,7 +7,7 @@ contenu est dans le changelog.
 
 ## 0.6.0
 
-* Style des fenêtres revu : palette, typographie, densité et hiérarchie cohérentes.
+* Habillages : retours d'usage sur « Ardoise » et « Salle », ajustements.
 * Choix de la police de caractère.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
   détachable, aperçu en mono-écran.

@@ -487,7 +487,9 @@ void MainWindow::setTheme(const Theme& iTheme) {
 
 	// Text 1 2
 	colors[ImGuiCol_Text] = utils::vec4ToImVec4(iTheme.text);
-	// colors[ImGuiCol_TextDisabled] = vec(iTheme.textDisabled);
+	// Ce qui est désactivé doit se voir comme désactivé à un mètre : le bouton de tirage
+	// bloqué par le délai en dépend.
+	colors[ImGuiCol_TextDisabled] = utils::vec4ToImVec4(iTheme.textDisabled);
 	// Window Background 2 3 4 5
 	colors[ImGuiCol_WindowBg] = utils::vec4ToImVec4(iTheme.windowBackground);
 	colors[ImGuiCol_ChildBg] = utils::vec4ToImVec4(iTheme.childBackground);

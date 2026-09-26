@@ -90,6 +90,34 @@ void MainConfigPopups::onPopupUpdate() {
 		ImGui::Text("Thème");
 		ImGui::Separator();
 
+		// Habillage : un point de départ cohérent, que la personnalisation ci-dessous
+		// reprend ensuite couleur par couleur.
+		ImGui::Text("Habillage");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(200);
+		{
+			const auto current = Application::get().getTheme().preset;
+			int selected = static_cast<int>(current);
+			std::string names;
+			for (const auto& candidate: magic_enum::enum_values<Theme::Preset>()) {
+				names += Theme::presetName(candidate);
+				names += '\0';
+			}
+			names += '\0';
+			if (ImGui::Combo("##ThemePreset", &selected, names.c_str())) {
+				Application::get().setTheme(Theme::fromPreset(static_cast<Theme::Preset>(selected)));
+				log_info("Habillage appliqué : {}", Theme::presetName(static_cast<Theme::Preset>(selected)));
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Réappliquer")) {
+			const auto current = Application::get().getTheme().preset;
+			Application::get().setTheme(Theme::fromPreset(current));
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Revenir aux couleurs de l'habillage, en oubliant les retouches.");
+		ImGui::Spacing();
+
 		// Personnalisation
 		if (ImGui::BeginChild("Customization", ImVec2(0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight),
 							  ImGuiWindowFlags_NoTitleBar)) {

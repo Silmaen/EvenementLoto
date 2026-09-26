@@ -21,6 +21,17 @@ logiciel ou
 de fermeture accidentelle. Il est donc recommandé de choisir un répertoire où vous avez l'habitude de sauvegarder vos
 données, et de ne pas le changer trop souvent.
 
+La section "Thème" commence par le choix d'un **habillage**, qui fixe d'un coup toutes les couleurs et l'espacement
+des fenêtres de travail :
+
+* **Nuit** : l'habillage d'origine, bleu-gris sombre et arrondi.
+* **Ardoise** : gris neutres et un seul accent ambre, le même que celui du dernier numéro tiré sur le panneau
+  d'affichage ; angles plus francs et plus d'air entre les lignes.
+* **Salle** : clair et très contrasté, avec des cibles plus larges, pour une salle mal éclairée ou un écran vu de biais.
+
+Un habillage n'est qu'un point de départ : les couleurs restent modifiables une par une juste en dessous, et ce sont
+elles qui sont enregistrées. "Réappliquer" revient aux couleurs de l'habillage en oubliant les retouches.
+
 Les paramètre de thème permettent de régler les couleurs et les polices utilisées par le logiciel.
 Il est possible de choisir parmi plusieurs thèmes prédéfinis, ou de créer son propre thème en modifiant
 les couleurs et les polices. Le thème choisi sera utilisé pour tous les événements créés,

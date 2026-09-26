@@ -14,6 +14,9 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   la partie en cours.
 * Rapport de fin d'événement : parties, gagnants, lots, donateurs et statistiques,
   affiché, copiable et enregistrable en Markdown.
+* Trois habillages au choix : « Nuit » (l'ancien), « Ardoise » et « Salle », les couleurs
+  restant retouchables une par une.
+* Le texte désactivé se distingue enfin du texte actif.
 * Format de sauvegarde 8 ; les fichiers des versions 3 à 7 se relisent, leur valeur
   de lot étant portée par le premier article.
 
