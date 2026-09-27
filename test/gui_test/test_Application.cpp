@@ -9,11 +9,16 @@
 #include "gui/Application.h"
 #include "gui/views/DisplayView.h"
 
+#include "gui/utils/Rendering.h"
+
+#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using namespace evl::gui;
 
@@ -238,26 +243,25 @@ TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
 	event.nextState();
 	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
 
-	// A few frames, so textures and glyphs are really on the device before it goes.
-	app->setMaxFrame(2);
+	// The production path: the request comes in as it would from a Vulkan error, and the
+	// loop honours it between two frames, then keeps rendering. Calling recoverRenderer()
+	// after run() would prove less — run() leaves the application closed, and the frames
+	// that were supposed to follow the rebuild would never be drawn.
+	app->requestRendererRecovery();
+	app->setMaxFrame(4);
 	app->run();
-	ASSERT_EQ(app->getState(), Application::State::Closed);
 
-	// The rebuild, on a device in good health: that is the teardown and setup sequence
-	// being checked, without waiting for a card to fail.
-	app->setRunning();
-	EXPECT_TRUE(app->recoverRenderer());
-
-	// And it keeps rendering, with the event untouched.
-	app->setMaxFrame(3);
-	app->run();
 	EXPECT_EQ(app->getState(), Application::State::Closed);
+	// It really happened, and only once.
+	EXPECT_EQ(app->getRecoveryCount(), 1U);
+	// The event never left memory.
 	EXPECT_EQ(app->getCurrentEvent().getStatus(), evl::core::Event::Status::GameRunning);
 	EXPECT_EQ(app->getCurrentEvent().getName(), "reprise");
 	// The icons were uploaded again, so the toolbar is not a row of blanks.
 	EXPECT_NE(app->getTextureLibrary().getTextureId("dice"), 0U);
+	// And the glyphs came back with them.
+	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
-
 TEST(gui_Application, DrawsTheSettingsWindow) {
 	if (g_needsDisplay)
 		GTEST_SKIP() << "pas de session graphique sur cet agent";
@@ -281,4 +285,34 @@ TEST(gui_Application, StartsOnTheDefaultPreset) {
 	// Settings that know nothing of presets get the default one, which is what makes the
 	// restyle visible without anybody going looking for it.
 	EXPECT_EQ(app->getTheme().preset, Theme::g_defaultPreset);
+}
+
+TEST(gui_Application, TheToolbarIsTheSameSizeInEveryPreset) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	// The toolbar used to take its height from the theme's line height, which made its
+	// buttons visibly smaller under one habillage than under the others.
+	//
+	// One application per habillage: `run()` closes the one it was handed, and a second
+	// call on it would render nothing at all — which is how this test first managed to
+	// pass without measuring anything.
+	std::vector<float> heights;
+	for (const auto& preset: {Theme::Preset::Nuit, Theme::Preset::Ardoise, Theme::Preset::Salle}) {
+		const auto app = createApplication(0, nullptr);
+		ASSERT_NE(app, nullptr);
+		app->setTheme(Theme::fromPreset(preset));
+		app->setMaxFrame(2);
+		app->run();
+		const ImGuiWindow* bar = ImGui::FindWindowByName("Tool Bar");
+		ASSERT_NE(bar, nullptr) << Theme::presetName(preset);
+		// The habillage really did change the line height, which is what used to drive
+		// the toolbar.
+		EXPECT_FLOAT_EQ(ImGui::GetStyle().FramePadding.y, Theme::fromPreset(preset).framePadding.y());
+		heights.push_back(bar->Size.y);
+	}
+	ASSERT_EQ(heights.size(), 3);
+	EXPECT_FLOAT_EQ(heights[0], heights[1]);
+	EXPECT_FLOAT_EQ(heights[1], heights[2]);
+	// And tall enough to hold a whole icon, whatever the habillage.
+	EXPECT_GE(heights.front(), utils::actionButtonHeight());
 }

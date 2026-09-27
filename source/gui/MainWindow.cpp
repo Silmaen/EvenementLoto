@@ -237,10 +237,16 @@ auto MainWindow::recoverRenderer() -> bool {
 	if (const auto vkData = vulkan::VulkanContext::get().getVkData(); vkData.device != VK_NULL_HANDLE)
 		static_cast<void>(vkDeviceWaitIdle(vkData.device));
 
-	// Démonté dans l'ordre inverse du montage, sauf le contexte ImGui et le backend
-	// GLFW : ni l'un ni l'autre ne touche au périphérique graphique, et les conserver
-	// garde à l'écran les fenêtres, les onglets et les positions.
+	// Démonté dans l'ordre inverse du montage — le rendu, puis la plateforme — mais le
+	// contexte ImGui est conservé : c'est lui qui porte les fenêtres, les onglets et
+	// leurs positions, et il ne touche pas au périphérique graphique.
+	//
+	// Le backend GLFW est refait avec l'autre, et non conservé : arrêter le seul backend
+	// Vulkan détruit les fenêtres de plateforme des vues détachées, et l'image suivante
+	// interrogeait alors GLFW sur une fenêtre disparue. La fenêtre système elle-même,
+	// elle, ne bouge pas.
 	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
 	cleanupVulkanWindow();
 	g_mainWindowData.reset();
 	vulkan::VulkanContext::get().reset();
@@ -251,6 +257,8 @@ auto MainWindow::recoverRenderer() -> bool {
 		return false;
 	}
 	m_stage = Stage::Vulkan;
+	// La plateforme d'abord, le rendu ensuite, comme au montage.
+	ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(m_window), true);
 	initVulkanBackend();
 	m_stage = Stage::Backends;
 	m_swapChainRebuild = false;

@@ -20,6 +20,8 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   au lieu de groupes empilés à hauteur fixe qui coupaient leur contenu.
 * Choix du serveur d'affichage, X11 ou Wayland, dans les paramètres sous Linux.
 * Un panneau d'affichage rogné ne fait plus échouer l'assertion de fin de fenêtre.
+* Barre d'outils de taille identique dans tous les habillages : ses boutons suivaient
+  l'interligne du thème et rapetissaient sous « Nuit ».
 * Le texte désactivé se distingue enfin du texte actif.
 * Choix de la police d'interface et de sa taille, appliqués sans redémarrer ;
   un fichier qui n'est pas une police est refusé au lieu de faire tomber l'application.
@@ -27,7 +29,9 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Identité de bureau : app-id sous Wayland, classe WM sous X11, et un fichier .desktop
   livré avec son icône.
 * Périphérique graphique perdu : le rendu, les textures et les glyphes se refont entre
-  deux images, sans quitter ni perdre la partie, trois tentatives au plus.
+  deux images, sans quitter ni perdre la partie, trois tentatives au plus. Les deux
+  backends sont remontés ensemble, sans quoi l'image suivante interrogeait une fenêtre
+  disparue.
 * Catalogue des lots de l'événement, saisi d'un bloc et indépendant des parties, par le
   menu « Jeu » > « Catalogue des lots ».
 * Répartition automatique des lots : valeur croissante de la quine au carton plein, et

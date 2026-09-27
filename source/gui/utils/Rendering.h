@@ -15,6 +15,25 @@
 
 namespace evl::gui::utils {
 
+/// Taille des icônes des boutons d'action, en pixels.
+constexpr float g_actionIconSize = 24.0f;
+
+/**
+ * @brief Marge autour de l'icône d'un bouton d'action.
+ *
+ * Volontairement indépendante de l'habillage : prise dans le `FramePadding` du thème,
+ * elle faisait des boutons de barre d'outils sensiblement plus petits sous « Nuit » que
+ * sous les deux autres. La barre d'outils est un repère, elle doit avoir la même taille
+ * partout ; c'est le reste de l'interface qui porte le caractère de l'habillage.
+ */
+constexpr float g_actionIconPadding = 6.0f;
+
+/**
+ * @brief Hauteur d'un bouton d'action, la même dans tous les habillages.
+ * @return La hauteur, en pixels.
+ */
+[[nodiscard]] constexpr auto actionButtonHeight() -> float { return g_actionIconSize + 2.0f * g_actionIconPadding; }
+
 /**
  * @brief Options for action buttons.
  */

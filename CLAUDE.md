@@ -102,6 +102,17 @@ X11/Wayland choice on Linux), Apparence (window preset and interface font), Affi
 joueurs (everything about the players' screen). Tabs rather than stacked fixed-height
 children: a page that outgrows its box used to have its content cut off.
 
+Action-button geometry (`utils::g_actionIconSize`, `g_actionIconPadding`,
+`actionButtonHeight()`) is deliberately **not** taken from the theme: the toolbar took
+its height from the theme's line height, which made its buttons 42 px under `Nuit`
+against 50 px under `Salle`. `ToolBar` and `MainView` both size themselves from
+`actionButtonHeight()`, and they must agree or the main view overlaps the bar.
+
+Note for tests: `Application::run()` leaves the application **closed** once `setMaxFrame`
+is reached, and `setRunning()` only comes back from `Waiting`. A second `run()` on the
+same instance therefore renders nothing — two tests silently measured nothing this way.
+Use one application per case, or drive the feature from inside a single `run()`.
+
 Two ImGui balance rules this code has been bitten by: `EndChild()` must be called
 whatever `BeginChild()` returned — inside the `if` it is skipped as soon as the child is
 clipped, and the enclosing `End()` then asserts — and a cursor move must always be
@@ -143,10 +154,12 @@ followed by an item.
 - `VK_ERROR_DEVICE_LOST` asks for a renderer rebuild instead of giving up:
   `Application::requestRendererRecovery()` notes it and saves, and the loop calls
   `recoverRenderer()` **between two frames**, never inside one.
-  `MainWindow::recoverRenderer()` tears down the Vulkan backend, the swapchain and the
+  `MainWindow::recoverRenderer()` tears down **both** backends, the swapchain and the
   device, builds them again, reloads every texture from its path
-  (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context and the
-  GLFW backend are kept, so windows and tabs stay put. Three attempts at most, then the
+  (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context is kept,
+  so windows and tabs stay put, and the system window is never recreated. Shutting down
+  the Vulkan backend alone destroys the detached views' platform windows and the next
+  frame then asks GLFW about a window that is gone. Three attempts at most, then the
   game is saved and the application stops. `Application::recoverRenderer()` is public so
   the sequence is exercised by the test suite on a healthy device
 - Any other fatal Vulkan error saves the game before leaving the loop
