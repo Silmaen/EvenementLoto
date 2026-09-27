@@ -404,6 +404,9 @@ All domain objects inherit from `Serializable` and implement:
   JIT, which run because the GUI tests create a real window), scoped by module so a
   finding in our own code is still reported. `lsan_suppressions.txt` is now empty, the
   libdbus leaks having left with the native dialogs
+- `test_Application.cpp` draws **every** registered popup (`AllPopups/PopupDrawing`), one
+  application per popup. Both layout bugs this code was bitten by only show themselves
+  when the thing is actually drawn, so a popup no test opens is a popup nobody checks
 - The GUI suite needs a display: `ctest` runs it under `xvfb-run -a`, with lavapipe as
   the Vulkan driver. `test_Application.cpp` exercises the render loop and the exception
   net, registering a throwing view through `Application::addView()`

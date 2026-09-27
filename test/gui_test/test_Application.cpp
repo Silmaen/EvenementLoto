@@ -14,6 +14,8 @@
 #include "core/Distribution.h"
 #include "gui/views/CataloguePopup.h"
 
+#include <string>
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -379,3 +381,71 @@ TEST(gui_Application, DrawsTheDistributionPage) {
 	// It really is that page which was drawn, not the other one.
 	EXPECT_EQ(selectedTabNear("Répartition"), "Répartition");
 }
+
+namespace {
+
+/// Prepare a running game with prizes, which is the richest state a popup can face.
+void playableEvent(Application& ioApp) {
+	auto& event = ioApp.getCurrentEvent();
+	event.setName("essai");
+	event.setOrganizerName("organisateur");
+	event.setLocation("salle des fêtes");
+	evl::core::GameRound round{};
+	round.setId(1);
+	round.getSubRound(0)->setPrizes({evl::core::Prize{"un jambon", 45.0}});
+	event.pushGameRound(round);
+	event.pushGameRound(evl::core::GameRound{evl::core::GameRound::Type::Pause});
+	evl::core::GameRound second{evl::core::GameRound::Type::OneQuineFullCard};
+	second.setId(2);
+	event.pushGameRound(second);
+	event.setCatalogue({evl::core::Prize{"un jambon", 45.0}, evl::core::Prize{"une tondeuse", 200.0}});
+	event.nextState();
+	event.nextState();
+	// Far enough in that a winner is being asked for, which is what the winner popup
+	// needs to have something to show.
+	while (event.getStatus() == evl::core::Event::Status::GameRunning &&
+		   event.getCurrentCGameRound()->getCurrentSubRound()->getStatus() !=
+				   evl::core::SubGameRound::Status::Running) {
+		event.nextState();
+	}
+	event.getCurrentGameRound()->addPickedNumber(12);
+}
+
+}// namespace
+
+/// Every popup, opened and drawn.
+///
+/// Both bugs this code was bitten by — a child left open when it got clipped, a cursor
+/// move with no item after it — only show themselves when the thing is actually drawn.
+/// A popup nobody opens in a test is a popup nobody checks.
+class PopupDrawing : public testing::TestWithParam<const char*> {
+protected:
+	/// Hors ligne : sans cela la vtable serait émise dans chaque unité de traduction.
+	~PopupDrawing() override;
+};
+
+PopupDrawing::~PopupDrawing() = default;
+
+TEST_P(PopupDrawing, SurvivesBeingDrawn) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	// One application per popup: `run()` leaves the one it was handed closed, and modals
+	// would stack rather than show side by side.
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	playableEvent(*app);
+
+	const auto popup = app->getPopup(GetParam());
+	ASSERT_NE(popup, nullptr) << GetParam();
+	popup->open();
+	app->setMaxFrame(4);
+	app->run();
+	// Closed and not Error: no frame threw, and no ImGui assertion fired.
+	EXPECT_EQ(app->getState(), Application::State::Closed) << GetParam();
+}
+
+INSTANTIATE_TEST_SUITE_P(AllPopups, PopupDrawing,
+						 testing::Values("popup_about", "popup_main_config", "popup_event_config",
+										 "popup_game_round_config", "popup_rescue", "popup_message", "popup_winner",
+										 "popup_winners", "popup_quick_game", "popup_report", "popup_catalogue"),
+						 [](const testing::TestParamInfo<const char*>& iInfo) -> std::string { return iInfo.param; });
