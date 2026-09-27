@@ -10,6 +10,11 @@
 #include "core/Distribution.h"
 #include "core/Event.h"
 
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+
 using namespace evl::core;
 
 namespace {
@@ -204,4 +209,114 @@ TEST(Distribution, theCatalogueSurvivesTheFile) {
 	ASSERT_TRUE(in.good());
 	ASSERT_EQ(restored.getCatalogue().size(), 6);
 	EXPECT_NEAR(totalValue(restored.getCatalogue()), totalValue(event.getCatalogue()), 0.001);
+}
+
+TEST(Distribution, anOldFileHandsItsManualPrizesToTheCatalogue) {
+	// An event as it was before the catalogue existed: every prize sits in its
+	// sub-round, placed by hand. Written in the current format it keeps its catalogue,
+	// so the old layout is rebuilt here by gathering rather than by reading a fixture.
+	auto event = programme();
+	event.getGameRound(0)->getSubRound(0)->setPrizes({Prize{"un lot de quine", 10.0}});
+	event.getGameRound(0)->getSubRound(2)->setPrizes({Prize{"un carton plein", 50.0}, Prize{"et un bouquet", 15.0}});
+	event.getGameRound(2)->getSubRound(1)->setPrizes({Prize{"une double quine", 25.0}});
+	ASSERT_TRUE(event.getCatalogue().empty());
+
+	EXPECT_EQ(event.gatherCatalogueFromRounds(), 4);
+	EXPECT_NEAR(totalValue(event.getCatalogue()), 100.0, 0.001);
+	// Programme order, the pause skipped.
+	EXPECT_STREQ(event.getCatalogue().front().getDesignation().c_str(), "un lot de quine");
+	EXPECT_STREQ(event.getCatalogue().back().getDesignation().c_str(), "une double quine");
+
+	// And that is enough for the automatic distribution to have something to chew on.
+	const auto result = distributePrizes(event);
+	EXPECT_EQ(result.placed, 4);
+	EXPECT_EQ(result.leftOver, 0);
+}
+
+TEST(Distribution, gatheringIgnoresPausesAndEmptyArticles) {
+	auto event = programme();
+	event.getGameRound(0)->getSubRound(0)->setPrizes({Prize{"un lot", 10.0}, Prize{}});
+	EXPECT_EQ(event.gatherCatalogueFromRounds(), 1);
+	// Run twice: gathering replaces, it does not pile up.
+	EXPECT_EQ(event.gatherCatalogueFromRounds(), 1);
+}
+
+TEST(Distribution, readingAPreCatalogueFileFillsTheCatalogue) {
+	// Version 8 wrote prizes in the sub-rounds and knew nothing of a catalogue. Its body
+	// is built here by writing a current file and relabelling it, the catalogue field
+	// being the only difference and sitting at the very end of the body.
+	auto event = programme();
+	event.getGameRound(0)->getSubRound(0)->setPrizes({Prize{"un jambon", 45.0}});
+	event.getGameRound(2)->getSubRound(2)->setPrizes({Prize{"une tondeuse", 200.0}});
+
+	std::ostringstream out(std::ios::out | std::ios::binary);
+	event.write(out);
+	auto buffer = out.str();
+	// Drop the trailing catalogue (its eight-byte count, empty here) and the checksum,
+	// declare version 8, and re-sign.
+	constexpr std::size_t bodyOffset = 4 + sizeof(uint16_t);
+	ASSERT_GT(buffer.size(), bodyOffset + sizeof(uint64_t) + sizeof(uint32_t));
+	auto body = buffer.substr(bodyOffset, buffer.size() - bodyOffset - sizeof(uint32_t) - sizeof(uint64_t));
+	constexpr uint16_t legacyVersion = 8;
+	std::string legacy(sizeof(legacyVersion), '\0');
+	std::memcpy(legacy.data(), &legacyVersion, sizeof(legacyVersion));
+	legacy += body;
+
+	std::istringstream stream(legacy, std::ios::in | std::ios::binary);
+	Event restored;
+	restored.read(stream, {});
+	ASSERT_TRUE(stream.good());
+	// Nothing was written as a catalogue, yet the event arrives with one.
+	ASSERT_EQ(restored.getCatalogue().size(), 2);
+	EXPECT_NEAR(totalValue(restored.getCatalogue()), 245.0, 0.001);
+}
+
+TEST(Distribution, theShippedEventsArriveWithACatalogue) {
+	// The real files in `data/`, versions 3, 4 and 6, with prizes placed by hand years
+	// ago. This is the case the organizer will actually try the distribution on.
+	const std::filesystem::path dataDir{EVL_TEST_DATA_DIR};
+	ASSERT_TRUE(is_directory(dataDir)) << dataDir.string();
+	std::size_t withPrizes = 0;
+	for (const auto& name: {"loto_sou.lev", "loto_sou_2.lev", "super_loto.lev", "test_sou.lev"}) {
+		const auto path = dataDir / name;
+		if (!is_regular_file(path))
+			continue;
+		std::ifstream file(path, std::ios::in | std::ios::binary);
+		ASSERT_TRUE(file.is_open()) << path.string();
+		Event event;
+		event.read(file, {});
+		ASSERT_TRUE(file.good()) << name;
+		// Whatever was in the rounds is now in the catalogue, ready to be redistributed.
+		std::size_t inRounds = 0;
+		for (auto round = event.beginRounds(); round != event.endRounds(); ++round) {
+			if (round->getType() == GameRound::Type::Pause)
+				continue;
+			for (auto sub = round->beginSubRound(); sub != round->endSubRound(); ++sub) {
+				for (const auto& prize: sub->getPrizes()) {
+					if (!prize.isEmpty())
+						++inRounds;
+				}
+			}
+		}
+		EXPECT_EQ(event.getCatalogue().size(), inRounds) << name;
+		if (inRounds > 0)
+			++withPrizes;
+	}
+	// At least one of the delivered events really carries prizes, otherwise this test
+	// would be passing on nothing.
+	EXPECT_GT(withPrizes, 0);
+}
+
+TEST(Distribution, aCatalogueWithoutValuesSaysSo) {
+	// A version 3 file never stored the prize values: only the designations come back.
+	// Ranking them means nothing, and the summary must not pretend otherwise.
+	auto event = programme();
+	event.setCatalogue({Prize{"un lot"}, Prize{"un autre lot"}});
+	const auto result = distributePrizes(event);
+	EXPECT_EQ(result.placed, 2);
+	EXPECT_NE(result.summary.find("ordre obtenu est arbitraire"), std::string::npos);
+
+	// One value is enough for the ranking to mean something again.
+	event.setCatalogue({Prize{"un lot", 10.0}, Prize{"un autre lot"}});
+	EXPECT_EQ(distributePrizes(event).summary.find("arbitraire"), std::string::npos);
 }

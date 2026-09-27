@@ -300,6 +300,23 @@ public:
 	[[nodiscard]] auto getCatalogue() const -> const prizes_type& { return m_catalogue; }
 
 	/**
+	 * @brief Reconstitue le catalogue à partir des lots déjà placés dans les parties.
+	 *
+	 * Un événement d'avant le catalogue porte tous ses lots dans ses manches, répartis à
+	 * la main. Les y reprendre est ce qui permet de rejouer la répartition automatique
+	 * sur un ancien fichier : sans cela le catalogue resterait vide et il n'y aurait
+	 * rien à répartir. C'est fait tout seul à la lecture d'un fichier antérieur à la
+	 * version 9, et refaisable à la demande.
+	 *
+	 * Les articles sont pris dans l'ordre du programme, les pauses ignorées, et les
+	 * articles vides laissés de côté. Deux articles de même désignation sont deux
+	 * articles : rien n'est fusionné, deux bouteilles restent deux bouteilles.
+	 *
+	 * @return Le nombre d'articles repris.
+	 */
+	auto gatherCatalogueFromRounds() -> std::size_t;
+
+	/**
 	 * @brief Remplace le catalogue des lots.
 	 * @param iCatalogue Le nouveau catalogue.
 	 */

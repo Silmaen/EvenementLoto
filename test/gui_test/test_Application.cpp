@@ -257,3 +257,28 @@ TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
 	// The icons were uploaded again, so the toolbar is not a row of blanks.
 	EXPECT_NE(app->getTextureLibrary().getTextureId("dice"), 0U);
 }
+
+TEST(gui_Application, DrawsTheSettingsWindow) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// The settings window is where the layout bites: a page that outgrows its box, a
+	// child left open. Drawing it for a few frames is what catches that.
+	const auto popup = app->getPopup("popup_main_config");
+	ASSERT_NE(popup, nullptr);
+	popup->open();
+	app->setMaxFrame(4);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+}
+
+TEST(gui_Application, StartsOnTheDefaultPreset) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// Settings that know nothing of presets get the default one, which is what makes the
+	// restyle visible without anybody going looking for it.
+	EXPECT_EQ(app->getTheme().preset, Theme::g_defaultPreset);
+}

@@ -78,7 +78,11 @@ Author: Silmaen
 `Event::getCatalogue()` holds every article the organizer has, entered in one go and
 independent of the rounds. It stays the master list: a distributed article is **copied**
 into the sub-round, so a `.lev` file is complete on its own and the distribution can be
-run again.
+run again. `gatherCatalogueFromRounds()` rebuilds it from the prizes already sitting in
+the sub-rounds, and is called automatically when reading a file older than version 9 —
+without it an old event would arrive with an empty catalogue and nothing to distribute.
+Beware version 3 files: the format did not store prize values, so their articles come
+back without a price and the distribution says the resulting order is arbitrary.
 
 Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
 multi-line string with one value; **9** added the event catalogue. Files from versions 3
@@ -93,6 +97,16 @@ compatibility fixtures — every format change adds one and keeps the previous o
 
 ### GUI (namespace `evl::gui`)
 
+`MainConfigPopups` is laid out as three tabs — Général (directories, draw delay, and the
+X11/Wayland choice on Linux), Apparence (window preset and interface font), Affichage
+joueurs (everything about the players' screen). Tabs rather than stacked fixed-height
+children: a page that outgrows its box used to have its content cut off.
+
+Two ImGui balance rules this code has been bitten by: `EndChild()` must be called
+whatever `BeginChild()` returned — inside the `if` it is skipped as soon as the child is
+clipped, and the enclosing `End()` then asserts — and a cursor move must always be
+followed by an item.
+
 - `Application` - Singleton application class, manages views/popups/actions, Vulkan
   rendering, autosave (`rescue.lev` every 10s during active gameplay, atomic, two
   generations), the recovery prompt at startup, the draw re-arm delay
@@ -104,9 +118,12 @@ compatibility fixtures — every format change adds one and keeps the previous o
   at the start of the next frame, never inside an open one, and a file that is not an
   `sfnt` is refused rather than handed to ImGui, which would assert
 - `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in
-  settings). Three presets — `Nuit` (the original), `Ardoise`, `Salle` — derived from a
-  five-colour palette by `applyPalette`, so the fifty ImGui colours stay coherent. A
-  preset is a starting point: the stored colours win, and `Réappliquer` goes back to them
+  settings). Three presets — `Nuit` (the original), `Ardoise` (the default,
+  `g_defaultPreset`), `Salle` — derived from a five-colour palette by `applyPalette`, so
+  the fifty ImGui colours stay coherent. A preset is a starting point: the stored colours
+  win, and `Réappliquer` goes back to them. Settings carrying no `Preset` key predate the
+  presets, so their colours are the old defaults nothing could edit: the default preset
+  takes their place once, which is what makes the restyle actually land
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
 - `views/` - View, MainView (with a `Présentateur` tab drawing the display miniature),
   DisplayView (`renderInline()` draws its content scaled down in the current window),

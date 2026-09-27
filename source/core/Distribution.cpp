@@ -175,6 +175,13 @@ auto distributePrizes(Event& ioEvent, const DistributionSettings& iSettings) -> 
 	if (result.leftOver > 0)
 		result.summary += std::format(", {} laissé(s) au catalogue faute de manche compatible", result.leftOver);
 	result.summary += ".";
+	// Un catalogue sans une valeur ni un attrait ne dit rien de l'ordre à suivre — c'est
+	// le cas d'un vieux fichier dont le format ne portait pas les prix. Le dire vaut
+	// mieux que de laisser croire au classement obtenu.
+	if (std::ranges::none_of(candidates, [](const Candidate& iCandidate) -> bool { return iCandidate.score > 0.0f; })) {
+		result.summary += " Aucun article ne porte de valeur ni d'attrait : l'ordre obtenu est arbitraire, "
+						  "renseignez-les pour que la répartition ait un sens.";
+	}
 	return result;
 }
 

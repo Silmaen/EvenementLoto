@@ -64,6 +64,7 @@ private:
 	 */
 	struct Data {
 		std::filesystem::path dataLocation{core::getExecPath() / "data"};
+		std::string displayServer{"x11"};
 		std::filesystem::path fontPath{};
 		float fontSize{20.0f};
 		float drawDelay{0.0f};
@@ -83,6 +84,12 @@ private:
 		int fadeAmount{3};
 		float fadeStrength{0};
 	} m_data;
+	/// Page « Général » : répertoires, tirage, et sous Linux le serveur d'affichage.
+	void renderGeneralTab();
+	/// Page « Apparence » : habillage des fenêtres et police d'interface.
+	void renderAppearanceTab();
+	/// Page « Affichage joueurs » : tout ce qui ne concerne que l'écran des joueurs.
+	void renderPlayerDisplayTab();
 	/**
 	 * @brief Convert data to settings.
 	 */

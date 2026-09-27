@@ -127,7 +127,13 @@ auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
 		return false;
 	// version 9
 	m_catalogue.clear();
-	return iContext.version <= 8 || readCatalogue(iBs, iContext);
+	if (iContext.version > 8)
+		return readCatalogue(iBs, iContext);
+	// Un fichier d'avant le catalogue : ses lots sont dans ses manches, réparties à la
+	// main. Les y reprendre est ce qui rend la répartition automatique utilisable sur un
+	// ancien événement.
+	gatherCatalogueFromRounds();
+	return true;
 }
 
 auto Event::readCatalogue(std::istream& iBs, const ReadContext& iContext) -> bool {
@@ -346,6 +352,24 @@ void Event::pushGameRound(const GameRound& iRound) {
 	}
 	m_gameRounds.push_back(iRound);
 	checkValidConfig();
+}
+
+auto Event::gatherCatalogueFromRounds() -> std::size_t {
+	prizes_type gathered;
+	for (const auto& round: m_gameRounds) {
+		if (round.getType() == GameRound::Type::Pause)
+			continue;
+		for (auto sub = round.beginSubRound(); sub != round.endSubRound(); ++sub) {
+			for (const auto& prize: sub->getPrizes()) {
+				if (prize.isEmpty())
+					continue;
+				gathered.push_back(prize);
+			}
+		}
+	}
+	m_catalogue = gathered;
+	log_info("Catalogue reconstitué à partir des parties : {} article(s).", m_catalogue.size());
+	return m_catalogue.size();
 }
 
 auto Event::nextFreeRoundId() const -> int {

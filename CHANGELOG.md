@@ -14,8 +14,12 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   la partie en cours.
 * Rapport de fin d'événement : parties, gagnants, lots, donateurs et statistiques,
   affiché, copiable et enregistrable en Markdown.
-* Trois habillages au choix : « Nuit » (l'ancien), « Ardoise » et « Salle », les couleurs
-  restant retouchables une par une.
+* Trois habillages au choix, « Ardoise » par défaut : « Nuit » reste l'ancien, « Salle »
+  est clair et contrasté, et les couleurs restent retouchables une par une.
+* Fenêtre de paramètres réorganisée en onglets — Général, Apparence, Affichage joueurs —
+  au lieu de groupes empilés à hauteur fixe qui coupaient leur contenu.
+* Choix du serveur d'affichage, X11 ou Wayland, dans les paramètres sous Linux.
+* Un panneau d'affichage rogné ne fait plus échouer l'assertion de fin de fenêtre.
 * Le texte désactivé se distingue enfin du texte actif.
 * Choix de la police d'interface et de sa taille, appliqués sans redémarrer ;
   un fichier qui n'est pas une police est refusé au lieu de faire tomber l'application.
@@ -31,6 +35,9 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * L'attrait d'un lot pèse dans la répartition à côté de son prix, dans la proportion voulue.
 * Une partie enfant ne reçoit que les articles marqués compatibles.
 * Répartition rejouable : les manches déjà entamées ne sont jamais touchées.
+* Un événement enregistré avant le catalogue arrive avec le sien, reconstitué depuis les
+  lots déjà répartis à la main ; « Reprendre les lots des parties » le refait à la demande.
+* La répartition prévient quand aucun article ne porte de valeur ni d'attrait.
 * Format de sauvegarde 9 ; les fichiers des versions 3 à 8 se relisent, la valeur d'un
   ancien lot étant portée par son premier article et le catalogue partant vide.
 

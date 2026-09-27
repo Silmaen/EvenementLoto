@@ -549,9 +549,11 @@ void DisplayView::renderRoundRunning() const {
 			ImGui::Text("%s", core::formatClockNoSecond(now).c_str());
 			setFontScale(1.0f);
 			ImGui::EndGroup();
-
-			ImGui::EndChild();
 		}
+		// Appelé quoi qu'ait renvoyé BeginChild : à l'intérieur du bloc, il était sauté
+		// dès que l'enfant était rogné, et le End() de la fenêtre échouait alors sur une
+		// assertion — un plantage en pleine partie pour un panneau un peu trop étroit.
+		ImGui::EndChild();
 	}
 	ImGui::EndChild();
 

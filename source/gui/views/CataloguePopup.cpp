@@ -50,6 +50,17 @@ void PopupCatalogue::onPopupUpdate() {
 		event.setCatalogue(m_catalogue);
 		Application::get().saveProgress();
 	}
+	ImGui::SameLine();
+	if (ImGui::Button("Reprendre les lots des parties")) {
+		event.gatherCatalogueFromRounds();
+		m_catalogue = event.getCatalogue();
+		m_lastResult = std::format("{} article(s) repris des parties.", m_catalogue.size());
+		log_info("{}", m_lastResult);
+		Application::get().saveProgress();
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Remplace le catalogue par les lots actuellement placés dans les parties.\n"
+						  "C'est ce qui permet de repartir d'une répartition faite à la main.");
 
 	ImGui::Separator();
 	ImGui::Text("Répartition automatique");
@@ -69,6 +80,9 @@ void PopupCatalogue::onPopupUpdate() {
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Une partie enfant ne reçoit que les articles marqués compatibles.");
 
+	if (!m_lastResult.empty())
+		ImGui::TextWrapped("%s", m_lastResult.c_str());
+
 	if (ImGui::Button("Répartir", {g_buttonWidth, 0})) {
 		event.setCatalogue(m_catalogue);
 		const auto result = core::distributePrizes(event, m_settings);
@@ -82,10 +96,6 @@ void PopupCatalogue::onPopupUpdate() {
 	ImGui::SameLine();
 	if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
 		ImGui::CloseCurrentPopup();
-	if (!m_lastResult.empty()) {
-		ImGui::SameLine();
-		ImGui::TextDisabled("%s", m_lastResult.c_str());
-	}
 }
 
 }// namespace evl::gui::views
