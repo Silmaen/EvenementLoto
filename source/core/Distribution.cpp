@@ -104,6 +104,48 @@ auto rankCatalogue(const prizes_type& iCatalogue, const DistributionSettings& iS
 
 }// namespace
 
+auto DistributionOverview::highestSubRoundValue() const -> double {
+	double highest = 0.0;
+	for (const auto& entry: subRounds) highest = std::max(highest, entry.value);
+	return highest;
+}
+
+auto DistributionOverview::highestRoundValue() const -> double {
+	double highest = 0.0;
+	for (const auto& value: roundValues) highest = std::max(highest, value);
+	return highest;
+}
+
+auto overview(const Event& iEvent) -> DistributionOverview {
+	DistributionOverview result;
+	for (uint32_t roundIndex = 0; roundIndex < static_cast<uint32_t>(iEvent.sizeRounds()); ++roundIndex) {
+		const auto round = std::next(iEvent.beginRounds(), roundIndex);
+		if (round->getType() == GameRound::Type::Pause)
+			continue;
+		double roundTotal = 0.0;
+		for (uint32_t subIndex = 0; subIndex < static_cast<uint32_t>(round->sizeSubRound()); ++subIndex) {
+			const auto sub = std::next(round->beginSubRound(), subIndex);
+			roundTotal += sub->getValue();
+			result.subRounds.push_back({.round = roundIndex,
+										.subRound = subIndex,
+										.roundName = round->getName(),
+										.subRoundName = sub->getTypeStr(),
+										.value = sub->getValue(),
+										.count = sub->getPrizes().size(),
+										.editable = sub->isEditable()});
+		}
+		result.roundValues.push_back(roundTotal);
+		result.roundNames.push_back(round->getName());
+	}
+	for (const auto& prize: iEvent.getCatalogue()) {
+		if (iEvent.findPrizeSlot(prize.getId()).has_value())
+			continue;
+		result.unassignedValue += prize.getValue();
+		++result.unassignedCount;
+	}
+	return result;
+}
+
 auto distributePrizes(Event& ioEvent, const DistributionSettings& iSettings) -> DistributionResult {
 	DistributionResult result;
 	auto slots = collectSlots(ioEvent, iSettings);

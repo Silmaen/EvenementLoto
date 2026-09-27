@@ -11,8 +11,12 @@
 
 #include "gui/utils/Rendering.h"
 
+#include "core/Distribution.h"
+#include "gui/views/CataloguePopup.h"
+
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <filesystem>
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -315,4 +319,63 @@ TEST(gui_Application, TheToolbarIsTheSameSizeInEveryPreset) {
 	EXPECT_FLOAT_EQ(heights[1], heights[2]);
 	// And tall enough to hold a whole icon, whatever the habillage.
 	EXPECT_GE(heights.front(), utils::actionButtonHeight());
+}
+
+namespace {
+
+/// The name of the tab currently drawn by the bar holding @p iName, empty if not found.
+auto selectedTabNear(const char* iName) -> std::string {
+	ImGuiContext& context = *ImGui::GetCurrentContext();
+	for (int n = 0; n < context.TabBars.GetMapSize(); ++n) {
+		ImGuiTabBar* bar = context.TabBars.TryGetMapData(n);
+		if (bar == nullptr)
+			continue;
+		bool holdsIt = false;
+		for (ImGuiTabItem& tab: bar->Tabs) {
+			if (const char* name = ImGui::TabBarGetTabName(bar, &tab);
+				name != nullptr && std::strcmp(name, iName) == 0) {
+				holdsIt = true;
+			}
+		}
+		if (!holdsIt)
+			continue;
+		for (ImGuiTabItem& tab: bar->Tabs) {
+			if (tab.ID == bar->SelectedTabId) {
+				const char* name = ImGui::TabBarGetTabName(bar, &tab);
+				return name == nullptr ? std::string{} : std::string{name};
+			}
+		}
+	}
+	return {};
+}
+
+}// namespace
+
+TEST(gui_Application, DrawsTheDistributionPage) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	auto& event = app->getCurrentEvent();
+	event.setName("répartition");
+	event.setOrganizerName("organisateur");
+	event.pushGameRound(evl::core::GameRound{});
+	event.pushGameRound(evl::core::GameRound{evl::core::GameRound::Type::Pause});
+	event.pushGameRound(evl::core::GameRound{evl::core::GameRound::Type::OneQuineFullCard});
+	event.setCatalogue({evl::core::Prize{"un jambon", 45.0}, evl::core::Prize{"une tondeuse", 200.0},
+						evl::core::Prize{"un panier", 25.0}});
+	ASSERT_GT(evl::core::distributePrizes(event).placed, 0U);
+
+	const auto popup = std::static_pointer_cast<views::PopupCatalogue>(app->getPopup("popup_catalogue"));
+	ASSERT_NE(popup, nullptr);
+	popup->open();
+	// The page the `Répartir` button brings forward: charts, table and assignment combos
+	// all go through ImGui here.
+	popup->showDistribution();
+	app->setMaxFrame(6);
+	app->run();
+
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	// It really is that page which was drawn, not the other one.
+	EXPECT_EQ(selectedTabNear("Répartition"), "Répartition");
 }

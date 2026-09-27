@@ -127,8 +127,13 @@ auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
 		return false;
 	// version 9
 	m_catalogue.clear();
-	if (iContext.version > 8)
-		return readCatalogue(iBs, iContext);
+	if (iContext.version > 8) {
+		if (!readCatalogue(iBs, iContext))
+			return false;
+		// Un catalogue d'avant la version 10 n'a pas d'identifiants.
+		assignPrizeIds();
+		return true;
+	}
 	// Un fichier d'avant le catalogue : ses lots sont dans ses manches, réparties à la
 	// main. Les y reprendre est ce qui rend la répartition automatique utilisable sur un
 	// ancien événement.
@@ -354,6 +359,83 @@ void Event::pushGameRound(const GameRound& iRound) {
 	checkValidConfig();
 }
 
+void Event::setCatalogue(const prizes_type& iCatalogue) {
+	if (isFinished()) {
+		log_warn("Impossible de modifier le catalogue d'un événement terminé");
+		return;
+	}
+	m_catalogue = iCatalogue;
+	assignPrizeIds();
+}
+
+void Event::assignPrizeIds() {
+	uint32_t highest = 0;
+	for (const auto& prize: m_catalogue) highest = std::max(highest, prize.getId());
+	for (auto& prize: m_catalogue) {
+		if (prize.getId() == 0)
+			prize.setId(++highest);
+	}
+}
+
+auto Event::findPrizeSlot(const uint32_t iId) const -> std::optional<PrizeSlot> {
+	if (iId == 0)
+		return std::nullopt;
+	for (uint32_t roundIndex = 0; roundIndex < static_cast<uint32_t>(m_gameRounds.size()); ++roundIndex) {
+		const auto& round = m_gameRounds[roundIndex];
+		for (uint32_t subIndex = 0; subIndex < static_cast<uint32_t>(round.sizeSubRound()); ++subIndex) {
+			const auto sub = round.getSubRound(subIndex);
+			if (std::ranges::any_of(sub->getPrizes(),
+									[iId](const Prize& iPrize) -> bool { return iPrize.getId() == iId; }))
+				return PrizeSlot{.round = roundIndex, .subRound = subIndex};
+		}
+	}
+	return std::nullopt;
+}
+
+auto Event::assignPrize(const uint32_t iId, const std::optional<PrizeSlot>& iTarget) -> bool {
+	const auto catalogued =
+			std::ranges::find_if(m_catalogue, [iId](const Prize& iPrize) -> bool { return iPrize.getId() == iId; });
+	if (iId == 0 || catalogued == m_catalogue.end()) {
+		log_warn("Article {} inconnu du catalogue, affectation refusée", iId);
+		return false;
+	}
+	const auto current = findPrizeSlot(iId);
+	if (current == iTarget)
+		return true;
+
+	// La destination d'abord : si elle refuse, l'article ne doit pas avoir quitté sa
+	// place au passage.
+	if (iTarget.has_value()) {
+		const auto round = getGameRound(iTarget->round);
+		if (round == m_gameRounds.end() || iTarget->subRound >= round->sizeSubRound()) {
+			log_warn("Manche {}/{} inexistante, affectation refusée", iTarget->round, iTarget->subRound);
+			return false;
+		}
+		if (!round->getSubRound(iTarget->subRound)->isEditable()) {
+			log_warn("Manche {}/{} déjà entamée, affectation refusée", iTarget->round, iTarget->subRound);
+			return false;
+		}
+	}
+	if (current.has_value()) {
+		const auto round = getGameRound(current->round);
+		const auto sub = round->getSubRound(current->subRound);
+		if (!sub->isEditable()) {
+			log_warn("Article {} en jeu dans une manche entamée, il y reste", iId);
+			return false;
+		}
+		auto remaining = sub->getPrizes();
+		std::erase_if(remaining, [iId](const Prize& iPrize) -> bool { return iPrize.getId() == iId; });
+		sub->setPrizes(remaining);
+	}
+	if (iTarget.has_value()) {
+		const auto sub = getGameRound(iTarget->round)->getSubRound(iTarget->subRound);
+		auto prizes = sub->getPrizes();
+		prizes.push_back(*catalogued);
+		sub->setPrizes(prizes);
+	}
+	return true;
+}
+
 auto Event::gatherCatalogueFromRounds() -> std::size_t {
 	prizes_type gathered;
 	for (const auto& round: m_gameRounds) {
@@ -368,6 +450,30 @@ auto Event::gatherCatalogueFromRounds() -> std::size_t {
 		}
 	}
 	m_catalogue = gathered;
+	assignPrizeIds();
+	// Les identifiants sont reportés dans les manches, sinon le lien ne vaudrait que
+	// dans un sens et l'affectation resterait invisible.
+	std::size_t next = 0;
+	for (auto& round: m_gameRounds) {
+		if (round.getType() == GameRound::Type::Pause)
+			continue;
+		for (uint32_t subIndex = 0; subIndex < static_cast<uint32_t>(round.sizeSubRound()); ++subIndex) {
+			const auto sub = round.getSubRound(subIndex);
+			auto prizes = sub->getPrizes();
+			bool touched = false;
+			for (auto& prize: prizes) {
+				if (prize.isEmpty())
+					continue;
+				if (next < m_catalogue.size()) {
+					prize.setId(m_catalogue[next].getId());
+					++next;
+					touched = true;
+				}
+			}
+			if (touched && sub->isEditable())
+				sub->setPrizes(prizes);
+		}
+	}
 	log_info("Catalogue reconstitué à partir des parties : {} article(s).", m_catalogue.size());
 	return m_catalogue.size();
 }
@@ -449,6 +555,13 @@ auto Event::getCurrentGameRound() -> rounds_type::iterator {
 }
 
 auto Event::getGameRound(const uint32_t& iIndex) -> rounds_type::iterator {
+	// Borné comme `GameRound::getSubRound` l'est déjà : `std::next` au-delà de la fin
+	// est un comportement indéfini, et les appelants comparent tous le résultat à
+	// `endRounds()`. Un index hors limite venait, lui, de faire tomber le processus.
+	if (iIndex >= m_gameRounds.size()) {
+		log_warn("getGameRound: index {} hors limites (taille {})", iIndex, m_gameRounds.size());
+		return m_gameRounds.end();
+	}
 	return std::next(m_gameRounds.begin(), iIndex);
 }
 

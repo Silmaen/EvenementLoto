@@ -14,7 +14,12 @@
 
 namespace evl::core {
 
-void Prize::read(std::istream& iBs, const ReadContext& /*iContext*/) {
+void Prize::read(std::istream& iBs, const ReadContext& iContext) {
+	// version 10 : l'identifiant. Un article plus ancien en reçoit un à la lecture de
+	// l'événement, qui est seul à savoir lesquels sont déjà pris.
+	m_id = 0;
+	if (iContext.version > 9 && !readRaw(iBs, m_id))
+		return;
 	if (!readString(iBs, m_designation) || !readString(iBs, m_donor) || !readRaw(iBs, m_value))
 		return;
 	uint8_t attractiveness = 0;
@@ -29,6 +34,7 @@ void Prize::read(std::istream& iBs, const ReadContext& /*iContext*/) {
 }
 
 void Prize::write(std::ostream& iBs) const {
+	writeRaw(iBs, m_id);
 	writeString(iBs, m_designation);
 	writeString(iBs, m_donor);
 	writeRaw(iBs, m_value);
@@ -38,6 +44,7 @@ void Prize::write(std::ostream& iBs) const {
 
 auto Prize::toJson() const -> Json::Value {
 	Json::Value value;
+	value["id"] = m_id;
 	value["designation"] = m_designation;
 	value["donor"] = m_donor;
 	value["value"] = m_value;
@@ -47,6 +54,8 @@ auto Prize::toJson() const -> Json::Value {
 }
 
 void Prize::fromJson(const Json::Value& iJson) {
+	if (const auto val = iJson.get("id", 0); val.isNumeric())
+		m_id = static_cast<uint32_t>(std::max(0, val.asInt()));
 	if (const auto val = iJson.get("designation", ""); val.isString())
 		m_designation = val.asString();
 	if (const auto val = iJson.get("donor", ""); val.isString())
@@ -61,6 +70,7 @@ void Prize::fromJson(const Json::Value& iJson) {
 
 auto Prize::toYaml() const -> YAML::Node {
 	YAML::Node node;
+	node["id"] = m_id;
 	node["designation"] = m_designation;
 	node["donor"] = m_donor;
 	node["value"] = m_value;
@@ -70,6 +80,7 @@ auto Prize::toYaml() const -> YAML::Node {
 }
 
 void Prize::fromYaml(const YAML::Node& iNode) {
+	m_id = static_cast<uint32_t>(std::max(0, iNode["id"].as<int>(0)));
 	m_designation = iNode["designation"].as<std::string>("");
 	m_donor = iNode["donor"].as<std::string>("");
 	setValue(iNode["value"].as<double>(0.0));

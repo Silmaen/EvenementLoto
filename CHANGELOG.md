@@ -42,8 +42,17 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Un événement enregistré avant le catalogue arrive avec le sien, reconstitué depuis les
   lots déjà répartis à la main ; « Reprendre les lots des parties » le refait à la demande.
 * La répartition prévient quand aucun article ne porte de valeur ni d'attrait.
-* Format de sauvegarde 9 ; les fichiers des versions 3 à 8 se relisent, la valeur d'un
-  ancien lot étant portée par son premier article et le catalogue partant vide.
+* Onglet « Répartition » : histogramme des valeurs par manche, courbe de progression par
+  partie, et le détail article par article de ce qui est mis en jeu où.
+* Affectation d'un article changée à la main dans ce tableau, les courbes suivant
+  immédiatement ; une manche entamée n'y figure pas et garde ses lots.
+* La page « Répartition » s'affiche d'elle-même après une répartition automatique.
+* Chaque article du catalogue porte un identifiant : savoir où il est mis en jeu est un
+  fait et non une comparaison de désignations.
+* Un index de partie hors limites ne fait plus tomber l'application.
+* Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
+* Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
+  article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.
 
 ## 0.5.1 — 26 septembre 2026
 

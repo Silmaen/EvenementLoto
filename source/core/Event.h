@@ -299,6 +299,35 @@ public:
 	 */
 	[[nodiscard]] auto getCatalogue() const -> const prizes_type& { return m_catalogue; }
 
+	/// L'emplacement d'un article : la partie et la manche qui le mettent en jeu.
+	struct PrizeSlot {
+		uint32_t round = 0;///< Index de la partie.
+		uint32_t subRound = 0;///< Index de la manche dans la partie.
+
+		/// Comparaison, pour savoir si un article a changé de place.
+		[[nodiscard]] auto operator==(const PrizeSlot&) const -> bool = default;
+	};
+
+	/**
+	 * @brief Où un article du catalogue est mis en jeu.
+	 * @param iId L'identifiant de l'article.
+	 * @return La manche qui le met en jeu, rien s'il n'est affecté nulle part.
+	 */
+	[[nodiscard]] auto findPrizeSlot(uint32_t iId) const -> std::optional<PrizeSlot>;
+
+	/**
+	 * @brief Déplace un article du catalogue vers une manche, ou l'en retire.
+	 *
+	 * L'ajustement à la main d'une répartition : l'article quitte la manche où il était
+	 * et rejoint celle demandée. Une manche déjà entamée ne se laisse pas modifier, ni
+	 * comme source ni comme destination — ce qui est en jeu est en jeu.
+	 *
+	 * @param iId L'identifiant de l'article, qui doit être au catalogue.
+	 * @param iTarget La manche voulue, rien pour le laisser au catalogue sans emploi.
+	 * @return True si l'article est à l'endroit demandé.
+	 */
+	auto assignPrize(uint32_t iId, const std::optional<PrizeSlot>& iTarget) -> bool;
+
 	/**
 	 * @brief Reconstitue le catalogue à partir des lots déjà placés dans les parties.
 	 *
@@ -320,13 +349,7 @@ public:
 	 * @brief Remplace le catalogue des lots.
 	 * @param iCatalogue Le nouveau catalogue.
 	 */
-	void setCatalogue(const prizes_type& iCatalogue) {
-		if (isFinished()) {
-			log_warn("Impossible de modifier le catalogue d'un événement terminé");
-			return;
-		}
-		m_catalogue = iCatalogue;
-	}
+	void setCatalogue(const prizes_type& iCatalogue);
 
 	/**
 	 * @brief Le premier numéro de partie encore libre.
@@ -498,6 +521,14 @@ private:
 	 * @return Vrai si le corps a été lu en entier.
 	 */
 	auto readBody(std::istream& iBs, const ReadContext& iContext) -> bool;
+
+	/**
+	 * @brief Donne un identifiant aux articles du catalogue qui n'en ont pas.
+	 *
+	 * Les identifiants sont attribués ici et nulle part ailleurs : l'événement est seul
+	 * à savoir lesquels sont déjà pris.
+	 */
+	void assignPrizeIds();
 
 	/**
 	 * @brief Lit le catalogue des lots, à partir de la version 9.
