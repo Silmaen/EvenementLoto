@@ -74,6 +74,13 @@ void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesys
 		log_error("Failed to load SVG: {} from {}", iName, iTexturePath.string());
 		return;
 	}
+	// nanosvg est indulgent : un fichier qui n'est pas un SVG lui rend une image de
+	// largeur nulle plutôt qu'une erreur. Sans ce contrôle, l'échelle plus bas divisait
+	// par zéro et une texture de n'importe quoi partait sur la carte graphique.
+	if (imagePtr->width <= 0.0f || imagePtr->height <= 0.0f) {
+		log_error("SVG sans dimensions : {} depuis {}", iName, iTexturePath.string());
+		return;
+	}
 	if (!rastPtr) {
 		log_error("Failed to create SVG rasterizer");
 		return;
@@ -82,7 +89,12 @@ void TextureLibrary::loadSvgTexture(const std::string& iName, const std::filesys
 	nsvgRasterize(rastPtr.get(), imagePtr.get(), 0, 0, static_cast<float>(iWidth) / imagePtr->width, imageData.data(),
 				  static_cast<int>(iWidth), static_cast<int>(iHeight), static_cast<int>(iWidth) * 4);
 
-	m_textureMap[iName] = VulkanContext::get().loadImage(imageData.data(), iWidth, iHeight, 4);
+	const auto textureId = VulkanContext::get().loadImage(imageData.data(), iWidth, iHeight, 4);
+	if (textureId == 0) {
+		log_error("Failed to create GPU texture: {} from {}", iName, iTexturePath.string());
+		return;
+	}
+	m_textureMap[iName] = textureId;
 	m_texturePaths[iName] = iTexturePath;
 
 	log_trace("Loaded SVG texture: {} from {}", iName, iTexturePath.string());

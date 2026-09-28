@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <filesystem>
+#include <fstream>
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <stdexcept>
@@ -449,3 +450,33 @@ INSTANTIATE_TEST_SUITE_P(AllPopups, PopupDrawing,
 										 "popup_game_round_config", "popup_rescue", "popup_message", "popup_winner",
 										 "popup_winners", "popup_quick_game", "popup_report", "popup_catalogue"),
 						 [](const testing::TestParamInfo<const char*>& iInfo) -> std::string { return iInfo.param; });
+
+TEST(gui_Application, DrawsAnEventWhoseLogosAreNotImages) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// Un logo mal saisi, c'est-à-dire un chemin quelconque : l'affichage doit tenir
+	// l'après-midi avec un trou à la place de l'image, pas tomber dessus.
+	const auto tmp = std::filesystem::temp_directory_path() / "evl-bad-logo";
+	create_directories(tmp);
+	const auto fake = tmp / "logo.png";
+	{
+		std::ofstream out(fake);
+		out << "ceci n'est pas une image";
+	}
+	auto& event = app->getCurrentEvent();
+	event.setName("logos douteux");
+	event.setOrganizerName("organisateur");
+	event.setLogo(fake);
+	event.setOrganizerLogo(tmp / "absent.svg");
+	event.pushGameRound(evl::core::GameRound{});
+	event.nextState();
+	event.nextState();
+	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
+
+	app->setMaxFrame(4);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	remove_all(tmp);
+}
