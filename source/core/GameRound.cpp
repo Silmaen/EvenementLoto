@@ -294,6 +294,14 @@ auto GameRound::getSubRound(const uint32_t iIndex) const -> std::vector<SubGameR
 
 auto GameRound::getName() const -> std::string {
 	std::stringstream res;
+	// Une pause n'est pas une partie : l'appeler « Partie 3 Pause » trompait l'affichage
+	// comme le rapport. Elle porte son propre nom et sa propre numérotation.
+	if (m_type == Type::Pause) {
+		res << "Pause";
+		if (m_id > 0)
+			res << " " << m_id;
+		return res.str();
+	}
 	res << "Partie";
 	if (m_id > 0)
 		res << " " << m_id;

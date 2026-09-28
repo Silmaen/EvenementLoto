@@ -50,6 +50,12 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Chaque article du catalogue porte un identifiant : savoir où il est mis en jeu est un
   fait et non une comparaison de désignations.
 * Un index de partie hors limites ne fait plus tomber l'application.
+* Numéro de partie attribué d'office à l'ajout, et la partie ajoutée devient la sélection.
+* Une pause s'appelle « Pause N » et non « Partie N Pause », avec sa propre numérotation.
+* Un lot saisi dans le réglage des parties entre au catalogue au lieu d'y rester invisible.
+* Bouton « Ajouter un lot » au-dessus de la liste : sous une liste pleine, il était hors champ.
+* Import d'un catalogue depuis un tableur : CSV à point-virgule, virgule ou tabulation,
+  colonnes reconnues dans n'importe quel ordre, virgule décimale et symbole euro acceptés.
 * Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
 * Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
   article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.

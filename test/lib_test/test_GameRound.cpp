@@ -277,3 +277,22 @@ TEST(GameRound, results) {
 	EXPECT_STREQ(gr.getDrawStr().c_str(), "simple quine: 5 78 45 23\ndouble quine: 65 12 14 26\ncarton plein: 27\n");
 	EXPECT_STREQ(gr.getWinnerStr().c_str(), "simple quine: Mr X\ndouble quine: Mr Y\n");
 }
+
+TEST(GameRound, aPauseIsNotCalledAGame) {
+	GameRound pause{GameRound::Type::Pause};
+	EXPECT_TRUE(pause.isPause());
+	// « Partie 3 Pause » n'avait aucun sens, ni à l'écran ni dans le rapport.
+	EXPECT_STREQ(pause.getName().c_str(), "Pause");
+	pause.setId(2);
+	EXPECT_STREQ(pause.getName().c_str(), "Pause 2");
+
+	GameRound game{GameRound::Type::OneTwoQuineFullCard};
+	EXPECT_FALSE(game.isPause());
+	game.setId(3);
+	EXPECT_STREQ(game.getName().c_str(), "Partie 3");
+	// Un type particulier reste dit, mais pas pour une pause.
+	GameRound child{GameRound::Type::Enfant};
+	child.setId(4);
+	EXPECT_NE(std::string{child.getName()}.find("Partie 4"), std::string::npos);
+	EXPECT_NE(std::string{child.getName()}.find("nfant"), std::string::npos);
+}

@@ -9,8 +9,10 @@
 
 #include "CataloguePopup.h"
 
+#include "core/CsvCatalogue.h"
 #include "core/Log.h"
 #include "gui/Application.h"
+#include "gui/utils/FileDialog.h"
 #include "gui/utils/Rendering.h"
 
 #include <imgui.h>
@@ -34,11 +36,24 @@ PopupCatalogue::PopupCatalogue() = default;
 PopupCatalogue::~PopupCatalogue() = default;
 
 void PopupCatalogue::onOpen() {
+	// Un lot saisi dans le réglage des parties n'est pas au catalogue : il y entre ici,
+	// sinon il resterait invisible de la seule fenêtre censée tout montrer.
+	if (const auto adopted = Application::get().getCurrentEvent().adoptOrphanPrizes(); adopted > 0)
+		m_lastResult = std::format("{} lot(s) des parties entrés au catalogue.", adopted);
+	else
+		m_lastResult.clear();
 	m_catalogue = Application::get().getCurrentEvent().getCatalogue();
-	m_lastResult.clear();
 }
 
 void PopupCatalogue::refreshCatalogue() { m_catalogue = Application::get().getCurrentEvent().getCatalogue(); }
+
+void PopupCatalogue::commitCatalogue() {
+	Application::get().getCurrentEvent().setCatalogue(m_catalogue);
+	// L'événement vient d'attribuer un identifiant aux nouveaux articles : sans le
+	// relire, la page « Répartition » les croirait sans identité.
+	refreshCatalogue();
+	Application::get().saveProgress();
+}
 
 void PopupCatalogue::onPopupUpdate() {
 	if (Application::get().getCurrentEvent().isFinished()) {
@@ -80,24 +95,45 @@ void PopupCatalogue::renderCatalogueTab() {
 	ImGui::Text("Valeur totale du catalogue : %.2f €", core::totalValue(m_catalogue));
 	ImGui::Separator();
 
-	if (utils::renderPrizeList(m_catalogue, true, {0, -g_settingsHeight})) {
-		event.setCatalogue(m_catalogue);
-		// L'événement vient d'attribuer un identifiant aux nouveaux articles : sans le
-		// relire, la page « Répartition » les croirait sans identité.
-		refreshCatalogue();
-		Application::get().saveProgress();
+	// Une barre d'outils au-dessus de la liste : les trois façons de garnir le catalogue
+	// se voient d'emblée, au lieu d'un bouton poussé sous une liste qui remplit sa zone.
+	if (ImGui::Button("Ajouter un lot")) {
+		m_catalogue.emplace_back();
+		commitCatalogue();
 	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Ajoute une ligne vide à remplir.");
+	ImGui::SameLine();
+	if (ImGui::Button("Importer un tableur...")) {
+		utils::FileDialog::openFile("Tableur|csv,tsv,txt", [this](const std::filesystem::path& iPath) -> void {
+			const auto imported = core::importCatalogueCsv(iPath);
+			m_lastResult = imported.summary;
+			if (!imported.read || imported.prizes.empty())
+				return;
+			// Ajoutés à la suite : on importe souvent une liste après en avoir déjà
+			// saisi une partie, et écraser serait une perte silencieuse.
+			m_catalogue.insert(m_catalogue.end(), imported.prizes.begin(), imported.prizes.end());
+			commitCatalogue();
+		});
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Lit un fichier CSV exporté d'un tableur et ajoute ses lignes au catalogue.\n"
+						  "Colonnes reconnues : désignation, donateur, valeur, attrait, enfant.");
 	ImGui::SameLine();
 	if (ImGui::Button("Reprendre les lots des parties")) {
-		event.gatherCatalogueFromRounds();
-		m_catalogue = event.getCatalogue();
-		m_lastResult = std::format("{} article(s) repris des parties.", m_catalogue.size());
+		const auto adopted = event.adoptOrphanPrizes();
+		refreshCatalogue();
+		m_lastResult = adopted == 0 ? "Tous les lots des parties sont déjà au catalogue."
+									: std::format("{} lot(s) des parties entrés au catalogue.", adopted);
 		log_info("{}", m_lastResult);
 		Application::get().saveProgress();
 	}
 	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Remplace le catalogue par les lots actuellement placés dans les parties.\n"
-						  "C'est ce qui permet de repartir d'une répartition faite à la main.");
+		ImGui::SetTooltip("Fait entrer au catalogue les lots placés dans les parties qui n'y sont pas encore.\n"
+						  "N'enlève rien : c'est ce qui permet de repartir d'une répartition faite à la main.");
+
+	if (utils::renderPrizeList(m_catalogue, {.editable = true, .size = {0, -g_settingsHeight}, .withAddButton = false}))
+		commitCatalogue();
 
 	ImGui::Separator();
 	ImGui::Text("Répartition automatique");
@@ -121,8 +157,7 @@ void PopupCatalogue::renderCatalogueTab() {
 		ImGui::TextWrapped("%s", m_lastResult.c_str());
 
 	if (ImGui::Button("Répartir", {g_buttonWidth, 0})) {
-		event.setCatalogue(m_catalogue);
-		refreshCatalogue();
+		commitCatalogue();
 		const auto result = core::distributePrizes(event, m_settings);
 		m_lastResult = result.summary;
 		log_info("Répartition des lots : {}", result.summary);

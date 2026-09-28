@@ -723,6 +723,9 @@ void GameRoundConfigPopups::fromCurrentEvent() {
 void GameRoundConfigPopups::toCurrentEvent() const {
 	// Save data to current event
 	Application::get().getCurrentEvent() = m_event;
+	// Un lot saisi ici est un lot dont on dispose : il rejoint le catalogue, faute de
+	// quoi il n'apparaîtrait ni dans la liste ni dans la répartition.
+	Application::get().getCurrentEvent().adoptOrphanPrizes();
 }
 
 void GameRoundConfigPopups::renderFirstColumn() {
@@ -792,7 +795,16 @@ void GameRoundConfigPopups::renderSecondColumn() {
 		ImGui::SetNextItemWidth(-140);
 		int currentGameRoundType = static_cast<int>(currentRound->getType()) - 1;// skipping display of id 0 == Invalid
 		if (ImGui::Combo("##GameRoundTypes", &currentGameRoundType, getRoundTypes().c_str())) {
+			const bool wasPause = currentRound->isPause();
 			currentRound->setType(static_cast<core::GameRound::Type>(currentGameRoundType + 1));
+			// Passer d'une partie à une pause, ou l'inverse, change de numérotation : le
+			// numéro d'avant appartient à l'autre série et vaudrait doublon. Il est
+			// d'abord rendu — la partie n'a plus de numéro dans aucune des deux séries —
+			// pour ne pas se compter elle-même dans le calcul du suivant.
+			if (currentRound->isPause() != wasPause) {
+				currentRound->setId(0);
+				currentRound->setId(m_event.nextFreeRoundId(currentRound->isPause()));
+			}
 		}
 		ImGui::SameLine();
 		ImGui::Text("N°");
@@ -874,7 +886,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			ImGui::Spacing();
 			ImGui::Text("Lots à gagner :");
 			auto prizes = subRound->getPrizes();
-			if (utils::renderPrizeList(prizes, editable, {0, -80}) && editable)
+			if (utils::renderPrizeList(prizes, {.editable = editable, .size = {0, -80}}) && editable)
 				subRound->setPrizes(prizes);
 		} else {
 			// Pause
@@ -1012,7 +1024,17 @@ void GameRoundConfigPopups::renderResult() {
 	ImGui::Spacing();
 }
 
-void GameRoundConfigPopups::addGameRound() { m_event.pushGameRound(core::GameRound()); }
+void GameRoundConfigPopups::addGameRound() {
+	// Numérotée d'office : saisir le numéro à la main à chaque ajout était une corvée,
+	// et un doublon passait sans bruit.
+	core::GameRound round;
+	round.setId(m_event.nextFreeRoundId(round.isPause()));
+	m_event.pushGameRound(round);
+	// La nouvelle partie devient la sélection : c'est celle qu'on vient d'ajouter que
+	// l'on veut régler.
+	m_selectedGameRound = m_event.sizeRounds() - 1;
+	m_selectedSubRound = 0;
+}
 
 void GameRoundConfigPopups::deleteGameRound() {
 	if (m_event.sizeRounds() == 0) {

@@ -61,19 +61,37 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 auto getNextStepStr(const core::Event& iEvent) -> std::string;
 
 /**
+ * @brief Options for the prize list.
+ */
+struct PrizeListOptions {
+	/// False once the round has started, the list is then read only.
+	bool editable = true;
+	/// The region for the list, the ImGui child convention for zero and negative values
+	/// applying.
+	math::vec2 size{0, -80};
+	/**
+	 * @brief Draw the « Ajouter un lot » button above the list.
+	 *
+	 * Above and not below: under a list that filled its region, the button ended up out
+	 * of sight and there seemed to be no way to add anything. False when the caller
+	 * places it in a toolbar of its own.
+	 */
+	bool withAddButton = true;
+};
+
+/**
  * @brief Draw an editable list of prize articles.
  *
  * One row per article: what it is, who gave it, what it is worth, how much it makes
  * people want it, and whether it can be put in play in a children's round. Shared by
- * the round configuration and by the improvised round, which fill the very same list.
+ * the round configuration, the improvised round and the catalogue, which fill the very
+ * same list.
  *
  * @param[in,out] ioPrizes The articles to edit.
- * @param[in] iEditable False once the round has started, the list is then read only.
- * @param[in] iSize The region for the list, the ImGui child convention for zero and
- *            negative values applying.
+ * @param[in] iOptions How to draw it.
  * @return True when the list changed this frame.
  */
-auto renderPrizeList(core::prizes_type& ioPrizes, bool iEditable, const math::vec2& iSize = {0, -80}) -> bool;
+auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptions = {}) -> bool;
 
 /**
  * @brief Options for text adaptation.

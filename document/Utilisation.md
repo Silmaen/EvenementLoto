@@ -198,6 +198,32 @@ logiciel les répartir. Le catalogue s'ouvre par le menu "Jeu" > "Catalogue des 
 liste des lots d'une manche : un article par ligne, avec sa désignation, son donateur, sa valeur, son attrait et sa
 compatibilité enfant. La valeur totale du catalogue s'affiche en haut.
 
+Trois boutons garnissent le catalogue, au-dessus de la liste :
+
+* **Ajouter un lot** ajoute une ligne vide à remplir ;
+* **Importer un tableur...** lit un fichier CSV et ajoute ses lignes à la suite, sans rien écraser ;
+* **Reprendre les lots des parties** fait entrer au catalogue les lots déjà placés dans les parties qui n'y sont pas
+  encore — il n'enlève jamais rien.
+
+Un lot saisi directement dans le réglage des parties rejoint le catalogue de lui-même : il n'y a pas deux endroits où
+tenir la même liste.
+
+#### Importer depuis un tableur
+
+Le fichier attendu est un CSV tel qu'un tableur l'exporte. Le logiciel s'adapte à ce qui sort vraiment d'un tableur :
+
+* séparateur point-virgule, virgule ou tabulation, deviné sur la première ligne ;
+* guillemets pour protéger un séparateur à l'intérieur d'un champ ;
+* virgule décimale acceptée autant que le point, symbole euro et espaces des milliers ignorés ;
+* colonnes reconnues sur leur nom, dans n'importe quel ordre, accentué ou non : **désignation** (ou article, lot,
+  libellé), **donateur**, **valeur** (ou prix), **attrait** (ou attractivité, note), **enfant** ;
+* une colonne inconnue est ignorée sans décaler les autres ;
+* sans en-tête reconnu, l'ordre désignation, donateur, valeur, attrait, enfant est supposé ;
+* la colonne enfant accepte oui/non, vrai/faux, 1/0 ou une croix.
+
+Seule la désignation compte vraiment : tout le reste peut manquer. Les lignes vides en fin de fichier sont comptées comme
+ignorées, ce n'est pas une erreur, et le nombre de lots lus s'affiche après l'import.
+
 Le bouton "Répartir" place alors tout le catalogue sur les manches, avec les deux montées qu'une après-midi demande :
 
 * **dans une partie**, la quine vaut moins que la double quine, qui vaut moins que le carton plein ;
@@ -252,6 +278,9 @@ de gagnants que vous souhaitez faire gagner. Par exemple, pour une partie normal
 différentes phases de la partie.
 
 ![reglage_parties_lots.png](images/reglage_parties_lots.png)
+
+Le numéro de la partie est attribué d'office à l'ajout, et se corrige à la main si besoin. Les pauses ont leur propre
+numérotation : la première pause de l'après-midi est "Pause 1" même si elle arrive après la troisième partie.
 
 Les lots se saisissent **article par article**. "Ajouter un lot" crée une ligne, et chaque ligne porte :
 

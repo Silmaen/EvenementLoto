@@ -137,7 +137,7 @@ auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
 	// Un fichier d'avant le catalogue : ses lots sont dans ses manches, réparties à la
 	// main. Les y reprendre est ce qui rend la répartition automatique utilisable sur un
 	// ancien événement.
-	gatherCatalogueFromRounds();
+	adoptOrphanPrizes();
 	return true;
 }
 
@@ -368,12 +368,23 @@ void Event::setCatalogue(const prizes_type& iCatalogue) {
 	assignPrizeIds();
 }
 
-void Event::assignPrizeIds() {
+auto Event::nextFreePrizeId() const -> uint32_t {
 	uint32_t highest = 0;
 	for (const auto& prize: m_catalogue) highest = std::max(highest, prize.getId());
+	// Les copies placées dans les manches comptent aussi : un identifiant déjà porté par
+	// un lot en jeu ne doit pas être redonné à un autre article.
+	for (const auto& round: m_gameRounds) {
+		for (auto sub = round.beginSubRound(); sub != round.endSubRound(); ++sub) {
+			for (const auto& prize: sub->getPrizes()) highest = std::max(highest, prize.getId());
+		}
+	}
+	return highest + 1;
+}
+
+void Event::assignPrizeIds() {
 	for (auto& prize: m_catalogue) {
 		if (prize.getId() == 0)
-			prize.setId(++highest);
+			prize.setId(nextFreePrizeId());
 	}
 }
 
@@ -436,26 +447,10 @@ auto Event::assignPrize(const uint32_t iId, const std::optional<PrizeSlot>& iTar
 	return true;
 }
 
-auto Event::gatherCatalogueFromRounds() -> std::size_t {
-	prizes_type gathered;
-	for (const auto& round: m_gameRounds) {
-		if (round.getType() == GameRound::Type::Pause)
-			continue;
-		for (auto sub = round.beginSubRound(); sub != round.endSubRound(); ++sub) {
-			for (const auto& prize: sub->getPrizes()) {
-				if (prize.isEmpty())
-					continue;
-				gathered.push_back(prize);
-			}
-		}
-	}
-	m_catalogue = gathered;
-	assignPrizeIds();
-	// Les identifiants sont reportés dans les manches, sinon le lien ne vaudrait que
-	// dans un sens et l'affectation resterait invisible.
-	std::size_t next = 0;
+auto Event::adoptOrphanPrizes() -> std::size_t {
+	std::size_t adopted = 0;
 	for (auto& round: m_gameRounds) {
-		if (round.getType() == GameRound::Type::Pause)
+		if (round.isPause())
 			continue;
 		for (uint32_t subIndex = 0; subIndex < static_cast<uint32_t>(round.sizeSubRound()); ++subIndex) {
 			const auto sub = round.getSubRound(subIndex);
@@ -464,23 +459,37 @@ auto Event::gatherCatalogueFromRounds() -> std::size_t {
 			for (auto& prize: prizes) {
 				if (prize.isEmpty())
 					continue;
-				if (next < m_catalogue.size()) {
-					prize.setId(m_catalogue[next].getId());
-					++next;
+				if (prize.getId() != 0 && std::ranges::any_of(m_catalogue, [&prize](const Prize& iItem) -> bool {
+						return iItem.getId() == prize.getId();
+					})) {
+					continue;
+				}
+				// Un lot qui porte déjà un identifiant le garde : il a pu être retiré du
+				// catalogue alors qu'il restait en jeu, et lui en donner un autre
+				// changerait une identité pour rien. Sinon il en reçoit un, posé sur la
+				// copie comme sur l'article, pour que le lien vaille dans les deux sens.
+				if (prize.getId() == 0) {
+					prize.setId(nextFreePrizeId());
 					touched = true;
 				}
+				m_catalogue.push_back(prize);
+				++adopted;
 			}
 			if (touched && sub->isEditable())
 				sub->setPrizes(prizes);
 		}
 	}
-	log_info("Catalogue reconstitué à partir des parties : {} article(s).", m_catalogue.size());
-	return m_catalogue.size();
+	if (adopted > 0)
+		log_info("{} lot(s) des parties entrés au catalogue.", adopted);
+	return adopted;
 }
-
-auto Event::nextFreeRoundId() const -> int {
+auto Event::nextFreeRoundId(const bool iForPause) const -> int {
 	int highest = 0;
-	for (const auto& round: m_gameRounds) { highest = std::max(highest, round.getId()); }
+	for (const auto& round: m_gameRounds) {
+		if (round.isPause() != iForPause)
+			continue;
+		highest = std::max(highest, round.getId());
+	}
 	return highest + 1;
 }
 
