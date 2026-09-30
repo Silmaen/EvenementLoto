@@ -2,12 +2,8 @@
 
 Une ligne par élément. Ce qui est livré passe dans [CHANGELOG.md](CHANGELOG.md).
 
-La version en cours de développement est la **0.5.1**.
-
-## 0.5.1
-
-* Délai de réactivation des boutons de tirage, réglable, pour donner le tempo.
-* Onglet présentateur reprenant en réduit ce qui est à l'écran.
+La **0.5.1** est livrée, son contenu est dans le changelog. La prochaine version est la
+**0.6.0**.
 
 ## 0.6.0
 

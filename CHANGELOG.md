@@ -2,7 +2,7 @@
 
 Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 
-## 0.5.1 — en développement
+## 0.5.1 — 26 septembre 2026
 
 * Nom des archives de livraison suffixé par la plateforme : `linux64`, `win64`.
 * Délai de réactivation des commandes de tirage, réglable, pour donner le tempo.
