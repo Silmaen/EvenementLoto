@@ -12,6 +12,7 @@
 #include "Convert.h"
 #include "gui/Application.h"
 #include <imgui.h>
+#include <imgui_stdlib.h>
 
 namespace evl::gui::utils {
 
@@ -106,6 +107,78 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 			ImGui::EndDisabled();
 		}
 	}
+}
+
+auto renderPrizeList(core::prizes_type& ioPrizes, const bool iEditable, const math::vec2& iSize) -> bool {
+	bool changed = false;
+	if (ImGui::BeginChild("PrizeList", vec2ToImVec2(iSize), ImGuiChildFlags_Borders)) {
+		if (ioPrizes.empty())
+			ImGui::TextDisabled("Aucun lot pour cette phase.");
+		for (size_t i = 0; i < ioPrizes.size(); ++i) {
+			auto& prize = ioPrizes[i];
+			ImGui::PushID(static_cast<int>(i));
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
+			std::string designation = prize.getDesignation();
+			if (ImGui::InputTextWithHint("##designation", "désignation", &designation) && iEditable) {
+				prize.setDesignation(designation);
+				changed = true;
+			}
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+			std::string donor = prize.getDonor();
+			if (ImGui::InputTextWithHint("##donor", "donateur", &donor) && iEditable) {
+				prize.setDonor(donor);
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Donateur, facultatif");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(110);
+			auto value = static_cast<float>(prize.getValue());
+			if (ImGui::InputFloat("##value", &value, 0.0f, 0.0f, "%.2f €") && iEditable) {
+				prize.setValue(static_cast<double>(value));
+				changed = true;
+			}
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(120);
+			auto attractiveness = static_cast<int>(prize.getAttractiveness());
+			if (ImGui::SliderInt("##attractiveness", &attractiveness, 0,
+								 static_cast<int>(core::Prize::g_maxAttractiveness), "attrait %d") &&
+				iEditable) {
+				prize.setAttractiveness(static_cast<uint8_t>(attractiveness));
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Envie qu'il suscite, indépendamment de son prix. 0 : non noté.");
+			ImGui::SameLine();
+			bool childFriendly = prize.isChildFriendly();
+			if (ImGui::Checkbox("enfant", &childFriendly) && iEditable) {
+				prize.setChildFriendly(childFriendly);
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("L'article peut être mis en jeu dans une partie enfant.");
+			ImGui::SameLine();
+			if (ImGui::Button("Retirer") && iEditable) {
+				ioPrizes.erase(ioPrizes.begin() + static_cast<ptrdiff_t>(i));
+				ImGui::PopID();
+				ImGui::EndChild();
+				return true;
+			}
+			ImGui::PopID();
+		}
+	}
+	ImGui::EndChild();
+
+	if (!iEditable)
+		ImGui::BeginDisabled();
+	if (ImGui::Button("Ajouter un lot")) {
+		ioPrizes.emplace_back();
+		changed = true;
+	}
+	if (!iEditable)
+		ImGui::EndDisabled();
+	return changed;
 }
 
 auto getNextStepStr(const core::Event& iEvent) -> std::string {

@@ -310,6 +310,40 @@ void Event::pushGameRound(const GameRound& iRound) {
 	checkValidConfig();
 }
 
+auto Event::nextFreeRoundId() const -> int {
+	int highest = 0;
+	for (const auto& round: m_gameRounds) { highest = std::max(highest, round.getId()); }
+	return highest + 1;
+}
+
+auto Event::firstInsertableIndex() const -> uint32_t {
+	if (isEditable())
+		return 0;
+	const auto current = getCurrentGameRoundIndex();
+	// No round left to play: the only place left is the end.
+	if (current < 0)
+		return static_cast<uint32_t>(m_gameRounds.size());
+	return static_cast<uint32_t>(current) + 1;
+}
+
+auto Event::insertGameRound(const uint32_t iIndex, const GameRound& iRound) -> std::optional<uint32_t> {
+	if (isFinished()) {
+		log_warn("Impossible d'ajouter une partie à un événement terminé");
+		return std::nullopt;
+	}
+	const auto first = firstInsertableIndex();
+	const auto last = static_cast<uint32_t>(m_gameRounds.size());
+	const auto index = std::clamp(iIndex, first, last);
+	if (index != iIndex)
+		log_info("Partie improvisée déplacée en position {} : {} était hors de la plage autorisée", index, iIndex);
+	m_gameRounds.insert(std::next(m_gameRounds.begin(), index), iRound);
+	// Les numéros de partie restent ceux que l'organisateur a choisis : renuméroter
+	// derrière lui changerait le programme imprimé et se heurterait aux parties déjà
+	// jouées, qui ne sont plus modifiables.
+	checkValidConfig();
+	return index;
+}
+
 void Event::deleteRoundByIndex(const uint16_t& iIndex) {
 	if (isFinished()) {
 		log_warn("Impossible de supprimer un round d'un événement terminé");
