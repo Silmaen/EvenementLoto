@@ -10,6 +10,7 @@
 #include "gui/views/DisplayView.h"
 
 #include <cstdlib>
+#include <filesystem>
 #include <imgui.h>
 #include <stdexcept>
 #include <string>
@@ -161,4 +162,64 @@ TEST(gui_Application, DrawsTheDisplayMiniature) {
 	// Drawn every frame, and the loop never had to catch anything.
 	EXPECT_EQ(view->drawn(), 3U);
 	EXPECT_EQ(app->getState(), Application::State::Closed);
+}
+
+TEST(gui_Application, SurvivesAnUnreadableFont) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// A font that is not there, asked for from the settings window: the atlas has to be
+	// rebuilt anyway, with the embedded face, and the event must go on.
+	app->setFont("/n/existe/pas.ttf", 18.0f);
+	app->setMaxFrame(2);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
+}
+
+TEST(gui_Application, RejectsAFileThatIsNotAFont) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// A real file, readable, and not a font at all: the signature check is what keeps
+	// ImGui from asserting on it.
+	app->setFont(EVL_TEST_DOC_FILE, 20.0f);
+	app->setMaxFrame(2);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
+}
+
+TEST(gui_Application, LoadsAFontFromAFile) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	// A system font, when the image ships one: the happy path is worth checking where
+	// it can be, and skipping where it cannot rather than pinning a path.
+	const std::filesystem::path candidate{"/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"};
+	if (!is_regular_file(candidate))
+		GTEST_SKIP() << "aucune police système à essayer";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	app->setFont(candidate, 22.0f);
+	app->setMaxFrame(3);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	// The chosen face first, then the three embedded ones behind it.
+	EXPECT_EQ(ImGui::GetIO().Fonts->Fonts.Size, 4);
+}
+
+TEST(gui_Application, ChangesTheFontSizeAtRuntime) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// Empty path: the embedded face, at another size. Rebuilding the atlas mid-run is
+	// what the Vulkan backend's dynamic textures are for.
+	app->setFont({}, 28.0f);
+	app->setMaxFrame(3);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }

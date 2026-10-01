@@ -14,6 +14,14 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   la partie en cours.
 * Rapport de fin d'événement : parties, gagnants, lots, donateurs et statistiques,
   affiché, copiable et enregistrable en Markdown.
+* Trois habillages au choix : « Nuit » (l'ancien), « Ardoise » et « Salle », les couleurs
+  restant retouchables une par une.
+* Le texte désactivé se distingue enfin du texte actif.
+* Choix de la police d'interface et de sa taille, appliqués sans redémarrer ;
+  un fichier qui n'est pas une police est refusé au lieu de faire tomber l'application.
+* Interface dessinée dans la coupe régulière et non plus en gras.
+* Identité de bureau : app-id sous Wayland, classe WM sous X11, et un fichier .desktop
+  livré avec son icône.
 * Format de sauvegarde 8 ; les fichiers des versions 3 à 7 se relisent, leur valeur
   de lot étant portée par le premier article.
 

@@ -26,7 +26,7 @@
 // memory fonts...
 #include "gui//fonts/Roboto-Bold.embed"
 #include "gui//fonts/Roboto-Italic.embed"
-//#include "core/fonts/Roboto-Regular.embed"// not used here
+#include "gui//fonts/Roboto-Regular.embed"
 
 #include "event/AppEvent.h"
 #include "event/KeyEvent.h"
@@ -56,6 +56,9 @@ void glfwErrorCallback(const int iError, const char* iDescription) {
 }
 
 void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkResult(iResult, __FILE__, __LINE__); }
+
+/// L'identité de l'application pour le bureau, égale au nom du fichier `.desktop`.
+constexpr const char* g_applicationId = "EvenementLoto";
 
 }// namespace
 
@@ -95,6 +98,13 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 
 	// Create window with Vulkan context
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	// L'identité de l'application, telle que le bureau la reconnaît : sous Wayland
+	// l'app-id est le seul lien avec le fichier `.desktop`, donc avec l'icône et le nom
+	// affichés ; sous X11 c'est la classe WM qui joue ce rôle. Les deux valent
+	// `EvenementLoto`, comme le nom du fichier `.desktop` livré dans `resources/desktop`.
+	glfwWindowHintString(GLFW_WAYLAND_APP_ID, g_applicationId);
+	glfwWindowHintString(GLFW_X11_CLASS_NAME, g_applicationId);
+	glfwWindowHintString(GLFW_X11_INSTANCE_NAME, g_applicationId);
 	const float main_scale =
 			ImGui_ImplGlfw_GetContentScaleForMonitor(glfwGetPrimaryMonitor());// Valid on GLFW 3.3+ only
 	GLFWwindow* window = glfwCreateWindow(static_cast<int>(static_cast<float>(m_options.size.x()) * main_scale),
@@ -379,6 +389,9 @@ auto MainWindow::shouldClose() const -> bool {
 }
 
 void MainWindow::newFrame() {
+	// Avant toute chose, hors de toute image ouverte : c'est le seul moment où l'atlas
+	// des glyphes peut être reconstruit sans tirer le tapis sous le rendu en cours.
+	applyFontRequest();
 	// Poll and handle events (inputs, window resize, etc.)
 	// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
 	// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
@@ -460,23 +473,98 @@ void MainWindow::render(const math::vec4& iClearColor) {
 }
 
 
+namespace {
+
+/// Taille de police par défaut, en pixels.
+constexpr float g_defaultFontSize = 20.0f;
+
+/// Ajoute les trois coupes embarquées, la régulière en premier donc par défaut.
+void addEmbeddedFonts(const ImGuiIO& iIo, const float iSize) {
+	ImFontConfig fontConfig;
+	fontConfig.FontDataOwnedByAtlas = false;
+	// NOLINTBEGIN(cppcoreguidelines-pro-type-const-cast)
+	iIo.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoRegular)),
+									sizeof(g_RobotoRegular), iSize, &fontConfig);
+	iIo.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoBold)), sizeof(g_RobotoBold),
+									iSize, &fontConfig);
+	iIo.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoItalic)), sizeof(g_RobotoItalic),
+									iSize, &fontConfig);
+	// NOLINTEND(cppcoreguidelines-pro-type-const-cast)
+}
+
+/**
+ * @brief Lit un fichier de police, en refusant ce qui n'en est manifestement pas un.
+ *
+ * `AddFontFromFileTTF` ne renvoie pas d'erreur : il déclenche une assertion, donc
+ * l'application meurt sur un chemin erroné en build de mise au point. Le fichier est
+ * donc lu et reconnu ici, sur sa signature `sfnt`, avant qu'ImGui n'y touche.
+ *
+ * @param[in] iPath Le fichier à lire.
+ * @return Les octets de la police, rien si le fichier n'en est pas une.
+ */
+auto loadFontFile(const std::filesystem::path& iPath) -> std::optional<std::vector<char>> {
+	std::error_code error;
+	if (!is_regular_file(iPath, error)) {
+		log_error("Police '{}' introuvable.", iPath.string());
+		return std::nullopt;
+	}
+	std::ifstream file(iPath, std::ios::in | std::ios::binary);
+	if (!file.is_open()) {
+		log_error("Police '{}' illisible.", iPath.string());
+		return std::nullopt;
+	}
+	std::vector<char> bytes{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+	// Les quatre premiers octets d'un fichier sfnt : TrueType, 'true', OpenType, ou une
+	// collection.
+	static constexpr std::array<std::string_view, 4> signatures{{{"\0\1\0\0", 4}, "true", "OTTO", "ttcf"}};
+	if (bytes.size() < 4 || std::ranges::none_of(signatures, [&bytes](const std::string_view iSignature) -> bool {
+			return std::string_view{bytes.data(), 4} == iSignature;
+		})) {
+		log_error("Fichier '{}' : ce n'est pas une police.", iPath.string());
+		return std::nullopt;
+	}
+	return bytes;
+}
+
+}// namespace
+
+void MainWindow::requestFont(const std::filesystem::path& iPath, const float iSize) {
+	m_fontRequest = std::make_pair(iPath, iSize > 0.0f ? iSize : g_defaultFontSize);
+}
+
+void MainWindow::applyFontRequest() {
+	if (!m_fontRequest.has_value())
+		return;
+	const auto [path, size] = m_fontRequest.value();
+	m_fontRequest.reset();
+	const ImGuiIO& io = ImGui::GetIO();
+	io.Fonts->Clear();
+	m_fontBytes.clear();
+	if (!path.empty()) {
+		if (auto bytes = loadFontFile(path); bytes.has_value()) {
+			// Gardés par la fenêtre : l'atlas ne détient pas ces octets, il y pointe.
+			m_fontBytes = std::move(bytes.value());
+			ImFontConfig fontConfig;
+			fontConfig.FontDataOwnedByAtlas = false;
+			io.Fonts->AddFontFromMemoryTTF(m_fontBytes.data(), static_cast<int>(m_fontBytes.size()), size, &fontConfig);
+			// Les coupes embarquées restent derrière, pour le gras et l'italique.
+			addEmbeddedFonts(io, size);
+			log_info("Police d'interface : '{}' à {} px.", path.string(), size);
+			return;
+		}
+		log_warn("Retour à la police embarquée.");
+	}
+	addEmbeddedFonts(io, size);
+	log_info("Police d'interface embarquée à {} px.", size);
+}
+
 void MainWindow::setTheme(const Theme& iTheme) {
 	m_currentTheme = iTheme;
 	const ImGuiIO& io = ImGui::GetIO();
 	// Better fonts
 	if (!m_fontsLoaded) {
 		m_fontsLoaded = true;
-
-		ImFontConfig fontConfig;
-		fontConfig.FontDataOwnedByAtlas = false;
-		// NOLINTBEGIN(cppcoreguidelines-pro-type-const-cast)
-		//ImFont* robotoFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoRegular)),
-		//													sizeof(g_RobotoRegular), 20.0f, &fontConfig);
-		io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoBold)), sizeof(g_RobotoBold),
-									   20.0f, &fontConfig);
-		io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(g_RobotoItalic)),
-									   sizeof(g_RobotoItalic), 20.0f, &fontConfig);
-		// NOLINTEND(cppcoreguidelines-pro-type-const-cast)
+		addEmbeddedFonts(io, g_defaultFontSize);
 	}
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -487,7 +575,9 @@ void MainWindow::setTheme(const Theme& iTheme) {
 
 	// Text 1 2
 	colors[ImGuiCol_Text] = utils::vec4ToImVec4(iTheme.text);
-	// colors[ImGuiCol_TextDisabled] = vec(iTheme.textDisabled);
+	// Ce qui est désactivé doit se voir comme désactivé à un mètre : le bouton de tirage
+	// bloqué par le délai en dépend.
+	colors[ImGuiCol_TextDisabled] = utils::vec4ToImVec4(iTheme.textDisabled);
 	// Window Background 2 3 4 5
 	colors[ImGuiCol_WindowBg] = utils::vec4ToImVec4(iTheme.windowBackground);
 	colors[ImGuiCol_ChildBg] = utils::vec4ToImVec4(iTheme.childBackground);

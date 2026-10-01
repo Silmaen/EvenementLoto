@@ -7,11 +7,9 @@ contenu est dans le changelog.
 
 ## 0.6.0
 
-* Style des fenêtres revu : palette, typographie, densité et hiérarchie cohérentes.
-* Choix de la police de caractère.
+* Habillages : retours d'usage sur « Ardoise » et « Salle », ajustements.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
   détachable, aperçu en mono-écran.
-* Icône et nom de l'application sous Wayland, via l'app-id et un fichier `.desktop`.
 * Reprise d'un périphérique Vulkan perdu sans redémarrer l'application.
 
 ## 0.7.0

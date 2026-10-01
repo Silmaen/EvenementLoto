@@ -21,6 +21,17 @@ logiciel ou
 de fermeture accidentelle. Il est donc recommandé de choisir un répertoire où vous avez l'habitude de sauvegarder vos
 données, et de ne pas le changer trop souvent.
 
+La section "Thème" commence par le choix d'un **habillage**, qui fixe d'un coup toutes les couleurs et l'espacement
+des fenêtres de travail :
+
+* **Nuit** : l'habillage d'origine, bleu-gris sombre et arrondi.
+* **Ardoise** : gris neutres et un seul accent ambre, le même que celui du dernier numéro tiré sur le panneau
+  d'affichage ; angles plus francs et plus d'air entre les lignes.
+* **Salle** : clair et très contrasté, avec des cibles plus larges, pour une salle mal éclairée ou un écran vu de biais.
+
+Un habillage n'est qu'un point de départ : les couleurs restent modifiables une par une juste en dessous, et ce sont
+elles qui sont enregistrées. "Réappliquer" revient aux couleurs de l'habillage en oubliant les retouches.
+
 Les paramètre de thème permettent de régler les couleurs et les polices utilisées par le logiciel.
 Il est possible de choisir parmi plusieurs thèmes prédéfinis, ou de créer son propre thème en modifiant
 les couleurs et les polices. Le thème choisi sera utilisé pour tous les événements créés,
@@ -28,6 +39,12 @@ mais il est possible de le modifier pour chaque événement.
 
 **Il est recommandé d'adapter le thème le Jour de la manifestation avec le vidéoprojecteur utilisé, et dans
 l'environnement de jeu pour que les couleurs soient bien visibles.**
+
+#### Police d'interface
+
+La section "Police d'interface" permet de choisir un fichier de police (.ttf, .otf, .ttc) et sa taille. Le
+changement est immédiat, sans redémarrage. "Défaut" revient à la police embarquée. Un fichier qui n'est pas une police
+est refusé, avec un message dans le journal, et la police embarquée reprend sa place.
 
 #### Délai de réactivation des tirages
 
@@ -287,6 +304,19 @@ qui s'enregistre sont le même texte. Le rapport se consulte à tout moment, pas
 qui s'est joué jusque-là.
 
 Bonne chance pour votre événement, et n'hésitez pas à nous faire part de vos retours pour améliorer le logiciel !
+
+## Intégration au bureau (Linux)
+
+L'archive livrée est portable : elle s'extrait où l'on veut et se lance directement. Pour que l'application apparaisse
+dans le menu du bureau avec son nom et son icône, deux fichiers sont fournis dans le dossier resources/desktop :
+
+1. Copier EvenementLoto.png dans ~/.local/share/icons/
+2. Copier EvenementLoto.desktop dans ~/.local/share/applications/, puis y corriger la ligne Exec pour y mettre le
+   chemin complet du programme extrait.
+
+Sous Wayland c'est ce fichier qui donne à la fenêtre son nom et son icône : le protocole n'autorise pas une application
+à les demander elle-même, le compositeur les prend dans l'entrée de bureau qu'il reconnaît par l'identifiant de
+l'application. Sans ces deux fichiers, la fenêtre reste sans icône.
 
 ## En cas d'incident
 

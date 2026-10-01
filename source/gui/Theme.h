@@ -11,13 +11,32 @@
 #include "core/Settings.h"
 #include "core/maths/vectors.h"
 
+#include <string_view>
+
 namespace evl::gui {
 
 /**
  * @brief Struct Theme.
  */
 struct Theme {
+	/**
+	 * @brief Les habillages proposés pour les fenêtres de travail.
+	 *
+	 * Un habillage n'est qu'un point de départ : les couleurs restent modifiables une
+	 * par une, et ce sont elles qui sont enregistrées. Le nom n'est gardé que pour
+	 * savoir de quoi on est parti.
+	 */
+	enum struct Preset : uint8_t {
+		Nuit,///< L'habillage d'origine, bleu-gris sombre et arrondi.
+		Ardoise,///< Gris neutres, un seul accent ambre, angles plus francs, plus d'air.
+		Salle,///< Clair et très contrasté, pour une salle des fêtes mal éclairée.
+	};
+
+	/// L'habillage dont les couleurs sont issues.
+	Preset preset{Preset::Nuit};
+
 	math::vec4 text{0.85f, 0.85f, 0.85f, 1.0f};
+	math::vec4 textDisabled{0.45f, 0.45f, 0.48f, 1.0f};
 	math::vec4 windowBackground{0.21f, 0.21f, 0.23f, 1.0f};
 	math::vec4 childBackground{0.18f, 0.18f, 0.20f, 1.0f};
 	math::vec4 backgroundPopup{0.25f, 0.25f, 0.27f, 1.0f};
@@ -111,6 +130,20 @@ struct Theme {
 	math::vec2 displaySafeAreaPadding{3.0f, 3.0f};
 
 	float mouseCursorScale{1.0f};
+
+	/**
+	 * @brief Le nom affiché d'un habillage.
+	 * @param iPreset L'habillage.
+	 * @return Son nom.
+	 */
+	[[nodiscard]] static auto presetName(Preset iPreset) -> std::string_view;
+
+	/**
+	 * @brief Construit l'habillage demandé.
+	 * @param iPreset L'habillage voulu.
+	 * @return Le thème complet.
+	 */
+	[[nodiscard]] static auto fromPreset(Preset iPreset) -> Theme;
 
 	/**
 	 * @brief Load theme from settings.

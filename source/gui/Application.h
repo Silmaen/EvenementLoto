@@ -121,6 +121,13 @@ public:
 	}
 
 	/**
+	 * @brief Demande une autre police d'interface, et la retient dans les réglages.
+	 * @param[in] iPath Le fichier de police, vide pour la police embarquée.
+	 * @param[in] iSize La taille en pixels.
+	 */
+	void setFont(const std::filesystem::path& iPath, float iSize);
+
+	/**
 	 * @brief Get the application theme.
 	 * @return The current theme.
 	 */

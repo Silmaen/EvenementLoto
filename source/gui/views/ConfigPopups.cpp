@@ -70,6 +70,36 @@ void MainConfigPopups::onPopupUpdate() {
 	}
 	ImGui::EndChild();
 
+	// Police d'interface
+	if (ImGui::BeginChild("FontSettings", ImVec2(0, 80), ImGuiWindowFlags_NoTitleBar)) {
+		ImGui::Text("Police d'interface");
+		ImGui::Separator();
+		ImGui::Text("Fichier:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(-160);
+		std::string fontPath = m_data.fontPath.string();
+		if (ImGui::InputTextWithHint("##FontPath", "police embarquée", &fontPath))
+			m_data.fontPath = fontPath;
+		ImGui::SameLine();
+		if (ImGui::Button("...##SearchFont")) {
+			utils::FileDialog::openFile("Police|ttf,otf,ttc", [this](const std::filesystem::path& iPath) -> void {
+				m_data.fontPath = iPath;
+			});
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Parcourir...");
+		ImGui::SameLine();
+		if (ImGui::Button("Défaut##Font"))
+			m_data.fontPath.clear();
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Revenir à la police embarquée.");
+		ImGui::Text("Taille:");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(120);
+		ImGui::DragFloat("##FontSize", &m_data.fontSize, 0.5f, 10.0f, 48.0f, "%.0f px");
+	}
+	ImGui::EndChild();
+
 	// Tirage
 	if (ImGui::BeginChild("DrawSettings", ImVec2(0, 60), ImGuiWindowFlags_NoTitleBar)) {
 		ImGui::Text("Tirage");
@@ -89,6 +119,34 @@ void MainConfigPopups::onPopupUpdate() {
 		ImGui::BeginChild("Theme", ImVec2(0, themeHeight), ImGuiWindowFlags_NoTitleBar)) {
 		ImGui::Text("Thème");
 		ImGui::Separator();
+
+		// Habillage : un point de départ cohérent, que la personnalisation ci-dessous
+		// reprend ensuite couleur par couleur.
+		ImGui::Text("Habillage");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(200);
+		{
+			const auto current = Application::get().getTheme().preset;
+			int selected = static_cast<int>(current);
+			std::string names;
+			for (const auto& candidate: magic_enum::enum_values<Theme::Preset>()) {
+				names += Theme::presetName(candidate);
+				names += '\0';
+			}
+			names += '\0';
+			if (ImGui::Combo("##ThemePreset", &selected, names.c_str())) {
+				Application::get().setTheme(Theme::fromPreset(static_cast<Theme::Preset>(selected)));
+				log_info("Habillage appliqué : {}", Theme::presetName(static_cast<Theme::Preset>(selected)));
+			}
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Réappliquer")) {
+			const auto current = Application::get().getTheme().preset;
+			Application::get().setTheme(Theme::fromPreset(current));
+		}
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Revenir aux couleurs de l'habillage, en oubliant les retouches.");
+		ImGui::Spacing();
 
 		// Personnalisation
 		if (ImGui::BeginChild("Customization", ImVec2(0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight),
@@ -269,6 +327,9 @@ void MainConfigPopups::dataToSettings() {
 	settings.setValue("fade_strength", m_data.fadeStrength);
 	core::getSettings()->include(settings, "gui");
 	core::getSettings()->setValue("general/data_location", std::string{m_data.dataLocation.string()});
+	// La police n'est pas qu'un réglage : elle demande la reconstruction de l'atlas, qui
+	// aura lieu au début de l'image suivante.
+	Application::get().setFont(m_data.fontPath, m_data.fontSize);
 }
 
 void MainConfigPopups::settingsToData() {
@@ -277,6 +338,8 @@ void MainConfigPopups::settingsToData() {
 
 	m_data.dataLocation =
 			core::getSettings()->getValue<std::string>("general/data_location", defaults.dataLocation.string());
+	m_data.fontPath = settings.getValue<std::string>("font_path", defaults.fontPath.string());
+	m_data.fontSize = settings.getValue<float>("font_size", defaults.fontSize);
 	m_data.drawDelay = settings.getValue<float>("draw_delay", defaults.drawDelay);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
 	m_data.timeScale = settings.getValue<float>("time_scale", defaults.timeScale);
