@@ -227,6 +227,22 @@ l'aide d'un boulier traditionnel puis clique sur le bouton correspondant sur le 
 Bien qu'il soit possible de faire les deux modes, il est recommandé de choisir un mode de tirage pour chaque partie, et
 de s'y tenir pour éviter la confusion.
 
+### Saisie du gagnant
+
+À la fin de chaque manche — la quine, la double quine, le carton plein — le bouton de progression ouvre la fenêtre
+"Gagnant de la manche". Elle rappelle la partie, la manche et les lots en jeu, puis attend le ou les prétendants :
+
+* **Un seul prétendant** : saisir le numéro de carton ou le nom, puis "Valider".
+* **Plusieurs prétendants** : "Ajouter un prétendant" autant de fois que nécessaire. Le prétendant retenu se désigne
+  en cochant sa ligne, ou par "Tirer au sort" qui en choisit un au hasard. C'est le prétendant retenu qui est
+  enregistré.
+* **Personne ne réclame** : "Passer" termine la manche sans gagnant, la partie continue.
+
+"Annuler" ferme la fenêtre sans terminer la manche : le jeu reste où il était.
+
+Un nom saisi dans l'urgence se corrige après coup par le menu "Jeu" > "Gagnants". La fenêtre liste toutes les manches
+terminées de l'événement avec leur gagnant ; corriger un nom ne rejoue rien et l'enregistrement est immédiat.
+
 Durant une partie les écrans organisateur et d'affichage devrait ressembler à ça :
 
 ![ecran_organisateur.png](images/ecran_organisateur.png)

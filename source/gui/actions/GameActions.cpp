@@ -41,22 +41,26 @@ void GameNextActions::onExecute() {
 		currentEvent.displayRules();// The call in this state will restore previous state.
 		return;// No further action needed.
 	}
-	bool goNext = true;
 	if (currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		if (const auto round = currentEvent.getCurrentCGameRound();
 			round->getType() != core::GameRound::Type::Pause &&
 			round->getStatus() == core::GameRound::Status::Running) {
 			if (round->getCurrentSubRound()->getStatus() == core::SubGameRound::Status::Running) {
-				currentEvent.addWinnerToCurrentRound("john_doe");// Placeholder for winner input
-				goNext = false;
+				// Ending a sub-round means awarding its prize: who won is asked for, and
+				// the popup is what moves the game on once it knows.
+				if (const auto popup = Application::get().getPopup("popup_winner")) {
+					popup->open();
+					return;
+				}
+				log_warn("Popup 'popup_winner' not found, manche validée sans gagnant.");
+				currentEvent.addWinnerToCurrentRound({});
 			}
 		}
 	}
-	if (goNext) {
-		currentEvent.nextState();
-	}
-	if (const auto round = currentEvent.getCurrentCGameRound();
-		round->getType() != core::GameRound::Type::Pause && round->drawsCount() == 0) {
+	currentEvent.nextState();
+	if (const auto round = currentEvent.getCurrentCGameRound(); round != currentEvent.endRounds() &&
+																round->getType() != core::GameRound::Type::Pause &&
+																round->drawsCount() == 0) {
 		Application::get().getRng().resetPick();
 	}
 	// A new phase starts with its controls armed, whatever the tempo of the last draw.
@@ -95,6 +99,16 @@ DisplayRulesAction::~DisplayRulesAction() = default;
 void DisplayRulesAction::onExecute() {
 	auto& event = Application::get().getCurrentEvent();
 	event.displayRules();
+}
+
+WinnersAction::WinnersAction() { setIconName("euro-money"); }
+WinnersAction::~WinnersAction() = default;
+void WinnersAction::onExecute() {
+	if (const auto popup = Application::get().getPopup("popup_winners")) {
+		popup->open();
+	} else {
+		log_warn("Popup 'popup_winners' not found.");
+	}
 }
 
 }// namespace evl::gui::actions

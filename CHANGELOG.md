@@ -2,6 +2,13 @@
 
 Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 
+## 0.6.0 — en développement
+
+* Saisie du gagnant à la fin de chaque manche, en remplacement du nom fictif.
+* Départage des prétendants à égalité, par choix ou par tirage au sort.
+* Étape du gagnant passable, une manche que personne ne réclame n'arrête plus la partie.
+* Correction des noms de gagnant après la manche, par le menu « Jeu » > « Gagnants ».
+
 ## 0.5.1 — 26 septembre 2026
 
 * Nom des archives de livraison suffixé par la plateforme : `linux64`, `win64`.

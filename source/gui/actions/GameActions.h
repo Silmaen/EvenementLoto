@@ -183,4 +183,34 @@ private:
 	void onExecute() override;
 };
 
+/**
+ * @brief Class WinnersAction: opens the list of winners, to correct a name.
+ */
+class WinnersAction final : public Action {
+public:
+	/**
+	 * @brief Default constructor.
+	 */
+	WinnersAction();
+	/**
+	 * @brief Default destructor.
+	 */
+	~WinnersAction() override;
+	WinnersAction(const WinnersAction&) = delete;
+	WinnersAction(WinnersAction&&) = delete;
+	auto operator=(const WinnersAction&) -> WinnersAction& = delete;
+	auto operator=(WinnersAction&&) -> WinnersAction& = delete;
+	/**
+	 * @brief Get the Name object.
+	 * @return The name.
+	 */
+	[[nodiscard]] auto getName() const -> std::string override { return "winners"; }
+
+private:
+	/**
+	 * @brief Execute the action.
+	 */
+	void onExecute() override;
+};
+
 }// namespace evl::gui::actions
