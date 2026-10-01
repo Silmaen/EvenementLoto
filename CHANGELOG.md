@@ -2,6 +2,10 @@
 
 Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 
+## 0.5.1 — en développement
+
+* Nom des archives de livraison suffixé par la plateforme : `linux64`, `win64`.
+
 ## 0.5.0 — 25 septembre 2026
 
 Version de transition vers Conan : outillage, CI et stabilité, sans nouveauté

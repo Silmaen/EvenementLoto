@@ -19,9 +19,19 @@ else ()
     endif ()
 endif ()
 
-# No platform or architecture in the name: there is one Package configuration per
-# target and the extension already tells them apart (.tgz on Linux, .zip on Windows).
-set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+# The platform tag is part of the name: telling the archives apart by their extension
+# alone was too thin, a downloaded file has to say what it runs on.
+if (${PROJECT_PREFIX}_PLATFORM_WINDOWS)
+    set(${PROJECT_PREFIX}_PLATFORM_TAG "win")
+else ()
+    set(${PROJECT_PREFIX}_PLATFORM_TAG "linux")
+endif ()
+if (${PROJECT_PREFIX}_ARCH_AARCH64)
+    set(${PROJECT_PREFIX}_PLATFORM_TAG "${${PROJECT_PREFIX}_PLATFORM_TAG}-arm64")
+else ()
+    set(${PROJECT_PREFIX}_PLATFORM_TAG "${${PROJECT_PREFIX}_PLATFORM_TAG}64")
+endif ()
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-${${PROJECT_PREFIX}_PLATFORM_TAG}")
 message(STATUS "PACKAGING Expected package Name: ${CPACK_PACKAGE_FILE_NAME}")
 
 if (${PROJECT_PREFIX}_PLATFORM_WINDOWS)

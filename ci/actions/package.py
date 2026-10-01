@@ -70,9 +70,9 @@ class Package(BaseAction):
             return pack_result
 
         archives = sorted(build_dir.glob("EvenementLoto-*.zip"))
-        # CPack's TGZ generator writes `.tar.gz`; the delivered name is `.tgz`, so the
-        # two targets are told apart by their extension alone and neither needs the
-        # platform spelled out in the file name.
+        # CPack's TGZ generator writes `.tar.gz`; the delivered name is `.tgz`. The
+        # platform tag CPackConfig.cmake adds (`linux64`, `win64`) is what tells the
+        # archives apart, the extension only says how to open them.
         for archive in sorted(build_dir.glob("EvenementLoto-*.tar.gz")):
             renamed = archive.with_name(archive.name.removesuffix(".tar.gz") + ".tgz")
             archive.replace(renamed)
