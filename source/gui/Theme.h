@@ -32,6 +32,9 @@ struct Theme {
 		Salle,///< Clair et très contrasté, pour une salle des fêtes mal éclairée.
 	};
 
+	/// L'habillage retenu par défaut, celui d'une installation neuve.
+	static constexpr Preset g_defaultPreset = Preset::Ardoise;
+
 	/// L'habillage dont les couleurs sont issues.
 	Preset preset{Preset::Nuit};
 

@@ -123,7 +123,30 @@ auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
 			return false;
 	}
 	log_info("Event lu et contenant {} parties", roundCount);
-	return readTimePoint(iBs, m_start) && readTimePoint(iBs, m_end);
+	if (!readTimePoint(iBs, m_start) || !readTimePoint(iBs, m_end))
+		return false;
+	// version 9
+	m_catalogue.clear();
+	if (iContext.version > 8)
+		return readCatalogue(iBs, iContext);
+	// Un fichier d'avant le catalogue : ses lots sont dans ses manches, réparties à la
+	// main. Les y reprendre est ce qui rend la répartition automatique utilisable sur un
+	// ancien événement.
+	gatherCatalogueFromRounds();
+	return true;
+}
+
+auto Event::readCatalogue(std::istream& iBs, const ReadContext& iContext) -> bool {
+	std::size_t count = 0;
+	if (!readLength(iBs, count, g_maxSerializedCount))
+		return false;
+	m_catalogue.assign(count, Prize{});
+	for (auto& prize: m_catalogue) {
+		prize.read(iBs, iContext);
+		if (!iBs.good())
+			return false;
+	}
+	return true;
 }
 
 
@@ -142,6 +165,9 @@ void Event::write(std::ostream& oBs) const {
 	for (const auto& round: m_gameRounds) round.write(body);
 	writeTimePoint(body, m_start);
 	writeTimePoint(body, m_end);
+	// version >= 9
+	writeLength(body, m_catalogue.size());
+	for (const auto& prize: m_catalogue) prize.write(body);
 	writeFrame(oBs, getSaveVersion(), body.str());
 }
 
@@ -150,12 +176,19 @@ auto Event::toJson() const -> Json::Value {
 	for (const auto& game: m_gameRounds) { sub.append(game.toJson()); }
 	Json::Value result;
 	result["rounds"] = sub;
+	Json::Value catalogue(Json::arrayValue);
+	for (const auto& prize: m_catalogue) { catalogue.append(prize.toJson()); }
+	result["catalogue"] = catalogue;
 	return result;
 }
 
 void Event::fromJson(const Json::Value& iJson) {
 	m_gameRounds.clear();
 	for (auto& jj: iJson.get("rounds", Json::Value::null)) { m_gameRounds.emplace_back().fromJson(jj); }
+	m_catalogue.clear();
+	if (const auto catalogue = iJson.get("catalogue", Json::Value::null); catalogue.isArray()) {
+		for (const auto& jj: catalogue) { m_catalogue.emplace_back().fromJson(jj); }
+	}
 }
 
 auto Event::toYaml() const -> YAML::Node {
@@ -163,6 +196,9 @@ auto Event::toYaml() const -> YAML::Node {
 	YAML::Node roundsNode;
 	for (const auto& game: m_gameRounds) { roundsNode.push_back(game.toYaml()); }
 	node["rounds"] = roundsNode;
+	YAML::Node catalogueNode;
+	for (const auto& prize: m_catalogue) { catalogueNode.push_back(prize.toYaml()); }
+	node["catalogue"] = catalogueNode;
 	return node;
 }
 
@@ -172,6 +208,14 @@ void Event::fromYaml(const YAML::Node& iNode) {
 		GameRound gr;
 		gr.fromYaml(jj);
 		m_gameRounds.push_back(gr);
+	}
+	m_catalogue.clear();
+	if (const auto catalogueNode = iNode["catalogue"]; catalogueNode.IsSequence()) {
+		for (const auto& jj: catalogueNode) {
+			Prize prize;
+			prize.fromYaml(jj);
+			m_catalogue.push_back(prize);
+		}
 	}
 }
 
@@ -308,6 +352,24 @@ void Event::pushGameRound(const GameRound& iRound) {
 	}
 	m_gameRounds.push_back(iRound);
 	checkValidConfig();
+}
+
+auto Event::gatherCatalogueFromRounds() -> std::size_t {
+	prizes_type gathered;
+	for (const auto& round: m_gameRounds) {
+		if (round.getType() == GameRound::Type::Pause)
+			continue;
+		for (auto sub = round.beginSubRound(); sub != round.endSubRound(); ++sub) {
+			for (const auto& prize: sub->getPrizes()) {
+				if (prize.isEmpty())
+					continue;
+				gathered.push_back(prize);
+			}
+		}
+	}
+	m_catalogue = gathered;
+	log_info("Catalogue reconstitué à partir des parties : {} article(s).", m_catalogue.size());
+	return m_catalogue.size();
 }
 
 auto Event::nextFreeRoundId() const -> int {

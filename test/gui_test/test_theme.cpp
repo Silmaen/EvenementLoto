@@ -1,6 +1,9 @@
 
 #include "../TestMainHelper.h"
+#include "core/Settings.h"
 #include "gui/Theme.h"
+
+#include <filesystem>
 
 TEST(gui_Theme, instantiate) {
 	constexpr evl::gui::Theme theme;
@@ -47,4 +50,43 @@ TEST(gui_Theme, presetSurvivesSettings) {
 	EXPECT_EQ(loaded.preset, evl::gui::Theme::Preset::Ardoise);
 	EXPECT_EQ(loaded.windowBackground, theme.windowBackground);
 	EXPECT_EQ(loaded.textDisabled, theme.textDisabled);
+}
+
+TEST(gui_Theme, theChosenPresetSurvivesARestart) {
+	// The habillage is a choice, so it must come back at the next start — otherwise the
+	// default preset would silently take its place every launch.
+	const auto tmp = std::filesystem::temp_directory_path() / "evl-theme-test";
+	create_directories(tmp);
+	const auto file = tmp / "config.yml";
+
+	{
+		evl::core::Settings settings;
+		const auto chosen = evl::gui::Theme::fromPreset(evl::gui::Theme::Preset::Salle);
+		auto copy = chosen;
+		settings.include(copy.saveToSettings(), "theme");
+		settings.toFile(file);
+	}
+
+	evl::core::Settings reloaded;
+	reloaded.fromFile(file);
+	const auto extracted = reloaded.extract("theme");
+	ASSERT_TRUE(extracted.contains("Preset"));
+	evl::gui::Theme theme;
+	theme.loadFromSettings(extracted);
+	EXPECT_EQ(theme.preset, evl::gui::Theme::Preset::Salle);
+	// And the colours with it, not just the name.
+	EXPECT_EQ(theme.windowBackground, evl::gui::Theme::fromPreset(evl::gui::Theme::Preset::Salle).windowBackground);
+
+	remove_all(tmp);
+}
+
+TEST(gui_Theme, settingsFromBeforeThePresetsGetTheDefaultOne) {
+	// Settings that know nothing of habillages carry the old defaults, which no
+	// interface could edit: they are not a choice, and the default preset replaces them.
+	evl::core::Settings old;
+	old.setValue("Text", evl::math::vec4{0.85f, 0.85f, 0.85f, 1.0f});
+	evl::gui::Theme theme;
+	theme.loadFromSettings(old);
+	EXPECT_EQ(theme.preset, evl::gui::Theme::g_defaultPreset);
+	EXPECT_EQ(theme.windowBackground, evl::gui::Theme::fromPreset(evl::gui::Theme::g_defaultPreset).windowBackground);
 }

@@ -55,6 +55,12 @@ Author: Silmaen
   articles, the whole value carried by the first
 - `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
   what the popup shows and what is written to disk
+- `Distribution` - `distributePrizes()`: spreads the event's prize catalogue over its
+  sub-rounds. Two climbs superimposed — quine < two quines < full card inside a round,
+  and each round heavier than the last up to the final climax. Value and attractiveness
+  are each normalised before being mixed, in the proportion `DistributionSettings` says.
+  Idempotent: it always starts from the whole catalogue and never touches a sub-round
+  that is no longer editable
 - `Serializable` - Abstract base for binary stream, JSON (jsoncpp), and YAML (yaml-cpp) serialization
 - `Settings` - Application settings (key-value store)
 - `Statistics` - Draw statistics tracking
@@ -69,10 +75,20 @@ Author: Silmaen
 - `RandomNumberGenerator` - Number drawing engine (uses `std::mt19937` + `std::uniform_int_distribution`)
 - `Log` - Logging wrapper around spdlog, with `LogBuffer` for in-app log display
 
-Save format **8**: the prizes of a sub-round are a list of articles instead of a
-multi-line string with one value. Files from versions 3 to 7 still read.
-`test/lib_test/reference-v8.lev` is the checked-in byte reference every toolchain is
-compared against, `reference-v7.lev` the compatibility fixture.
+`Event::getCatalogue()` holds every article the organizer has, entered in one go and
+independent of the rounds. It stays the master list: a distributed article is **copied**
+into the sub-round, so a `.lev` file is complete on its own and the distribution can be
+run again. `gatherCatalogueFromRounds()` rebuilds it from the prizes already sitting in
+the sub-rounds, and is called automatically when reading a file older than version 9 —
+without it an old event would arrive with an empty catalogue and nothing to distribute.
+Beware version 3 files: the format did not store prize values, so their articles come
+back without a price and the distribution says the resulting order is arbitrary.
+
+Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
+multi-line string with one value; **9** added the event catalogue. Files from versions 3
+to 8 still read. `test/lib_test/reference-v9.lev` is the checked-in byte reference every
+toolchain is compared against, and `reference-v7.lev` / `reference-v8.lev` are the
+compatibility fixtures — every format change adds one and keeps the previous ones.
 
 ### Math Utilities (namespace `evl::math`)
 
@@ -80,6 +96,16 @@ compared against, `reference-v7.lev` the compatibility fixture.
 - Type aliases: `vec2`, `vec2i`, etc.
 
 ### GUI (namespace `evl::gui`)
+
+`MainConfigPopups` is laid out as three tabs — Général (directories, draw delay, and the
+X11/Wayland choice on Linux), Apparence (window preset and interface font), Affichage
+joueurs (everything about the players' screen). Tabs rather than stacked fixed-height
+children: a page that outgrows its box used to have its content cut off.
+
+Two ImGui balance rules this code has been bitten by: `EndChild()` must be called
+whatever `BeginChild()` returned — inside the `if` it is skipped as soon as the child is
+clipped, and the enclosing `End()` then asserts — and a cursor move must always be
+followed by an item.
 
 - `Application` - Singleton application class, manages views/popups/actions, Vulkan
   rendering, autosave (`rescue.lev` every 10s during active gameplay, atomic, two
@@ -92,17 +118,21 @@ compared against, `reference-v7.lev` the compatibility fixture.
   at the start of the next frame, never inside an open one, and a file that is not an
   `sfnt` is refused rather than handed to ImGui, which would assert
 - `Theme` - Theme configuration for the UI (colors, rounding, spacing; persisted in
-  settings). Three presets — `Nuit` (the original), `Ardoise`, `Salle` — derived from a
-  five-colour palette by `applyPalette`, so the fifty ImGui colours stay coherent. A
-  preset is a starting point: the stored colours win, and `Réappliquer` goes back to them
+  settings). Three presets — `Nuit` (the original), `Ardoise` (the default,
+  `g_defaultPreset`), `Salle` — derived from a five-colour palette by `applyPalette`, so
+  the fifty ImGui colours stay coherent. A preset is a starting point: the stored colours
+  win, and `Réappliquer` goes back to them. Settings carrying no `Preset` key predate the
+  presets, so their colours are the old defaults nothing could edit: the default preset
+  takes their place once, which is what makes the restyle actually land
 - `event/` - Event system: `Event` base, `KeyEvent`, `MouseEvent`, `AppEvent`, `KeyCode`, `MouseCode`
 - `views/` - View, MainView (with a `Présentateur` tab drawing the display miniature),
   DisplayView (`renderInline()` draws its content scaled down in the current window),
   HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups,
   HelpPopups, RescuePopup (resume an interrupted game), WinnerPopups (ask who won, settle
-  a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup
+  a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup,
+  CataloguePopup (the prize catalogue and the distribution tool)
 - `actions/` - Action base, FileActions, GameActions (draw, cancel, next step, winners,
-  quick game, report), SettingsActions, HelpActions
+  quick game, report, catalogue), SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
 - `utils/` - FileDialog (the ImGui file browser: `openFile`/`saveFile`/`selectFolder`, each taking a continuation; `OwnerScope` marks who is drawing; the pure parts — `parseFilters`, `matches`, `isDeclared`, `listEntries`, `resolveTarget`, `breadcrumb`, `splitQuery`, `commonPrefix`, `recentPaths` — are public so they can be tested without a window), Convert (ImGui/core vector conversions), MarkdownParser (lightweight markdown-to-elements parser), Rendering (action buttons, text auto-fit)
 
@@ -334,6 +364,10 @@ All domain objects inherit from `Serializable` and implement:
 - `test_Prize.cpp` checks the article model, its bounds and the pre-version-8 migration
 - `test_Report.cpp` checks the end-of-event report, including that a designation holding
   a pipe cannot break a Markdown table
+- `test_Distribution.cpp` checks the automatic distribution as properties rather than as
+  fixed output: value rising inside a round and across the event, appeal able to outweigh
+  price, a children's round only getting what it may, idempotence, and a round under way
+  keeping its prizes
 - The user documentation is itself under test: `test_markdownParser.cpp` fails on any
   markdown the in-app renderer cannot draw — inline code with backticks in particular
 - Sanitizer suppressions: `tsan_suppressions.txt` (races inside lavapipe and its LLVM

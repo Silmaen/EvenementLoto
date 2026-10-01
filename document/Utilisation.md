@@ -21,12 +21,15 @@ logiciel ou
 de fermeture accidentelle. Il est donc recommandé de choisir un répertoire où vous avez l'habitude de sauvegarder vos
 données, et de ne pas le changer trop souvent.
 
-La section "Thème" commence par le choix d'un **habillage**, qui fixe d'un coup toutes les couleurs et l'espacement
+La fenêtre se range en trois onglets : **Général** (répertoires, tirage, serveur d'affichage), **Apparence**
+(habillage des fenêtres, police) et **Affichage joueurs** (tout ce qui ne concerne que l'écran vu par la salle).
+
+L'onglet "Apparence" commence par le choix d'un **habillage**, qui fixe d'un coup toutes les couleurs et l'espacement
 des fenêtres de travail :
 
+* **Ardoise** : l'habillage par défaut, gris neutres et un seul accent ambre, le même que celui du dernier numéro
+  tiré sur le panneau d'affichage ; angles francs et plus d'air entre les lignes.
 * **Nuit** : l'habillage d'origine, bleu-gris sombre et arrondi.
-* **Ardoise** : gris neutres et un seul accent ambre, le même que celui du dernier numéro tiré sur le panneau
-  d'affichage ; angles plus francs et plus d'air entre les lignes.
 * **Salle** : clair et très contrasté, avec des cibles plus larges, pour une salle mal éclairée ou un écran vu de biais.
 
 Un habillage n'est qu'un point de départ : les couleurs restent modifiables une par une juste en dessous, et ce sont
@@ -52,6 +55,15 @@ La section "Tirage" porte un délai, en secondes, pendant lequel les commandes d
 numéro : le bouton de tirage aléatoire affiche le temps restant et la grille manuelle refuse les clics. C'est le tempo
 de l'annonce, le temps qu'il faut au numéro pour atteindre le fond de la salle. Zéro désactive le blocage. Annuler un
 tirage, ou changer de phase, réarme les commandes immédiatement.
+
+#### Serveur d'affichage (Linux)
+
+L'onglet "Général" permet de demander **X11** ou **Wayland**, ou de laisser le choix à la bibliothèque graphique. Le
+réglage prend effet au prochain démarrage.
+
+X11 — XWayland compris, donc y compris depuis une session Wayland — est le choix par défaut, et le seul qui permette
+d'envoyer la fenêtre d'affichage en plein écran sur le vidéoprojecteur : le protocole Wayland interdit à une application
+de choisir où ses fenêtres s'ouvrent. Wayland reste proposé pour les postes où X11 n'est pas disponible, ou pour essayer.
 
 #### Écran d'affichage sur un second écran (Linux)
 
@@ -178,6 +190,37 @@ les gagnants puissent continuer à jouer pour les phases suivantes. Par exemple,
 gagnant est celui qui remplit une quine, le second gagnant est celui qui remplit une double quine, et le troisième
 gagnant est celui qui remplit un carton plein. Si les cartons sont démarqués entre chaque phase, les participants ne
 pourront pas continuer à jouer pour les phases suivantes, et cela peut créer de la confusion.
+
+#### Catalogue des lots et répartition automatique
+
+Plutôt que de garnir chaque manche une par une, on peut saisir d'un bloc tous les lots dont on dispose, puis laisser le
+logiciel les répartir. Le catalogue s'ouvre par le menu "Jeu" > "Catalogue des lots". Il se remplit exactement comme la
+liste des lots d'une manche : un article par ligne, avec sa désignation, son donateur, sa valeur, son attrait et sa
+compatibilité enfant. La valeur totale du catalogue s'affiche en haut.
+
+Le bouton "Répartir" place alors tout le catalogue sur les manches, avec les deux montées qu'une après-midi demande :
+
+* **dans une partie**, la quine vaut moins que la double quine, qui vaut moins que le carton plein ;
+* **au long de l'événement**, chaque partie pèse un peu plus que la précédente, la dernière étant le point d'orgue.
+
+Trois réglages commandent la répartition :
+
+* **Part de l'attrait** : à zéro, seule la valeur compte ; à un, seul l'attrait compte. Un jambon fait souvent plus
+  d'effet qu'un objet plus cher, et c'est l'effet qui fait jouer.
+* **Montée vers la fin** : à zéro, toutes les parties se valent ; à un, la dernière emporte les plus beaux lots.
+* **Respecter les parties enfant** : une partie enfant ne reçoit alors que les articles marqués compatibles.
+
+Un événement enregistré avec une version antérieure au catalogue arrive avec le sien : les lots que vous aviez répartis
+à la main dans les parties sont reversés au catalogue à l'ouverture du fichier, prêts à être redistribués. Le bouton
+"Reprendre les lots des parties" refait l'opération à la demande, ce qui sert aussi après un ajustement manuel.
+
+**Attention aux fichiers très anciens** : avant la version 4 du format, la valeur des lots n'était pas enregistrée. Leurs
+articles reviennent donc sans prix, et la répartition vous prévient que l'ordre obtenu est arbitraire — il faut saisir
+les valeurs, ou au moins les attraits, pour qu'elle ait un sens.
+
+La répartition se rejoue autant de fois qu'on veut : elle repart du catalogue complet, et **ne touche jamais une manche
+déjà entamée**. Ce qu'elle décide s'ajuste ensuite à la main dans le réglage des parties. Le catalogue, lui, garde tout :
+c'est la liste de référence, les manches n'en reçoivent que des copies.
 
 #### Remplissage des lots à gagner
 

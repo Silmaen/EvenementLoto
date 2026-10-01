@@ -9,6 +9,8 @@
 
 #include "Theme.h"
 
+#include "core/Log.h"
+
 namespace evl::gui {
 
 namespace {
@@ -193,6 +195,15 @@ auto Theme::fromPreset(const Preset iPreset) -> Theme {
 }
 
 void Theme::loadFromSettings(const core::Settings& iSettings) {
+	if (!iSettings.contains("Preset")) {
+		// Des réglages d'avant les habillages : les couleurs qu'ils portent ne sont pas
+		// un choix, ce sont les anciennes valeurs par défaut, qu'aucune interface ne
+		// permettait de modifier. L'habillage par défaut prend donc leur place, et se
+		// change en un clic.
+		*this = fromPreset(g_defaultPreset);
+		log_info("Habillage par défaut appliqué : {}", presetName(preset));
+		return;
+	}
 	if (const auto name = iSettings.getValue<std::string>("Preset", std::string{presetName(preset)}); !name.empty()) {
 		for (const auto& candidate: magic_enum::enum_values<Preset>()) {
 			if (presetName(candidate) == name) {

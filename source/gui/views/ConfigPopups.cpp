@@ -27,6 +27,8 @@ namespace evl::gui::views {
 
 constexpr float g_buttonWidth = 100.0f;
 constexpr float g_buttonSectionHeight = 50.0f;
+/// Colonne où commencent les champs, pour que les libellés s'alignent d'une page à l'autre.
+constexpr float g_labelWidth = 200.0f;
 
 namespace {
 
@@ -48,263 +50,280 @@ MainConfigPopups::~MainConfigPopups() = default;
 void MainConfigPopups::onOpen() { settingsToData(); }
 
 void MainConfigPopups::onPopupUpdate() {
-	// Répertoires par défaut
-	const auto style = ImGui::GetStyle();
-	if (ImGui::BeginChild("DefaultDirectories", ImVec2(0, 80), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Répertoires par défaut");
-		ImGui::Separator();
-		ImGui::Text("Données:");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(-80);
-		std::string originalPath = m_data.dataLocation.string();
-		if (ImGui::InputText("##DataLocation", &originalPath)) {
-			m_data.dataLocation = originalPath;
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("...##SearchFolder")) {
-			utils::FileDialog::selectFolder(
-					[this](const std::filesystem::path& iPath) -> void { m_data.dataLocation = iPath; });
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Parcourir...");
-	}
-	ImGui::EndChild();
-
-	// Police d'interface
-	if (ImGui::BeginChild("FontSettings", ImVec2(0, 80), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Police d'interface");
-		ImGui::Separator();
-		ImGui::Text("Fichier:");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(-160);
-		std::string fontPath = m_data.fontPath.string();
-		if (ImGui::InputTextWithHint("##FontPath", "police embarquée", &fontPath))
-			m_data.fontPath = fontPath;
-		ImGui::SameLine();
-		if (ImGui::Button("...##SearchFont")) {
-			utils::FileDialog::openFile("Police|ttf,otf,ttc", [this](const std::filesystem::path& iPath) -> void {
-				m_data.fontPath = iPath;
-			});
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Parcourir...");
-		ImGui::SameLine();
-		if (ImGui::Button("Défaut##Font"))
-			m_data.fontPath.clear();
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Revenir à la police embarquée.");
-		ImGui::Text("Taille:");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(120);
-		ImGui::DragFloat("##FontSize", &m_data.fontSize, 0.5f, 10.0f, 48.0f, "%.0f px");
-	}
-	ImGui::EndChild();
-
-	// Tirage
-	if (ImGui::BeginChild("DrawSettings", ImVec2(0, 60), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Tirage");
-		ImGui::Separator();
-		ImGui::Text("Délai de réactivation (s):");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(120);
-		ImGui::DragFloat("##DrawDelay", &m_data.drawDelay, 0.1f, 0.0f, 30.0f, "%.1f");
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Temps pendant lequel les commandes de tirage restent bloquées après un\n"
-							  "numéro, pour donner le tempo. Zéro désactive le blocage.");
-	}
-	ImGui::EndChild();
-
-	// Thème
-	if (const float themeHeight = ImGui::GetContentRegionAvail().y - g_buttonSectionHeight;
-		ImGui::BeginChild("Theme", ImVec2(0, themeHeight), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Thème");
-		ImGui::Separator();
-
-		// Habillage : un point de départ cohérent, que la personnalisation ci-dessous
-		// reprend ensuite couleur par couleur.
-		ImGui::Text("Habillage");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(200);
-		{
-			const auto current = Application::get().getTheme().preset;
-			int selected = static_cast<int>(current);
-			std::string names;
-			for (const auto& candidate: magic_enum::enum_values<Theme::Preset>()) {
-				names += Theme::presetName(candidate);
-				names += '\0';
+	// Des onglets plutôt que des groupes empilés à hauteur fixe : chaque page prend la
+	// place qu'il lui faut, rien n'est coupé, et les réglages se rangent par sujet — ce
+	// qui vaut pour l'outil, ce qui vaut pour son apparence, ce qui vaut pour l'écran
+	// des joueurs.
+	if (ImGui::BeginChild("ConfigPages", {0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight},
+						  ImGuiChildFlags_None)) {
+		if (ImGui::BeginTabBar("ConfigTabs")) {
+			if (ImGui::BeginTabItem("Général")) {
+				renderGeneralTab();
+				ImGui::EndTabItem();
 			}
-			names += '\0';
-			if (ImGui::Combo("##ThemePreset", &selected, names.c_str())) {
-				Application::get().setTheme(Theme::fromPreset(static_cast<Theme::Preset>(selected)));
-				log_info("Habillage appliqué : {}", Theme::presetName(static_cast<Theme::Preset>(selected)));
+			if (ImGui::BeginTabItem("Apparence")) {
+				renderAppearanceTab();
+				ImGui::EndTabItem();
 			}
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Réappliquer")) {
-			const auto current = Application::get().getTheme().preset;
-			Application::get().setTheme(Theme::fromPreset(current));
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Revenir aux couleurs de l'habillage, en oubliant les retouches.");
-		ImGui::Spacing();
-
-		// Personnalisation
-		if (ImGui::BeginChild("Customization", ImVec2(0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight),
-							  ImGuiWindowFlags_NoTitleBar)) {
-			ImGui::Text("Personnalisation");
-			ImGui::Separator();
-
-			ImGui::Columns(2, "ConfigColumns");
-			ImGui::SetColumnWidth(1, 250);
-
-			// Échelles
-			ImGui::Text("Facteur d'échelle de titre");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 10.0f, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Text("Échelle texte grille");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.1f, 0.3f, 1.5f, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Text("Facteur d'échelle prix");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##ValueScale", &m_data.valueScale, 0.1f, 0.5f, 10.0f, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Text("Facteur d'échelle texte lots");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##PriceTextScale", &m_data.priceTextScale, 0.1f, 0.5f, 10.0f, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Text("Facteur d'échelle horloges");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##TimeScale", &m_data.timeScale, 0.1f, 0.5f, 2.5f, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Separator();
-
-			// Couleurs
-			ImGui::Text("Couleur de l'arrière plan");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::ColorEdit3("##BackgroundColor", reinterpret_cast<float*>(&m_data.backgroundColor),
-							  ImGuiColorEditFlags_NoInputs);
-			ImGui::NextColumn();
-
-			ImGui::Text("Couleur du texte");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::ColorEdit3("##TextColor", reinterpret_cast<float*>(&m_data.textColor), ImGuiColorEditFlags_NoInputs);
-			ImGui::NextColumn();
-
-			ImGui::Separator();
-
-			ImGui::Text("Arrière plan de la grille");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::ColorEdit3("##GridBackgroundColor", reinterpret_cast<float*>(&m_data.gridBackgroundColor),
-							  ImGuiColorEditFlags_NoInputs);
-			ImGui::NextColumn();
-
-			ImGui::Text("Espacement de la grille");
-			ImGui::NextColumn();
-			ImGui::BeginGroup();
-			const float gridSize = (ImGui::GetContentRegionAvail().x - style.ItemSpacing.x) * 0.5f;
-			ImGui::SetNextItemWidth(gridSize);
-			ImGui::DragFloat("##GridSpaceX", &m_data.gridSpace.x(), 0.1f, 0.1f, 10.f, "%.1f");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(gridSize);
-			ImGui::DragFloat("##GridSpaceY", &m_data.gridSpace.y(), 0.1f, 0.1f, 10.f, "%.1f");
-
-			ImGui::EndGroup();
-
-			ImGui::NextColumn();
-
-			ImGui::Separator();
-
-			ImGui::Text("Tronquer lignes de lots");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::Checkbox("##TruncatePrice", &m_data.truncatePrice);
-			ImGui::NextColumn();
-
-			ImGui::Text("Max lignes de lots");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragInt("##TruncatePriceLines", &m_data.truncatePriceLines, 1.0f, 1, 15);
-			ImGui::NextColumn();
-
-			ImGui::Separator();
-
-			// Numéros sélectionnés
-			ImGui::Text("Couleur chiffre sélectionné");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::ColorEdit3("##SelectedNumberColor", reinterpret_cast<float*>(&m_data.selectedNumberColor),
-							  ImGuiColorEditFlags_NoInputs);
-			ImGui::NextColumn();
-
-			ImGui::Text("Fondu de couleur");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::Checkbox("##FadeNumbers", &m_data.fadeNumbers);
-			ImGui::NextColumn();
-
-			ImGui::Text("Nombre de chiffres fondus");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragInt("##FadeAmount", &m_data.fadeAmount, 1.0f, 0, 10);
-			ImGui::NextColumn();
-
-			ImGui::Text("Force du fondu");
-			ImGui::NextColumn();
-			ImGui::SetNextItemWidth(-1);
-			ImGui::DragFloat("##FadeStrength", &m_data.fadeStrength, 0.1f, -2, 2, "%.1f");
-			ImGui::NextColumn();
-
-			ImGui::Columns(1);
-		}
-		ImGui::EndChild();
-
-		ImGui::Spacing();
-
-		// Boutons Reset/Restore
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(2));
-		if (ImGui::Button("Reset", ImVec2(g_buttonWidth, 0))) {
-			m_data = {};
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Restaurer", ImVec2(g_buttonWidth, 0))) {
-			settingsToData();
+			if (ImGui::BeginTabItem("Affichage joueurs")) {
+				renderPlayerDisplayTab();
+				ImGui::EndTabItem();
+			}
+			ImGui::EndTabBar();
 		}
 	}
 	ImGui::EndChild();
 
-	ImGui::Spacing();
 	ImGui::Separator();
-	ImGui::Spacing();
 
-	// Boutons Ok/Appliquer/Annuler
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(3));
+	// Boutons Reset/Restaurer/Ok/Appliquer/Annuler
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(5));
+	if (ImGui::Button("Reset", ImVec2(g_buttonWidth, 0)))
+		m_data = {};
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Revenir aux valeurs d'origine de tous les réglages.");
+	ImGui::SameLine();
+	if (ImGui::Button("Restaurer", ImVec2(g_buttonWidth, 0)))
+		settingsToData();
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Oublier les modifications en cours.");
+	ImGui::SameLine();
 	if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
 		dataToSettings();
 		ImGui::CloseCurrentPopup();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
+	if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0)))
 		dataToSettings();
+	ImGui::SameLine();
+	if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0)))
+		ImGui::CloseCurrentPopup();
+}
+
+void MainConfigPopups::renderGeneralTab() {
+	ImGui::SeparatorText("Répertoires par défaut");
+	ImGui::Text("Données");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(-80);
+	std::string originalPath = m_data.dataLocation.string();
+	if (ImGui::InputText("##DataLocation", &originalPath))
+		m_data.dataLocation = originalPath;
+	ImGui::SameLine();
+	if (ImGui::Button("...##SearchFolder")) {
+		utils::FileDialog::selectFolder(
+				[this](const std::filesystem::path& iPath) -> void { m_data.dataLocation = iPath; });
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Parcourir...");
+
+	ImGui::SeparatorText("Tirage");
+	ImGui::Text("Délai de réactivation");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(140);
+	ImGui::DragFloat("##DrawDelay", &m_data.drawDelay, 0.1f, 0.0f, 30.0f, "%.1f s");
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Temps pendant lequel les commandes de tirage restent bloquées après un\n"
+						  "numéro, pour donner le tempo. Zéro désactive le blocage.");
+
+#ifdef EVL_PLATFORM_LINUX
+	// Le choix n'a de sens que sous Linux, et seulement tant que Wayland ne permet pas
+	// d'envoyer l'affichage sur un second écran : il est donc présenté avec sa
+	// conséquence, pas comme une préférence anodine.
+	ImGui::SeparatorText("Serveur d'affichage");
+	ImGui::Text("Serveur demandé");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(140);
+	{
+		constexpr std::array<const char*, 3> values{{"x11", "wayland", "auto"}};
+		int selected = 0;
+		for (size_t i = 0; i < values.size(); ++i) {
+			if (m_data.displayServer == values[i])
+				selected = static_cast<int>(i);
+		}
+		if (ImGui::Combo("##DisplayServer", &selected, "X11\0Wayland\0Automatique\0\0"))
+			m_data.displayServer = values[static_cast<size_t>(selected)];
+	}
+	ImGui::TextWrapped("Sous X11, XWayland compris, la fenêtre d'affichage peut être envoyée en plein écran sur le "
+					   "vidéoprojecteur. Le protocole Wayland ne le permet pas : une application n'y choisit pas où "
+					   "ses fenêtres s'ouvrent. X11 reste donc le choix par défaut.");
+	ImGui::TextDisabled("Prend effet au prochain démarrage.");
+#endif
+}
+
+void MainConfigPopups::renderAppearanceTab() {
+	ImGui::SeparatorText("Habillage des fenêtres");
+	ImGui::Text("Habillage");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(200);
+	{
+		const auto current = Application::get().getTheme().preset;
+		int selected = static_cast<int>(current);
+		std::string names;
+		for (const auto& candidate: magic_enum::enum_values<Theme::Preset>()) {
+			names += Theme::presetName(candidate);
+			names += '\0';
+		}
+		names += '\0';
+		if (ImGui::Combo("##ThemePreset", &selected, names.c_str())) {
+			Application::get().setTheme(Theme::fromPreset(static_cast<Theme::Preset>(selected)));
+			log_info("Habillage appliqué : {}", Theme::presetName(static_cast<Theme::Preset>(selected)));
+		}
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
-		ImGui::CloseCurrentPopup();
+	if (ImGui::Button("Réappliquer")) {
+		const auto current = Application::get().getTheme().preset;
+		Application::get().setTheme(Theme::fromPreset(current));
 	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Revenir aux couleurs de l'habillage, en oubliant les retouches.");
+	ImGui::TextDisabled("Le changement est immédiat.");
+
+	ImGui::SeparatorText("Police d'interface");
+	ImGui::Text("Fichier");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(-170);
+	std::string fontPath = m_data.fontPath.string();
+	if (ImGui::InputTextWithHint("##FontPath", "police embarquée", &fontPath))
+		m_data.fontPath = fontPath;
+	ImGui::SameLine();
+	if (ImGui::Button("...##SearchFont")) {
+		utils::FileDialog::openFile("Police|ttf,otf,ttc",
+									[this](const std::filesystem::path& iPath) -> void { m_data.fontPath = iPath; });
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Parcourir...");
+	ImGui::SameLine();
+	if (ImGui::Button("Défaut##Font"))
+		m_data.fontPath.clear();
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Revenir à la police embarquée.");
+	ImGui::Text("Taille");
+	ImGui::SameLine(g_labelWidth);
+	ImGui::SetNextItemWidth(140);
+	ImGui::DragFloat("##FontSize", &m_data.fontSize, 0.5f, 10.0f, 48.0f, "%.0f px");
+}
+
+void MainConfigPopups::renderPlayerDisplayTab() {
+	const auto style = ImGui::GetStyle();
+	ImGui::TextWrapped("Ce qui suit ne concerne que l'écran vu par les joueurs.");
+	ImGui::Spacing();
+
+	ImGui::Columns(2, "ConfigColumns");
+	ImGui::SetColumnWidth(1, 250);
+
+	// Échelles
+	ImGui::Text("Facteur d'échelle de titre");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 10.0f, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Text("Échelle texte grille");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.1f, 0.3f, 1.5f, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Text("Facteur d'échelle prix");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##ValueScale", &m_data.valueScale, 0.1f, 0.5f, 10.0f, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Text("Facteur d'échelle texte lots");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##PriceTextScale", &m_data.priceTextScale, 0.1f, 0.5f, 10.0f, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Text("Facteur d'échelle horloges");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##TimeScale", &m_data.timeScale, 0.1f, 0.5f, 2.5f, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Separator();
+
+	// Couleurs
+	ImGui::Text("Couleur de l'arrière plan");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::ColorEdit3("##BackgroundColor", reinterpret_cast<float*>(&m_data.backgroundColor),
+					  ImGuiColorEditFlags_NoInputs);
+	ImGui::NextColumn();
+
+	ImGui::Text("Couleur du texte");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::ColorEdit3("##TextColor", reinterpret_cast<float*>(&m_data.textColor), ImGuiColorEditFlags_NoInputs);
+	ImGui::NextColumn();
+
+	ImGui::Separator();
+
+	ImGui::Text("Arrière plan de la grille");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::ColorEdit3("##GridBackgroundColor", reinterpret_cast<float*>(&m_data.gridBackgroundColor),
+					  ImGuiColorEditFlags_NoInputs);
+	ImGui::NextColumn();
+
+	ImGui::Text("Espacement de la grille");
+	ImGui::NextColumn();
+	ImGui::BeginGroup();
+	const float gridSize = (ImGui::GetContentRegionAvail().x - style.ItemSpacing.x) * 0.5f;
+	ImGui::SetNextItemWidth(gridSize);
+	ImGui::DragFloat("##GridSpaceX", &m_data.gridSpace.x(), 0.1f, 0.1f, 10.f, "%.1f");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(gridSize);
+	ImGui::DragFloat("##GridSpaceY", &m_data.gridSpace.y(), 0.1f, 0.1f, 10.f, "%.1f");
+
+	ImGui::EndGroup();
+
+	ImGui::NextColumn();
+
+	ImGui::Separator();
+
+	ImGui::Text("Tronquer lignes de lots");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::Checkbox("##TruncatePrice", &m_data.truncatePrice);
+	ImGui::NextColumn();
+
+	ImGui::Text("Max lignes de lots");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragInt("##TruncatePriceLines", &m_data.truncatePriceLines, 1.0f, 1, 15);
+	ImGui::NextColumn();
+
+	ImGui::Separator();
+
+	// Numéros sélectionnés
+	ImGui::Text("Couleur chiffre sélectionné");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::ColorEdit3("##SelectedNumberColor", reinterpret_cast<float*>(&m_data.selectedNumberColor),
+					  ImGuiColorEditFlags_NoInputs);
+	ImGui::NextColumn();
+
+	ImGui::Text("Fondu de couleur");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::Checkbox("##FadeNumbers", &m_data.fadeNumbers);
+	ImGui::NextColumn();
+
+	ImGui::Text("Nombre de chiffres fondus");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragInt("##FadeAmount", &m_data.fadeAmount, 1.0f, 0, 10);
+	ImGui::NextColumn();
+
+	ImGui::Text("Force du fondu");
+	ImGui::NextColumn();
+	ImGui::SetNextItemWidth(-1);
+	ImGui::DragFloat("##FadeStrength", &m_data.fadeStrength, 0.1f, -2, 2, "%.1f");
+	ImGui::NextColumn();
+
+	ImGui::Columns(1);
 }
 
 void MainConfigPopups::dataToSettings() {
@@ -325,6 +344,11 @@ void MainConfigPopups::dataToSettings() {
 	settings.setValue("fade_numbers", m_data.fadeNumbers);
 	settings.setValue("fade_amount", m_data.fadeAmount);
 	settings.setValue("fade_strength", m_data.fadeStrength);
+#ifdef EVL_PLATFORM_LINUX
+	// Ailleurs il n'y a rien à choisir, et écrire la clé donnerait l'illusion du
+	// contraire au prochain démarrage.
+	settings.setValue("display_server", m_data.displayServer);
+#endif
 	core::getSettings()->include(settings, "gui");
 	core::getSettings()->setValue("general/data_location", std::string{m_data.dataLocation.string()});
 	// La police n'est pas qu'un réglage : elle demande la reconstruction de l'atlas, qui
@@ -338,6 +362,7 @@ void MainConfigPopups::settingsToData() {
 
 	m_data.dataLocation =
 			core::getSettings()->getValue<std::string>("general/data_location", defaults.dataLocation.string());
+	m_data.displayServer = settings.getValue<std::string>("display_server", defaults.displayServer);
 	m_data.fontPath = settings.getValue<std::string>("font_path", defaults.fontPath.string());
 	m_data.fontSize = settings.getValue<float>("font_size", defaults.fontSize);
 	m_data.drawDelay = settings.getValue<float>("draw_delay", defaults.drawDelay);
