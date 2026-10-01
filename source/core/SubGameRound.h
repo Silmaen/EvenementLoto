@@ -8,6 +8,7 @@
 #pragma once
 
 #include "Log.h"
+#include "Prize.h"
 #include "Serializable.h"
 #include "timeFunctions.h"
 
@@ -44,7 +45,7 @@ public:
 	/**
 	 * @brief Constructeur Avec données
 	 * @param iType Le type de sous partie
-	 * @param iPrices Le(s) lot(s) pour cette partie
+	 * @param iPrices Le(s) lot(s) pour cette partie, une ligne par article
 	 * @param iValue La valeur du lot
 	 */
 	explicit SubGameRound(const Type& iType = Type::OneQuine, const std::string& iPrices = "",
@@ -53,33 +54,59 @@ public:
 	}
 
 	/**
-	 * @brief Définition de la sous-partie
+	 * @brief Définition de la sous-partie, les lots décrits par une chaine multiligne.
 	 * @param iType Le type de sous partie
-	 * @param iPrices Le(s) lot(s) pour cette partie
-	 * @param iValue La valeur des lots
+	 * @param iPrices Le(s) lot(s) pour cette partie, une ligne par article
+	 * @param iValue La valeur des lots, portée par le premier article
 	 */
 	void define(const Type& iType, const std::string& iPrices = "", const double iValue = 0) {
+		definePrizes(iType, prizesFromLegacy(iPrices, iValue));
+	}
+
+	/**
+	 * @brief Définition de la sous-partie et de ses articles.
+	 * @param iType Le type de sous partie
+	 * @param iPrizes Les articles à gagner
+	 */
+	void definePrizes(const Type& iType, const prizes_type& iPrizes) {
 		if (!isEditable()) {
 			log_warn("Impossible de modifier une sous-partie non éditable");
 			return;
 		}
 		m_type = iType;
-		m_prices = iPrices;
-		m_pricesValue = iValue;
+		m_prizes = iPrizes;
 		m_winner = "";
 	}
 
 	/**
-	 * @brief Renvoie les lots de cette partie.
-	 * @return Les lots.
+	 * @brief Renvoie les lots de cette partie, une ligne par article.
+	 * @return Les désignations des articles.
 	 */
-	[[nodiscard]] auto getPrices() const -> const std::string& { return m_prices; }
+	[[nodiscard]] auto getPrices() const -> std::string { return designations(m_prizes); }
 
 	/**
-	 * @brief Renvoie la valeur du lot à gagner.
+	 * @brief Renvoie la valeur du lot à gagner, somme de celle des articles.
 	 * @return La valeur du lot.
 	 */
-	[[nodiscard]] auto getValue() const -> const double& { return m_pricesValue; }
+	[[nodiscard]] auto getValue() const -> double { return totalValue(m_prizes); }
+
+	/**
+	 * @brief Accès aux articles à gagner.
+	 * @return Les articles.
+	 */
+	[[nodiscard]] auto getPrizes() const -> const prizes_type& { return m_prizes; }
+
+	/**
+	 * @brief Remplace les articles à gagner.
+	 * @param iPrizes Les nouveaux articles.
+	 */
+	void setPrizes(const prizes_type& iPrizes) {
+		if (!isEditable()) {
+			log_warn("Impossible de modifier les lots d'une sous-partie non éditable");
+			return;
+		}
+		m_prizes = iPrizes;
+	}
 
 	/**
 	 * @brief Renvoie le type de sous-partie.
@@ -249,14 +276,20 @@ public:
 	}
 #endif
 private:
+	/**
+	 * @brief Lit la liste des articles, à partir de la version 8.
+	 * @param iBs Le stream d’entrée.
+	 * @param iContext Ce que le lecteur sait du fichier parcouru.
+	 * @return True si la lecture a réussi.
+	 */
+	auto readPrizes(std::istream& iBs, const ReadContext& iContext) -> bool;
+
 	/// Le type de la sous-partie
 	Type m_type = Type::OneQuine;
 	/// Le statut de la sous-partie
 	Status m_status = Status::Ready;
-	/// La valeur du lot
-	double m_pricesValue = 0;
-	/// La liste des prix pour cette sous-partie
-	std::string m_prices;
+	/// Les articles à gagner pour cette sous-partie
+	prizes_type m_prizes;
 	/// Le nom du gagnant
 	std::string m_winner;
 	/// La liste des numéros tirés.

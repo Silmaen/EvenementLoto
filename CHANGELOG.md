@@ -8,6 +8,10 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Départage des prétendants à égalité, par choix ou par tirage au sort.
 * Étape du gagnant passable, une manche que personne ne réclame n'arrête plus la partie.
 * Correction des noms de gagnant après la manche, par le menu « Jeu » > « Gagnants ».
+* Lots saisis article par article : désignation, donateur, valeur, attrait, compatibilité enfant.
+* Liste détaillée des lots sur l'écran de contrôle, avec valeur et donateur.
+* Format de sauvegarde 8 ; les fichiers des versions 3 à 7 se relisent, leur valeur
+  de lot étant portée par le premier article.
 
 ## 0.5.1 — 26 septembre 2026
 

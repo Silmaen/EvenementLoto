@@ -7,9 +7,7 @@ contenu est dans le changelog.
 
 ## 0.6.0
 
-* Affichage de la liste des lots sur l'écran présentateur pendant l'annonce.
 * Rapport de fin d'événement.
-* Édition des lots sous forme de liste d'articles.
 * Partie improvisée : grille seule, insérable n'importe où dans un événement démarré,
   lots facultatifs saisis au dernier moment, comptée dans le rapport de fin.
 * Style des fenêtres revu : palette, typographie, densité et hiérarchie cohérentes.
@@ -21,8 +19,7 @@ contenu est dans le changelog.
 
 ## 0.7.0
 
-* Catalogue des lots de l'événement : désignation, donateur, valeur, attractivité,
-  compatibilité enfant.
+* Catalogue des lots de l'événement, saisi d'un bloc et indépendant des parties.
 * Répartition automatique des lots sur les parties, puis ajustement manuel.
 * Valeur croissante des lots au sein d'une partie, de la quine au carton plein.
 * Progression de la valeur des lots au long de l'événement, climax à la dernière partie.

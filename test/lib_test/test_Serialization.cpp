@@ -80,25 +80,43 @@ TEST(Serialization, RoundTrip) {
 	EXPECT_EQ(restored.sizeRounds(), original.sizeRounds());
 }
 
+/// Read a whole file into memory.
+static auto readFile(const std::filesystem::path& iPath) -> std::string {
+	std::ifstream file(iPath, std::ios::in | std::ios::binary);
+	if (!file.is_open())
+		return {};
+	return std::string{std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
+}
+
 TEST(Serialization, PreviousVersionStillReads) {
-	// A version 6 file: no magic, no checksum, the version as the first field. The body
-	// itself is unchanged — lengths were already eight bytes and dates already counted
-	// nanoseconds on this platform, which is what makes the fixed widths a spelling out
-	// rather than a migration.
-	const auto framed = serialize(makeEvent());
-	ASSERT_GT(framed.size(), g_bodyOffset + sizeof(uint32_t));
-	const auto body = framed.substr(g_bodyOffset, framed.size() - g_bodyOffset - sizeof(uint32_t));
+	// The version 7 reference, kept as a fixture once version 8 changed the body: a
+	// relabelled copy of the current body would only ever test itself.
+	const auto expected = makeEvent();
+	const auto reference = readFile(EVL_TEST_REFERENCE_FILE_V7);
+	ASSERT_FALSE(reference.empty()) << EVL_TEST_REFERENCE_FILE_V7;
+
+	std::istringstream stream(reference, std::ios::in | std::ios::binary);
+	Event restored;
+	restored.read(stream, {});
+	EXPECT_TRUE(stream.good());
+	EXPECT_EQ(restored.getName(), expected.getName());
+	EXPECT_EQ(restored.sizeRounds(), expected.sizeRounds());
+
+	// And the same body without its frame, labelled version 6, which is how the files
+	// from before the magic are laid out.
+	ASSERT_GT(reference.size(), g_bodyOffset + sizeof(uint32_t));
+	const auto body = reference.substr(g_bodyOffset, reference.size() - g_bodyOffset - sizeof(uint32_t));
 	constexpr uint16_t legacyVersion = 6;
 	std::string legacy(sizeof(legacyVersion), '\0');
 	std::memcpy(legacy.data(), &legacyVersion, sizeof(legacyVersion));
 	legacy += body;
 
-	std::istringstream stream(legacy, std::ios::in | std::ios::binary);
-	Event restored;
-	restored.read(stream, {});
-	EXPECT_TRUE(stream.good());
-	EXPECT_EQ(restored.getName(), makeEvent().getName());
-	EXPECT_EQ(restored.sizeRounds(), makeEvent().sizeRounds());
+	std::istringstream legacyStream(legacy, std::ios::in | std::ios::binary);
+	Event fromLegacy;
+	fromLegacy.read(legacyStream, {});
+	EXPECT_TRUE(legacyStream.good());
+	EXPECT_EQ(fromLegacy.getName(), expected.getName());
+	EXPECT_EQ(fromLegacy.sizeRounds(), expected.sizeRounds());
 }
 
 /// What each file delivered in data/ is expected to contain.
@@ -176,9 +194,8 @@ TEST(Serialization, MatchesTheReferenceFile) {
 	//
 	// Should this fail after a deliberate format change, bump the save version and
 	// regenerate the file, keeping the old one as a compatibility fixture.
-	std::ifstream reference(EVL_TEST_REFERENCE_FILE, std::ios::in | std::ios::binary);
-	ASSERT_TRUE(reference.is_open()) << EVL_TEST_REFERENCE_FILE;
-	const std::string expected{std::istreambuf_iterator<char>(reference), std::istreambuf_iterator<char>()};
+	const std::string expected = readFile(EVL_TEST_REFERENCE_FILE);
+	ASSERT_FALSE(expected.empty()) << EVL_TEST_REFERENCE_FILE;
 	EXPECT_EQ(serialize(makeEvent()), expected);
 
 	// And it reads back, which is the other half of the promise.

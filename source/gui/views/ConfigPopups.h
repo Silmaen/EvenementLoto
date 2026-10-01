@@ -203,6 +203,12 @@ private:
 	void renderSecondColumn();
 	void renderThirdColumn();
 	void renderResult();
+	/**
+	 * @brief Draw the editable list of articles of a sub-round.
+	 * @param iSubRound The sub-round whose prizes are edited.
+	 * @param iEditable False once the sub-round has started, the list is then read only.
+	 */
+	static void renderPrizeList(const core::GameRound::sub_rounds_type::iterator& iSubRound, bool iEditable);
 	void addGameRound();
 	void deleteGameRound();
 	void moveGameRoundUp();

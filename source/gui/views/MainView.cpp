@@ -671,8 +671,26 @@ void MainView::renderBottomStatisticsPanel() const {
 		ImGui::TextWrapped(" ");
 	} else if (currentRound->getType() == core::GameRound::Type::Pause) {
 		ImGui::TextWrapped("Pas de lots pour une pause.");
-	} else {
-		ImGui::Text("%s", currentRound->getCurrentSubRound()->getPrices().c_str());
+	} else if (const auto& prizes = currentRound->getCurrentSubRound()->getPrizes(); prizes.empty()) {
+		ImGui::TextDisabled("Aucun lot pour cette phase.");
+	} else if (ImGui::BeginTable("Prizes", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+		// What the presenter reads out during the announcement: the article, what it is
+		// worth, and who to thank for it.
+		ImGui::TableSetupColumn("Article");
+		ImGui::TableSetupColumn("Valeur", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+		ImGui::TableSetupColumn("Donateur");
+		ImGui::TableHeadersRow();
+		for (const auto& prize: prizes) {
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::TextWrapped("%s", prize.getDesignation().c_str());
+			ImGui::TableNextColumn();
+			if (prize.getValue() > 0.0)
+				ImGui::Text("%.2f €", prize.getValue());
+			ImGui::TableNextColumn();
+			ImGui::TextWrapped("%s", prize.getDonor().c_str());
+		}
+		ImGui::EndTable();
 	}
 	ImGui::EndChild();
 	ImGui::EndGroup();

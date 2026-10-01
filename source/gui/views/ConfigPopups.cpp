@@ -776,23 +776,15 @@ void GameRoundConfigPopups::renderThirdColumn() {
 				std::string subRoundName = subRound->getTypeStr();
 				ImGui::InputText("##SubRoundName", &subRoundName, ImGuiInputTextFlags_ReadOnly);
 			}
-			ImGuiInputFlags flags = ImGuiInputTextFlags_None;
-			if (!subRound->isEditable())
-				flags |= ImGuiInputTextFlags_ReadOnly;
+			const bool editable = subRound->isEditable();
 			ImGui::Spacing();
-			ImGui::Text("Valeur Totale");
-			ImGui::SetNextItemWidth(-1);
-			auto priceValue = static_cast<float>(subRound->getValue());
-			if (ImGui::InputFloat("##PriceValue", &priceValue, 0.0f, 0.0f, "%.2f €", flags)) {
-				subRound->define(subRound->getType(), subRound->getPrices(), static_cast<double>(priceValue));
-			}
+			ImGui::Text("Valeur Totale : %.2f €", subRound->getValue());
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Somme des valeurs des articles ci-dessous.");
 
 			ImGui::Spacing();
-			ImGui::Text("Liste des lots:");
-			std::string prices = subRound->getPrices();
-			if (ImGui::InputTextMultiline("##TextPrices", &prices, ImVec2(-1, -80), flags)) {
-				subRound->define(subRound->getType(), prices, subRound->getValue());
-			}
+			ImGui::Text("Lots à gagner :");
+			renderPrizeList(subRound, editable);
 		} else {
 			// Pause
 			bool pauseDiapo = currentRound->hasDiapo();
@@ -957,6 +949,86 @@ void GameRoundConfigPopups::moveGameRoundDown() {
 	m_event.swapRoundByIndex(static_cast<uint16_t>(m_selectedGameRound),
 							 static_cast<uint16_t>(m_selectedGameRound + 1));
 	m_selectedGameRound++;
+}
+
+void GameRoundConfigPopups::renderPrizeList(const core::GameRound::sub_rounds_type::iterator& iSubRound,
+											const bool iEditable) {
+	// One row per article: what it is, who gave it, what it is worth, how much it makes
+	// people want it, and whether it can be put in play in a children's round.
+	auto prizes = iSubRound->getPrizes();
+	bool changed = false;
+	if (ImGui::BeginChild("PrizeList", ImVec2(0, -80), ImGuiChildFlags_Borders)) {
+		if (prizes.empty())
+			ImGui::TextDisabled("Aucun lot pour cette phase.");
+		for (size_t i = 0; i < prizes.size(); ++i) {
+			auto& prize = prizes[i];
+			ImGui::PushID(static_cast<int>(i));
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
+			std::string designation = prize.getDesignation();
+			if (ImGui::InputText("##designation", &designation) && iEditable) {
+				prize.setDesignation(designation);
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Désignation de l'article");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+			std::string donor = prize.getDonor();
+			if (ImGui::InputTextWithHint("##donor", "donateur", &donor) && iEditable) {
+				prize.setDonor(donor);
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Donateur, facultatif");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(110);
+			auto value = static_cast<float>(prize.getValue());
+			if (ImGui::InputFloat("##value", &value, 0.0f, 0.0f, "%.2f €") && iEditable) {
+				prize.setValue(static_cast<double>(value));
+				changed = true;
+			}
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(120);
+			auto attractiveness = static_cast<int>(prize.getAttractiveness());
+			if (ImGui::SliderInt("##attractiveness", &attractiveness, 0,
+								 static_cast<int>(core::Prize::g_maxAttractiveness), "attrait %d") &&
+				iEditable) {
+				prize.setAttractiveness(static_cast<uint8_t>(attractiveness));
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Envie qu'il suscite, indépendamment de son prix. 0 : non noté.");
+			ImGui::SameLine();
+			bool childFriendly = prize.isChildFriendly();
+			if (ImGui::Checkbox("enfant", &childFriendly) && iEditable) {
+				prize.setChildFriendly(childFriendly);
+				changed = true;
+			}
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("L'article peut être mis en jeu dans une partie enfant.");
+			ImGui::SameLine();
+			if (ImGui::Button("Retirer") && iEditable) {
+				prizes.erase(prizes.begin() + static_cast<ptrdiff_t>(i));
+				changed = true;
+				ImGui::PopID();
+				break;
+			}
+			ImGui::PopID();
+		}
+	}
+	ImGui::EndChild();
+
+	if (!iEditable)
+		ImGui::BeginDisabled();
+	if (ImGui::Button("Ajouter un lot")) {
+		prizes.emplace_back();
+		changed = true;
+	}
+	if (!iEditable)
+		ImGui::EndDisabled();
+
+	if (changed && iEditable)
+		iSubRound->setPrizes(prizes);
 }
 
 }// namespace evl::gui::views
