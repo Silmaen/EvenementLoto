@@ -13,6 +13,8 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <numeric>
+#include <set>
 #include <sstream>
 
 using namespace evl::core;
@@ -241,39 +243,12 @@ TEST(Distribution, gatheringIgnoresPausesAndEmptyArticles) {
 	EXPECT_EQ(event.gatherCatalogueFromRounds(), 1);
 }
 
-TEST(Distribution, readingAPreCatalogueFileFillsTheCatalogue) {
-	// Version 8 wrote prizes in the sub-rounds and knew nothing of a catalogue. Its body
-	// is built here by writing a current file and relabelling it, the catalogue field
-	// being the only difference and sitting at the very end of the body.
-	auto event = programme();
-	event.getGameRound(0)->getSubRound(0)->setPrizes({Prize{"un jambon", 45.0}});
-	event.getGameRound(2)->getSubRound(2)->setPrizes({Prize{"une tondeuse", 200.0}});
-
-	std::ostringstream out(std::ios::out | std::ios::binary);
-	event.write(out);
-	auto buffer = out.str();
-	// Drop the trailing catalogue (its eight-byte count, empty here) and the checksum,
-	// declare version 8, and re-sign.
-	constexpr std::size_t bodyOffset = 4 + sizeof(uint16_t);
-	ASSERT_GT(buffer.size(), bodyOffset + sizeof(uint64_t) + sizeof(uint32_t));
-	auto body = buffer.substr(bodyOffset, buffer.size() - bodyOffset - sizeof(uint32_t) - sizeof(uint64_t));
-	constexpr uint16_t legacyVersion = 8;
-	std::string legacy(sizeof(legacyVersion), '\0');
-	std::memcpy(legacy.data(), &legacyVersion, sizeof(legacyVersion));
-	legacy += body;
-
-	std::istringstream stream(legacy, std::ios::in | std::ios::binary);
-	Event restored;
-	restored.read(stream, {});
-	ASSERT_TRUE(stream.good());
-	// Nothing was written as a catalogue, yet the event arrives with one.
-	ASSERT_EQ(restored.getCatalogue().size(), 2);
-	EXPECT_NEAR(totalValue(restored.getCatalogue()), 245.0, 0.001);
-}
-
 TEST(Distribution, theShippedEventsArriveWithACatalogue) {
 	// The real files in `data/`, versions 3, 4 and 6, with prizes placed by hand years
-	// ago. This is the case the organizer will actually try the distribution on.
+	// ago. This is the case the organizer will actually try the distribution on, and it
+	// is the whole coverage of "a file older than the catalogue gets one at last": a
+	// hand-fabricated old body would have to be rewritten at every format change, for
+	// less.
 	const std::filesystem::path dataDir{EVL_TEST_DATA_DIR};
 	ASSERT_TRUE(is_directory(dataDir)) << dataDir.string();
 	std::size_t withPrizes = 0;
@@ -319,4 +294,143 @@ TEST(Distribution, aCatalogueWithoutValuesSaysSo) {
 	// One value is enough for the ranking to mean something again.
 	event.setCatalogue({Prize{"un lot", 10.0}, Prize{"un autre lot"}});
 	EXPECT_EQ(distributePrizes(event).summary.find("arbitraire"), std::string::npos);
+}
+
+TEST(Distribution, everyCataloguedArticleGetsAnIdentifier) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	std::set<uint32_t> ids;
+	for (const auto& prize: event.getCatalogue()) {
+		EXPECT_NE(prize.getId(), 0U);
+		ids.insert(prize.getId());
+	}
+	// Distinct: two bottles must stay two bottles.
+	EXPECT_EQ(ids.size(), event.getCatalogue().size());
+}
+
+TEST(Distribution, theDistributionSaysWhereEachArticleWent) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	ASSERT_EQ(distributePrizes(event).placed, 6);
+	// Every article of the catalogue is somewhere, and that somewhere is known.
+	for (const auto& prize: event.getCatalogue()) {
+		const auto slot = event.findPrizeSlot(prize.getId());
+		ASSERT_TRUE(slot.has_value()) << prize.getDesignation();
+		EXPECT_NE(std::next(event.beginRounds(), slot->round)->getType(), GameRound::Type::Pause);
+	}
+	// An unknown article is nowhere, and asking is not an error.
+	EXPECT_FALSE(event.findPrizeSlot(9999).has_value());
+	EXPECT_FALSE(event.findPrizeSlot(0).has_value());
+}
+
+TEST(Distribution, anArticleCanBeMovedByHand) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	ASSERT_EQ(distributePrizes(event).placed, 6);
+	const auto id = event.getCatalogue().front().getId();
+	const auto before = event.findPrizeSlot(id);
+	ASSERT_TRUE(before.has_value());
+
+	// Moved to the last sub-round of the last round: it leaves where it was.
+	const Event::PrizeSlot target{.round = 2, .subRound = 2};
+	ASSERT_NE(before.value(), target);
+	EXPECT_TRUE(event.assignPrize(id, target));
+	EXPECT_EQ(event.findPrizeSlot(id), target);
+	// It is not in two places at once.
+	std::size_t seen = 0;
+	for (auto round = event.beginRounds(); round != event.endRounds(); ++round) {
+		for (auto sub = round->beginSubRound(); sub != round->endSubRound(); ++sub) {
+			for (const auto& prize: sub->getPrizes()) {
+				if (prize.getId() == id)
+					++seen;
+			}
+		}
+	}
+	EXPECT_EQ(seen, 1);
+
+	// Taken out of play altogether, it stays in the catalogue.
+	EXPECT_TRUE(event.assignPrize(id, std::nullopt));
+	EXPECT_FALSE(event.findPrizeSlot(id).has_value());
+	EXPECT_EQ(event.getCatalogue().size(), 6);
+}
+
+TEST(Distribution, movingRefusesWhatItShould) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	ASSERT_EQ(distributePrizes(event).placed, 6);
+	const auto id = event.getCatalogue().front().getId();
+
+	// An article nobody has heard of.
+	EXPECT_FALSE(event.assignPrize(9999, Event::PrizeSlot{.round = 0, .subRound = 0}));
+	// A sub-round that does not exist, and a round that does not either.
+	EXPECT_FALSE(event.assignPrize(id, Event::PrizeSlot{.round = 0, .subRound = 42}));
+	EXPECT_FALSE(event.assignPrize(id, Event::PrizeSlot{.round = 42, .subRound = 0}));
+	// And the article did not move in the meantime.
+	EXPECT_TRUE(event.findPrizeSlot(id).has_value());
+
+	// A round under way keeps what it has.
+	event.nextState();
+	event.nextState();
+	ASSERT_EQ(event.getStatus(), Event::Status::GameRunning);
+	ASSERT_FALSE(std::next(event.beginRounds(), 0)->getSubRound(0)->isEditable());
+	const auto playing = std::next(event.beginRounds(), 0)->getSubRound(0)->getPrizes().front().getId();
+	EXPECT_FALSE(event.assignPrize(playing, std::nullopt));
+	EXPECT_EQ(event.findPrizeSlot(playing), (Event::PrizeSlot{.round = 0, .subRound = 0}));
+	// And nothing new can be dropped into it either.
+	const auto elsewhere = std::next(event.beginRounds(), 2)->getSubRound(2)->getPrizes().front().getId();
+	EXPECT_FALSE(event.assignPrize(elsewhere, Event::PrizeSlot{.round = 0, .subRound = 0}));
+	EXPECT_EQ(event.findPrizeSlot(elsewhere), (Event::PrizeSlot{.round = 2, .subRound = 2}));
+}
+
+TEST(Distribution, theOverviewMatchesTheRounds) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	ASSERT_EQ(distributePrizes(event).placed, 6);
+
+	const auto snapshot = overview(event);
+	// Six sub-rounds across the two real rounds; the pause contributes nothing.
+	EXPECT_EQ(snapshot.subRounds.size(), 6);
+	EXPECT_EQ(snapshot.roundValues.size(), 2);
+	EXPECT_EQ(snapshot.roundNames.size(), 2);
+	EXPECT_EQ(snapshot.unassignedCount, 0);
+
+	// The figures of the chart are the figures of the rounds.
+	double total = 0.0;
+	for (const auto& entry: snapshot.subRounds) {
+		EXPECT_NEAR(entry.value, valueOf(event, entry.round, entry.subRound), 0.001);
+		total += entry.value;
+	}
+	EXPECT_NEAR(total, totalValue(event.getCatalogue()), 0.001);
+	EXPECT_NEAR(std::accumulate(snapshot.roundValues.begin(), snapshot.roundValues.end(), 0.0), total, 0.001);
+	// And the climax really is the last round.
+	EXPECT_GT(snapshot.roundValues.back(), snapshot.roundValues.front());
+	EXPECT_NEAR(snapshot.highestSubRoundValue(), 60.0, 0.001);
+}
+
+TEST(Distribution, theOverviewCountsWhatIsNotInPlay) {
+	auto event = programme();
+	event.setCatalogue(catalogue());
+	ASSERT_EQ(distributePrizes(event).placed, 6);
+	const auto id = event.getCatalogue().front().getId();
+	const auto value = event.getCatalogue().front().getValue();
+	ASSERT_TRUE(event.assignPrize(id, std::nullopt));
+
+	const auto snapshot = overview(event);
+	EXPECT_EQ(snapshot.unassignedCount, 1);
+	EXPECT_NEAR(snapshot.unassignedValue, value, 0.001);
+	// And the charts lost exactly that much.
+	EXPECT_NEAR(std::accumulate(snapshot.roundValues.begin(), snapshot.roundValues.end(), 0.0),
+				totalValue(event.getCatalogue()) - value, 0.001);
+}
+
+TEST(Distribution, anEmptyOverviewIsHarmless) {
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	const auto snapshot = overview(event);
+	EXPECT_TRUE(snapshot.subRounds.empty());
+	EXPECT_TRUE(snapshot.roundValues.empty());
+	// The chart scale must not be asked to divide by nothing.
+	EXPECT_NEAR(snapshot.highestSubRoundValue(), 0.0, 0.001);
+	EXPECT_NEAR(snapshot.highestRoundValue(), 0.0, 0.001);
 }

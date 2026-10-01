@@ -19,7 +19,10 @@ namespace evl::core {
 // value carried by the first one.
 // 9: the event carries a catalogue of prizes, every article the organizer has, which
 // the distribution draws from. A file from 8 and below simply has an empty one.
-constexpr uint16_t g_currentSaveVersion = 9;
+// 10: every prize article carries an identifier, which is what links an article of the
+// catalogue to the copy placed in a sub-round. Articles read from an older file are
+// given one by the event.
+constexpr uint16_t g_currentSaveVersion = 10;
 
 namespace {
 

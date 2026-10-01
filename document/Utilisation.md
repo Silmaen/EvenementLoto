@@ -219,8 +219,26 @@ articles reviennent donc sans prix, et la répartition vous prévient que l'ordr
 les valeurs, ou au moins les attraits, pour qu'elle ait un sens.
 
 La répartition se rejoue autant de fois qu'on veut : elle repart du catalogue complet, et **ne touche jamais une manche
-déjà entamée**. Ce qu'elle décide s'ajuste ensuite à la main dans le réglage des parties. Le catalogue, lui, garde tout :
-c'est la liste de référence, les manches n'en reçoivent que des copies.
+déjà entamée**. Le catalogue, lui, garde tout : c'est la liste de référence, les manches n'en reçoivent que des copies.
+
+#### Voir et ajuster la répartition
+
+L'onglet "Répartition" de la même fenêtre montre ce que la répartition a donné. Il s'affiche de lui-même juste après un
+clic sur "Répartir".
+
+En haut, deux graphiques :
+
+* un **histogramme des valeurs par manche**, dans l'ordre du programme : on y lit d'un coup d'œil la montée de la quine
+  au carton plein, partie après partie ;
+* une **courbe des valeurs par partie**, qui doit monter jusqu'à la dernière — le point d'orgue.
+
+En dessous, le tableau de tous les articles du catalogue avec, pour chacun, sa valeur, son attrait, sa compatibilité
+enfant, et **la manche où il est mis en jeu**. Cette dernière colonne est une liste déroulante : la changer déplace
+l'article sur-le-champ, et les deux graphiques du dessus suivent immédiatement. "non affecté" retire l'article du jeu
+sans le retirer du catalogue.
+
+Une manche déjà entamée n'apparaît pas dans les destinations proposées, et un article qui y est en jeu est affiché comme
+tel, sans liste déroulante : ce qui est en jeu est en jeu.
 
 #### Remplissage des lots à gagner
 

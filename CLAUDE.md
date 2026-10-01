@@ -50,13 +50,19 @@ Author: Silmaen
 - `GameRound` - A single game round: type (OneQuine, TwoQuines, FullCard, combinations, Enfant, Inverse, Pause), sub-rounds, draws
 - `SubGameRound` - A sub-game within a round: type, draws, prizes, winner. `editWinner()`
   fixes a name once the sub-round is over, without replaying anything
-- `Prize` - One prize article: designation, donor, value, attractiveness (0-5), child
-  compatibility. `prizesFromLegacy()` turns a pre-version-8 multi-line string into
+- `Prize` - One prize article: an identifier, designation, donor, value, attractiveness
+  (0-5), child compatibility. The identifier is what links a catalogue article to the copy
+  placed in a sub-round; it is handed out by `Event` and nowhere else, since only the
+  event knows which are taken. Without it, two identical bottles would be
+  indistinguishable and "where is this one in play" would be a guess. `prizesFromLegacy()` turns a pre-version-8 multi-line string into
   articles, the whole value carried by the first
 - `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
   what the popup shows and what is written to disk
-- `Distribution` - `distributePrizes()`: spreads the event's prize catalogue over its
-  sub-rounds. Two climbs superimposed — quine < two quines < full card inside a round,
+- `Distribution` - `overview()` dresses the state of the distribution — one entry per
+  sub-round in programme order, the per-round totals, and what is in the catalogue but not
+  in play. The charts and the table are drawn from that same snapshot, so their figures
+  cannot disagree and they are checked without opening a window.
+  `distributePrizes()`: spreads the event's prize catalogue over its sub-rounds. Two climbs superimposed — quine < two quines < full card inside a round,
   and each round heavier than the last up to the final climax. Value and attractiveness
   are each normalised before being mixed, in the proportion `DistributionSettings` says.
   Idempotent: it always starts from the whole catalogue and never touches a sub-round
@@ -81,14 +87,23 @@ into the sub-round, so a `.lev` file is complete on its own and the distribution
 run again. `gatherCatalogueFromRounds()` rebuilds it from the prizes already sitting in
 the sub-rounds, and is called automatically when reading a file older than version 9 —
 without it an old event would arrive with an empty catalogue and nothing to distribute.
+`findPrizeSlot()` says where an article is in play and `assignPrize()` moves it, which is
+the manual adjustment: a sub-round under way refuses both as source and as destination.
 Beware version 3 files: the format did not store prize values, so their articles come
 back without a price and the distribution says the resulting order is arbitrary.
 
+`Event::getGameRound()` and `GameRound::getSubRound()` both **bound their index** and
+return `end()` past it — `std::next` beyond the end is undefined behaviour, and an
+out-of-range round index used to take the process down.
+
 Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
-multi-line string with one value; **9** added the event catalogue. Files from versions 3
-to 8 still read. `test/lib_test/reference-v9.lev` is the checked-in byte reference every
-toolchain is compared against, and `reference-v7.lev` / `reference-v8.lev` are the
-compatibility fixtures — every format change adds one and keeps the previous ones.
+multi-line string with one value; **9** added the event catalogue; **10** gave each
+article an identifier. Files from versions 3 to 9 still read.
+`test/lib_test/reference-v10.lev` is the checked-in byte reference every toolchain is
+compared against, and `reference-v7/8/9.lev` are the compatibility fixtures — every format
+change adds one and keeps the previous ones, listed in `g_legacyReferences`. A test that
+fabricates an old body byte by byte has to be rewritten at every bump for less than the
+shipped files in `data/` already prove.
 
 ### Math Utilities (namespace `evl::math`)
 
@@ -101,6 +116,17 @@ compatibility fixtures — every format change adds one and keeps the previous o
 X11/Wayland choice on Linux), Apparence (window preset and interface font), Affichage
 joueurs (everything about the players' screen). Tabs rather than stacked fixed-height
 children: a page that outgrows its box used to have its content cut off.
+
+Action-button geometry (`utils::g_actionIconSize`, `g_actionIconPadding`,
+`actionButtonHeight()`) is deliberately **not** taken from the theme: the toolbar took
+its height from the theme's line height, which made its buttons 42 px under `Nuit`
+against 50 px under `Salle`. `ToolBar` and `MainView` both size themselves from
+`actionButtonHeight()`, and they must agree or the main view overlaps the bar.
+
+Note for tests: `Application::run()` leaves the application **closed** once `setMaxFrame`
+is reached, and `setRunning()` only comes back from `Waiting`. A second `run()` on the
+same instance therefore renders nothing — two tests silently measured nothing this way.
+Use one application per case, or drive the feature from inside a single `run()`.
 
 Two ImGui balance rules this code has been bitten by: `EndChild()` must be called
 whatever `BeginChild()` returned — inside the `if` it is skipped as soon as the child is
@@ -130,7 +156,9 @@ followed by an item.
   HelpView (non-modal markdown help), MenuBar, ToolBar, StatusBar, Popups, ConfigPopups,
   HelpPopups, RescuePopup (resume an interrupted game), WinnerPopups (ask who won, settle
   a tie, correct a name afterwards), QuickGamePopup (improvise a round), ReportPopup,
-  CataloguePopup (the prize catalogue and the distribution tool)
+  CataloguePopup (two pages: the prize catalogue with the automatic distribution, and the
+  `Répartition` view — histogram per sub-round, progression curve per round, and the
+  article-by-article assignment table whose combo moves an article on the spot)
 - `actions/` - Action base, FileActions, GameActions (draw, cancel, next step, winners,
   quick game, report, catalogue), SettingsActions, HelpActions
 - `vulkan/` - VulkanContext (Vulkan instance/device/swapchain management), TextureLibrary (SVG/PNG/JPG loading), vkData
@@ -143,10 +171,12 @@ followed by an item.
 - `VK_ERROR_DEVICE_LOST` asks for a renderer rebuild instead of giving up:
   `Application::requestRendererRecovery()` notes it and saves, and the loop calls
   `recoverRenderer()` **between two frames**, never inside one.
-  `MainWindow::recoverRenderer()` tears down the Vulkan backend, the swapchain and the
+  `MainWindow::recoverRenderer()` tears down **both** backends, the swapchain and the
   device, builds them again, reloads every texture from its path
-  (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context and the
-  GLFW backend are kept, so windows and tabs stay put. Three attempts at most, then the
+  (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context is kept,
+  so windows and tabs stay put, and the system window is never recreated. Shutting down
+  the Vulkan backend alone destroys the detached views' platform windows and the next
+  frame then asks GLFW about a window that is gone. Three attempts at most, then the
   game is saved and the application stops. `Application::recoverRenderer()` is public so
   the sequence is exercised by the test suite on a healthy device
 - Any other fatal Vulkan error saves the game before leaving the loop

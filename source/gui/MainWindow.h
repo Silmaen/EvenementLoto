@@ -114,9 +114,9 @@ public:
 	 *
 	 * Une carte graphique réinitialisée — pilote qui redémarre, veille mal digérée —
 	 * emporte le périphérique, la swapchain, les textures et l'atlas des glyphes. Tout
-	 * cela se refait sans quitter : le contexte ImGui et le backend GLFW, qui n'y
-	 * touchent pas, sont conservés, donc les fenêtres et les onglets restent où ils
-	 * étaient. L'événement en cours, lui, n'a jamais quitté la mémoire.
+	 * cela se refait sans quitter : le contexte ImGui est conservé, donc les fenêtres et
+	 * les onglets restent où ils étaient, et la fenêtre système n'est pas recréée.
+	 * L'événement en cours, lui, n'a jamais quitté la mémoire.
 	 *
 	 * À n'appeler qu'entre deux images, jamais depuis l'intérieur d'une image : c'est
 	 * `Application` qui diffère la demande.

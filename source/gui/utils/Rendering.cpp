@@ -44,10 +44,10 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 		if (texId != 0) {
 			if (iOptions.showLabel) {
 				// Calculate total width needed for icon + text
-				constexpr float iconSize = 24.0f;
+				constexpr float iconSize = g_actionIconSize;
 				const ImVec2 spacing = ImGui::GetStyle().ItemInnerSpacing;
 				const ImVec2 textSize = ImGui::CalcTextSize(iLabel.c_str());
-				const ImVec2 padding = ImGui::GetStyle().FramePadding;
+				constexpr ImVec2 padding{g_actionIconPadding, g_actionIconPadding};
 				const ImVec2 totalSize{padding.x * 2 + iconSize + spacing.x + textSize.x,
 									   padding.y * 2 + std::max(iconSize, textSize.y)};
 				const float rounding = ImGui::GetStyle().FrameRounding;
@@ -90,7 +90,12 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 						ImVec2(contentMin.x + iconSize + spacing.x, contentMin.y + (iconSize - textSize.y) * 0.5f),
 						ImGui::GetColorU32(ImGuiCol_Text), iLabel.c_str());
 			} else {
-				if (ImGui::ImageButton("##icon", texId, {24.0f, 24.0f})) {
+				// La marge est imposée, pas héritée de l'habillage, pour que les
+				// boutons de la barre d'outils fassent la même taille partout.
+				ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, {g_actionIconPadding, g_actionIconPadding});
+				const bool clicked = ImGui::ImageButton("##icon", texId, {g_actionIconSize, g_actionIconSize});
+				ImGui::PopStyleVar();
+				if (clicked) {
 					action->execute();
 				}
 				if (ImGui::IsItemHovered()) {

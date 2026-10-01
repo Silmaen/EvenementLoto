@@ -37,7 +37,9 @@ void MainView::onUpdate() {
 	const ImGuiStyle& style = ImGui::GetStyle();
 
 	// Calculate the available space
-	const float toolBarHeight = ImGui::GetFrameHeight() + style.WindowPadding.y * 2;
+	// La même hauteur que celle que la barre d'outils se donne, sinon la vue principale
+	// la recouvre ou laisse un trou.
+	const float toolBarHeight = utils::actionButtonHeight() + style.WindowPadding.y * 2;
 	const float statusBarHeight = g_statusBarHeight + style.WindowPadding.y;
 
 	// Position and size for the main view

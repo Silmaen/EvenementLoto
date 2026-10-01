@@ -37,6 +37,23 @@ public:
 		: m_designation{std::move(iDesignation)}, m_value{iValue} {}
 
 	/**
+	 * @brief Renvoie l'identifiant de l'article, zéro s'il n'en a pas encore.
+	 *
+	 * C'est ce qui fait le lien entre un article du catalogue et sa copie placée dans
+	 * une manche. Sans lui, savoir où un article est affecté demanderait de comparer
+	 * des désignations, et deux bouteilles identiques deviendraient indiscernables.
+	 *
+	 * @return L'identifiant.
+	 */
+	[[nodiscard]] auto getId() const -> uint32_t { return m_id; }
+
+	/**
+	 * @brief Définit l'identifiant de l'article.
+	 * @param iId L'identifiant.
+	 */
+	void setId(const uint32_t iId) { m_id = iId; }
+
+	/**
 	 * @brief Renvoie la désignation de l'article.
 	 * @return La désignation.
 	 */
@@ -145,6 +162,8 @@ public:
 	void fromYaml(const YAML::Node& iNode) override;
 
 private:
+	/// L'identifiant de l'article, attribué par l'événement, zéro tant qu'il n'en a pas.
+	uint32_t m_id = 0;
 	/// La désignation de l'article.
 	std::string m_designation;
 	/// Le donateur, facultatif.

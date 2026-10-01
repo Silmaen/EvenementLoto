@@ -29,7 +29,10 @@ void ToolBar::onUpdate() {
 	const float menuBarHeight = ImGui::GetFrameHeight();// Height of the menu bar
 	// Set window position and size
 	ImGui::SetNextWindowPos({viewport->Pos.x, viewport->Pos.y + menuBarHeight});
-	ImGui::SetNextWindowSize({viewport->Size.x, ImGui::GetFrameHeight() + ImGui::GetStyle().WindowPadding.y * 2});
+	// Dimensionnée sur le bouton d'action et non sur la hauteur de ligne du thème : la
+	// barre d'outils garde ainsi la même taille dans tous les habillages, et aucune
+	// icône n'y est rognée.
+	ImGui::SetNextWindowSize({viewport->Size.x, utils::actionButtonHeight() + ImGui::GetStyle().WindowPadding.y * 2});
 	// Create the toolbar window
 	ImGui::Begin("Tool Bar", nullptr,
 				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |

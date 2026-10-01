@@ -59,6 +59,55 @@ struct DistributionResult {
 };
 
 /**
+ * @brief Ce que la répartition donne à voir, manche par manche et partie par partie.
+ *
+ * Calculé ici plutôt que dessiné directement : les chiffres de l'histogramme sont alors
+ * les mêmes que ceux du tableau, et ils se vérifient sans ouvrir de fenêtre.
+ */
+struct DistributionOverview {
+	/// Une manche et ce qu'elle met en jeu.
+	struct SubRoundEntry {
+		uint32_t round = 0;///< Index de la partie.
+		uint32_t subRound = 0;///< Index de la manche dans la partie.
+		std::string roundName;///< Le nom de la partie.
+		std::string subRoundName;///< Le type de la manche.
+		double value = 0.0;///< La valeur des lots en jeu.
+		std::size_t count = 0;///< Le nombre d'articles.
+		bool editable = true;///< Faux pour une manche entamée, qui ne bouge plus.
+	};
+
+	/// Les manches, dans l'ordre du programme, les pauses exclues.
+	std::vector<SubRoundEntry> subRounds;
+	/// La valeur totale de chaque partie, dans l'ordre du programme.
+	std::vector<double> roundValues;
+	/// Le nom de chaque partie, dans le même ordre.
+	std::vector<std::string> roundNames;
+	/// La valeur des articles du catalogue qui ne sont affectés nulle part.
+	double unassignedValue = 0.0;
+	/// Le nombre de ces articles.
+	std::size_t unassignedCount = 0;
+
+	/**
+	 * @brief La plus grande valeur de manche, pour mettre l'histogramme à l'échelle.
+	 * @return La valeur la plus haute, zéro si rien n'est réparti.
+	 */
+	[[nodiscard]] auto highestSubRoundValue() const -> double;
+
+	/**
+	 * @brief La plus grande valeur de partie.
+	 * @return La valeur la plus haute, zéro si rien n'est réparti.
+	 */
+	[[nodiscard]] auto highestRoundValue() const -> double;
+};
+
+/**
+ * @brief Dresse l'état de la répartition d'un événement.
+ * @param iEvent L'événement à examiner.
+ * @return Ce qu'il y a à montrer.
+ */
+[[nodiscard]] auto overview(const Event& iEvent) -> DistributionOverview;
+
+/**
  * @brief Répartit le catalogue de l'événement sur ses manches.
  *
  * Deux montées se superposent, telles que l'organisateur les décrit :

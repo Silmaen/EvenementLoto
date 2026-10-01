@@ -20,6 +20,8 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
   au lieu de groupes empilés à hauteur fixe qui coupaient leur contenu.
 * Choix du serveur d'affichage, X11 ou Wayland, dans les paramètres sous Linux.
 * Un panneau d'affichage rogné ne fait plus échouer l'assertion de fin de fenêtre.
+* Barre d'outils de taille identique dans tous les habillages : ses boutons suivaient
+  l'interligne du thème et rapetissaient sous « Nuit ».
 * Le texte désactivé se distingue enfin du texte actif.
 * Choix de la police d'interface et de sa taille, appliqués sans redémarrer ;
   un fichier qui n'est pas une police est refusé au lieu de faire tomber l'application.
@@ -27,7 +29,9 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Identité de bureau : app-id sous Wayland, classe WM sous X11, et un fichier .desktop
   livré avec son icône.
 * Périphérique graphique perdu : le rendu, les textures et les glyphes se refont entre
-  deux images, sans quitter ni perdre la partie, trois tentatives au plus.
+  deux images, sans quitter ni perdre la partie, trois tentatives au plus. Les deux
+  backends sont remontés ensemble, sans quoi l'image suivante interrogeait une fenêtre
+  disparue.
 * Catalogue des lots de l'événement, saisi d'un bloc et indépendant des parties, par le
   menu « Jeu » > « Catalogue des lots ».
 * Répartition automatique des lots : valeur croissante de la quine au carton plein, et
@@ -38,8 +42,17 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Un événement enregistré avant le catalogue arrive avec le sien, reconstitué depuis les
   lots déjà répartis à la main ; « Reprendre les lots des parties » le refait à la demande.
 * La répartition prévient quand aucun article ne porte de valeur ni d'attrait.
-* Format de sauvegarde 9 ; les fichiers des versions 3 à 8 se relisent, la valeur d'un
-  ancien lot étant portée par son premier article et le catalogue partant vide.
+* Onglet « Répartition » : histogramme des valeurs par manche, courbe de progression par
+  partie, et le détail article par article de ce qui est mis en jeu où.
+* Affectation d'un article changée à la main dans ce tableau, les courbes suivant
+  immédiatement ; une manche entamée n'y figure pas et garde ses lots.
+* La page « Répartition » s'affiche d'elle-même après une répartition automatique.
+* Chaque article du catalogue porte un identifiant : savoir où il est mis en jeu est un
+  fait et non une comparaison de désignations.
+* Un index de partie hors limites ne fait plus tomber l'application.
+* Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
+* Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
+  article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.
 
 ## 0.5.1 — 26 septembre 2026
 

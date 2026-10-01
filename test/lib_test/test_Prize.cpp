@@ -9,6 +9,7 @@
 
 #include "core/Prize.h"
 #include "core/SubGameRound.h"
+#include "core/utilities.h"
 
 #include <sstream>
 
@@ -71,12 +72,17 @@ TEST(Prize, serializeRoundTrip) {
 	prize.setAttractiveness(5);
 	prize.setChildFriendly(false);
 
+	prize.setId(7);
+
 	std::ostringstream out(std::ios::out | std::ios::binary);
 	prize.write(out);
 	std::istringstream in(out.str(), std::ios::in | std::ios::binary);
 	Prize restored;
-	restored.read(in, {});
+	// La version doit être dite : un article écrit aujourd'hui porte un identifiant, que
+	// le lecteur ne va chercher que s'il sait à quelle version il a affaire.
+	restored.read(in, {.version = getSaveVersion()});
 	EXPECT_TRUE(in.good());
+	EXPECT_EQ(restored.getId(), 7U);
 	EXPECT_STREQ(restored.getDesignation().c_str(), "une moto");
 	EXPECT_STREQ(restored.getDonor().c_str(), "le garage du coin");
 	EXPECT_NEAR(restored.getValue(), 1500.0, 0.001);
@@ -121,4 +127,28 @@ TEST(Prize, subRoundExposesTheList) {
 	sub.nextStatus();
 	sub.setPrizes({});
 	EXPECT_EQ(sub.getPrizes().size(), 1);
+}
+
+TEST(Prize, anArticleWithoutAnIdentifierStillReads) {
+	// Un article écrit avant la version 10 n'a pas d'identifiant : le lecteur ne doit
+	// pas aller en chercher un, sous peine de décaler tout le reste.
+	Prize prize{"un lot ancien", 12.0};
+	std::ostringstream out(std::ios::out | std::ios::binary);
+	// Écrit à la main dans la disposition d'avant, sans identifiant.
+	const auto body = [&prize]() -> std::string {
+		std::ostringstream stream(std::ios::out | std::ios::binary);
+		prize.write(stream);
+		// Le premier champ est l'identifiant, sur quatre octets : le retirer redonne
+		// exactement la disposition de la version 9.
+		return stream.str().substr(sizeof(uint32_t));
+	}();
+	out << body;
+
+	std::istringstream in(out.str(), std::ios::in | std::ios::binary);
+	Prize restored;
+	restored.read(in, {.version = 9});
+	EXPECT_TRUE(in.good());
+	EXPECT_EQ(restored.getId(), 0U);
+	EXPECT_STREQ(restored.getDesignation().c_str(), "un lot ancien");
+	EXPECT_NEAR(restored.getValue(), 12.0, 0.001);
 }

@@ -141,6 +141,17 @@ public:
 	auto recoverRenderer() -> bool;
 
 	/**
+	 * @brief Nombre de reconstructions du rendu déjà tentées.
+	 *
+	 * Observable pour que la reprise après une perte du périphérique graphique soit
+	 * vérifiable : sans cela, rien ne distingue « reconstruit » de « rien ne s'est
+	 * passé ».
+	 *
+	 * @return Le compte, depuis le démarrage.
+	 */
+	[[nodiscard]] auto getRecoveryCount() const -> uint32_t { return m_recoveryCount; }
+
+	/**
 	 * @brief Demande une autre police d'interface, et la retient dans les réglages.
 	 * @param[in] iPath Le fichier de police, vide pour la police embarquée.
 	 * @param[in] iSize La taille en pixels.
