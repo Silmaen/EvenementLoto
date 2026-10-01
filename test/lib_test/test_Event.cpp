@@ -10,6 +10,7 @@
 
 #include <core/utilities.h>
 #include <fstream>
+#include <set>
 
 using namespace evl::core;
 
@@ -111,6 +112,71 @@ TEST(Event, ImprovisedRoundTakesTheNextFreeNumber) {
 	first.setId(3);
 	evt.pushGameRound(first);
 	EXPECT_EQ(evt.nextFreeRoundId(), 4);
+}
+
+TEST(Event, PausesAreNumberedApartFromGames) {
+	Event evt;
+	evt.setName("loto");
+	evt.setOrganizerName("amicale");
+	GameRound first;
+	first.setId(1);
+	evt.pushGameRound(first);
+	GameRound second;
+	second.setId(2);
+	evt.pushGameRound(second);
+	// La première pause de l'après-midi est « Pause 1 », même après deux parties.
+	EXPECT_EQ(evt.nextFreeRoundId(true), 1);
+	GameRound pause{GameRound::Type::Pause};
+	pause.setId(evt.nextFreeRoundId(true));
+	evt.pushGameRound(pause);
+	EXPECT_STREQ(evt.getGameRound(2)->getName().c_str(), "Pause 1");
+	// Et les deux séries avancent chacune de leur côté.
+	EXPECT_EQ(evt.nextFreeRoundId(false), 3);
+	EXPECT_EQ(evt.nextFreeRoundId(true), 2);
+}
+
+TEST(Event, APrizeTypedInARoundJoinsTheCatalogue) {
+	Event evt;
+	evt.setName("loto");
+	evt.setOrganizerName("amicale");
+	GameRound round;
+	round.getSubRound(0)->setPrizes({Prize{"un jambon", 45.0}});
+	evt.pushGameRound(round);
+	evt.pushGameRound(GameRound{GameRound::Type::Pause});
+	ASSERT_TRUE(evt.getCatalogue().empty());
+
+	// Saisi dans le réglage des parties, il n'avait aucune raison de rester invisible.
+	EXPECT_EQ(evt.adoptOrphanPrizes(), 1);
+	ASSERT_EQ(evt.getCatalogue().size(), 1);
+	const auto id = evt.getCatalogue().front().getId();
+	EXPECT_NE(id, 0U);
+	// Et le lien vaut dans les deux sens : la copie en jeu porte le même identifiant.
+	ASSERT_TRUE(evt.findPrizeSlot(id).has_value());
+	EXPECT_EQ(evt.findPrizeSlot(id)->round, 0U);
+
+	// Rejoué, il n'y a plus rien à adopter et rien n'est doublé.
+	EXPECT_EQ(evt.adoptOrphanPrizes(), 0);
+	EXPECT_EQ(evt.getCatalogue().size(), 1);
+}
+
+TEST(Event, AdoptionDoesNotReuseAnIdentifierAlreadyInPlay) {
+	Event evt;
+	evt.setName("loto");
+	evt.setOrganizerName("amicale");
+	// Un lot déjà identifié dans une manche, mais absent du catalogue : son identifiant
+	// est pris et ne doit pas être redonné.
+	Prize inPlay{"une tondeuse", 200.0};
+	inPlay.setId(7);
+	GameRound round;
+	round.getSubRound(0)->setPrizes({inPlay, Prize{"un jambon", 45.0}});
+	evt.pushGameRound(round);
+
+	EXPECT_EQ(evt.adoptOrphanPrizes(), 2);
+	ASSERT_EQ(evt.getCatalogue().size(), 2);
+	std::set<uint32_t> ids;
+	for (const auto& prize: evt.getCatalogue()) ids.insert(prize.getId());
+	EXPECT_EQ(ids.size(), 2);
+	EXPECT_TRUE(ids.contains(7));
 }
 
 TEST(Event, RoundManipulation) {

@@ -223,7 +223,7 @@ TEST(Distribution, anOldFileHandsItsManualPrizesToTheCatalogue) {
 	event.getGameRound(2)->getSubRound(1)->setPrizes({Prize{"une double quine", 25.0}});
 	ASSERT_TRUE(event.getCatalogue().empty());
 
-	EXPECT_EQ(event.gatherCatalogueFromRounds(), 4);
+	EXPECT_EQ(event.adoptOrphanPrizes(), 4);
 	EXPECT_NEAR(totalValue(event.getCatalogue()), 100.0, 0.001);
 	// Programme order, the pause skipped.
 	EXPECT_STREQ(event.getCatalogue().front().getDesignation().c_str(), "un lot de quine");
@@ -238,9 +238,10 @@ TEST(Distribution, anOldFileHandsItsManualPrizesToTheCatalogue) {
 TEST(Distribution, gatheringIgnoresPausesAndEmptyArticles) {
 	auto event = programme();
 	event.getGameRound(0)->getSubRound(0)->setPrizes({Prize{"un lot", 10.0}, Prize{}});
-	EXPECT_EQ(event.gatherCatalogueFromRounds(), 1);
-	// Run twice: gathering replaces, it does not pile up.
-	EXPECT_EQ(event.gatherCatalogueFromRounds(), 1);
+	EXPECT_EQ(event.adoptOrphanPrizes(), 1);
+	// Run twice: the second time there is nothing left to adopt, and nothing is doubled.
+	EXPECT_EQ(event.adoptOrphanPrizes(), 0);
+	EXPECT_EQ(event.getCatalogue().size(), 1);
 }
 
 TEST(Distribution, theShippedEventsArriveWithACatalogue) {

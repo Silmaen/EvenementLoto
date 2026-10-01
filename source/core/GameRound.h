@@ -255,9 +255,19 @@ public:
 
 	/**
 	 * @brief Affichage de nom spécial
+	 *
+	 * « Partie N » pour une partie, « Pause N » pour une pause : les deux ont leur
+	 * propre numérotation, et une pause n'est pas la troisième partie du programme.
+	 *
 	 * @return Nom du round
 	 */
 	[[nodiscard]] auto getName() const -> std::string;
+
+	/**
+	 * @brief Renvoie si cette partie n'est qu'une pause.
+	 * @return True pour une pause.
+	 */
+	[[nodiscard]] auto isPause() const -> bool { return m_type == Type::Pause; }
 
 	// ----------- Draws management -----------------
 	/**

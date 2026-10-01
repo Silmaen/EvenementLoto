@@ -133,7 +133,7 @@ void PopupQuickGame::onPopupUpdate() {
 		const auto subRound = m_round.getSubRound(static_cast<uint32_t>(m_selectedSubRound));
 		ImGui::Text("Valeur de la phase : %.2f €", subRound->getValue());
 		auto prizes = subRound->getPrizes();
-		if (utils::renderPrizeList(prizes, true, {0, -50}))
+		if (utils::renderPrizeList(prizes, {.editable = true, .size = {0, -50}}))
 			subRound->setPrizes(prizes);
 	}
 

@@ -114,9 +114,22 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 	}
 }
 
-auto renderPrizeList(core::prizes_type& ioPrizes, const bool iEditable, const math::vec2& iSize) -> bool {
+auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptions) -> bool {
+	const bool iEditable = iOptions.editable;
 	bool changed = false;
-	if (ImGui::BeginChild("PrizeList", vec2ToImVec2(iSize), ImGuiChildFlags_Borders)) {
+	// Au-dessus de la liste : sous une liste qui remplissait sa zone, le bouton se
+	// retrouvait hors champ et rien ne semblait permettre d'ajouter un lot.
+	if (iOptions.withAddButton) {
+		if (!iEditable)
+			ImGui::BeginDisabled();
+		if (ImGui::Button("Ajouter un lot")) {
+			ioPrizes.emplace_back();
+			changed = true;
+		}
+		if (!iEditable)
+			ImGui::EndDisabled();
+	}
+	if (ImGui::BeginChild("PrizeList", vec2ToImVec2(iOptions.size), ImGuiChildFlags_Borders)) {
 		if (ioPrizes.empty())
 			ImGui::TextDisabled("Aucun lot pour cette phase.");
 		for (size_t i = 0; i < ioPrizes.size(); ++i) {
@@ -174,15 +187,6 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const bool iEditable, const ma
 		}
 	}
 	ImGui::EndChild();
-
-	if (!iEditable)
-		ImGui::BeginDisabled();
-	if (ImGui::Button("Ajouter un lot")) {
-		ioPrizes.emplace_back();
-		changed = true;
-	}
-	if (!iEditable)
-		ImGui::EndDisabled();
 	return changed;
 }
 

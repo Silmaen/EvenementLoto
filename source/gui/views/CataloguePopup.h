@@ -72,6 +72,8 @@ protected:
 	void onOpen() override;
 
 private:
+	/// Écrit le catalogue dans l'événement, en relit les identifiants et enregistre.
+	void commitCatalogue();
 	/// Page « Catalogue » : la liste des articles et la répartition automatique.
 	void renderCatalogueTab();
 	/// Page « Répartition » : les courbes, le détail par manche et l'ajustement à la main.

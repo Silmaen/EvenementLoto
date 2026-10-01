@@ -329,21 +329,22 @@ public:
 	auto assignPrize(uint32_t iId, const std::optional<PrizeSlot>& iTarget) -> bool;
 
 	/**
-	 * @brief Reconstitue le catalogue à partir des lots déjà placés dans les parties.
+	 * @brief Fait entrer au catalogue les lots des parties qui n'y sont pas.
 	 *
-	 * Un événement d'avant le catalogue porte tous ses lots dans ses manches, répartis à
-	 * la main. Les y reprendre est ce qui permet de rejouer la répartition automatique
-	 * sur un ancien fichier : sans cela le catalogue resterait vide et il n'y aurait
-	 * rien à répartir. C'est fait tout seul à la lecture d'un fichier antérieur à la
-	 * version 9, et refaisable à la demande.
+	 * Deux situations, une seule réponse. Un événement d'avant le catalogue porte tous
+	 * ses lots dans ses manches, répartis à la main : sans les reprendre, le catalogue
+	 * resterait vide et il n'y aurait rien à répartir. Et un lot saisi directement dans
+	 * le réglage des parties n'a, lui non plus, aucune raison de rester invisible au
+	 * catalogue.
 	 *
-	 * Les articles sont pris dans l'ordre du programme, les pauses ignorées, et les
-	 * articles vides laissés de côté. Deux articles de même désignation sont deux
-	 * articles : rien n'est fusionné, deux bouteilles restent deux bouteilles.
+	 * L'opération n'enlève rien : elle ajoute ce qui manque et attribue un identifiant à
+	 * l'article comme à sa copie, ce qui rend l'affectation lisible dans les deux sens.
+	 * Deux articles de même désignation sont deux articles — deux bouteilles restent
+	 * deux bouteilles.
 	 *
-	 * @return Le nombre d'articles repris.
+	 * @return Le nombre d'articles nouvellement entrés au catalogue.
 	 */
-	auto gatherCatalogueFromRounds() -> std::size_t;
+	auto adoptOrphanPrizes() -> std::size_t;
 
 	/**
 	 * @brief Remplace le catalogue des lots.
@@ -352,10 +353,15 @@ public:
 	void setCatalogue(const prizes_type& iCatalogue);
 
 	/**
-	 * @brief Le premier numéro de partie encore libre.
-	 * @return Le plus grand numéro utilisé, plus un.
+	 * @brief Le premier numéro encore libre, dans la numérotation demandée.
+	 *
+	 * Les pauses se numérotent à part : la deuxième pause de l'après-midi est « Pause 2 »
+	 * même si elle arrive après la cinquième partie.
+	 *
+	 * @param iForPause True pour la numérotation des pauses, false pour celle des parties.
+	 * @return Le plus grand numéro utilisé dans cette numérotation, plus un.
 	 */
-	[[nodiscard]] auto nextFreeRoundId() const -> int;
+	[[nodiscard]] auto nextFreeRoundId(bool iForPause = false) const -> int;
 
 	/**
 	 * @brief Première position où une partie peut être insérée.
@@ -521,6 +527,12 @@ private:
 	 * @return Vrai si le corps a été lu en entier.
 	 */
 	auto readBody(std::istream& iBs, const ReadContext& iContext) -> bool;
+
+	/**
+	 * @brief Le premier identifiant d'article encore libre.
+	 * @return Le plus grand identifiant connu, au catalogue comme en jeu, plus un.
+	 */
+	[[nodiscard]] auto nextFreePrizeId() const -> uint32_t;
 
 	/**
 	 * @brief Donne un identifiant aux articles du catalogue qui n'en ont pas.
