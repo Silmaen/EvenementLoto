@@ -41,6 +41,9 @@ namespace {
 constexpr double g_autoSavePeriodSeconds = 10.0;
 /// Frames in a row allowed to fail before giving up.
 constexpr uint32_t g_maxConsecutiveFrameFailures = 5;
+/// Reconstructions du rendu tolérées : au-delà, la machine a un vrai problème et
+/// s'obstiner ne ferait que retarder la sauvegarde et la sortie propre.
+constexpr uint32_t g_maxRendererRecoveries = 3;
 }// namespace
 
 Application* Application::m_instance = nullptr;
@@ -197,6 +200,12 @@ void Application::run() {
 		}
 		if (consecutiveFailures >= g_maxConsecutiveFrameFailures)
 			reportError("Trop d'erreurs consécutives pendant le rendu.");
+		// Image fermée : c'est le seul moment où le périphérique graphique peut être
+		// refait sans emporter ce qui est en cours de dessin.
+		if (m_recoveryRequested && m_state != State::Error) {
+			if (recoverRenderer())
+				consecutiveFailures = 0;
+		}
 		++frameCount;
 		if (m_maxFrame != 0 && frameCount >= m_maxFrame) {
 			log_info("Maximum frame count {} reached, closing application.", m_maxFrame);
@@ -229,6 +238,30 @@ auto Application::getDrawDelayRemaining() const -> double {
 		return 0.0;
 	const double elapsed = core::durationSeconds(core::clock::now() - m_lastDraw);
 	return std::max(0.0, delay - elapsed);
+}
+
+void Application::requestRendererRecovery() {
+	if (m_recoveryRequested)
+		return;
+	if (m_recoveryCount >= g_maxRendererRecoveries) {
+		log_error("Périphérique graphique perdu {} fois : la partie est enregistrée et l'application s'arrête.",
+				  m_recoveryCount);
+		reportError("La carte graphique a été réinitialisée trop de fois.");
+		return;
+	}
+	log_warn("Périphérique graphique perdu : reconstruction du rendu demandée.");
+	m_recoveryRequested = true;
+	// Quoi qu'il advienne de la reconstruction, la partie est à l'abri.
+	autoSave(true);
+}
+
+auto Application::recoverRenderer() -> bool {
+	m_recoveryRequested = false;
+	++m_recoveryCount;
+	if (m_mainWindow.recoverRenderer())
+		return true;
+	reportError("La carte graphique n'a pas pu être récupérée.");
+	return false;
 }
 
 void Application::setFont(const std::filesystem::path& iPath, const float iSize) {

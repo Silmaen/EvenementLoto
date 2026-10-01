@@ -60,6 +60,9 @@ void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkRes
 /// L'identité de l'application pour le bureau, égale au nom du fichier `.desktop`.
 constexpr const char* g_applicationId = "EvenementLoto";
 
+/// Taille de police par défaut, en pixels.
+constexpr float g_defaultFontSize = 20.0f;
+
 }// namespace
 
 
@@ -121,36 +124,9 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 		return;
 	}
 
-	// Setup renderer
-	{
-		std::vector<const char*> extensions;
-		{
-			uint32_t extensions_count = 0;
-			const char* const* glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
-			extensions.reserve(extensions_count);
-			for (uint32_t i = 0; i < extensions_count; i++) extensions.push_back(glfw_extensions[i]);
-		}
-
-		auto& vkContext = vulkan::VulkanContext::get();
-		vkContext.init(extensions);
-		g_mainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
-
-		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool,
-			  commandPool] = vkContext.getVkData();
-		VkSurfaceKHR surface = nullptr;
-
-		const VkResult err = glfwCreateWindowSurface(instance, window, allocator, &surface);
-		vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
-		if (err != VK_SUCCESS)
-			return;
-		// Create Framebuffers
-		int w = 0;
-		int h = 0;
-		glfwGetFramebufferSize(window, &w, &h);
-		g_mainWindowData->Surface = surface;
-		setupVulkanWindow(w, h);
-		m_stage = Stage::Vulkan;
-	}
+	if (!setupRenderer())
+		return;
+	m_stage = Stage::Vulkan;
 
 	// Setup Dear ImGui context
 	{
@@ -179,45 +155,114 @@ void MainWindow::init(const MainWindowOptions& iOptions) {
 	}
 
 	// Setup Platform/Renderer backends
-	{
-		ImGui_ImplGlfw_InitForVulkan(window, true);
-		auto [allocator, instance, physicalDevice, device, queueFamily, queue, pipelineCache, descriptorPool,
-			  commandPool] = vulkan::VulkanContext::get().getVkData();
-		ImGui_ImplVulkan_InitInfo init_info = {.ApiVersion = VK_API_VERSION_1_4,
-											   .Instance = instance,
-											   .PhysicalDevice = physicalDevice,
-											   .Device = device,
-											   .QueueFamily = queueFamily,
-											   .Queue = queue,
-											   .DescriptorPool = descriptorPool,
-											   .DescriptorPoolSize = 0,
-											   .MinImageCount = m_minImageCount,
-											   .ImageCount = g_mainWindowData->ImageCount,
-											   .PipelineCache = pipelineCache,
-											   .PipelineInfoMain = {.RenderPass = g_mainWindowData->RenderPass,
-																	.Subpass = 0,
-																	.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
-																	.ExtraDynamicStates = {},
-#ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
-																	.PipelineRenderingCreateInfo = {},
-#endif
-																	.SwapChainImageUsage = {}},
-											   .PipelineInfoForViewports = {},
-											   .UseDynamicRendering = false,
-											   .Allocator = allocator,
-											   .CheckVkResultFn = vkErrorCallback,
-											   .MinAllocationSize = 0,
-											   .CustomShaderVertCreateInfo = {},
-											   .CustomShaderFragCreateInfo = {}};
-		ImGui_ImplVulkan_Init(&init_info);
-		m_stage = Stage::Backends;
-	}
+	ImGui_ImplGlfw_InitForVulkan(window, true);
+	initVulkanBackend();
+	m_stage = Stage::Backends;
 	if (Application::get().getState() == Application::State::Error)
 		return;
 
 	setTheme({});
 
 	setCallbacks();
+}
+
+auto MainWindow::setupRenderer() -> bool {
+	auto* window = static_cast<GLFWwindow*>(m_window);
+	std::vector<const char*> extensions;
+	{
+		uint32_t extensions_count = 0;
+		const char* const* glfw_extensions = glfwGetRequiredInstanceExtensions(&extensions_count);
+		extensions.reserve(extensions_count);
+		for (uint32_t i = 0; i < extensions_count; i++) extensions.push_back(glfw_extensions[i]);
+	}
+
+	auto& vkContext = vulkan::VulkanContext::get();
+	vkContext.init(extensions);
+	g_mainWindowData = std::make_shared<ImGui_ImplVulkanH_Window>();
+
+	const auto vkData = vkContext.getVkData();
+	VkSurfaceKHR surface = nullptr;
+	const VkResult err = glfwCreateWindowSurface(vkData.instance, window, vkData.allocator, &surface);
+	vulkan::VulkanContext::checkVkResult(err, __FILE__, __LINE__);
+	if (err != VK_SUCCESS)
+		return false;
+	// Create Framebuffers
+	int w = 0;
+	int h = 0;
+	glfwGetFramebufferSize(window, &w, &h);
+	g_mainWindowData->Surface = surface;
+	setupVulkanWindow(w, h);
+	return true;
+}
+
+void MainWindow::initVulkanBackend() {
+	const auto vkData = vulkan::VulkanContext::get().getVkData();
+	ImGui_ImplVulkan_InitInfo init_info = {.ApiVersion = VK_API_VERSION_1_4,
+										   .Instance = vkData.instance,
+										   .PhysicalDevice = vkData.physicalDevice,
+										   .Device = vkData.device,
+										   .QueueFamily = vkData.queueFamily,
+										   .Queue = vkData.queue,
+										   .DescriptorPool = vkData.descriptorPool,
+										   .DescriptorPoolSize = 0,
+										   .MinImageCount = m_minImageCount,
+										   .ImageCount = g_mainWindowData->ImageCount,
+										   .PipelineCache = vkData.pipelineCache,
+										   .PipelineInfoMain = {.RenderPass = g_mainWindowData->RenderPass,
+																.Subpass = 0,
+																.MSAASamples = VK_SAMPLE_COUNT_1_BIT,
+																.ExtraDynamicStates = {},
+#ifdef IMGUI_IMPL_VULKAN_HAS_DYNAMIC_RENDERING
+																.PipelineRenderingCreateInfo = {},
+#endif
+																.SwapChainImageUsage = {}},
+										   .PipelineInfoForViewports = {},
+										   .UseDynamicRendering = false,
+										   .Allocator = vkData.allocator,
+										   .CheckVkResultFn = vkErrorCallback,
+										   .MinAllocationSize = 0,
+										   .CustomShaderVertCreateInfo = {},
+										   .CustomShaderFragCreateInfo = {}};
+	ImGui_ImplVulkan_Init(&init_info);
+}
+
+auto MainWindow::recoverRenderer() -> bool {
+	if (m_stage < Stage::Backends || m_window == nullptr) {
+		log_error("[vulkan] Rien à reconstruire : le rendu n'était pas monté.");
+		return false;
+	}
+	log_warn("[vulkan] Reconstruction du rendu.");
+	// Le périphérique est peut-être déjà perdu : l'attente est de bonne volonté, son
+	// échec est attendu et ne doit pas être rapporté comme une nouvelle erreur fatale.
+	if (const auto vkData = vulkan::VulkanContext::get().getVkData(); vkData.device != VK_NULL_HANDLE)
+		static_cast<void>(vkDeviceWaitIdle(vkData.device));
+
+	// Démonté dans l'ordre inverse du montage, sauf le contexte ImGui et le backend
+	// GLFW : ni l'un ni l'autre ne touche au périphérique graphique, et les conserver
+	// garde à l'écran les fenêtres, les onglets et les positions.
+	ImGui_ImplVulkan_Shutdown();
+	cleanupVulkanWindow();
+	g_mainWindowData.reset();
+	vulkan::VulkanContext::get().reset();
+	m_stage = Stage::ImGuiContext;
+
+	if (!setupRenderer()) {
+		log_error("[vulkan] Reconstruction impossible : le périphérique reste inaccessible.");
+		return false;
+	}
+	m_stage = Stage::Vulkan;
+	initVulkanBackend();
+	m_stage = Stage::Backends;
+	m_swapChainRebuild = false;
+
+	// Les images et les glyphes vivaient sur le périphérique disparu : les deux sont
+	// renvoyés. La police demandée est celle des réglages, comme au démarrage.
+	Application::get().getTextureLibrary().reload();
+	requestFont(core::getSettings()->getValue<std::string>("gui/font_path", {}),
+				core::getSettings()->getValue<float>("gui/font_size", g_defaultFontSize));
+	setTheme(m_currentTheme);
+	log_info("[vulkan] Rendu reconstruit.");
+	return true;
 }
 
 void MainWindow::setupVulkanWindow(const int iWidth, const int iHeight) {
@@ -474,9 +519,6 @@ void MainWindow::render(const math::vec4& iClearColor) {
 
 
 namespace {
-
-/// Taille de police par défaut, en pixels.
-constexpr float g_defaultFontSize = 20.0f;
 
 /// Ajoute les trois coupes embarquées, la régulière en premier donc par défaut.
 void addEmbeddedFonts(const ImGuiIO& iIo, const float iSize) {

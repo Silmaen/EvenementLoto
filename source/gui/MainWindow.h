@@ -110,6 +110,22 @@ public:
 	void setTheme(const Theme& iTheme);
 
 	/**
+	 * @brief Reconstruit tout ce qui dépend du périphérique graphique.
+	 *
+	 * Une carte graphique réinitialisée — pilote qui redémarre, veille mal digérée —
+	 * emporte le périphérique, la swapchain, les textures et l'atlas des glyphes. Tout
+	 * cela se refait sans quitter : le contexte ImGui et le backend GLFW, qui n'y
+	 * touchent pas, sont conservés, donc les fenêtres et les onglets restent où ils
+	 * étaient. L'événement en cours, lui, n'a jamais quitté la mémoire.
+	 *
+	 * À n'appeler qu'entre deux images, jamais depuis l'intérieur d'une image : c'est
+	 * `Application` qui diffère la demande.
+	 *
+	 * @return True si le rendu est reparti.
+	 */
+	auto recoverRenderer() -> bool;
+
+	/**
 	 * @brief Demande une autre police d'interface.
 	 *
 	 * La demande est notée et honorée au début de l'image suivante : vider l'atlas
@@ -206,6 +222,17 @@ private:
 	std::optional<std::pair<std::filesystem::path, float>> m_fontRequest;
 	/// Les octets de la police chargée depuis un fichier, auxquels l'atlas renvoie.
 	std::vector<char> m_fontBytes;
+
+	/**
+	 * @brief Monte le contexte Vulkan, la surface et la swapchain.
+	 * @return True si tout est en place.
+	 */
+	auto setupRenderer() -> bool;
+
+	/**
+	 * @brief Initialise le backend Vulkan d'ImGui sur le contexte courant.
+	 */
+	void initVulkanBackend();
 
 	/**
 	 * @brief Reconstruit l'atlas avec la police demandée, ou la police embarquée.

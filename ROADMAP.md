@@ -10,7 +10,6 @@ contenu est dans le changelog.
 * Habillages : retours d'usage sur « Ardoise » et « Salle », ajustements.
 * Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
   détachable, aperçu en mono-écran.
-* Reprise d'un périphérique Vulkan perdu sans redémarrer l'application.
 
 ## 0.7.0
 

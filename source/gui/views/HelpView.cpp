@@ -53,12 +53,16 @@ void HelpView::renderSpans(const std::vector<utils::TextSpan>& iSpans) {
 }
 
 auto HelpView::getImageInfo(const std::string& iImagePath) -> const ImageInfo& {
-	if (const auto it = m_imageCache.find(iImagePath); it != m_imageCache.end())
-		return it->second;
-
 	const auto fullPath = m_basePath / iImagePath;
 	auto& texLib = Application::get().getTextureLibrary();
 	const auto texName = "doc_" + iImagePath;
+	if (const auto it = m_imageCache.find(iImagePath); it != m_imageCache.end()) {
+		// L'identifiant retenu est vérifié et non seulement rappelé : une texture part
+		// avec le périphérique graphique, et le rechargement en fabrique un autre.
+		if (texLib.getTextureId(texName) == it->second.textureId)
+			return it->second;
+		m_imageCache.erase(it);
+	}
 	const auto texId = texLib.getOrLoadTextureId(texName, fullPath);
 
 	int width = 0;
