@@ -128,6 +128,10 @@ void MainView::renderLeftPanel() const {
 				renderDrawnNumbersTab();
 				ImGui::EndTabItem();
 			}
+			if (ImGui::BeginTabItem("Présentateur")) {
+				renderPresenterTab();
+				ImGui::EndTabItem();
+			}
 			if (ImGui::BeginTabItem("Statistiques")) {
 				renderStatisticsTab();
 				ImGui::EndTabItem();
@@ -162,7 +166,7 @@ void MainView::renderDrawnNumbersTab() const {
 	const ImVec2 buttonSize{(availWidth.x - spacing.x * 9) / 10.0f, (availWidth.y - spacing.y * 8) / 9.0f};
 
 	// Render 9 rows of 10 buttons (1-90)
-	const bool manualDisabled = (m_drawMode == DrawMode::Random);
+	const bool manualDisabled = (m_drawMode == DrawMode::Random) || Application::get().isDrawHeld();
 	if (manualDisabled)
 		ImGui::BeginDisabled();
 	for (uint8_t row = 0; row < 9; ++row) {
@@ -195,6 +199,8 @@ void MainView::renderDrawnNumbersTab() const {
 			if (clicked && !isDrawn && !manualDisabled) {
 				currentRound->addPickedNumber(number);
 				rng.addPick(number);
+				Application::get().notifyDraw();
+				Application::get().saveProgress();
 			}
 
 			// Same line except last column
@@ -205,6 +211,15 @@ void MainView::renderDrawnNumbersTab() const {
 	}
 	if (manualDisabled)
 		ImGui::EndDisabled();
+}
+
+void MainView::renderPresenterTab() {
+	const auto displayView = std::static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
+	if (displayView == nullptr) {
+		ImGui::TextDisabled("Affichage indisponible");
+		return;
+	}
+	displayView->renderInline(utils::imVec2ToVec2(ImGui::GetContentRegionAvail()));
 }
 
 void MainView::renderRightPanel() const {
@@ -331,11 +346,14 @@ void MainView::renderCommandsTab() const {
 				"Affichage règlement", "display_rules",
 				{.showLabel = true, .disabled = btnDisabled, .sameLine = false, .setDisabled = true});
 	}
-	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick",
-								  {.showLabel = true,
-								   .disabled = !m_currentEvent.canDraw() || m_drawMode == DrawMode::Manual,
-								   .sameLine = false,
-								   .setDisabled = true});
+	const double held = Application::get().getDrawDelayRemaining();
+	const std::string pickLabel = held > 0.0 ? std::format("Tirage Aléatoire ({:.1f} s)", held) : "Tirage Aléatoire";
+	utils::defineActionButtonItem(
+			pickLabel, "random_pick",
+			{.showLabel = true,
+			 .disabled = !m_currentEvent.canDraw() || m_drawMode == DrawMode::Manual || held > 0.0,
+			 .sameLine = false,
+			 .setDisabled = true});
 	utils::defineActionButtonItem(
 			"Annuler dernier tirage", "cancel_pick",
 			{.showLabel = true, .disabled = prevDrawnNumber == -1, .sameLine = false, .setDisabled = true});

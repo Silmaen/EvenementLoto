@@ -208,6 +208,16 @@ void Application::reportError(const std::string& iMessage) {
 	autoSave(true);
 }
 
+auto Application::getDrawDelayRemaining() const -> double {
+	if (m_lastDraw == core::g_epoch)
+		return 0.0;
+	const auto delay = static_cast<double>(core::getSettings()->getValue<float>("gui/draw_delay", 0.0f));
+	if (delay <= 0.0)
+		return 0.0;
+	const double elapsed = core::durationSeconds(core::clock::now() - m_lastDraw);
+	return std::max(0.0, delay - elapsed);
+}
+
 auto Application::getTheme() const -> const Theme& { return m_theme; }
 
 void Application::setTheme(const Theme& iTheme) {

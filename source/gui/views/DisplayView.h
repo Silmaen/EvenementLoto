@@ -73,6 +73,17 @@ public:
 	}
 
 	/**
+	 * @brief Draw the display content, scaled down, inside the current window.
+	 *
+	 * What the presenter tab shows: the very same content as the projector, fitted in
+	 * the region it is given and keeping the projector's aspect ratio, so the organizer
+	 * reads on the control screen what the room is looking at.
+	 *
+	 * @param iSize The region to fit the miniature into.
+	 */
+	void renderInline(const math::vec2& iSize);
+
+	/**
 	 * @brief Set preview event to render.
 	 * @param iEvent The event to render.
 	 * @param iRound The round to render.
@@ -85,6 +96,25 @@ public:
 	}
 
 private:
+	/**
+	 * @brief Draw the content matching the current state, in the current window.
+	 */
+	void renderContent();
+
+	/**
+	 * @brief Apply a font scale, taking the miniature factor into account.
+	 * @param iScale The scale asked for by the layout.
+	 */
+	void setFontScale(float iScale) const;
+
+	/**
+	 * @brief Draw a centered title at the top of the region.
+	 * @param iTitle The title text.
+	 * @param iRegion The region to center it in.
+	 * @param iExtraScale An extra factor on the configured title scale.
+	 */
+	void renderTitle(const std::string& iTitle, const math::vec2& iRegion, float iExtraScale = 1.0f) const;
+
 	void renderRoundReady() const;
 	void renderRoundRunning() const;
 	void renderRoundEnd() const;
@@ -103,6 +133,8 @@ private:
 	size_t m_previewRound = 0;
 	size_t m_previewSubRound = 0;
 	bool m_customStyle = true;
+	/// Factor applied to every font scale, below one while drawing the miniature.
+	float m_contentScale = 1.0f;
 	core::clock::time_point m_diapoChanged;
 	size_t m_currentDiapoIndex = 0;
 	size_t m_totalDiapoImages = 0;

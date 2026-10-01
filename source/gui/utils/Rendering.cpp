@@ -52,7 +52,7 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 				const float rounding = ImGui::GetStyle().FrameRounding;
 
 				// Create invisible button covering both icon and text
-				if (ImGui::InvisibleButton(std::format("{}##btn", iLabel).c_str(), totalSize)) {
+				if (ImGui::InvisibleButton("##btn", totalSize)) {
 					action->execute();
 				}
 				// Get button state
@@ -89,7 +89,7 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 						ImVec2(contentMin.x + iconSize + spacing.x, contentMin.y + (iconSize - textSize.y) * 0.5f),
 						ImGui::GetColorU32(ImGuiCol_Text), iLabel.c_str());
 			} else {
-				if (ImGui::ImageButton(std::format("##{}", iLabel).c_str(), texId, {24.0f, 24.0f})) {
+				if (ImGui::ImageButton("##icon", texId, {24.0f, 24.0f})) {
 					action->execute();
 				}
 				if (ImGui::IsItemHovered()) {
@@ -97,7 +97,7 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 				}
 			}
 		} else {
-			if (ImGui::Button(iLabel.c_str())) {
+			if (ImGui::Button(std::format("{}##plain", iLabel).c_str())) {
 				action->execute();
 			}
 		}
@@ -160,8 +160,13 @@ void adaptTextToRegion(const std::string& iText, const TextAdaptOptions& iOption
 	const float scaleX = numberSize.x / numberTextSize.x;
 	const float scaleY = numberSize.y / numberTextSize.y;
 	const float scale = std::min(scaleX, scaleY) * 0.9f;// 90% of the available space
-	if (scale <= 0.0f)
-		return;// No need to scale up
+	if (scale <= 0.0f) {
+		// Nothing can be written in a degenerate region. An item still has to follow the
+		// caller's cursor move, otherwise ImGui cannot grow the parent.
+		if (iOptions.drawText)
+			ImGui::Dummy({0.0f, 0.0f});
+		return;
+	}
 	ImGui::SetWindowFontScale(scale);
 	if (iOptions.hCenter) {
 		const float centerX = (numberSize.x - numberTextSize.x * scale) * 0.5f;

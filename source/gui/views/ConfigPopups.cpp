@@ -69,6 +69,20 @@ void MainConfigPopups::onPopupUpdate() {
 	}
 	ImGui::EndChild();
 
+	// Tirage
+	if (ImGui::BeginChild("DrawSettings", ImVec2(0, 60), ImGuiWindowFlags_NoTitleBar)) {
+		ImGui::Text("Tirage");
+		ImGui::Separator();
+		ImGui::Text("Délai de réactivation (s):");
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(120);
+		ImGui::DragFloat("##DrawDelay", &m_data.drawDelay, 0.1f, 0.0f, 30.0f, "%.1f");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Temps pendant lequel les commandes de tirage restent bloquées après un\n"
+							  "numéro, pour donner le tempo. Zéro désactive le blocage.");
+	}
+	ImGui::EndChild();
+
 	// Thème
 	if (const float themeHeight = ImGui::GetContentRegionAvail().y - g_buttonSectionHeight;
 		ImGui::BeginChild("Theme", ImVec2(0, themeHeight), ImGuiWindowFlags_NoTitleBar)) {
@@ -236,6 +250,7 @@ void MainConfigPopups::onPopupUpdate() {
 
 void MainConfigPopups::dataToSettings() {
 	core::Settings settings;
+	settings.setValue("draw_delay", m_data.drawDelay);
 	settings.setValue("title_scale", m_data.titleScale);
 	settings.setValue("time_scale", m_data.timeScale);
 	settings.setValue("value_scale", m_data.valueScale);
@@ -261,6 +276,7 @@ void MainConfigPopups::settingsToData() {
 
 	m_data.dataLocation =
 			core::getSettings()->getValue<std::string>("general/data_location", defaults.dataLocation.string());
+	m_data.drawDelay = settings.getValue<float>("draw_delay", defaults.drawDelay);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
 	m_data.timeScale = settings.getValue<float>("time_scale", defaults.timeScale);
 	m_data.valueScale = settings.getValue<float>("value_scale", defaults.valueScale);
