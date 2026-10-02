@@ -9,6 +9,8 @@
 
 #include "GameRound.h"
 
+#include "YamlRead.h"
+
 #include "StreamWrite.h"
 
 #include "EnumLabel.h"
@@ -245,13 +247,21 @@ auto GameRound::toYaml() const -> YAML::Node {
 }
 
 void GameRound::fromYaml(const YAML::Node& iNode) {
-	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
-	m_id = iNode["Id"].as<int>();
+	// Des accès avec valeur par défaut : un YAML valide mais d'une autre forme doit
+	// donner une partie incomplète, pas une exception au milieu d'une image.
+	m_type = enumFromLabel(g_typeLabels, yamlValue(iNode, "type", std::string{}), m_type);
+	m_id = yamlValue(iNode, "Id", 0);
 	m_subGames.clear();
-	for (const auto& jj: iNode["subGames"]) {
-		SubGameRound sgr;
-		sgr.fromYaml(jj);
-		m_subGames.push_back(sgr);
+	if (const auto subGames = yamlChild(iNode, "subGames"); subGames.IsSequence()) {
+		for (const auto& jj: subGames) {
+			SubGameRound sgr;
+			sgr.fromYaml(jj);
+			m_subGames.push_back(sgr);
+		}
+	}
+	if (m_subGames.empty()) {
+		// Sans sous-partie, la partie serait injouable : son type en redonne la liste.
+		setType(m_type);
 	}
 }
 

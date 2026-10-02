@@ -9,6 +9,8 @@
 
 #include "Event.h"
 
+#include "YamlRead.h"
+
 #include "EnumLabel.h"
 #include "FileFormat.h"
 #include "Log.h"
@@ -209,13 +211,15 @@ auto Event::toYaml() const -> YAML::Node {
 
 void Event::fromYaml(const YAML::Node& iNode) {
 	m_gameRounds.clear();
-	for (const auto& jj: iNode["rounds"]) {
-		GameRound gr;
-		gr.fromYaml(jj);
-		m_gameRounds.push_back(gr);
+	if (const auto rounds = yamlChild(iNode, "rounds"); rounds.IsSequence()) {
+		for (const auto& jj: rounds) {
+			GameRound gr;
+			gr.fromYaml(jj);
+			m_gameRounds.push_back(gr);
+		}
 	}
 	m_catalogue.clear();
-	if (const auto catalogueNode = iNode["catalogue"]; catalogueNode.IsSequence()) {
+	if (const auto catalogueNode = yamlChild(iNode, "catalogue"); catalogueNode.IsSequence()) {
 		for (const auto& jj: catalogueNode) {
 			Prize prize;
 			prize.fromYaml(jj);
@@ -224,44 +228,90 @@ void Event::fromYaml(const YAML::Node& iNode) {
 	}
 }
 
-void Event::exportJSON(const std::filesystem::path& iFile) const {
-	std::ofstream file_save(iFile, std::ios::out | std::ios::binary);
-	if (!file_save.is_open()) {
-		log_warn("Failed to open file '{}' for JSON export.", iFile.string());
-		return;
+auto Event::exportJSON(const std::filesystem::path& iFile) const -> bool {
+	try {
+		std::ofstream file_save(iFile, std::ios::out | std::ios::binary);
+		if (!file_save.is_open()) {
+			log_warn("Impossible d'ouvrir '{}' pour l'export JSON.", iFile.string());
+			return false;
+		}
+		file_save << std::setw(4) << toJson();
+		return file_save.good();
+	} catch (const std::exception& e) {
+		log_error("Export JSON de '{}' impossible : {}", iFile.string(), e.what());
+		return false;
 	}
-	file_save << std::setw(4) << toJson();
 }
 
-void Event::importJSON(const std::filesystem::path& iFile) {
-	std::ifstream file_read(iFile, std::ios::in | std::ios::binary);
-	if (!file_read.is_open()) {
-		log_warn("Failed to open file '{}' for JSON import.", iFile.string());
-		return;
+auto Event::importJSON(const std::filesystem::path& iFile) -> bool {
+	// Lu dans un événement de côté : un fichier à moitié compris ne doit pas laisser
+	// celui-ci à moitié écrasé.
+	Event parsed;
+	try {
+		std::ifstream file_read(iFile, std::ios::in | std::ios::binary);
+		if (!file_read.is_open()) {
+			log_warn("Impossible d'ouvrir '{}' pour l'import JSON.", iFile.string());
+			return false;
+		}
+		Json::Value j;
+		file_read >> j;
+		// Un fichier lisible n'est pas pour autant un événement : sans la liste des
+		// parties, c'est un autre fichier, et l'accepter effacerait le programme en
+		// place au profit de rien.
+		if (!j.isObject() || !j.isMember("rounds")) {
+			log_warn("'{}' ne décrit pas un événement : pas de liste de parties.", iFile.string());
+			return false;
+		}
+		parsed.fromJson(j);
+	} catch (const std::exception& e) {
+		log_error("'{}' n'est pas un événement lisible : {}", iFile.string(), e.what());
+		return false;
 	}
-	Json::Value j;
-	file_read >> j;
-	fromJson(j);
+	*this = parsed;
+	checkValidConfig();
+	return true;
 }
 
-void Event::exportYaml(const std::filesystem::path& iFile) const {
-	YAML::Emitter out;
-	out << toYaml();
-	std::ofstream fileOut(iFile);
-	if (!fileOut.is_open()) {
-		log_warn("Failed to open file '{}' for YAML export.", iFile.string());
-		return;
+auto Event::exportYaml(const std::filesystem::path& iFile) const -> bool {
+	try {
+		YAML::Emitter out;
+		out << toYaml();
+		std::ofstream fileOut(iFile);
+		if (!fileOut.is_open()) {
+			log_warn("Impossible d'ouvrir '{}' pour l'export YAML.", iFile.string());
+			return false;
+		}
+		fileOut << out.c_str();
+		return fileOut.good();
+	} catch (const std::exception& e) {
+		log_error("Export YAML de '{}' impossible : {}", iFile.string(), e.what());
+		return false;
 	}
-	fileOut << out.c_str();
 }
 
-void Event::importYaml(const std::filesystem::path& iFile) {
-	if (!exists(iFile)) {
-		log_warn("File '{}' does not exist for YAML import.", iFile.string());
-		return;
+auto Event::importYaml(const std::filesystem::path& iFile) -> bool {
+	std::error_code error;
+	if (!is_regular_file(iFile, error)) {
+		log_warn("'{}' n'existe pas, import YAML impossible.", iFile.string());
+		return false;
 	}
-	const YAML::Node data = YAML::LoadFile(iFile.string());
-	fromYaml(data);
+	Event parsed;
+	try {
+		const auto root = YAML::LoadFile(iFile.string());
+		if (!yamlHas(root, "rounds")) {
+			log_warn("'{}' ne décrit pas un événement : pas de liste de parties.", iFile.string());
+			return false;
+		}
+		parsed.fromYaml(root);
+	} catch (const std::exception& e) {
+		// Un YAML illisible, ou lisible mais d'une autre forme : c'était la seule voie
+		// par laquelle une exception remontait jusqu'à la boucle de rendu.
+		log_error("'{}' n'est pas un événement lisible : {}", iFile.string(), e.what());
+		return false;
+	}
+	*this = parsed;
+	checkValidConfig();
+	return true;
 }
 
 void Event::checkValidConfig() {

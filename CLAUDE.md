@@ -74,6 +74,15 @@ Author: Silmaen
   could throw during static initialization
 - `AtomicFile.h` - `writeFileAtomically()`: write to `<name>.tmp`, flush, check, then
   rename, so a crash never destroys the previous version
+- `CsvCatalogue.h` - `parseCatalogueCsv()` / `importCatalogueCsv()`: a prize catalogue
+  read from what a spreadsheet really exports — separator guessed, quotes honoured,
+  decimal comma and euro sign accepted, columns matched on their name in any order
+- `YamlRead.h` - `yamlHas()` / `yamlChild()` / `yamlValue()`. Two yaml-cpp traps this
+  code was bitten by: indexing a **const** node on a missing key gives an *invalid* node
+  whose `IsSequence()`/`IsMap()` **throw**, so a naive guard is itself the thrower — that
+  was the one path by which an exception reached the render loop; and `as<std::string>`
+  on a *null* node yields the string `"null"` instead of the fallback, which is why a
+  prize with no designation was called « null ». Read YAML through these three only
 - `StreamRead.h` - defensive binary readers (`readRaw`, `readEnum`, `readLength`,
   `readString`, `readVector`); the stream's `failbit` is the error channel
 - `Rescue.h` - the interrupted game: `saveRescue`, `findRescue`, `loadRescue`,
@@ -394,6 +403,9 @@ All domain objects inherit from `Serializable` and implement:
 - `test_Prize.cpp` checks the article model, its bounds and the pre-version-8 migration
 - `test_Report.cpp` checks the end-of-event report, including that a designation holding
   a pipe cannot break a Markdown table
+- `test_ErrorPaths.cpp` is the degraded-path suite: settings and rescue files that are
+  directories, malformed YAML, binary rubbish, unwritable destinations, a finished event
+  refusing everything, out-of-range indexes. Four crashes were found by writing it
 - `test_Distribution.cpp` checks the automatic distribution as properties rather than as
   fixed output: value rising inside a round and across the event, appeal able to outweigh
   price, a children's round only getting what it may, idempotence, and a round under way

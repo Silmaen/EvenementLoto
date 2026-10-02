@@ -284,10 +284,10 @@ TEST(Event, JSONSerialize) {
 	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
-	evt.exportJSON(file);
+	ASSERT_TRUE(evt.exportJSON(file));
 
 	Event evt2;
-	evt2.importJSON(file);
+	ASSERT_TRUE(evt2.importJSON(file));
 
 	EXPECT_STREQ(evt2.getGameRound(1)->getSubRound(1)->getPrices().c_str(),
 				 "un bon pour un tour à l’urinoir\nun colonel");
@@ -307,11 +307,15 @@ TEST(Event, basePath) {
 
 TEST(Event, ImportInvalidPaths) {
 	Event evt;
-	// These should not crash, just log warnings
-	evt.importJSON("/nonexistent/path/does_not_exist.json");
+	// Un échec annoncé, et non seulement une absence de plantage : c'est ce qui permet à
+	// l'interface de dire à l'organisateur que son fichier n'en est pas un.
+	EXPECT_FALSE(evt.importJSON("/nonexistent/path/does_not_exist.json"));
 	EXPECT_EQ(evt.sizeRounds(), 0);
-	evt.importYaml("/nonexistent/path/does_not_exist.yaml");
+	EXPECT_FALSE(evt.importYaml("/nonexistent/path/does_not_exist.yaml"));
 	EXPECT_EQ(evt.sizeRounds(), 0);
+	// Un répertoire n'est pas un fichier.
+	EXPECT_FALSE(evt.importYaml(fs::temp_directory_path()));
+	EXPECT_FALSE(evt.importJSON(fs::temp_directory_path()));
 }
 
 TEST(Event, ExportInvalidPaths) {
@@ -319,9 +323,96 @@ TEST(Event, ExportInvalidPaths) {
 	evt.setName("toto");
 	evt.setOrganizerName("tata");
 	evt.pushGameRound(GameRound());
-	// Export to a directory that doesn't exist - should not crash
-	evt.exportJSON("/nonexistent_dir_abc123/test.json");
-	evt.exportYaml("/nonexistent_dir_abc123/test.yaml");
+	// Un répertoire qui n'existe pas : l'échec est dit, pas subi.
+	EXPECT_FALSE(evt.exportJSON("/nonexistent_dir_abc123/test.json"));
+	EXPECT_FALSE(evt.exportYaml("/nonexistent_dir_abc123/test.yaml"));
+}
+
+TEST(Event, AFileThatIsNotAnEventIsRefusedNotThrown) {
+	const fs::path tmp = fs::temp_directory_path() / "evl-import-test";
+	create_directories(tmp);
+
+	Event reference;
+	reference.setName("intact");
+	reference.setOrganizerName("amicale");
+	reference.pushGameRound(GameRound());
+
+	// Du YAML valide, mais qui ne décrit pas un événement. C'était la seule voie par
+	// laquelle une exception remontait jusqu'à la boucle de rendu.
+	const auto wrongShape = tmp / "autre.yml";
+	{
+		std::ofstream out(wrongShape);
+		out << "ceci: n'est pas un evenement\nautre: 12\n";
+	}
+	Event evt = reference;
+	EXPECT_FALSE(evt.importYaml(wrongShape));
+	// Et l'événement en place n'a pas été à moitié écrasé.
+	EXPECT_STREQ(evt.getName().c_str(), "intact");
+	EXPECT_EQ(evt.sizeRounds(), 1);
+
+	// Du YAML qui n'est même pas du YAML.
+	const auto notYaml = tmp / "cassé.yml";
+	{
+		std::ofstream out(notYaml);
+		out << "[[[ ceci ne ferme jamais\n\t- et mélange les indentations\n";
+	}
+	evt = reference;
+	EXPECT_FALSE(evt.importYaml(notYaml));
+	EXPECT_STREQ(evt.getName().c_str(), "intact");
+
+	// Du JSON qui n'en est pas.
+	const auto notJson = tmp / "cassé.json";
+	{
+		std::ofstream out(notJson);
+		out << "ceci n'est pas du json {{{";
+	}
+	evt = reference;
+	EXPECT_FALSE(evt.importJSON(notJson));
+	EXPECT_STREQ(evt.getName().c_str(), "intact");
+
+	// Du JSON valide, mais qui ne décrit pas un événement : refusé aussi, sinon il
+	// effacerait le programme en place au profit de rien.
+	const auto emptyJson = tmp / "vide.json";
+	{
+		std::ofstream out(emptyJson);
+		out << "{\"nimporte\": 42}";
+	}
+	evt = reference;
+	EXPECT_FALSE(evt.importJSON(emptyJson));
+	EXPECT_EQ(evt.sizeRounds(), 1);
+
+	// Un événement vide de parties, en revanche, est un événement : accepté.
+	const auto emptyEvent = tmp / "sans-partie.yml";
+	{
+		std::ofstream out(emptyEvent);
+		out << "rounds: []\n";
+	}
+	evt = reference;
+	EXPECT_TRUE(evt.importYaml(emptyEvent));
+	EXPECT_EQ(evt.sizeRounds(), 0);
+
+	remove_all(tmp);
+}
+
+TEST(Event, AnIncompleteYamlRoundStillGivesAPlayableRound) {
+	const fs::path tmp = fs::temp_directory_path() / "evl-import-partial";
+	create_directories(tmp);
+	const auto file = tmp / "partiel.yml";
+	{
+		// Une partie sans ses sous-parties : lue, elle doit rester jouable plutôt que de
+		// donner une partie vide qui bloquerait l'après-midi.
+		std::ofstream out(file);
+		out << "rounds:\n  - type: partie normale\n    Id: 2\n";
+	}
+	ASSERT_TRUE(is_regular_file(file)) << file.string();
+	Event evt;
+	ASSERT_TRUE(evt.importYaml(file)) << "contenu : " << [&file]() -> std::string {
+		std::ifstream in(file);
+		return std::string{std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>()};
+	}();
+	ASSERT_EQ(evt.sizeRounds(), 1);
+	EXPECT_GT(evt.getGameRound(0)->sizeSubRound(), 0);
+	remove_all(tmp);
 }
 
 TEST(Event, FullWorkflowWithAutoAdvance) {
@@ -367,10 +458,10 @@ TEST(Event, YamlSerialize) {
 	create_directories(tmp);
 	const fs::path file = tmp / "testGameRound.sdeg";
 
-	evt.exportYaml(file);
+	ASSERT_TRUE(evt.exportYaml(file));
 
 	Event evt2;
-	evt2.importYaml(file);
+	ASSERT_TRUE(evt2.importYaml(file));
 
 	EXPECT_STREQ(evt2.getGameRound(1)->getSubRound(1)->getPrices().c_str(),
 				 "un bon pour un tour à l’urinoir\nun colonel");

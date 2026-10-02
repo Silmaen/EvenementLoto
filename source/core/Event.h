@@ -84,26 +84,39 @@ public:
 	/**
 	 * @brief Export des parties au format JSON
 	 * @param iFile Le fichier où exporter
+	 * @return True si le fichier a été écrit.
 	 */
-	void exportJSON(const std::filesystem::path& iFile) const;
+	[[nodiscard]] auto exportJSON(const std::filesystem::path& iFile) const -> bool;
 
 	/**
 	 * @brief Import des parties au format JSON
+	 *
+	 * L'événement n'est remplacé que si le fichier a été compris de bout en bout : un
+	 * fichier illisible le laisse intact plutôt qu'à moitié écrasé.
+	 *
 	 * @param iFile Le fichier à importer
+	 * @return True si l'événement a été remplacé.
 	 */
-	void importJSON(const std::filesystem::path& iFile);
+	[[nodiscard]] auto importJSON(const std::filesystem::path& iFile) -> bool;
 
 	/**
 	 * @brief Export des parties au format YAML
 	 * @param iFile Le fichier où exporter
+	 * @return True si le fichier a été écrit.
 	 */
-	void exportYaml(const std::filesystem::path& iFile) const;
+	[[nodiscard]] auto exportYaml(const std::filesystem::path& iFile) const -> bool;
 
 	/**
 	 * @brief Import des parties au format YAML
+	 *
+	 * Comme l'import JSON : l'événement n'est remplacé qu'en cas de succès. Un YAML
+	 * illisible, ou lisible mais d'une autre forme, était la seule voie par laquelle une
+	 * exception remontait jusqu'à la boucle de rendu.
+	 *
 	 * @param iFile Le fichier à importer
+	 * @return True si l'événement a été remplacé.
 	 */
-	void importYaml(const std::filesystem::path& iFile);
+	[[nodiscard]] auto importYaml(const std::filesystem::path& iFile) -> bool;
 
 	// ---- manipulation du statut ----
 	/**

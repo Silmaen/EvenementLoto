@@ -71,6 +71,14 @@ auto saveRescue(const Event& iEvent) -> bool {
 }
 
 auto loadRescue(const std::filesystem::path& iPath, Event& oEvent) -> bool {
+	std::error_code error;
+	// Un flux s'ouvre sur un répertoire, et c'est la lecture qui lève : la question se
+	// pose donc avant. Un dossier nommé `rescue.lev` dans l'espace de données suffisait
+	// à faire échouer le démarrage.
+	if (!is_regular_file(iPath, error) || error) {
+		log_warn("'{}' n'est pas un fichier de secours.", iPath.string());
+		return false;
+	}
 	std::ifstream file(iPath, std::ios::in | std::ios::binary);
 	if (!file.is_open()) {
 		log_warn("Impossible d'ouvrir '{}'.", iPath.string());
@@ -78,7 +86,12 @@ auto loadRescue(const std::filesystem::path& iPath, Event& oEvent) -> bool {
 	}
 	Event candidate;
 	candidate.setBasePath(iPath);
-	candidate.read(file, {});
+	try {
+		candidate.read(file, {});
+	} catch (const std::exception& e) {
+		log_warn("Le fichier de secours '{}' n'a pas pu être lu : {}", iPath.string(), e.what());
+		return false;
+	}
 	if (!file.good()) {
 		log_warn("Le fichier de secours '{}' est incomplet ou corrompu.", iPath.string());
 		return false;

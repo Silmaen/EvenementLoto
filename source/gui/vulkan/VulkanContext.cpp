@@ -690,6 +690,17 @@ void VulkanContext::frameRender(void* iWd, void* iDrawData, bool& oRebuildSwapCh
 
 auto VulkanContext::loadImage(const unsigned char* iImageData, const uint32_t iWidth, const uint32_t iHeight,
 							  const uint32_t iChannels) -> uint64_t {
+	// Sans périphérique, il n'y a pas de texture à créer : c'est l'état pendant la
+	// reconstruction du rendu, et celui d'un test qui n'a pas de carte graphique. Le
+	// chargeur Vulkan, lui, abandonnait le processus.
+	if (m_data.device == VK_NULL_HANDLE) {
+		log_warn("[vulkan] Aucun périphérique : texture non chargée.");
+		return 0;
+	}
+	if (iImageData == nullptr || iWidth == 0 || iHeight == 0) {
+		log_warn("[vulkan] Image vide : texture non chargée.");
+		return 0;
+	}
 	const VkDeviceSize imageSize = static_cast<VkDeviceSize>(iWidth) * static_cast<VkDeviceSize>(iHeight) * 4;
 
 	VkBuffer stagingBuffer = VK_NULL_HANDLE;

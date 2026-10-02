@@ -9,6 +9,8 @@
 
 #include "SubGameRound.h"
 
+#include "YamlRead.h"
+
 #include "StreamWrite.h"
 
 #include "EnumLabel.h"
@@ -184,10 +186,10 @@ auto SubGameRound::toYaml() const -> YAML::Node {
 }
 
 void SubGameRound::fromYaml(const YAML::Node& iNode) {
-	m_type = enumFromLabel(g_typeLabels, iNode["type"].as<std::string>(), m_type);
-	m_winner = iNode["winner"].as<std::string>();
+	m_type = enumFromLabel(g_typeLabels, yamlValue(iNode, "type", std::string{}), m_type);
+	m_winner = yamlValue(iNode, "winner", std::string{});
 	m_prizes.clear();
-	if (const auto prizesNode = iNode["prizes"]; prizesNode.IsSequence()) {
+	if (const auto prizesNode = yamlChild(iNode, "prizes"); prizesNode.IsSequence()) {
 		for (const auto& item: prizesNode) {
 			Prize prize;
 			prize.fromYaml(item);
@@ -195,10 +197,12 @@ void SubGameRound::fromYaml(const YAML::Node& iNode) {
 		}
 	} else {
 		// Un export d'avant la version 8 : la chaine multiligne et sa valeur unique.
-		m_prizes = prizesFromLegacy(iNode["prices"].as<std::string>(""), iNode["value"].as<double>(0.0));
+		m_prizes = prizesFromLegacy(yamlValue(iNode, "prices", std::string{}), yamlValue(iNode, "value", 0.0));
 	}
 	m_draws.clear();
-	for (const auto& item: iNode["draws"]) { m_draws.push_back(item.as<uint8_t>()); }
+	if (const auto draws = yamlChild(iNode, "draws"); draws.IsSequence()) {
+		for (const auto& item: draws) { m_draws.push_back(item.as<uint8_t>(0)); }
+	}
 }
 
 }// namespace evl::core

@@ -25,7 +25,7 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 	// No settings yet is the normal state of a first start, and reporting it as an
 	// error sends the organizer looking for a fault that is not there. Only a file that
 	// exists and cannot be read is one.
-	if (!exists(iPath, error) || error) {
+	if (!is_regular_file(iPath, error) || error) {
 		log_warn("Aucun réglage enregistré dans '{}', les valeurs par défaut s'appliquent.", iPath.string());
 		return;
 	}
@@ -77,7 +77,9 @@ void Settings::fromFile(const std::filesystem::path& iPath) {
 
 		flattenNode(root, "");
 
-	} catch (const YAML::Exception& e) { log_error("Failed to load settings from '{}': {}", iPath.string(), e.what()); }
+		// `std::exception` et non la seule `YAML::Exception` : lire un répertoire lève une
+		// `ios_base::failure`, qui n'en est pas une, et remontait donc jusqu'au démarrage.
+	} catch (const std::exception& e) { log_error("Réglages de '{}' illisibles : {}", iPath.string(), e.what()); }
 }
 
 void Settings::toFile(const std::filesystem::path& iPath) const {

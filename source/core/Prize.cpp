@@ -11,6 +11,7 @@
 
 #include "StreamRead.h"
 #include "StreamWrite.h"
+#include "YamlRead.h"
 
 namespace evl::core {
 
@@ -80,13 +81,13 @@ auto Prize::toYaml() const -> YAML::Node {
 }
 
 void Prize::fromYaml(const YAML::Node& iNode) {
-	m_id = static_cast<uint32_t>(std::max(0, iNode["id"].as<int>(0)));
-	m_designation = iNode["designation"].as<std::string>("");
-	m_donor = iNode["donor"].as<std::string>("");
-	setValue(iNode["value"].as<double>(0.0));
+	m_id = static_cast<uint32_t>(std::max(0, yamlValue(iNode, "id", 0)));
+	m_designation = yamlValue(iNode, "designation", std::string{});
+	m_donor = yamlValue(iNode, "donor", std::string{});
+	setValue(yamlValue(iNode, "value", 0.0));
 	setAttractiveness(static_cast<uint8_t>(
-			std::clamp(iNode["attractiveness"].as<int>(0), 0, static_cast<int>(g_maxAttractiveness))));
-	m_childFriendly = iNode["child_friendly"].as<bool>(true);
+			std::clamp(yamlValue(iNode, "attractiveness", 0), 0, static_cast<int>(g_maxAttractiveness))));
+	m_childFriendly = yamlValue(iNode, "child_friendly", true);
 }
 
 auto totalValue(const prizes_type& iPrizes) -> double {

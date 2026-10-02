@@ -56,6 +56,13 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Bouton « Ajouter un lot » au-dessus de la liste : sous une liste pleine, il était hors champ.
 * Import d'un catalogue depuis un tableur : CSV à point-virgule, virgule ou tabulation,
   colonnes reconnues dans n'importe quel ordre, virgule décimale et symbole euro acceptés.
+* Import d'un fichier qui n'est pas un événement : refusé et dit, au lieu d'une exception
+  remontée jusqu'à la boucle de rendu, et l'événement en place reste intact.
+* Réglages ou fichier de secours pointant sur un répertoire : signalés au lieu d'arrêter
+  le démarrage.
+* Un lot importé sans désignation ne s'appelle plus « null ».
+* Un SVG qui n'en est pas un est refusé au lieu de partir sur la carte graphique.
+* Aucune texture n'est tentée sans périphérique graphique.
 * Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
 * Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
   article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.

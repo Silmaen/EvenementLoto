@@ -701,14 +701,20 @@ void GameRoundConfigPopups::onPopupUpdate() {
 		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
 			// Action import
 			utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				m_event.importYaml(iPath);
+				if (m_event.importYaml(iPath)) {
+					m_selectedGameRound = 0;
+					m_selectedSubRound = 0;
+					return;
+				}
+				Application::get().tell("Import", "Ce fichier n'est pas un événement lisible.", iPath.string());
 			});
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
 			// Action export
 			utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				m_event.exportYaml(iPath);
+				if (!m_event.exportYaml(iPath))
+					Application::get().tell("Export", "L'événement n'a pas pu être exporté.", iPath.string());
 			});
 		}
 	}
