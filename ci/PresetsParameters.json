@@ -1,7 +1,5 @@
 {
   "defaults": {
-    "docker_registry": "registry.argawaen.net",
-    "docker_namespace": "builder",
     "release_preset": "",
     "run_tests": false,
     "run_documentation": false,
@@ -12,55 +10,33 @@
       "run_tests": true,
       "run_documentation": true,
       "run_coverage": true,
-      "release_preset": "linux-clang-release",
-      "docker_image": "builder-ubuntu2404"
+      "release_preset": "linux-clang-release"
     },
     "linux-gcc-debug": {
       "run_tests": true,
       "run_coverage": true,
-      "release_preset": "linux-gcc-release",
-      "docker_image": "builder-ubuntu2404"
+      "release_preset": "linux-gcc-release"
     },
     "windows-clang-debug": {
       "run_tests": true,
       "run_documentation": true,
-      "release_preset": "windows-clang-release",
-      "docker_image": ""
+      "release_preset": "windows-clang-release"
     },
     "windows-gcc-debug": {
       "run_tests": true,
-      "release_preset": "windows-gcc-release",
-      "docker_image": ""
-    },
-    "linux-clang-tidy": {
-      "docker_image": "builder-ubuntu2404"
+      "release_preset": "windows-gcc-release"
     },
     "linux-sanitizer-address": {
-      "run_tests": true,
-      "docker_image": "builder-ubuntu2404"
+      "run_tests": true
     },
     "linux-sanitizer-thread": {
-      "run_tests": true,
-      "docker_image": "builder-ubuntu2404"
+      "run_tests": true
     },
     "linux-sanitizer-undefined-behavior": {
-      "run_tests": true,
-      "docker_image": "builder-ubuntu2404"
+      "run_tests": true
     },
     "linux-sanitizer-leak": {
-      "run_tests": true,
-      "docker_image": "builder-ubuntu2404"
-    },
-    "code-style": {
-      "docker_image": "builder-ubuntu2404",
-      "run_tests": false
-    },
-    "linux-clang-release": {
-      "docker_image": "builder-ubuntu2404"
-    },
-    "windows-clang-release": {},
-    "linux-analysis": {
-      "docker_image": "builder-ubuntu2404"
+      "run_tests": true
     }
   }
 }

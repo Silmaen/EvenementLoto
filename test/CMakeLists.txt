@@ -92,8 +92,11 @@ foreach (child ${children})
             endif ()
             if (${child} MATCHES "gui" AND XVFB_RUN)
                 # -a picks a free display number, so parallel builds on one agent do not
-                # fight over :99.
-                set(testLauncher ${XVFB_RUN} -a ${testLauncher})
+                # fight over :99. -noreset: by default Xvfb resets each time its last client
+                # leaves, which every test does when it closes its window, and a test
+                # connecting during that reset is refused ("Failed to open display").
+                # Passing -s replaces xvfb-run's default arguments, hence the screen.
+                set(testLauncher ${XVFB_RUN} -a -s "-screen 0 1280x1024x24 -noreset" ${testLauncher})
             endif ()
             set(${PROJECT_PREFIX_LOWER}_${child}_test_command ${testLauncher} ${CMAKE_BINARY_DIR}/bin/${${child}_exe} --gtest_output=xml:${CMAKE_CURRENT_BINARY_DIR}/${child}_UTest_Report.xml)
             add_test(${PROJECT_PREFIX_LOWER}_${child}_UTests ${${PROJECT_PREFIX_LOWER}_${child}_test_command})

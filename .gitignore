@@ -42,10 +42,8 @@ Doxyfile
 __pycache__/
 *.pyc
 
-# TeamCity
-TeamCity_*.zip
-projectSettings.zip
-.teamcity/target
+# Conan and Poetry caches of the CI jobs
+.cache/
 
 # Application log, written next to the binary
 exec.log

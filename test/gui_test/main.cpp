@@ -8,7 +8,9 @@
 #include "../TestMainHelper.h"
 
 auto main(int iArgc, char** iArgv) -> int {
-	evl::Log::init(g_logLv);
+	// Errors only: when the application ends in State::Error, the reason is the one thing
+	// the test output would otherwise not say, and ctest shows it for a failed run alone.
+	evl::Log::init(evl::Log::Level::Error);
 	evl::core::initializeUtilities(iArgc, iArgv);
 	evl::core::mergeDefaultSettings();
 	::testing::InitGoogleTest(&iArgc, iArgv);

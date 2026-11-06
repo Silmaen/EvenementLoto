@@ -35,6 +35,9 @@ class Coverage(BaseAction):
                     f"{root}",
                     "-o",
                     f'{get_build_dir(preset) / "Coverage" / "index.html"}',
+                    # Read by GitLab to mark the covered lines on the merge request diff.
+                    "--cobertura",
+                    f'{get_build_dir(preset) / "Coverage" / "cobertura.xml"}',
                     "--gcov-executable",
                     f"{gcov_executable}",
                     # The preset's build directory, not the whole tree: several

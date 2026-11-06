@@ -22,7 +22,6 @@ class PresetConfig:
 
     def __init__(self, preset: str):
         self.preset = preset
-        self.docker_image = f""
         self.release_preset = f""
         self.run_tests = True
         self.run_coverage = False
@@ -38,12 +37,6 @@ class PresetConfig:
         p_data = data.get("defaults", {})
         for key, value in data.get("presets", {}).get(self.preset, {}).items():
             p_data[key] = value
-        if "docker_image" in p_data:
-            self.docker_image = f'{p_data["docker_image"]}'
-            if "docker_namespace" in p_data:
-                self.docker_image = f"{p_data['docker_namespace']}/{self.docker_image}"
-            if "docker_registry" in p_data:
-                self.docker_image = f"{p_data['docker_registry']}/{self.docker_image}"
         if "release_preset" in p_data:
             self.release_preset = p_data["release_preset"]
         if "run_tests" in p_data:

@@ -1,0 +1,264 @@
+# Pipeline of EvenementLoto.
+#
+# Everything a job does lives in `ci/` and is driven by `ci_action.py <Action> <preset>`:
+# this file only says which presets exist, where they run and in which order. Whether a
+# preset runs its tests, its coverage or its documentation is described once in
+# `ci/PresetsParameters.json` and must not be duplicated here.
+#
+# The chain, each link waiting for the previous one and not starting if it failed:
+# style → builds → sanitizers (from the Clang builds) → analyses → packages.
+#
+# Runners: the instance runners take tagged jobs only. Their config gives CONAN_HOME and
+# CCACHE_DIR on persistent volumes, so this file never sets them.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+stages:
+  - style
+  - build
+  - sanitize
+  - analyse
+  - package
+
+variables:
+  # In the project directory so that GitLab's cache carries the virtual environment.
+  POETRY_CACHE_DIR: $CI_PROJECT_DIR/.cache/pypoetry
+
+default:
+  interruptible: true
+
+# --- When a job runs ------------------------------------------------------------------
+
+# A draft merge request only gets the style and the two Clang builds: enough to know the
+# change compiles and passes its tests on both platforms.
+.on-draft:
+  rules:
+    - when: on_success
+
+.on-ready:
+  rules:
+    - if: $CI_MERGE_REQUEST_TITLE =~ /^(\[draft\]|\(draft\)|draft:)/i
+      when: never
+    - when: on_success
+
+# Never from a merge request: a push to main, or a pipeline started by hand.
+.on-main:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+# --- Where a job runs -----------------------------------------------------------------
+
+.linux:
+  image: registry.argawaen.net/builder/builder-ubuntu2404
+  # artemis and hephaistos both carry these.
+  tags:
+    - linux
+    - docker
+  variables:
+    # The runner clones as root and the image runs as `user`: without this git refuses
+    # the checkout as of dubious ownership, and the analyses cannot diff.
+    GIT_CONFIG_COUNT: "1"
+    GIT_CONFIG_KEY_0: safe.directory
+    GIT_CONFIG_VALUE_0: $CI_PROJECT_DIR
+  cache:
+    key: linux
+    paths:
+      - .cache/
+  before_script:
+    - python3 -u ci_action.py PythonRequirements "$PRESET"
+
+.windows:
+  tags:
+    - windows
+  variables:
+    # The runner puts MSYS2 first on PATH, and its Python makes a POSIX-layout venv
+    # (`bin/`, no `Scripts/`) that neither Poetry nor cmake/Poetry.cmake can use.
+    POETRY_VIRTUALENVS_USE_POETRY_PYTHON: "true"
+  cache:
+    key: windows
+    paths:
+      - .cache/
+  before_script:
+    - python3 -u ci_action.py PythonRequirements $env:PRESET
+
+# --- Style ----------------------------------------------------------------------------
+
+code-style:
+  extends: [.linux, .on-draft]
+  stage: style
+  variables:
+    PRESET: code-style
+  script:
+    - poetry run python3 -u ci_action.py CodeStyle "$PRESET"
+  artifacts:
+    when: always
+    reports:
+      codequality: output/code-quality/code-style.json
+
+# --- Builds ---------------------------------------------------------------------------
+
+.build:
+  stage: build
+  needs:
+    - job: code-style
+      artifacts: false
+  coverage: '/lines: (\d+(?:\.\d+)?)%/'
+  artifacts:
+    when: always
+    expire_in: 1 week
+    # No binaries: nothing downstream uses them, and debug trees go past the size the
+    # server accepts. The archives come from the package jobs.
+    paths:
+      - output/build/*/Coverage/
+      - output/build/*/Documentation/html/
+    reports:
+      junit: output/build/*/test/*_Report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: output/build/*/Coverage/cobertura.xml
+
+.build-linux:
+  extends: [.linux, .build]
+  script:
+    - poetry run python3 -u ci_action.py BuildAndTest "$PRESET"
+
+.build-windows:
+  extends: [.windows, .build]
+  script:
+    - poetry run python3 -u ci_action.py BuildAndTest $env:PRESET
+
+linux-gcc:
+  extends: [.build-linux, .on-ready]
+  variables:
+    PRESET: linux-gcc-debug
+
+linux-clang:
+  extends: [.build-linux, .on-draft]
+  variables:
+    PRESET: linux-clang-debug
+
+windows-gcc:
+  extends: [.build-windows, .on-ready]
+  variables:
+    PRESET: windows-gcc-debug
+
+windows-clang:
+  extends: [.build-windows, .on-draft]
+  variables:
+    PRESET: windows-clang-debug
+
+# --- Sanitizers -----------------------------------------------------------------------
+
+# From the Clang builds only: they are what the sanitizers are built with. The GCC
+# builds still report their own result, but making four jobs wait on a second compiler
+# would lengthen every merge request for nothing.
+.sanitizer:
+  extends: [.build-linux, .on-ready]
+  stage: sanitize
+  needs:
+    - job: linux-clang
+      artifacts: false
+    - job: windows-clang
+      artifacts: false
+
+sanitizer-address:
+  extends: .sanitizer
+  variables:
+    PRESET: linux-sanitizer-address
+
+sanitizer-leak:
+  extends: .sanitizer
+  variables:
+    PRESET: linux-sanitizer-leak
+
+sanitizer-thread:
+  extends: .sanitizer
+  variables:
+    PRESET: linux-sanitizer-thread
+
+sanitizer-undefined-behavior:
+  extends: .sanitizer
+  variables:
+    PRESET: linux-sanitizer-undefined-behavior
+
+# --- Analyses -------------------------------------------------------------------------
+
+# The end of the chain, so the jobs a merge waits for. Inside a merge request they look
+# at what changed and a finding fails the job; on main they survey the whole codebase
+# and only warn, a finding elsewhere not being this commit's fault.
+.analysis:
+  extends: [.linux, .on-ready]
+  stage: analyse
+  variables:
+    PRESET: linux-analysis
+    # The merge base has to be in the checkout for the diff.
+    GIT_DEPTH: 0
+  needs:
+    - job: sanitizer-address
+      artifacts: false
+    - job: sanitizer-leak
+      artifacts: false
+    - job: sanitizer-thread
+      artifacts: false
+    - job: sanitizer-undefined-behavior
+      artifacts: false
+  script:
+    - >-
+      poetry run python3 -u ci_action.py Analysis "$PRESET" --tool "$TOOL"
+      --merge-request "$CI_MERGE_REQUEST_IID"
+      --merge-base "$CI_MERGE_REQUEST_DIFF_BASE_SHA"
+      --base "${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+  artifacts:
+    when: always
+    reports:
+      codequality: output/code-quality/*.json
+
+clang-tidy:
+  extends: .analysis
+  variables:
+    TOOL: tidy
+
+static-analyzer:
+  extends: .analysis
+  variables:
+    TOOL: analyzer
+
+# --- Packages -------------------------------------------------------------------------
+
+# Waits for the Clang build, which tested this same release preset: an archive built
+# from code whose tests fail has no business existing. It builds the preset again
+# rather than borrowing that tree, CPack needing the tree it was configured in.
+package-linux:
+  extends: [.linux, .on-main]
+  stage: package
+  variables:
+    PRESET: linux-clang-release
+  needs:
+    - job: linux-clang
+      artifacts: false
+  script:
+    - poetry run python3 -u ci_action.py Clean "$PRESET"
+    - poetry run python3 -u ci_action.py Package "$PRESET"
+  artifacts:
+    paths:
+      - output/build/linux-clang-release/EvenementLoto-*.tgz
+
+package-windows:
+  extends: [.windows, .on-main]
+  stage: package
+  variables:
+    PRESET: windows-clang-release
+  needs:
+    - job: windows-clang
+      artifacts: false
+  script:
+    - poetry run python3 -u ci_action.py Clean $env:PRESET
+    - poetry run python3 -u ci_action.py Package $env:PRESET
+  artifacts:
+    paths:
+      - output/build/windows-clang-release/EvenementLoto-*.zip
