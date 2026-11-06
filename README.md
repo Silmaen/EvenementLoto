@@ -47,7 +47,8 @@ il n’y a aucune commande à lancer avant.
 
 ### Construction dans un conteneur
 
-La CI compile dans `registry.argawaen.net/builder/builder-ubuntu2404`, qui contient les
+La CI GitLab (`.gitlab-ci.yml`) compile dans
+`registry.argawaen.net/builder/builder-ubuntu2404`, qui contient les
 deux chaînes de compilation (gcc et clang) ainsi que tout l’outillage. Les recettes de
 ces images vivent dans un dépôt séparé.
 
