@@ -17,8 +17,8 @@ def main():
     )
     parser.add_argument("preset", type=str, help="The preset to check.")
     # Anything left over goes to the action: an action that takes options declares them
-    # itself, so the exact command stays readable in the build log and in the TeamCity
-    # step instead of hiding in environment variables.
+    # itself, so the exact command stays readable in the job log and in .gitlab-ci.yml
+    # instead of hiding in environment variables.
     args, options = parser.parse_known_args()
 
     if args.action not in action_list:

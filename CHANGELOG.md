@@ -66,6 +66,10 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
 * Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
   article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.
+* Dépôt et CI passés sur GitLab : `.gitlab-ci.yml` remplace la configuration TeamCity.
+* Constats de style et d'analyse affichés sur la merge request par le rapport Code Quality.
+* Résultats des tests et couverture des lignes visibles dans la merge request.
+* Compilation avec clang 23, connu de Conan à partir de la 2.34.
 
 ## 0.5.1 — 26 septembre 2026
 

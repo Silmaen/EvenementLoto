@@ -34,7 +34,8 @@ Author: Silmaen
 - `source/main.cpp` - Entry point (ImGui UI); returns `EXIT_FAILURE` when the application ends in `State::Error`
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
 - `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
-- `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation)
+- `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation), run by
+  `.gitlab-ci.yml`
 - `cmake/` - CMake modules (BaseConfig, Conan, conan_provider, Vulkan, Sanitizers,
   Coverage, Poetry, UtilityFunctions, DocumentationConfig) + preset fragments
 - `conan/` - Conan profiles and `global.conf` (`conan/config/`)
@@ -235,7 +236,7 @@ monitor hosting the control window is deduced from the primary monitor.
 
 ### Python Dependencies (via Poetry)
 
-- conan ^2.32, black ^25.12.0, gcovr ^8.6, rich ^14.2.0
+- conan ^2.34 (2.34 is the first to know clang 23, which MSYS2 now ships), black ^25.12.0, gcovr ^8.6, rich ^14.2.0
 
 Poetry owns the virtual environment and every build tool in it; `cmake/Poetry.cmake`
 runs `poetry sync` at configure time and prepends the venv to `PATH`.
@@ -303,30 +304,40 @@ passed through to the action, so `Analysis` takes flags (`--tool`, `--mode`, …
 of environment variables; an action that takes none refuses them rather than ignoring
 them.
 
-Every finding a CI action reports is printed as `path:line:column: level: message`: the
-teamcity-github-bridge plugin scans the build log for that shape and turns each one into
-a GitHub check run annotation pinned to the diff. A finding printed otherwise never
-leaves the build log.
+Every finding a CI action reports is printed as `path:line:column: level: message`, and
+`ci/utils/code_quality.py` turns the same lines into a GitLab **Code Quality** report
+(`output/code-quality/*.json`) shown on the merge request. A finding printed otherwise
+never leaves the job log. A report is written even when empty: that is how GitLab knows
+the findings of the target branch are resolved.
 
-The TeamCity configurations are described in `.teamcity/settings.kts`:
+The pipeline is `.gitlab-ci.yml`, a chain where each job waits for the previous ones
+(`needs`) and does not start if one failed:
 
-- **Build** (one per preset) and the **sanitizers** — pull requests marked ready, and
-  pushes to `main`
-- **Code Style** — the only one that also runs on **draft** pull requests
-- **Clang-Tidy (diff)** / **Static Analyzer (diff)** — the gate: a finding fails the
-  build and lands on the diff
-- **Clang-Tidy** / **Static Analyzer** — the full scan on `main`, findings are warnings
-  and are not annotated
-- **Package** (Linux, Windows) — never triggered by a pull request
+- **code-style** — the gate everything waits for, runs on every pipeline
+- **linux-clang**, **windows-clang** — also on **draft** merge requests (title starting
+  with `Draft:`); **linux-gcc**, **windows-gcc** — from ready merge requests on
+- **sanitizer-*** — after the two Clang builds
+- **clang-tidy** / **static-analyzer** — last: inside a merge request they analyse what
+  the diff touches (`CI_MERGE_REQUEST_DIFF_BASE_SHA`, hence `GIT_DEPTH: 0`) and a
+  finding fails the job; on `main` they scan everything and only warn
+- **package-linux** / **package-windows** — never from a merge request, only `main` or a
+  pipeline started by hand
 
-Branch pushes are built by a `vcsTrigger` limited to `main`: the bridge plugin enqueues
-builds from pull request events only, its webhook controller ignoring `push`.
+Pipelines run for merge requests and for `main`, never for a bare branch push, so nothing
+is built twice. The file only says which presets exist and where they run: what a preset
+builds, tests, covers and documents is in `ci/PresetsParameters.json`, read by
+`BuildAndTest`. The instance runners only take tagged jobs: Linux jobs run in
+`builder-ubuntu2404` on the docker runners, Windows jobs on the `windows` runner with
+PowerShell. `CONAN_HOME` comes from the runner config, on a persistent volume, and is
+never set by the pipeline; only the Poetry cache goes through GitLab's `cache:`.
 
 The actions:
 
+- `ci/actions/build_and_test.py` - the build job: Clean, Build, Test, Coverage of the
+  preset, then of its release preset, then Documentation, as `PresetsParameters.json` says
 - `ci/actions/build.py` - CMake configure + Ninja build
 - `ci/actions/test.py` - Test execution
-- `ci/actions/coverage.py` - gcovr coverage reports
+- `ci/actions/coverage.py` - gcovr coverage reports, HTML and Cobertura for the merge request
 - `ci/actions/package.py` - the ready-to-run archive: configure, build, CPack, and the
   `.tar.gz` renamed `.tgz` so `EvenementLoto-<version>.tgz` / `.zip` is the only name
 - `ci/actions/code_style.py` - clang-format and black, inspect only, never rewrite
@@ -334,15 +345,14 @@ The actions:
   `clang-analyzer-*`, over every translation unit or only over what a diff touches
 - `ci/actions/documentation.py` - Doxygen documentation generation
 - `ci/actions/clean.py` - Build directory cleanup
-- `ci/actions/define_docker_image.py` - Docker image configuration
-- `ci/actions/define_variables.py` - Variable definitions
 - `ci/actions/python_requirements.py` - Python requirements handling
 - `ci/utils/run.py` - Command execution with real-time output
 - `ci/utils/changed_tus.py` - which translation units a diff requires analysing: a
   changed header pulls in every unit that includes it, transitively
+- `ci/utils/code_quality.py` - findings to GitLab Code Quality JSON
 - `ci/utils/preset.py` - CMake preset parsing (from `ci/PresetsParameters.json`)
-- `ci/utils/teamcity.py` - TeamCity CI integration
-- `ci/utils/cmake.py`, `ci/utils/docker.py`, `ci/utils/logging.py`, `ci/utils/python.py` - Additional utilities
+- `ci/utils/cmake.py`, `ci/utils/logging.py`, `ci/utils/python.py` - Additional
+  utilities; under `GITLAB_CI` the log is plain lines, Rich wrapping at 80 columns
 
 ## Coding Conventions
 

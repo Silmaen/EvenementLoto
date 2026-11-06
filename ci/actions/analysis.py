@@ -13,13 +13,12 @@ from ci.utils.run import run_command, run_command_capture_output, MODE_BY_COLOR
 # what this gate is for, and the checks are tuned for the product code.
 SOURCE_ROOTS = ("source",)
 
-# `path:line:col: warning: message [check]` — the shape the bridge's annotation parser
-# reads. Continuation lines (`note:`) belong to the diagnostic above them and are not
+# `path:line:col: warning: message [check]` — the shape the Code Quality report reads. Continuation lines (`note:`) belong to the diagnostic above them and are not
 # matched, or a finding would be counted twice.
 FINDING = re.compile(r"^\S[^:]*:\d+:\d+: (?:warning|error): ")
 
-# GitHub accepts 50 annotations per check run, and a wall of findings makes a build page
-# unreadable. The count in the summary stays exact.
+# A wall of findings makes a job log unreadable. The count in the summary stays exact,
+# and the Code Quality report carries every one of them.
 MAX_REPORTED = 40
 
 # Windows caps a command line around 32 000 characters, and a full scan would go past
@@ -45,7 +44,7 @@ class Analysis(BaseAction):
         Parse the options the entry point handed over.
 
         Options rather than environment variables: the exact command then reads in the
-        build log and in the TeamCity step, and argparse rejects a typo instead of the
+        job log and in `.gitlab-ci.yml`, and argparse rejects a typo instead of the
         action discovering it half way through.
 
         :param options: The leftover command-line arguments.
@@ -65,7 +64,7 @@ class Analysis(BaseAction):
             "--mode",
             choices=("auto", "full", "diff"),
             default="auto",
-            help="auto: diff inside a pull request, full elsewhere. full: every "
+            help="auto: diff inside a merge request, full elsewhere. full: every "
             "translation unit. diff: only the ones the change touches, a changed "
             "header pulling in every unit that includes it.",
         )
@@ -77,18 +76,18 @@ class Analysis(BaseAction):
             "green. fail: a finding fails the build.",
         )
         parser.add_argument(
-            "--pull-request",
+            "--merge-request",
             default="",
-            metavar="NUMBER",
-            help="the pull request being built, as the bridge publishes it. Empty "
-            "outside a pull request, which is what `auto` reads.",
+            metavar="IID",
+            help="the merge request being built, CI_MERGE_REQUEST_IID. Empty outside "
+            "a merge request, which is what `auto` reads.",
         )
         parser.add_argument(
             "--merge-base",
             default="",
             metavar="SHA",
-            help="the commit the diff starts from, normally the pull request's merge "
-            "base as GitHub computed it. Empty falls back to --base.",
+            help="the commit the diff starts from, CI_MERGE_REQUEST_DIFF_BASE_SHA. "
+            "Empty falls back to --base.",
         )
         parser.add_argument(
             "--base",
@@ -102,13 +101,13 @@ class Analysis(BaseAction):
         self.merge_base = parsed.merge_base.strip()
         self.base = parsed.base.strip() or "main"
 
-        # One configuration, two jobs. Inside a pull request the analysis is a gate: it
+        # One job, two roles. Inside a merge request the analysis is a gate: it
         # looks at what changed and a finding is an error. Anywhere else it is a survey
         # of the whole codebase, and a finding elsewhere is not this commit's fault.
-        insidePullRequest = parsed.pull_request.strip() != ""
+        insideMergeRequest = parsed.merge_request.strip() != ""
         self.mode = parsed.mode
         if self.mode == "auto":
-            self.mode = "diff" if insidePullRequest else "full"
+            self.mode = "diff" if insideMergeRequest else "full"
         self.on_findings = parsed.on_findings
         if self.on_findings == "auto":
             self.on_findings = "fail" if self.mode == "diff" else "warn"
@@ -116,8 +115,8 @@ class Analysis(BaseAction):
             f"Analyse : {self.tool}, portée {self.mode}, "
             f"constat {'bloquant' if self.on_findings == 'fail' else 'consultatif'}"
             + (
-                f", pull request {parsed.pull_request.strip()}"
-                if insidePullRequest
+                f", merge request !{parsed.merge_request.strip()}"
+                if insideMergeRequest
                 else ""
             )
         )
@@ -162,7 +161,7 @@ class Analysis(BaseAction):
             return 0
         if not targets:
             log.info("Nothing to analyse.")
-            return 0
+            return self._report([])
 
         label = "clang-tidy" if self.tool == "tidy" else "clang static analyzer"
         log.info(f"Running {label} over {len(targets)} translation unit(s)...")
@@ -194,14 +193,14 @@ class Analysis(BaseAction):
         """
         Ask git which files the change touched.
 
-        The merge base GitHub itself computed is preferred over the branch name, and for
-        a better reason than saving a fetch: it is the range the bridge places its
-        annotations against, so the analysed units and the lines GitHub is willing to
-        pin a finding on cannot disagree.
+        The merge base GitLab itself computed is preferred over the branch name, and for
+        a better reason than saving a fetch: it is the range the merge request's diff is
+        drawn from, so the analysed units and the lines the reviewer sees cannot
+        disagree. It needs the full history, hence `GIT_DEPTH: 0` on the analysis jobs.
 
         An empty merge base falls back to the branch name, which needs that branch in
-        the checkout — so the plugin's server setting `mergeBase.enabled` being on is
-        what keeps this path from being taken.
+        the checkout: a merge request pipeline always publishes one, so this path is for
+        a run by hand.
 
         :return: The changed paths relative to the repository root, or None when the
                  range could not be established at all.
@@ -219,8 +218,8 @@ class Analysis(BaseAction):
             )
             if start == "":
                 log.error(
-                    f"No merge base with 'origin/{self.base}': the agent has no such "
-                    "branch, and the bridge published none."
+                    f"No merge base with 'origin/{self.base}': the checkout has no "
+                    "such branch, and GitLab published none."
                 )
                 return None
         log.info(f"Diffing from {start}")
@@ -228,7 +227,7 @@ class Analysis(BaseAction):
             ["git", "diff", "--name-only", "--diff-filter=d", start, "HEAD"]
         )
         if code != 0:
-            log.error("git diff failed.")
+            log.error(f"git diff failed: {out.strip()}")
             return None
         return [line.strip() for line in out.splitlines() if line.strip()]
 
@@ -263,6 +262,13 @@ class Analysis(BaseAction):
         :param findings: The diagnostic lines collected.
         :return: Exit code indicating success or failure.
         """
+        from ci.utils.code_quality import write_report
+
+        write_report(
+            "clang-tidy" if self.tool == "tidy" else "static-analyzer",
+            f"clang-{self.tool}",
+            findings,
+        )
         if not findings:
             log.info("Analysis: nothing to report.")
             return 0

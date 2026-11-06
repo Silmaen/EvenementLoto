@@ -79,6 +79,16 @@ elseif (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
             -Wno-unsafe-buffer-usage
             -Wno-switch-default
     )
+    # Clang 23's lifetime analysis is experimental: it asks for [[clang::lifetimebound]]
+    # on every accessor returning a reference, and calls an output parameter resized on
+    # purpose "invalidated". Older versions do not know these options.
+    if (${CMAKE_CXX_COMPILER_VERSION} VERSION_GREATER_EQUAL 23)
+        target_compile_options(${CMAKE_PROJECT_NAME}_Base INTERFACE
+                -Wno-lifetime-safety-intra-tu-suggestions
+                -Wno-lifetime-safety-cross-tu-suggestions
+                -Wno-lifetime-safety-invalidation
+        )
+    endif ()
     set(${PROJECT_PREFIX}_COMPILER_CLANG ON)
     set(${PROJECT_PREFIX}_COMPILER_STR "clang")
 else ()

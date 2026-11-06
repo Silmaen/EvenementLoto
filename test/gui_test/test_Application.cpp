@@ -186,7 +186,9 @@ TEST(gui_Application, SurvivesAnUnreadableFont) {
 	app->setFont("/n/existe/pas.ttf", 18.0f);
 	app->setMaxFrame(2);
 	app->run();
-	EXPECT_EQ(app->getState(), Application::State::Closed);
+	// Asserted, not expected: an application in error has no ImGui context left, and
+	// reading it below would take the whole suite down with a segmentation fault.
+	ASSERT_EQ(app->getState(), Application::State::Closed);
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
 
@@ -200,7 +202,7 @@ TEST(gui_Application, RejectsAFileThatIsNotAFont) {
 	app->setFont(EVL_TEST_DOC_FILE, 20.0f);
 	app->setMaxFrame(2);
 	app->run();
-	EXPECT_EQ(app->getState(), Application::State::Closed);
+	ASSERT_EQ(app->getState(), Application::State::Closed);
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
 
@@ -217,7 +219,7 @@ TEST(gui_Application, LoadsAFontFromAFile) {
 	app->setFont(candidate, 22.0f);
 	app->setMaxFrame(3);
 	app->run();
-	EXPECT_EQ(app->getState(), Application::State::Closed);
+	ASSERT_EQ(app->getState(), Application::State::Closed);
 	// The chosen face first, then the three embedded ones behind it.
 	EXPECT_EQ(ImGui::GetIO().Fonts->Fonts.Size, 4);
 }
@@ -232,7 +234,7 @@ TEST(gui_Application, ChangesTheFontSizeAtRuntime) {
 	app->setFont({}, 28.0f);
 	app->setMaxFrame(3);
 	app->run();
-	EXPECT_EQ(app->getState(), Application::State::Closed);
+	ASSERT_EQ(app->getState(), Application::State::Closed);
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
 
@@ -258,7 +260,7 @@ TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
 	app->setMaxFrame(4);
 	app->run();
 
-	EXPECT_EQ(app->getState(), Application::State::Closed);
+	ASSERT_EQ(app->getState(), Application::State::Closed);
 	// It really happened, and only once.
 	EXPECT_EQ(app->getRecoveryCount(), 1U);
 	// The event never left memory.
