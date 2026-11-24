@@ -63,7 +63,6 @@ private:
 	float m_topBottomSplit = 0.7f;
 	float m_leftRightSplit = 0.7f;
 	math::vec2 m_lastSize = {0.0f, 0.0f};
-	int m_selectedScreen = 0;
 	float m_logScale = 0.7f;
 	size_t m_lineInLog = 0;
 };

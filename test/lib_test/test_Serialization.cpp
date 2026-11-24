@@ -33,6 +33,7 @@ auto makeEvent() -> Event {
 	GameRound pause{GameRound::Type::Pause};
 	pause.setDiapo("images", 5.0);
 	event.pushGameRound(pause);
+	event.setPlannedEnd(std::chrono::minutes{18 * 60 + 30});
 	return event;
 }
 
@@ -79,6 +80,7 @@ TEST(Serialization, RoundTrip) {
 	EXPECT_EQ(restored.getLocation(), original.getLocation());
 	EXPECT_EQ(restored.getRules(), original.getRules());
 	EXPECT_EQ(restored.sizeRounds(), original.sizeRounds());
+	EXPECT_EQ(restored.getPlannedEnd(), original.getPlannedEnd());
 }
 
 /// Read a whole file into memory.
@@ -93,9 +95,9 @@ static auto readFile(const std::filesystem::path& iPath) -> std::string {
 ///
 /// Every format change adds a file here and keeps the previous ones: a relabelled copy
 /// of the current body would only ever test itself.
-constexpr std::string_view g_currentReference = "reference-v10.lev";
-constexpr std::array<std::string_view, 3> g_legacyReferences{
-		{"reference-v7.lev", "reference-v8.lev", "reference-v9.lev"}};
+constexpr std::string_view g_currentReference = "reference-v11.lev";
+constexpr std::array<std::string_view, 4> g_legacyReferences{
+		{"reference-v7.lev", "reference-v8.lev", "reference-v9.lev", "reference-v10.lev"}};
 
 /// The path of a reference file.
 static auto referencePath(const std::string_view iName) -> std::filesystem::path {
@@ -206,10 +208,10 @@ TEST(Serialization, WritingIsDeterministic) {
 }
 
 TEST(Serialization, MatchesTheReferenceFile) {
-	// `test/lib_test/reference-v10.lev` was produced once by the GCC x64 build and is
+	// `test/lib_test/reference-v11.lev` was produced once by the GCC x64 build and is
 	// checked in. Comparing against it is what makes the format verifiably portable:
-	// every toolchain the CI runs — Clang, MinGW GCC, MinGW Clang, and an arm64 build
-	// the day there is one — checks the very same bytes, with nothing to orchestrate.
+	// every toolchain the CI runs — GCC, Clang, MinGW GCC, MinGW Clang — checks the very
+	// same bytes, with nothing to orchestrate.
 	//
 	// Should this fail after a deliberate format change, bump the save version and
 	// regenerate the file, keeping the old one as a compatibility fixture.

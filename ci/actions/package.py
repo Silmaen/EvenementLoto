@@ -59,12 +59,16 @@ class Package(BaseAction):
         :param build_dir: The configured build directory.
         :return: Exit code indicating success or failure.
         """
-        from os import chdir, curdir
+        from os import chdir, getcwd
 
-        cwd = curdir
+        # `os.curdir` is the string ".", not the current directory: going back to it
+        # stayed in the build tree.
+        cwd = getcwd()
         chdir(build_dir)
-        pack_result = run_command(["cpack"], detection_mode=MODE_BY_COLOR)
-        chdir(cwd)
+        try:
+            pack_result = run_command(["cpack"], detection_mode=MODE_BY_COLOR)
+        finally:
+            chdir(cwd)
         if pack_result != 0:
             log.error("CPack packaging failed.")
             return pack_result

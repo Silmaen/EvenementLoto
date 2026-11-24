@@ -11,6 +11,8 @@
 
 #include "baseDefine.h"
 
+#include "gui/utils/Layout.h"
+
 #include <imgui.h>
 
 namespace evl::gui::views {
@@ -62,18 +64,13 @@ void PopupAbout::onPopupUpdate() {
 							 "OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION "
 							 "WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.";
 
-	ImGui::BeginChild("LicenceText", ImVec2(500, 200), ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar);
-	ImGui::TextWrapped("%s", licence);
+	if (ImGui::BeginChild("LicenceText", {0.0f, utils::em(10.0f)}, ImGuiChildFlags_Borders))
+		ImGui::TextWrapped("%s", licence);
 	ImGui::EndChild();
 
-	ImGui::Spacing();
-
-	// Bouton Fermer centré
-	constexpr float buttonWidth = 120.0f;
-	ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-	if (ImGui::Button("Fermer", ImVec2(buttonWidth, 0))) {
+	utils::beginDialogFooter(1);
+	if (utils::dialogButton("Fermer"))
 		ImGui::CloseCurrentPopup();
-	}
 }
 
 

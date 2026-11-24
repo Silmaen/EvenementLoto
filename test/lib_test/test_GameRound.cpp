@@ -296,3 +296,20 @@ TEST(GameRound, aPauseIsNotCalledAGame) {
 	EXPECT_NE(std::string{child.getName()}.find("Partie 4"), std::string::npos);
 	EXPECT_NE(std::string{child.getName()}.find("nfant"), std::string::npos);
 }
+
+TEST(GameRound, APauseStepsWithoutSubRounds) {
+	// A pause has no sub-round, so its current one is end(). Starting it stepped that
+	// end() iterator, writing past the vector: the application died at its first pause.
+	GameRound pause(GameRound::Type::Pause);
+	ASSERT_EQ(pause.endSubRound(), pause.getCurrentSubRound());
+	pause.nextStatus();
+	EXPECT_EQ(pause.getStatus(), GameRound::Status::Running);
+	// Nothing to draw nor to win in a pause, and asking must not touch memory either.
+	pause.addPickedNumber(12);
+	pause.removeLastPick();
+	pause.addWinner("personne");
+	EXPECT_TRUE(pause.emptyDraws());
+	pause.nextStatus();
+	pause.nextStatus();
+	EXPECT_TRUE(pause.isFinished());
+}

@@ -11,6 +11,7 @@
 #include "core/Event.h"
 #include "core/Log.h"
 #include "core/maths/vectors.h"
+#include "gui/Monitors.h"
 
 namespace evl::gui::views {
 
@@ -55,12 +56,17 @@ public:
 	 */
 	[[nodiscard]] auto isFullscreen() const -> bool { return m_fullscreen; }
 	/**
-	 * @brief Set monitor ID.
-	 * @param iMonitor The new monitor ID.
+	 * @brief Send the display to a monitor, and remember it for the next start.
+	 * @param iMonitor The monitor.
 	 */
-	void setMonitorNumber(const size_t& iMonitor) {
-		log_info("Setting monitor ID to {}", iMonitor);
-		m_monitorId = iMonitor;
+	void setMonitor(const MonitorInfo& iMonitor);
+	/**
+	 * @brief The monitor the display goes to, among those present.
+	 * @param iMonitors The monitors.
+	 * @return Its index.
+	 */
+	[[nodiscard]] auto getMonitor(const std::vector<MonitorInfo>& iMonitors) const -> size_t {
+		return resolveDisplayMonitor(iMonitors, m_monitorKey);
 	}
 
 	/**
@@ -126,7 +132,8 @@ private:
 	void applyCommonStyle() const;
 
 	core::Event& m_currentEvent;
-	size_t m_monitorId = 0;
+	/// The monitor asked for, as `MonitorInfo::key()`.
+	std::string m_monitorKey;
 	bool m_fullscreen = true;
 	bool m_lastFullscreen = false;
 	bool m_previewMode = false;
@@ -138,6 +145,9 @@ private:
 	core::clock::time_point m_diapoChanged;
 	size_t m_currentDiapoIndex = 0;
 	size_t m_totalDiapoImages = 0;
+	/// The slide folder was read once already: an empty or missing one is not read again
+	/// at every frame of the pause.
+	bool m_diapoTried = false;
 };
 
 }// namespace evl::gui::views

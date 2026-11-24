@@ -8,6 +8,7 @@
 
 #pragma once
 #include "View.h"
+#include "core/maths/vectors.h"
 
 namespace evl::gui::views {
 
@@ -46,6 +47,26 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] virtual auto getPopupTitle() const -> std::string { return getName(); }
+
+	/**
+	 * @brief How a popup wants to be laid out, in font heights.
+	 *
+	 * Sized in font heights rather than pixels so it follows the font size, and always
+	 * kept within the control window: a dialog wider than its window got a platform
+	 * window of its own, on whichever screen.
+	 */
+	struct Layout {
+		/// Width and height, in font heights.
+		math::vec2 size{40.0f, 30.0f};
+		/// The height follows the content, for the short dialogs.
+		bool fitHeight = false;
+	};
+
+	/**
+	 * @brief The layout this popup asks for.
+	 * @return Its layout.
+	 */
+	[[nodiscard]] virtual auto layout() const -> Layout { return {}; }
 
 protected:
 	/// Function called when the popup is opened.

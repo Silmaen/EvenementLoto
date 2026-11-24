@@ -13,6 +13,7 @@
 #include "core/Log.h"
 #include "gui/Application.h"
 #include "gui/utils/FileDialog.h"
+#include "gui/utils/Layout.h"
 #include "gui/utils/Rendering.h"
 
 #include <imgui.h>
@@ -25,10 +26,15 @@ namespace evl::gui::views {
 
 namespace {
 
-constexpr float g_buttonWidth = 110.0f;
-constexpr float g_settingsHeight = 130.0f;
 /// Hauteur d'un histogramme : de quoi lire une tendance sans manger la page.
-constexpr float g_chartHeight = 90.0f;
+auto chartHeight() -> float { return utils::em(4.5f); }
+
+/// La place que prennent sous la liste les réglages de la répartition.
+auto settingsHeight() -> float {
+	const auto& style = ImGui::GetStyle();
+	return ImGui::GetTextLineHeightWithSpacing() * 2.0f + ImGui::GetFrameHeightWithSpacing() * 2.0f +
+		   style.ItemSpacing.y * 2.0f;
+}
 
 }// namespace
 
@@ -58,14 +64,18 @@ void PopupCatalogue::commitCatalogue() {
 void PopupCatalogue::onPopupUpdate() {
 	if (Application::get().getCurrentEvent().isFinished()) {
 		ImGui::TextDisabled("L'événement est terminé : son catalogue ne bouge plus.");
-		if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+		utils::beginDialogFooter(1);
+		if (utils::dialogButton("Fermer"))
 			ImGui::CloseCurrentPopup();
 		return;
 	}
 
 	// Deux pages : ce dont on dispose, et ce qu'on en a fait. La seconde est celle qui
 	// manquait — répartir sans voir le résultat, c'est répartir à l'aveugle.
-	if (ImGui::BeginChild("CataloguePages", {0, ImGui::GetContentRegionAvail().y - 40}, ImGuiChildFlags_None)) {
+	if (ImGui::BeginChild(
+				"CataloguePages",
+				{0, ImGui::GetContentRegionAvail().y - utils::dialogFooterHeight() - ImGui::GetStyle().ItemSpacing.y},
+				ImGuiChildFlags_None)) {
 		if (ImGui::BeginTabBar("CatalogueTabs")) {
 			if (ImGui::BeginTabItem("Catalogue")) {
 				renderCatalogueTab();
@@ -83,8 +93,8 @@ void PopupCatalogue::onPopupUpdate() {
 	}
 	ImGui::EndChild();
 
-	ImGui::Separator();
-	if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+	utils::beginDialogFooter(1);
+	if (utils::dialogButton("Fermer"))
 		ImGui::CloseCurrentPopup();
 }
 
@@ -132,18 +142,17 @@ void PopupCatalogue::renderCatalogueTab() {
 		ImGui::SetTooltip("Fait entrer au catalogue les lots placés dans les parties qui n'y sont pas encore.\n"
 						  "N'enlève rien : c'est ce qui permet de repartir d'une répartition faite à la main.");
 
-	if (utils::renderPrizeList(m_catalogue, {.editable = true, .size = {0, -g_settingsHeight}, .withAddButton = false}))
+	if (utils::renderPrizeList(m_catalogue, {.editable = true, .size = {0, -settingsHeight()}, .withAddButton = false}))
 		commitCatalogue();
 
-	ImGui::Separator();
-	ImGui::Text("Répartition automatique");
-	ImGui::SetNextItemWidth(240);
+	ImGui::SeparatorText("Répartition automatique");
+	ImGui::SetNextItemWidth(utils::em(9.0f));
 	ImGui::SliderFloat("Part de l'attrait", &m_settings.attractivenessWeight, 0.0f, 1.0f, "%.2f");
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Zéro : seule la valeur compte. Un : seul l'attrait compte.\n"
 						  "Un jambon fait souvent plus d'effet qu'un objet plus cher.");
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(240);
+	ImGui::SetNextItemWidth(utils::em(9.0f));
 	ImGui::SliderFloat("Montée vers la fin", &m_settings.climaxStrength, 0.0f, 1.0f, "%.2f");
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Zéro : toutes les parties se valent.\n"
@@ -153,10 +162,7 @@ void PopupCatalogue::renderCatalogueTab() {
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Une partie enfant ne reçoit que les articles marqués compatibles.");
 
-	if (!m_lastResult.empty())
-		ImGui::TextWrapped("%s", m_lastResult.c_str());
-
-	if (ImGui::Button("Répartir", {g_buttonWidth, 0})) {
+	if (utils::dialogButton("Répartir")) {
 		commitCatalogue();
 		const auto result = core::distributePrizes(event, m_settings);
 		m_lastResult = result.summary;
@@ -168,6 +174,11 @@ void PopupCatalogue::renderCatalogueTab() {
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Reprend tout le catalogue à zéro : les manches déjà entamées ne sont pas touchées,\n"
 						  "et l'ajustement à la main se fait ensuite dans le réglage des parties.");
+	if (!m_lastResult.empty()) {
+		ImGui::SameLine();
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextDisabled("%s", m_lastResult.c_str());
+	}
 }
 
 void PopupCatalogue::renderDistributionTab() {
@@ -192,7 +203,7 @@ void PopupCatalogue::renderCharts(const core::DistributionOverview& iOverview) {
 
 	ImGui::Text("Valeur par manche, dans l'ordre du programme");
 	ImGui::PlotHistogram("##SubRoundChart", subValues.data(), static_cast<int>(subValues.size()), 0, nullptr, 0.0f,
-						 subMax > 0.0f ? subMax * 1.1f : 1.0f, {-1, g_chartHeight});
+						 subMax > 0.0f ? subMax * 1.1f : 1.0f, {-1, chartHeight()});
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Chaque barre est une manche : quine, double quine, carton plein, partie après partie.");
 
@@ -203,7 +214,7 @@ void PopupCatalogue::renderCharts(const core::DistributionOverview& iOverview) {
 
 	ImGui::Text("Valeur par partie — la progression de l'après-midi");
 	ImGui::PlotLines("##RoundChart", roundValues.data(), static_cast<int>(roundValues.size()), 0, nullptr, 0.0f,
-					 roundMax > 0.0f ? roundMax * 1.1f : 1.0f, {-1, g_chartHeight});
+					 roundMax > 0.0f ? roundMax * 1.1f : 1.0f, {-1, chartHeight()});
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("La courbe doit monter jusqu'à la dernière partie, qui est le point d'orgue.");
 
@@ -240,9 +251,9 @@ void PopupCatalogue::renderAssignmentTable(const core::DistributionOverview& iOv
 	}
 	ImGui::TableSetupScrollFreeze(0, 1);
 	ImGui::TableSetupColumn("Article");
-	ImGui::TableSetupColumn("Valeur", ImGuiTableColumnFlags_WidthFixed, 90.0f);
-	ImGui::TableSetupColumn("Attrait", ImGuiTableColumnFlags_WidthFixed, 70.0f);
-	ImGui::TableSetupColumn("Enfant", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+	ImGui::TableSetupColumn("Valeur", ImGuiTableColumnFlags_WidthFixed, utils::em(4.5f));
+	ImGui::TableSetupColumn("Attrait", ImGuiTableColumnFlags_WidthFixed, utils::em(3.5f));
+	ImGui::TableSetupColumn("Enfant", ImGuiTableColumnFlags_WidthFixed, utils::em(3.0f));
 	ImGui::TableSetupColumn("Mis en jeu dans");
 	ImGui::TableHeadersRow();
 

@@ -99,7 +99,10 @@ void GameRound::nextStatus() {
 		case Status::Ready:
 			m_start = clock::now();
 			m_status = Status::Running;
-			sub->nextStatus();
+			// A pause has no sub-round: there the current one is end(), and stepping it
+			// wrote past the vector — the crash at the first pause of an afternoon.
+			if (sub != m_subGames.end())
+				sub->nextStatus();
 			break;
 		case Status::Running:
 			if (sub == m_subGames.end()) {
@@ -134,19 +137,19 @@ auto GameRound::getStateString() const -> std::string {
 }
 
 void GameRound::addPickedNumber(const uint8_t& iNumber) {
-	if (m_status == Status::Running)
-		getCurrentSubRound()->addPickedNumber(iNumber);
+	if (const auto sub = getCurrentSubRound(); m_status == Status::Running && sub != m_subGames.end())
+		sub->addPickedNumber(iNumber);
 }
 
 void GameRound::removeLastPick() {
-	if (m_status == Status::Running)
-		getCurrentSubRound()->removeLastPick();
+	if (const auto sub = getCurrentSubRound(); m_status == Status::Running && sub != m_subGames.end())
+		sub->removeLastPick();
 }
 
 void GameRound::addWinner(const std::string& iWinner) {
-	if (m_status != Status::Running)
-		return;
 	const auto sub = getCurrentSubRound();
+	if (m_status != Status::Running || sub == m_subGames.end())
+		return;
 	sub->setWinner(iWinner);
 	if (sub->isFinished())
 		nextStatus();

@@ -269,6 +269,15 @@ auto MainWindow::recoverRenderer() -> bool {
 	requestFont(core::getSettings()->getValue<std::string>("gui/font_path", {}),
 				core::getSettings()->getValue<float>("gui/font_size", g_defaultFontSize));
 	setTheme(m_currentTheme);
+	// Les vues détachées ont perdu leur fenêtre de plateforme avec le backend GLFW, mais
+	// la liste qu'ImGui tend aux backends ne sera refaite qu'à la fin de l'image suivante :
+	// le backend GLFW y demandait alors le focus d'une fenêtre nulle. Elles en sortent, et
+	// l'image suivante leur refait une fenêtre comme à une vue qui vient de se détacher.
+	auto& platformViewports = ImGui::GetPlatformIO().Viewports;
+	const auto stale = std::ranges::remove_if(platformViewports, [](const ImGuiViewport* iViewport) -> bool {
+		return iViewport->PlatformHandle == nullptr;
+	});
+	platformViewports.erase(stale.begin(), stale.end());
 	log_info("[vulkan] Rendu reconstruit.");
 	return true;
 }
@@ -633,7 +642,7 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	colors[ImGuiCol_ChildBg] = utils::vec4ToImVec4(iTheme.childBackground);
 	colors[ImGuiCol_PopupBg] = utils::vec4ToImVec4(iTheme.backgroundPopup);
 	colors[ImGuiCol_Border] = utils::vec4ToImVec4(iTheme.border);
-	// colors[ImGuiCol_BorderShadow] = utils::vec4ToImVec4(iTheme.border);
+	colors[ImGuiCol_BorderShadow] = {0.0f, 0.0f, 0.0f, 0.0f};
 	// Frame BG 7 8 9
 	colors[ImGuiCol_FrameBg] = utils::vec4ToImVec4(iTheme.frameBackground);
 	colors[ImGuiCol_FrameBgHovered] = utils::vec4ToImVec4(iTheme.frameBackgroundHovered);
@@ -651,6 +660,9 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	colors[ImGuiCol_ScrollbarGrabActive] = utils::vec4ToImVec4(iTheme.scrollbarGrabActive);
 	// Checkbox 18
 	colors[ImGuiCol_CheckMark] = utils::vec4ToImVec4(iTheme.checkMark);
+	// A checked box keeps the field's own background: left to ImGui it was the blue of
+	// its default style, whatever the look.
+	colors[ImGuiCol_CheckboxSelectedBg] = utils::vec4ToImVec4(iTheme.frameBackground);
 	// Slider 19 20
 	colors[ImGuiCol_SliderGrab] = utils::vec4ToImVec4(iTheme.sliderGrab);
 	colors[ImGuiCol_SliderGrabActive] = utils::vec4ToImVec4(iTheme.sliderGrabActive);
@@ -688,16 +700,22 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	colors[ImGuiCol_PlotHistogramHovered] = utils::vec4ToImVec4(iTheme.plotHistogramHovered);
 	/// Tables 46 47 48 49 50
 	colors[ImGuiCol_TableHeaderBg] = utils::vec4ToImVec4(iTheme.tableHeaderBg);
-	// colors[ImGuiCol_TableBorderStrong] = utils::vec4ToImVec4.(iTheme.Text);
+	colors[ImGuiCol_TableBorderStrong] = utils::vec4ToImVec4(iTheme.border);
 	colors[ImGuiCol_TableBorderLight] = utils::vec4ToImVec4(iTheme.tableBorderLight);
 	colors[ImGuiCol_TableRowBg] = utils::vec4ToImVec4(iTheme.tableRowBg);
 	colors[ImGuiCol_TableRowBgAlt] = utils::vec4ToImVec4(iTheme.tableRowBgAlt);
 	// Text Selected 51
 	colors[ImGuiCol_TextSelectedBg] = utils::vec4ToImVec4(iTheme.textSelectedBg);
+	colors[ImGuiCol_TextLink] = utils::vec4ToImVec4(iTheme.highlight);
+	colors[ImGuiCol_InputTextCursor] = utils::vec4ToImVec4(iTheme.text);
+	colors[ImGuiCol_TreeLines] = utils::vec4ToImVec4(iTheme.separator);
+	colors[ImGuiCol_UnsavedMarker] = utils::vec4ToImVec4(iTheme.highlight);
 	// Drag n Drop 52
 	colors[ImGuiCol_DragDropTarget] = utils::vec4ToImVec4(iTheme.dragDropTarget);
+	colors[ImGuiCol_DragDropTargetBg] = {iTheme.dragDropTarget.x(), iTheme.dragDropTarget.y(),
+										 iTheme.dragDropTarget.z(), 0.15f};
 	// Nav 53 54 55
-	colors[ImGuiCol_NavHighlight] = utils::vec4ToImVec4(iTheme.navHighlight);
+	colors[ImGuiCol_NavCursor] = utils::vec4ToImVec4(iTheme.navHighlight);
 	colors[ImGuiCol_NavWindowingHighlight] = utils::vec4ToImVec4(iTheme.navWindowingHighlight);
 	colors[ImGuiCol_NavWindowingDimBg] = utils::vec4ToImVec4(iTheme.navWindowingDimBg);
 	// Modal window 56
@@ -709,8 +727,16 @@ void MainWindow::setTheme(const Theme& iTheme) {
 
 	// rounding
 	style.WindowRounding = iTheme.windowRounding;
+	style.PopupRounding = iTheme.windowRounding;
+	style.ChildRounding = iTheme.frameRounding;
 	style.FrameRounding = iTheme.frameRounding;
 	style.FrameBorderSize = iTheme.frameBorderSize;
+	style.WindowBorderSize = 1.0f;
+	style.ChildBorderSize = 1.0f;
+	style.PopupBorderSize = 1.0f;
+	style.SelectableRounding = iTheme.frameRounding;
+	style.MenuItemRounding = iTheme.frameRounding;
+	style.ImageRounding = iTheme.frameRounding;
 
 	style.TabRounding = iTheme.tabRounding;
 	style.TabBarOverlineSize = iTheme.tabOverline;
@@ -723,6 +749,7 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	style.WindowMenuButtonPosition = ImGuiDir_Right;
 	style.ColorButtonPosition = ImGuiDir_Left;
 
+	style.WindowPadding = utils::vec2ToImVec2(iTheme.windowPadding);
 	style.ItemSpacing = utils::vec2ToImVec2(iTheme.itemSpacing);
 	style.ItemInnerSpacing = utils::vec2ToImVec2(iTheme.itemInnerSpacing);
 	style.CellPadding = utils::vec2ToImVec2(iTheme.cellPadding);
@@ -731,6 +758,10 @@ void MainWindow::setTheme(const Theme& iTheme) {
 	style.SelectableTextAlign = utils::vec2ToImVec2(iTheme.selectableTextAlign);
 	style.DisplayWindowPadding = utils::vec2ToImVec2(iTheme.displayWindowPadding);
 	style.DisplaySafeAreaPadding = utils::vec2ToImVec2(iTheme.displaySafeAreaPadding);
+	style.ScrollbarSize = iTheme.scrollbarSize;
+	style.GrabMinSize = std::max(10.0f, iTheme.scrollbarSize - 2.0f);
+	style.SeparatorTextBorderSize = 2.0f;
+	style.SeparatorTextPadding = {iTheme.itemSpacing.x() * 2.0f, iTheme.itemSpacing.y()};
 	style.MouseCursorScale = iTheme.mouseCursorScale;
 	// When viewports are enabled we tweak WindowRounding/WindowBg so platform
 	// windows can look identical to regular ones.
@@ -813,11 +844,36 @@ void MainWindow::setIcon(const std::string& iIconName) const {
 	glfwSetWindowIcon(glfwWindow, 1, &img);
 }
 
+void MainWindow::bindToMonitor(void* iPlatformHandle, const std::optional<size_t> iMonitor,
+							   const math::vec4& iWindowed) const {
+	auto* window = static_cast<GLFWwindow*>(iPlatformHandle);
+	if (m_wayland || window == nullptr || window == m_window)
+		return;
+	int count = 0;
+	GLFWmonitor* const* monitors = glfwGetMonitors(&count);
+	GLFWmonitor* wanted = nullptr;
+	if (iMonitor.has_value() && std::cmp_less(iMonitor.value(), count))
+		wanted = monitors[iMonitor.value()];
+	if (glfwGetWindowMonitor(window) == wanted)
+		return;
+	if (wanted == nullptr) {
+		glfwSetWindowMonitor(window, nullptr, static_cast<int>(iWindowed.x()), static_cast<int>(iWindowed.y()),
+							 static_cast<int>(iWindowed.z()), static_cast<int>(iWindowed.w()), GLFW_DONT_CARE);
+		log_info("Affichage sorti du plein écran.");
+		return;
+	}
+	const GLFWvidmode* mode = glfwGetVideoMode(wanted);
+	if (mode == nullptr)
+		return;
+	// A full-screen window minimises itself when it loses the focus, by default: the
+	// first click on the control window would have taken the display off the projector.
+	glfwSetWindowAttrib(window, GLFW_AUTO_ICONIFY, GLFW_FALSE);
+	// The monitor's own mode, so the screen keeps its resolution and nothing flickers.
+	glfwSetWindowMonitor(window, wanted, 0, 0, mode->width, mode->height, mode->refreshRate);
+	log_info("Affichage en plein écran sur '{}'.", glfwGetMonitorName(wanted));
+}
+
 auto MainWindow::getMonitorsInfo() const -> std::vector<MonitorInfo> {
-	auto* w = static_cast<GLFWwindow*>(m_window);
-	math::vec2i windowPos;
-	if (!m_wayland)
-		glfwGetWindowPos(w, &windowPos.x(), &windowPos.y());
 	std::vector<MonitorInfo> monitorsInfo;
 	int count = 0;
 	GLFWmonitor* const* monitors = glfwGetMonitors(&count);
@@ -833,18 +889,18 @@ auto MainWindow::getMonitorsInfo() const -> std::vector<MonitorInfo> {
 		glfwGetMonitorPhysicalSize(monitor, &monitorInfo.physicalSize.x(), &monitorInfo.physicalSize.y());
 		glfwGetMonitorWorkarea(monitor, &monitorInfo.workAreaPosition.x(), &monitorInfo.workAreaPosition.y(),
 							   &monitorInfo.workAreaSize.x(), &monitorInfo.workAreaSize.y());
-		if (m_wayland) {
-			// The window position is unknowable here, so the control window is assumed
-			// to sit on the primary monitor.
-			monitorInfo.isMainWindow = monitor == glfwGetPrimaryMonitor();
-		} else {
-			monitorInfo.isMainWindow =
-					monitorInfo.position.x() <= windowPos.x() &&
-					monitorInfo.position.x() + static_cast<int>(monitorInfo.size.x()) > windowPos.x() &&
-					monitorInfo.position.y() <= windowPos.y() &&
-					monitorInfo.position.y() + static_cast<int>(monitorInfo.size.y()) > windowPos.y();
-		}
+		// The window position is unknowable under Wayland, so the control window is
+		// assumed to sit on the primary monitor.
+		monitorInfo.isMainWindow = m_wayland && monitor == glfwGetPrimaryMonitor();
 		monitorsInfo.push_back(monitorInfo);
+	}
+	if (!m_wayland && !monitorsInfo.empty()) {
+		auto* window = static_cast<GLFWwindow*>(m_window);
+		math::vec2i position;
+		math::vec2i size;
+		glfwGetWindowPos(window, &position.x(), &position.y());
+		glfwGetWindowSize(window, &size.x(), &size.y());
+		monitorsInfo[monitorHolding(monitorsInfo, position, size)].isMainWindow = true;
 	}
 	return monitorsInfo;
 }

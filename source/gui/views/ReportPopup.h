@@ -46,6 +46,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Rapport de fin d'événement"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {50.0f, 38.0f}}; }
 
 protected:
 	/**

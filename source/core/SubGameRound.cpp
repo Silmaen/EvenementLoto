@@ -70,6 +70,17 @@ void SubGameRound::nextStatus() {
 	}
 }
 
+void SubGameRound::setWinner(const std::string& iWinner) {
+	if (m_status != Status::Running)
+		return;
+	// Settled, with a name or without: a round nobody claims ends all the same. Going
+	// through nextStatus() kept it running as long as the name was empty, which made
+	// « Passer » do nothing.
+	m_winner = iWinner;
+	m_status = Status::Done;
+	m_end = clock::now();
+}
+
 void SubGameRound::read(std::istream& iBs, const ReadContext& iContext) {
 	if (iContext.version > getSaveVersion()) {
 		iBs.setstate(std::ios::failbit);

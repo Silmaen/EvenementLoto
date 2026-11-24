@@ -14,16 +14,11 @@
 #include "core/Report.h"
 #include "gui/Application.h"
 #include "gui/utils/FileDialog.h"
+#include "gui/utils/Layout.h"
 
 #include <imgui.h>
 
 namespace evl::gui::views {
-
-namespace {
-
-constexpr float g_buttonWidth = 110.0f;
-
-}// namespace
 
 PopupReport::PopupReport() = default;
 PopupReport::~PopupReport() = default;
@@ -31,15 +26,17 @@ PopupReport::~PopupReport() = default;
 void PopupReport::onOpen() { m_report = core::buildReport(Application::get().getCurrentEvent()); }
 
 void PopupReport::onPopupUpdate() {
-	if (ImGui::BeginChild("ReportText", {0, ImGui::GetContentRegionAvail().y - 40}, ImGuiChildFlags_Borders,
-						  ImGuiWindowFlags_HorizontalScrollbar)) {
+	if (ImGui::BeginChild(
+				"ReportText",
+				{0, ImGui::GetContentRegionAvail().y - utils::dialogFooterHeight() - ImGui::GetStyle().ItemSpacing.y},
+				ImGuiChildFlags_Borders, ImGuiWindowFlags_HorizontalScrollbar)) {
 		// Shown as it is written: the text on screen and the file on disk are the same.
 		ImGui::TextUnformatted(m_report.c_str());
 	}
 	ImGui::EndChild();
 
-	ImGui::Separator();
-	if (ImGui::Button("Enregistrer...", {g_buttonWidth, 0})) {
+	utils::beginDialogFooter(3);
+	if (utils::dialogButton("Enregistrer...")) {
 		utils::FileDialog::saveFile("Rapport|md,txt", [report = m_report](const std::filesystem::path& iPath) -> void {
 			if (core::writeFileAtomically(iPath, [&report](std::ostream& oBs) -> void { oBs << report; })) {
 				log_info("Rapport enregistré dans '{}'.", iPath.string());
@@ -49,12 +46,12 @@ void PopupReport::onPopupUpdate() {
 		});
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Copier", {g_buttonWidth, 0})) {
+	if (utils::dialogButton("Copier")) {
 		ImGui::SetClipboardText(m_report.c_str());
 		log_info("Rapport copié dans le presse-papier.");
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+	if (utils::dialogButton("Fermer"))
 		ImGui::CloseCurrentPopup();
 }
 

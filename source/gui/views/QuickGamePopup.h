@@ -50,6 +50,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Partie improvisée"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {38.0f, 30.0f}}; }
 
 protected:
 	/**

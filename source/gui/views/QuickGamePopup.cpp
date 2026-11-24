@@ -13,13 +13,13 @@
 #include "gui/Application.h"
 #include "gui/utils/Rendering.h"
 
+#include "gui/utils/Layout.h"
+
 #include <imgui.h>
 
 namespace evl::gui::views {
 
 namespace {
-
-constexpr float g_buttonWidth = 100.0f;
 
 /// The round types, as one ImGui combo string, `Invalid` left out.
 auto roundTypes() -> std::string {
@@ -73,7 +73,8 @@ void PopupQuickGame::onPopupUpdate() {
 	const auto& event = Application::get().getCurrentEvent();
 	if (event.isFinished()) {
 		ImGui::TextDisabled("L'événement est terminé, plus rien ne peut y être ajouté.");
-		if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+		utils::beginDialogFooter(1);
+		if (utils::dialogButton("Fermer"))
 			ImGui::CloseCurrentPopup();
 		return;
 	}
@@ -83,15 +84,17 @@ void PopupQuickGame::onPopupUpdate() {
 	ImGui::Separator();
 
 	// Type and number.
-	ImGui::Text("Type de partie");
-	ImGui::SetNextItemWidth(-140);
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted("Type");
+	ImGui::SameLine(utils::em(4.0f));
+	ImGui::SetNextItemWidth(-(utils::em(9.0f) + ImGui::GetStyle().ItemSpacing.x));
 	int type = static_cast<int>(m_round.getType()) - 1;// Invalid is not offered
 	if (ImGui::Combo("##QuickType", &type, roundTypes().c_str()))
 		m_round.setType(static_cast<core::GameRound::Type>(type + 1));
 	ImGui::SameLine();
-	ImGui::Text("N°");
+	ImGui::TextUnformatted("N°");
 	ImGui::SameLine();
-	ImGui::SetNextItemWidth(100);
+	ImGui::SetNextItemWidth(-1);
 	int id = m_round.getId();
 	if (ImGui::InputInt("##QuickNumber", &id, 1, 10, ImGuiInputTextFlags_CharsDecimal))
 		m_round.setId(std::max(0, id));
@@ -113,14 +116,12 @@ void PopupQuickGame::onPopupUpdate() {
 	}
 
 	// Prizes, per sub-round, and optional.
-	ImGui::Spacing();
-	ImGui::Separator();
 	if (m_round.getType() == core::GameRound::Type::Pause) {
 		ImGui::TextDisabled("Une pause n'a pas de lot.");
 	} else {
 		if (m_selectedSubRound >= m_round.sizeSubRound())
 			m_selectedSubRound = 0;
-		ImGui::Text("Lots (facultatifs)");
+		ImGui::SeparatorText("Lots (facultatifs)");
 		if (m_round.sizeSubRound() > 1) {
 			for (size_t i = 0; i < m_round.sizeSubRound(); ++i) {
 				const auto sub = m_round.getSubRound(static_cast<uint32_t>(i));
@@ -133,17 +134,19 @@ void PopupQuickGame::onPopupUpdate() {
 		const auto subRound = m_round.getSubRound(static_cast<uint32_t>(m_selectedSubRound));
 		ImGui::Text("Valeur de la phase : %.2f €", subRound->getValue());
 		auto prizes = subRound->getPrizes();
-		if (utils::renderPrizeList(prizes, {.editable = true, .size = {0, -50}}))
+		if (utils::renderPrizeList(
+					prizes,
+					{.editable = true, .size = {0, -(utils::dialogFooterHeight() + ImGui::GetStyle().ItemSpacing.y)}}))
 			subRound->setPrizes(prizes);
 	}
 
-	ImGui::Separator();
-	if (ImGui::Button("Ajouter", {g_buttonWidth, 0})) {
+	utils::beginDialogFooter(2);
+	if (utils::dialogButton("Ajouter")) {
 		if (insertRound())
 			ImGui::CloseCurrentPopup();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Annuler", {g_buttonWidth, 0}))
+	if (utils::dialogButton("Annuler"))
 		ImGui::CloseCurrentPopup();
 }
 

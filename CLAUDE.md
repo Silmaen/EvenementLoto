@@ -20,7 +20,9 @@ Author: Silmaen
   - `source/gui/vulkan/` - Vulkan rendering (VulkanContext, TextureLibrary, vkData)
   - `source/gui/utils/` - UI utilities (FileDialog, Convert, MarkdownParser, Rendering
     helpers — `renderPrizeList` is shared by the round configuration and the improvised
-    round).
+    round, and drops to two lines per article when its region is narrow — and Layout:
+    `em()` counts in font heights, `beginDialogFooter()`/`dialogButton()` give every
+    dialog the same right-aligned button row).
     `FileDialog` is the in-app file browser: requests carry a continuation, and the
     browser is drawn inside the scope of whoever asked, so it stacks on an open popup
     instead of dismissing it. Two panes (recent paths and a directory tree, then the
@@ -30,10 +32,12 @@ Author: Silmaen
   - `source/gui/fonts/` - Embedded fonts (Roboto-Regular, Roboto-Bold, Roboto-Italic as `.embed` files)
 - `source/third_party/` - Single translation unit instantiating the header-only third
   parties, excluded from the project warnings and from clang-tidy
-- `source/resources/` - Resources copied at build time (dark icons, user documentation + images)
+- `source/resources/` - Resources copied at build time (dark icons, user documentation + images).
+  The application logo is drawn in `mainIcon/mainIcon.svg`; the PNGs (16 to 512), the
+  `.ico` and `icons|darkicons/mainIcon.png` are rendered from it, never edited by hand
 - `source/main.cpp` - Entry point (ImGui UI); returns `EXIT_FAILURE` when the application ends in `State::Error`
 - `test/lib_test/` - Unit tests for core library (Google Test, 10 test files)
-- `test/gui_test/` - Unit tests for GUI library (Google Test, 6 test files)
+- `test/gui_test/` - Unit tests for GUI library (Google Test, 7 test files)
 - `ci/` - Python-based CI scripts (build, test, coverage, deploy, documentation), run by
   `.gitlab-ci.yml`
 - `cmake/` - CMake modules (BaseConfig, Conan, conan_provider, Vulkan, Sanitizers,
@@ -57,6 +61,14 @@ Author: Silmaen
   event knows which are taken. Without it, two identical bottles would be
   indistinguishable and "where is this one in play" would be a guess. `prizesFromLegacy()` turns a pre-version-8 multi-line string into
   articles, the whole value carried by the first
+- `Schedule` - `estimateSchedule()`: when the event should end, from the mean length of
+  the phases played and the planned pause length (setting `gui/pause_duration`, in
+  minutes, read through `Application::getPauseLength()`); no estimate before a phase
+  has been played. It also gives the delay on `Event::getPlannedEnd()` — whose time of
+  day is taken on the occurrence nearest to now, so a programme already late is not
+  pushed to the next day — and the draw rhythm. `tallyPrizes()` splits the prizes into
+  given, unclaimed and remaining; `pauseResumesAt()` gives the time announced on the
+  pause screen
 - `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
   what the popup shows and what is written to disk
 - `Distribution` - `overview()` dresses the state of the distribution — one entry per
@@ -102,15 +114,21 @@ the manual adjustment: a sub-round under way refuses both as source and as desti
 Beware version 3 files: the format did not store prize values, so their articles come
 back without a price and the distribution says the resulting order is arbitrary.
 
+A pause has **no sub-round**: its `getCurrentSubRound()` is `end()`, and so is that of
+a round whose phases are all over while it shows its end screen. Every dereference
+checks it first — starting a pause used to step `end()` and write past the vector.
+`SubGameRound::setWinner()` ends the phase even with an empty name: that is « Passer ».
+
 `Event::getGameRound()` and `GameRound::getSubRound()` both **bound their index** and
 return `end()` past it — `std::next` beyond the end is undefined behaviour, and an
 out-of-range round index used to take the process down.
 
 Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
 multi-line string with one value; **9** added the event catalogue; **10** gave each
-article an identifier. Files from versions 3 to 9 still read.
-`test/lib_test/reference-v10.lev` is the checked-in byte reference every toolchain is
-compared against, and `reference-v7/8/9.lev` are the compatibility fixtures — every format
+article an identifier; **11** added the planned end of the event (a time of day, minutes
+after midnight, −1 for none). Files from versions 3 to 10 still read.
+`test/lib_test/reference-v11.lev` is the checked-in byte reference every toolchain is
+compared against, and `reference-v7/8/9/10.lev` are the compatibility fixtures — every format
 change adds one and keeps the previous ones, listed in `g_legacyReferences`. A test that
 fabricates an old body byte by byte has to be rewritten at every bump for less than the
 shipped files in `data/` already prove.
@@ -131,12 +149,21 @@ Action-button geometry (`utils::g_actionIconSize`, `g_actionIconPadding`,
 `actionButtonHeight()`) is deliberately **not** taken from the theme: the toolbar took
 its height from the theme's line height, which made its buttons 42 px under `Nuit`
 against 50 px under `Salle`. `ToolBar` and `MainView` both size themselves from
-`actionButtonHeight()`, and they must agree or the main view overlaps the bar.
+`toolBarHeight()`, whose padding is fixed as well, and they must agree or the main view
+overlaps the bar.
 
 Note for tests: `Application::run()` leaves the application **closed** once `setMaxFrame`
 is reached, and `setRunning()` only comes back from `Waiting`. A second `run()` on the
 same instance therefore renders nothing — two tests silently measured nothing this way.
 Use one application per case, or drive the feature from inside a single `run()`.
+
+Every dialog derives from `Popup` and states its size through `layout()`, in font
+heights; the base centres it on the control window at each opening, bounds it to that
+window every frame, and never lets `imgui.ini` remember it (`NoSavedSettings`). Sized
+in pixels and placed from the ini file, dialogs used to open off the control window —
+which made them platform windows of their own, on whatever screen. `BeginChild`'s third
+argument is a *child* flag: `ImGuiWindowFlags_NoTitleBar` passed there is
+`ImGuiChildFlags_Borders`, and `NoResize` is `AlwaysUseWindowPadding`.
 
 Two ImGui balance rules this code has been bitten by: `EndChild()` must be called
 whatever `BeginChild()` returned — inside the `if` it is skipped as soon as the child is
@@ -148,6 +175,19 @@ followed by an item.
   generations), the recovery prompt at startup, the draw re-arm delay
   (`notifyDraw`/`isDrawHeld`, setting `gui/draw_delay`) and the interface font
   (`setFont`, settings `gui/font_path` and `gui/font_size`)
+- `Monitors` - `MonitorInfo` and the pure screen logic: `monitorHolding()` (the screen
+  holding most of the control window), `displayCandidates()` and
+  `resolveDisplayMonitor()`. The players' display is never sent to the control window's
+  screen while there is another, and the choice is stored as `MonitorInfo::key()`
+  (name and position, setting `gui/display_monitor`), never as an index: the platform
+  order changes with a hotplug. Full screen covers the monitor rectangle, not its work
+  area — under X11 the work area is one rectangle for the whole desktop, so a taskbar
+  on one screen shaved a strip off the others. Covering it is not enough either: some
+  window managers keep a borderless window below their panels, so the display's
+  platform window is put in real full screen by `MainWindow::bindToMonitor()`, with
+  `GLFW_AUTO_ICONIFY` off — otherwise the first click on the control window minimises it.
+  `DisplayView::applyCommonStyle()` also pins its own spacing and paddings: the public
+  screen's layout must not follow the habillage
 - `MainWindow` - GLFW window management with Vulkan surface. The desktop identity is set
   at window creation (`GLFW_WAYLAND_APP_ID`, `GLFW_X11_CLASS_NAME`), matching the
   `EvenementLoto.desktop` entry shipped in `resources/desktop`. A font request is honoured
@@ -186,8 +226,11 @@ followed by an item.
   (`TextureLibrary::reload()`) and rebuilds the glyph atlas; the ImGui context is kept,
   so windows and tabs stay put, and the system window is never recreated. Shutting down
   the Vulkan backend alone destroys the detached views' platform windows and the next
-  frame then asks GLFW about a window that is gone. Three attempts at most, then the
-  game is saved and the application stops. `Application::recoverRenderer()` is public so
+  frame then asks GLFW about a window that is gone. Even with both backends rebuilt, the
+  viewport list ImGui hands the backends is only refreshed at the end of the next frame:
+  the viewports left without a window are dropped from it, or the GLFW backend asks for
+  the focus of a null window (`RebuildsTheRendererWithADetachedView`). Three attempts at
+  most, then the game is saved and the application stops. `Application::recoverRenderer()` is public so
   the sequence is exercised by the test suite on a healthy device
 - Any other fatal Vulkan error saves the game before leaving the loop
 - `Application::saveProgress()` is called after every change of the game state (draw,
@@ -328,7 +371,9 @@ is built twice. The file only says which presets exist and where they run: what 
 builds, tests, covers and documents is in `ci/PresetsParameters.json`, read by
 `BuildAndTest`. The instance runners only take tagged jobs: Linux jobs run in
 `builder-ubuntu2404` on the docker runners, Windows jobs on the `windows` runner with
-PowerShell. `CONAN_HOME` comes from the runner config, on a persistent volume, and is
+PowerShell. **Never arm64**: the arm64 runner also carries `linux` and `docker`, so every
+Linux job asks for `amd64` as well — without it a package job landed on the Raspberry
+Pi, rebuilt every dependency and hit the one hour limit. `CONAN_HOME` comes from the runner config, on a persistent volume, and is
 never set by the pipeline; only the Poetry cache goes through GitLab's `cache:`.
 
 The actions:
@@ -405,7 +450,7 @@ All domain objects inherit from `Serializable` and implement:
 
 - Framework: Google Test
 - Test files follow `test_<ClassName>.cpp` naming
-- Tests are in `test/lib_test/` (core, 10 files) and `test/gui_test/` (GUI, 6 files)
+- Tests are in `test/lib_test/` (core, 11 files) and `test/gui_test/` (GUI, 6 files)
 - Coverage via gcovr (configured in `gcovr.cfg`)
 - Test helper header: `test/TestMainHelper.h`
 - `test_Serialization.cpp` checks that no truncated or corrupted file is ever accepted

@@ -79,6 +79,30 @@ private:
 	uint32_t m_drawn = 0;
 };
 
+/// A window kept outside the control window, so it gets a platform window of its own —
+/// what the players' display is on a second screen — and that asks for a renderer
+/// rebuild once it is there.
+class DetachedView final : public views::View {
+public:
+	void onUpdate() override {
+		const ImGuiViewport* main = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos({main->Pos.x + main->Size.x + 20.0f, main->Pos.y}, ImGuiCond_Always);
+		ImGui::SetNextWindowSize({200.0f, 150.0f}, ImGuiCond_Always);
+		if (ImGui::Begin("Detached"))
+			ImGui::TextUnformatted("ailleurs");
+		const bool detached = ImGui::GetWindowViewport() != main;
+		ImGui::End();
+		if (detached && ++m_detachedFrames == 2)
+			Application::get().requestRendererRecovery();
+	}
+
+	[[nodiscard]] auto getName() const -> std::string override { return "detached_view"; }
+	[[nodiscard]] auto detachedFrames() const -> uint32_t { return m_detachedFrames; }
+
+private:
+	uint32_t m_detachedFrames = 0;
+};
+
 }// namespace
 
 /// The application needs a display. Under `xvfb-run` it gets a virtual one and Vulkan
@@ -271,6 +295,69 @@ TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
 	// And the glyphs came back with them.
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
 }
+TEST(gui_Application, RebuildsTheRendererWithADetachedView) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	if ((ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) == 0)
+		GTEST_SKIP() << "pas de vues détachées sur ce serveur d'affichage";
+	// The display on its own screen when the card goes: the rebuild took its platform
+	// window away, and the next frame asked GLFW whether a null window had the focus.
+	const auto view = std::make_shared<DetachedView>();
+	app->addView(view);
+	app->setMaxFrame(8);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+	EXPECT_EQ(app->getRecoveryCount(), 1U);
+	// Detached again after the rebuild, and drawn there.
+	EXPECT_GT(view->detachedFrames(), 3U);
+}
+
+TEST(gui_Application, PlaysIntoAPause) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	// A real programme, played up to its first pause: the application died there once,
+	// without a word in its log.
+	const std::filesystem::path file = std::filesystem::path{EVL_TEST_DATA_DIR} / "super_loto.lev";
+	std::ifstream in(file, std::ios::binary);
+	ASSERT_TRUE(in.is_open());
+	auto& event = app->getCurrentEvent();
+	event.setBasePath(file);
+	event.read(in, {});
+	ASSERT_TRUE(in.good());
+	for (int step = 0; step < 200 && event.getStatus() != evl::core::Event::Status::Finished; ++step) {
+		if (event.getStatus() == evl::core::Event::Status::GameRunning &&
+			event.getCurrentCGameRound()->getType() == evl::core::GameRound::Type::Pause)
+			break;
+		if (event.getStatus() == evl::core::Event::Status::GameRunning &&
+			event.getCurrentCGameRound()->getStatus() == evl::core::GameRound::Status::Running &&
+			event.getCurrentCGameRound()->getCurrentSubRound() != event.getCurrentCGameRound()->endSubRound() &&
+			event.getCurrentCGameRound()->getCurrentSubRound()->getStatus() ==
+					evl::core::SubGameRound::Status::Running) {
+			event.getCurrentGameRound()->addPickedNumber(static_cast<uint8_t>(step % 90 + 1));
+			event.addWinnerToCurrentRound("gagnant");
+			continue;
+		}
+		event.nextState();
+	}
+	ASSERT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
+	ASSERT_EQ(event.getCurrentCGameRound()->getType(), evl::core::GameRound::Type::Pause);
+	// What the organizer does there: the next step, as the button sends it — then the
+	// pause is over and the following round is on.
+	const auto next = app->getAction("game_next_step");
+	ASSERT_NE(next, nullptr);
+	next->execute();
+	next->execute();
+	EXPECT_EQ(event.getStatus(), evl::core::Event::Status::GameRunning);
+	EXPECT_NE(event.getCurrentCGameRound()->getType(), evl::core::GameRound::Type::Pause);
+	app->setMaxFrame(6);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
+}
+
 TEST(gui_Application, DrawsTheSettingsWindow) {
 	if (g_needsDisplay)
 		GTEST_SKIP() << "pas de session graphique sur cet agent";

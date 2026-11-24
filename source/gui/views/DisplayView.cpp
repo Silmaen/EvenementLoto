@@ -9,6 +9,7 @@
 
 #include "DisplayView.h"
 
+#include "core/Schedule.h"
 #include "core/utilities.h"
 #include "gui/Application.h"
 #include "gui/utils/Convert.h"
@@ -100,7 +101,8 @@ auto loadSlideFolderImages(const std::filesystem::path& iFolderPath) -> size_t {
 
 }// namespace
 
-DisplayView::DisplayView(core::Event& iEvent) : m_currentEvent{iEvent} {}
+DisplayView::DisplayView(core::Event& iEvent)
+	: m_currentEvent{iEvent}, m_monitorKey{core::getSettings()->getValue<std::string>("gui/display_monitor", "")} {}
 
 DisplayView::~DisplayView() = default;
 
@@ -113,36 +115,53 @@ void DisplayView::onUpdate() {
 	loadEventImages(m_currentEvent);
 	ImGuiWindowFlags flags = ImGuiWindowFlags_None;
 	const auto monitors = app.getMonitorsInfo();
-	if (monitors.size() < 2 && m_fullscreen) {
+	// Full screen on the control window's own screen would hide the controls.
+	if (displayCandidates(monitors).empty() && m_fullscreen) {
 		m_fullscreen = false;
 		m_lastFullscreen = true;
 	}
-	if (m_monitorId >= monitors.size())
-		m_monitorId = 0;
-	const auto& desiredMonitor = monitors[m_monitorId];
-	math::vec2 monitorPos = {static_cast<float>(desiredMonitor.workAreaPosition.x()),
-							 static_cast<float>(desiredMonitor.workAreaPosition.y())};
-	math::vec2 monitorSize = {static_cast<float>(desiredMonitor.workAreaSize.x() - 1),
-							  static_cast<float>(desiredMonitor.workAreaSize.y() - 1)};
+	if (monitors.empty()) {
+		style = style_backup;
+		return;
+	}
+	const size_t monitorIndex = getMonitor(monitors);
+	const auto& desiredMonitor = monitors[monitorIndex];
+	const math::vec4 windowed{static_cast<float>(desiredMonitor.workAreaPosition.x()) + 50.0f,
+							  static_cast<float>(desiredMonitor.workAreaPosition.y()) + 50.0f,
+							  static_cast<float>(desiredMonitor.workAreaSize.x()) - 200.0f,
+							  static_cast<float>(desiredMonitor.workAreaSize.y()) - 200.0f};
 	if (m_fullscreen) {
-		// Full screen window on desired monitor
-		ImGui::SetNextWindowPos({monitorPos.x(), monitorPos.y()}, ImGuiCond_Always);
-		ImGui::SetNextWindowSize({monitorSize.x(), monitorSize.y()}, ImGuiCond_Always);
+		// The whole screen, not its work area: the work area leaves out the panels, and
+		// under X11 it is one rectangle for the whole desktop, so a taskbar on one screen
+		// shaved a strip off the others. A borderless window covering the monitor
+		// exactly is also what window managers recognise as full screen.
+		ImGui::SetNextWindowPos(
+				{static_cast<float>(desiredMonitor.position.x()), static_cast<float>(desiredMonitor.position.y())},
+				ImGuiCond_Always);
+		ImGui::SetNextWindowSize(
+				{static_cast<float>(desiredMonitor.size.x()), static_cast<float>(desiredMonitor.size.y())},
+				ImGuiCond_Always);
 		flags |= ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoSavedSettings;
-	} else {
-		if (m_lastFullscreen) {
-			ImGui::SetNextWindowPos({monitorPos.x() + 50, monitorPos.y() + 50}, ImGuiCond_Always);
-			ImGui::SetNextWindowSize({monitorSize.x() - 200, monitorSize.y() - 200}, ImGuiCond_Always);
-		}
-		// Windowed mode with free size and position
-		flags |= ImGuiWindowFlags_None;
+	} else if (m_lastFullscreen) {
+		ImGui::SetNextWindowPos({windowed.x(), windowed.y()}, ImGuiCond_Always);
+		ImGui::SetNextWindowSize({windowed.z(), windowed.w()}, ImGuiCond_Always);
 	}
 	m_lastFullscreen = m_fullscreen;
 	if (ImGui::Begin("DisplayView", nullptr, flags)) {
 		renderContent();
 	}
+	// On its own screen the display has a platform window of its own, which is the one
+	// asked to go full screen; inside the control window there is nothing to ask.
+	app.getMainWindow().bindToMonitor(ImGui::GetWindowViewport()->PlatformHandle,
+									  m_fullscreen ? std::optional{monitorIndex} : std::nullopt, windowed);
 	ImGui::End();
 	style = style_backup;
+}
+
+void DisplayView::setMonitor(const MonitorInfo& iMonitor) {
+	m_monitorKey = iMonitor.key();
+	core::getSettings()->setValue("gui/display_monitor", m_monitorKey);
+	log_info("Écran d'affichage : {}", m_monitorKey);
 }
 
 void DisplayView::setFontScale(const float iScale) const { ImGui::SetWindowFontScale(iScale * m_contentScale); }
@@ -169,8 +188,8 @@ void DisplayView::renderInline(const math::vec2& iSize) {
 	m_currentEvent = app.getCurrentEvent();
 	loadEventImages(m_currentEvent);
 
-	const auto& target = monitors[m_monitorId < monitors.size() ? m_monitorId : 0];
-	const math::vec2 screen{static_cast<float>(target.workAreaSize.x()), static_cast<float>(target.workAreaSize.y())};
+	const auto& target = monitors[getMonitor(monitors)];
+	const math::vec2 screen{static_cast<float>(target.size.x()), static_cast<float>(target.size.y())};
 	// The miniature keeps the projector's aspect ratio: a faithful reduction, letterboxed
 	// in the region the tab gives it, and the same factor drives every font scale.
 	const float fit = std::min(iSize.x() / screen.x(), iSize.y() / screen.y());
@@ -202,6 +221,7 @@ void DisplayView::renderContent() {
 		} else {
 			m_currentDiapoIndex = 0;
 			m_totalDiapoImages = 0;
+			m_diapoTried = false;
 			m_diapoChanged = core::clock::now();
 			renderRoundReady();
 		}
@@ -219,6 +239,7 @@ void DisplayView::renderContent() {
 					} else {
 						m_currentDiapoIndex = 0;
 						m_totalDiapoImages = 0;
+						m_diapoTried = false;
 						m_diapoChanged = core::clock::now();
 						if (currentRound->getCurrentSubRound()->getStatus() == core::SubGameRound::Status::PreScreen) {
 							renderRoundReady();
@@ -439,7 +460,7 @@ void DisplayView::renderRoundRunning() const {
 	if (ImGui::BeginChild("NumberGridPanel", {leftPanelWidth, contentHeight}, ImGuiChildFlags_Borders)) {
 		// Render 9x10 grid
 		const ImVec2 availWidth = ImGui::GetContentRegionAvail();
-		const math::vec2 spacing = gui_settings.getValue("grid_button_spacing", math::vec2{4.0f, 4.0f});
+		const math::vec2 spacing = gui_settings.getValue("grid_button_spacing", math::vec2{0.0f, 0.0f});
 		const ImVec2 buttonSize{(availWidth.x - spacing.x() * 9) / 10.0f, (availWidth.y - spacing.y() * 8) / 9.0f};
 
 		const auto buttonColor = gui_settings.getValue("grid_background_color", math::vec4{0.1f, 0.1f, 0.1f, 1.0f});
@@ -482,9 +503,13 @@ void DisplayView::renderRoundRunning() const {
 				const float scaleY = buttonSize.y / textSize.y;
 				if (const float scale = std::min(scaleX, scaleY) * gridTextScale; scale > 0.f)
 					setFontScale(scale);
+				// A cell under the mouse must not look drawn: hovered and pressed keep its colour.
+				const ImVec4 cell = ImGui::GetStyleColorVec4(ImGuiCol_Button);
+				ImGui::PushStyleColor(ImGuiCol_ButtonHovered, cell);
+				ImGui::PushStyleColor(ImGuiCol_ButtonActive, cell);
 				ImGui::Button(label.c_str(), buttonSize);
 				setFontScale(1.0f);
-				ImGui::PopStyleColor();
+				ImGui::PopStyleColor(3);
 			}
 		}
 	}
@@ -494,59 +519,61 @@ void DisplayView::renderRoundRunning() const {
 
 	// Right panel - Info and display
 	if (ImGui::BeginChild("InfoPanel", {0, 0}, ImGuiChildFlags_Borders)) {
-		auto fullWidth = ImGui::GetContentRegionAvail().x;
+		const float fullWidth = ImGui::GetContentRegionAvail().x;
 		// Current draw
 		ImGui::Text("Numéro tiré");
 		ImGui::Separator();
 
-		ImGui::BeginGroup();
+		// The clocks first, since they decide how much is left for the logo: as large as
+		// asked, but never so large that the duration and the time collide.
+		const auto now = core::clock::now();
+		const std::string durationStr = core::formatDuration(now - currentSubRound->getStarting());
+		const std::string nowStr = core::formatClockNoSecond(now);
+		const float textHeight = ImGui::GetTextLineHeight();
+		const float figuresWidth = ImGui::CalcTextSize(durationStr.c_str()).x + ImGui::CalcTextSize(nowStr.c_str()).x;
+		const float wantedScale = std::max(gui_settings.getValue("time_scale", 2.4f), 0.5f);
+		const float timeScale = figuresWidth > 0.0f
+										? std::min(wantedScale, (fullWidth - style.ItemSpacing.x * 2.0f) / figuresWidth)
+										: wantedScale;
+		const float timingHeight = textHeight * (1.0f + timeScale) + style.ItemSpacing.y * 3.0f + style.SeparatorSize;
+
 		const auto drawnNumbers = currentRound->getAllDraws();
 		const std::string lastNumberText = drawnNumbers.empty() ? "--" : std::format("{}", drawnNumbers.back());
+		ImGui::BeginGroup();
 		utils::adaptTextToRegion(lastNumberText, {.autoRegion = false,
-												  .contentSize = {fullWidth, ImGui::GetContentRegionAvail().y},
+												  .contentSize = {fullWidth, ImGui::GetContentRegionAvail().y * 0.45f},
 												  .vCenter = false,
 												  .hCenter = true,
 												  .drawText = true,
 												  .textAdapt = "00"});
 		ImGui::EndGroup();
 
-		// Logo
-		ImGui::BeginGroup();
-		const float size = std::min(fullWidth, ImGui::GetContentRegionAvail().y - ImGui::GetCursorPosY());
-		drawImage(
-				"logo_organizer",
-				{(fullWidth - size) * 0.5f, (ImGui::GetContentRegionAvail().y + ImGui::GetCursorPosY() - size) * 0.5f},
-				{size, size});
-		ImGui::EndGroup();
+		// Logo: everything between the number and the clocks, as large as the narrower
+		// side allows, centred both ways.
+		const ImVec2 logoOrigin = ImGui::GetCursorPos();
+		const float logoHeight = ImGui::GetContentRegionAvail().y - timingHeight - style.ItemSpacing.y;
+		if (logoHeight > 0.0f)
+			drawImage("logo_organizer", {logoOrigin.x, logoOrigin.y}, {fullWidth, logoHeight});
+		ImGui::SetCursorPos({logoOrigin.x, logoOrigin.y + std::max(logoHeight, 0.0f) + style.ItemSpacing.y});
 
-		// Timing info
-		const auto textHeight = ImGui::CalcTextSize("D").y;
-		const float timeScale = gui_settings.getValue("time_scale", 1.6f);
-		auto now = core::clock::now();
-		auto elapsed = now - currentSubRound->getStarting();
-		const std::string nowStr = core::formatClockNoSecond(now);
-		auto nowSize = ImGui::CalcTextSize(nowStr.c_str()).x * (timeScale > 0.0f ? timeScale : 1.0f);
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() +
-							 (ImGui::GetContentRegionAvail().y - textHeight * (1 + timeScale) - style.WindowPadding.y));
-		if (ImGui::BeginChild("##TimingInfo", {0, 0}, ImGuiChildFlags_None)) {
+		if (ImGui::BeginChild("##TimingInfo", {0, timingHeight}, ImGuiChildFlags_None,
+							  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
 			ImGui::BeginGroup();
 			ImGui::Text("Durée partie");
 			ImGui::Separator();
-			if (timeScale > 0.0f)
-				setFontScale(timeScale);
-			ImGui::Text("%s", core::formatDuration(elapsed).c_str());
+			setFontScale(timeScale);
+			ImGui::Text("%s", durationStr.c_str());
 			setFontScale(1.0f);
 			ImGui::EndGroup();
 
 			ImGui::SameLine();
-			ImGui::SetCursorPosX(fullWidth - nowSize);
+			ImGui::SetCursorPosX(fullWidth - ImGui::CalcTextSize(nowStr.c_str()).x * timeScale);
 
 			ImGui::BeginGroup();
 			ImGui::Text("Heure");
 			ImGui::Separator();
-			if (timeScale > 0.0f)
-				setFontScale(timeScale);
-			ImGui::Text("%s", core::formatClockNoSecond(now).c_str());
+			setFontScale(timeScale);
+			ImGui::Text("%s", nowStr.c_str());
 			setFontScale(1.0f);
 			ImGui::EndGroup();
 		}
@@ -650,11 +677,25 @@ void DisplayView::renderEventPause() {
 	drawImage("logo_organizer", {ImGui::GetContentRegionAvail().x * 0.9f, 0},
 			  {ImGui::GetContentRegionAvail().x * 0.1f, ImGui::GetContentRegionAvail().x * 0.1f});
 
+	// The question every table asks during a pause: when does it start again.
+	if (const auto resumes = core::pauseResumesAt(*round, Application::getPauseLength()); resumes.has_value()) {
+		ImGui::Spacing();
+		const std::string text = std::format("Reprise vers {}", core::formatClockNoSecond(resumes.value()));
+		const float scale = std::max(core::getSettings()->getValue("gui/title_scale", 4.0f) * 0.6f, 1.0f);
+		ImGui::SetCursorPosX((ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(text.c_str()).x * scale) * 0.5f);
+		setFontScale(scale);
+		ImGui::Text("%s", text.c_str());
+		setFontScale(1.0f);
+	}
 	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.1f);
-	if (round->hasDiapo()) {
-		auto [folder, timing] = round->getDiapo();
-		if (m_totalDiapoImages == 0)
-			m_totalDiapoImages = loadSlideFolderImages(folder);
+	if (round->hasDiapo() && !m_diapoTried) {
+		m_totalDiapoImages = loadSlideFolderImages(std::get<0>(round->getDiapo()));
+		m_diapoTried = true;
+	}
+	// A slide show whose folder holds no image shows the message instead: a huge
+	// « <no logo> » in front of the hall said nothing to anybody.
+	if (round->hasDiapo() && m_totalDiapoImages > 0) {
+		const auto timing = std::get<1>(round->getDiapo());
 		// Change diapo if needed
 		if (const auto now = core::clock::now();
 			core::durationSeconds(now - m_diapoChanged) >= timing && m_totalDiapoImages > 0) {
@@ -701,6 +742,15 @@ void DisplayView::applyCommonStyle() const {
 		return;
 	}
 	auto& style = ImGui::GetStyle();
+	// The players' screen takes nothing of the control window's habillage: its numbers
+	// are coloured cells, without the outline the habillage gives to every field, and its
+	// layout keeps the spacing it was drawn for — a roomier habillage pushed its bottom
+	// lines off the screen.
+	style.FrameBorderSize = 0.0f;
+	style.WindowPadding = {8.0f, 8.0f};
+	style.ItemSpacing = {8.0f, 4.0f};
+	style.ItemInnerSpacing = {4.0f, 4.0f};
+	style.FramePadding = {4.0f, 3.0f};
 	const auto gui_settings = core::getSettings()->extract("gui");
 	const auto back = gui_settings.getValue("background_color", utils::imVec4ToVec4(style.Colors[ImGuiCol_WindowBg]));
 	style.Colors[ImGuiCol_WindowBg] = utils::vec4ToImVec4(back);

@@ -55,10 +55,11 @@ default:
 
 .linux:
   image: registry.argawaen.net/builder/builder-ubuntu2404
-  # artemis and hephaistos both carry these.
+  # `amd64` keeps the jobs off the arm64 runner, which carries `linux` and `docker` too.
   tags:
     - linux
     - docker
+    - amd64
   variables:
     # The runner clones as root and the image runs as `user`: without this git refuses
     # the checkout as of dubious ownership, and the analyses cannot diff.

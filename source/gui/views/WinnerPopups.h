@@ -51,6 +51,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Gagnant de la manche"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {34.0f, 24.0f}}; }
 
 protected:
 	/**
@@ -107,6 +108,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Gagnants"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {40.0f, 30.0f}}; }
 };
 
 }// namespace evl::gui::views

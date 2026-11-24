@@ -22,7 +22,7 @@ namespace evl::core {
 // 10: every prize article carries an identifier, which is what links an article of the
 // catalogue to the copy placed in a sub-round. Articles read from an older file are
 // given one by the event.
-constexpr uint16_t g_currentSaveVersion = 10;
+constexpr uint16_t g_currentSaveVersion = 11;
 
 namespace {
 

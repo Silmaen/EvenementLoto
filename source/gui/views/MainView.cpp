@@ -10,8 +10,11 @@
 #include "MainView.h"
 
 #include "DisplayView.h"
+#include "StatusBar.h"
+#include "core/Schedule.h"
 #include "gui/Application.h"
 #include "gui/utils/Convert.h"
+#include "gui/utils/Layout.h"
 #include "gui/utils/Rendering.h"
 
 #include <imgui.h>
@@ -19,13 +22,16 @@
 namespace evl::gui::views {
 
 constexpr float g_splitterThickness = 4.0f;
-constexpr float g_statusBarHeight = 25.0f;
-constexpr float g_minLeftPanelWidth = 200.0f;
-constexpr float g_minRightPanelWidth = 320.0f;
-constexpr float g_minTopPanelHeight = 150.0f;
-constexpr float g_minBottomPanelHeight = 200.0f;
 
-constexpr float g_commandSectionHeight = 150.0f;
+namespace {
+
+/// The four action buttons of the command section, stacked.
+auto commandSectionHeight() -> float {
+	const auto& style = ImGui::GetStyle();
+	return 4.0f * (utils::actionButtonHeight() + style.ItemSpacing.y) + style.WindowPadding.y * 2.0f;
+}
+
+}// namespace
 
 MainView::MainView(core::Event& iEvent) : m_currentEvent{iEvent} {}
 
@@ -34,13 +40,12 @@ MainView::~MainView() = default;
 void MainView::onUpdate() {
 	m_currentEvent = Application::get().getCurrentEvent();
 	const ImGuiViewport* viewport = ImGui::GetMainViewport();
-	const ImGuiStyle& style = ImGui::GetStyle();
 
 	// Calculate the available space
 	// La même hauteur que celle que la barre d'outils se donne, sinon la vue principale
 	// la recouvre ou laisse un trou.
-	const float toolBarHeight = utils::actionButtonHeight() + style.WindowPadding.y * 2;
-	const float statusBarHeight = g_statusBarHeight + style.WindowPadding.y;
+	const float toolBarHeight = utils::toolBarHeight();
+	const float statusBarHeight = StatusBar::height();
 
 	// Position and size for the main view
 	const ImVec2 pos = {viewport->WorkPos.x, viewport->WorkPos.y + toolBarHeight};
@@ -63,10 +68,13 @@ void MainView::onUpdate() {
 
 	if (ImGui::Begin("MainView", nullptr, flags)) {
 		// Initialize splitter positions if needed
-		const float minBottom = g_minTopPanelHeight / size.y;
-		const float maxBottom = 1.f - g_minBottomPanelHeight / size.y;
-		const float minLeft = g_minLeftPanelWidth / size.x;
-		const float maxLeft = 1.f - g_minRightPanelWidth / size.x;
+		// In font heights, so a larger font does not squeeze the panels it fills.
+		const float minBottom = utils::em(12.0f) / size.y;
+		// The bottom panel holds a tab bar and the three draw modes: what it needs to show
+		// them all without a scrollbar.
+		const float maxBottom = 1.f - utils::em(11.0f) / size.y;
+		const float minLeft = utils::em(14.0f) / size.x;
+		const float maxLeft = 1.f - utils::em(17.0f) / size.x;
 		if (resized) {
 			m_leftRightSplit = maxLeft;
 			m_topBottomSplit = maxBottom;
@@ -124,7 +132,7 @@ void MainView::onUpdate() {
 
 void MainView::renderLeftPanel() const {
 	// Main tabs area
-	if (ImGui::BeginChild("MainTabs", {0, -ImGui::GetFrameHeightWithSpacing() * 5}, ImGuiWindowFlags_NoResize)) {
+	if (ImGui::BeginChild("MainTabs", {0, -ImGui::GetFrameHeightWithSpacing() * 5}, ImGuiChildFlags_None)) {
 		if (ImGui::BeginTabBar("MainTabBar")) {
 			if (ImGui::BeginTabItem("Numéros tirés")) {
 				renderDrawnNumbersTab();
@@ -143,7 +151,7 @@ void MainView::renderLeftPanel() const {
 	}
 	ImGui::EndChild();
 
-	if (ImGui::BeginChild("EventInfo", {0, 0}, ImGuiWindowFlags_NoResize)) {
+	if (ImGui::BeginChild("EventInfo", {0, 0}, ImGuiChildFlags_None)) {
 		renderEventInfo();
 	}
 	ImGui::EndChild();
@@ -246,15 +254,12 @@ void MainView::renderRightPanel() const {
 		}
 	}
 
-	auto size = ImGui::GetContentRegionAvail();
-	size.y -= 2 * style.WindowPadding.y;
-	size.x -= style.WindowPadding.x;
+	const float commandsHeight = commandSectionHeight();
+	const float numbersHeight = ImGui::GetContentRegionAvail().y - commandsHeight - style.ItemSpacing.y;
 
-
-	if (ImGui::BeginChild("NumbersDisplay", {size.x, size.y - g_commandSectionHeight}, ImGuiWindowFlags_NoTitleBar)) {
+	if (ImGui::BeginChild("NumbersDisplay", {0, std::max(numbersHeight, utils::em(4.0f))}, ImGuiChildFlags_Borders)) {
 		// Current draw
-		if (ImGui::BeginChild("CurrentDraw", {0, 0.70f * ImGui::GetContentRegionAvail().y},
-							  ImGuiWindowFlags_NoResize)) {
+		if (ImGui::BeginChild("CurrentDraw", {0, 0.70f * ImGui::GetContentRegionAvail().y}, ImGuiChildFlags_None)) {
 			ImGui::Text("Numéro tiré");
 			ImGui::Separator();
 			const std::string numberText = (prevDrawnNumber != -1) ? std::format("{}", prevDrawnNumber) : "--";
@@ -265,7 +270,7 @@ void MainView::renderRightPanel() const {
 		ImGui::EndChild();
 
 		// Last numbers
-		if (ImGui::BeginChild("LastNumbers", {0, 0}, ImGuiWindowFlags_NoResize)) {
+		if (ImGui::BeginChild("LastNumbers", {0, 0}, ImGuiChildFlags_None)) {
 			ImGui::Text("Derniers numéros");
 			ImGui::Separator();
 			std::string lastNumbers;
@@ -293,7 +298,7 @@ void MainView::renderRightPanel() const {
 	ImGui::EndChild();
 
 	// Commands section at bottom
-	if (ImGui::BeginChild("Commands", {size.x, g_commandSectionHeight}, ImGuiWindowFlags_NoTitleBar)) {
+	if (ImGui::BeginChild("Commands", {0, 0}, ImGuiChildFlags_Borders)) {
 		renderCommandsTab();
 	}
 	ImGui::EndChild();
@@ -361,58 +366,181 @@ void MainView::renderCommandsTab() const {
 			{.showLabel = true, .disabled = prevDrawnNumber == -1, .sameLine = false, .setDisabled = true});
 }
 
+namespace {
+
+/// A gap to the programme, in words: late, ahead, or on time within the minute.
+auto delayText(const core::duration& iDelay) -> std::string {
+	const auto minutes = static_cast<int>(std::lround(iDelay.count() / 60.0));
+	if (minutes == 0)
+		return "à l'heure";
+	const int amount = std::abs(minutes);
+	const std::string length =
+			amount >= 60 ? std::format("{} h {:02}", amount / 60, amount % 60) : std::format("{} min", amount);
+	return minutes > 0 ? std::format("+{}", length) : std::format("-{}", length);
+}
+
+/// A time between two numbers, in seconds while it is under a minute.
+auto intervalText(const core::duration& iInterval) -> std::string {
+	if (iInterval < std::chrono::minutes{1})
+		return std::format("{:.0f} s", iInterval.count());
+	return core::formatDuration(iInterval);
+}
+
+/// A sum of money for a tile.
+auto euros(const double iValue) -> std::string { return std::format("{:.2f} €", iValue); }
+
+/// A duration for the statistics, a dash while there is nothing measured.
+auto durationText(const core::duration& iDuration) -> std::string {
+	return iDuration > core::duration::zero() ? core::formatDuration(iDuration) : std::string{"--"};
+}
+
+/**
+ * @brief A figure in a tile: what it is, the figure itself in large, and what it means.
+ * @param iId The child id.
+ * @param iTitle What the figure is.
+ * @param iValue The figure.
+ * @param iHint A line under it, possibly empty.
+ * @param iWidth The tile width.
+ */
+void statTile(const char* iId, const char* iTitle, const std::string& iValue, const std::string& iHint,
+			  const float iWidth) {
+	const float height = ImGui::GetTextLineHeightWithSpacing() * 2.0f + ImGui::GetFontSize() * 1.8f +
+						 ImGui::GetStyle().WindowPadding.y * 2.0f;
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, ImGui::GetStyleColorVec4(ImGuiCol_TableHeaderBg));
+	if (ImGui::BeginChild(iId, {iWidth, height}, ImGuiChildFlags_Borders,
+						  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+		ImGui::TextDisabled("%s", iTitle);
+		ImGui::SetWindowFontScale(1.8f);
+		ImGui::TextUnformatted(iValue.c_str());
+		ImGui::SetWindowFontScale(1.0f);
+		if (!iHint.empty())
+			ImGui::TextDisabled("%s", iHint.c_str());
+	}
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+}
+
+/**
+ * @brief How often each number came out, one bar per number.
+ *
+ * Drawn by hand rather than with `PlotHistogram`, whose tooltip counts from zero: the
+ * bar under the mouse has to say which number it is.
+ * @param iCounts One count per number, number 1 first.
+ * @param iHeight The height of the chart.
+ */
+void pickChart(const core::Statistics::pick_list& iCounts, const float iHeight) {
+	const ImVec2 origin = ImGui::GetCursorScreenPos();
+	const float width = ImGui::GetContentRegionAvail().x;
+	ImGui::InvisibleButton("##PickChart", {std::max(width, 1.0f), iHeight});
+	if (iCounts.empty())
+		return;
+	auto* draw = ImGui::GetWindowDrawList();
+	draw->AddRectFilled(origin, {origin.x + width, origin.y + iHeight}, ImGui::GetColorU32(ImGuiCol_FrameBg),
+						ImGui::GetStyle().FrameRounding);
+	const auto [least, most] = std::ranges::minmax(iCounts);
+	const float barWidth = width / static_cast<float>(iCounts.size());
+	const bool hovered = ImGui::IsItemHovered();
+	const float mouseX = ImGui::GetIO().MousePos.x - origin.x;
+	for (size_t i = 0; i < iCounts.size(); ++i) {
+		const float x = origin.x + barWidth * static_cast<float>(i);
+		const float ratio = most > 0 ? static_cast<float>(iCounts[i]) / static_cast<float>(most) : 0.0f;
+		const float top = origin.y + iHeight - (iHeight - 2.0f) * ratio;
+		const bool isHovered = hovered && mouseX >= x - origin.x && mouseX < x - origin.x + barWidth;
+		ImU32 colour = ImGui::GetColorU32(ImGuiCol_PlotHistogram);
+		if (most > least && iCounts[i] == most)
+			colour = ImGui::GetColorU32(ImGuiCol_PlotHistogramHovered);
+		if (isHovered)
+			colour = ImGui::GetColorU32(ImGuiCol_Text);
+		if (ratio > 0.0f)
+			draw->AddRectFilled({x + 1.0f, top}, {x + barWidth - 1.0f, origin.y + iHeight}, colour);
+		if (isHovered)
+			ImGui::SetTooltip("Numéro %zu : %u sortie%s", i + 1, iCounts[i], iCounts[i] > 1 ? "s" : "");
+	}
+}
+
+}// namespace
+
 void MainView::renderStatisticsTab() const {
 	const auto stats = m_currentEvent.getStats();
-	ImGui::Columns(2, "StatsColumns", true);
+	const auto schedule = core::estimateSchedule(m_currentEvent, Application::getPauseLength(), core::clock::now());
+	const auto& counts = stats.pickCounts();
+	uint32_t totalDraws = 0;
+	for (const auto count: counts) totalDraws += count;
 
-	if (ImGui::BeginChild("LeftColumnStats")) {
-		// Less picked numbers
-		if (ImGui::CollapsingHeader("Numéros le moins sortis", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::TextWrapped("%s", stats.lessPickStr().c_str());
-			ImGui::Text("Nombre de sorties: %d", stats.lessPickNb);
-		}
+	// The figures the presenter is asked about, in tiles: four per row, two when narrow.
+	const auto& style = ImGui::GetStyle();
+	const float avail = ImGui::GetContentRegionAvail().x;
+	const int perRow = avail < utils::em(30.0f) ? 2 : 4;
+	const float tileWidth = (avail - style.ItemSpacing.x * static_cast<float>(perRow - 1)) / static_cast<float>(perRow);
+	int index = 0;
+	const auto tile = [&](const char* iId, const char* iTitle, const std::string& iValue,
+						  const std::string& iHint) -> void {
+		statTile(iId, iTitle, iValue, iHint, tileWidth);
+		if (++index % perRow != 0)
+			ImGui::SameLine();
+	};
+	tile("EndTile", "Fin estimée",
+		 schedule.estimatedEnd ? core::formatClockNoSecond(schedule.estimatedEnd.value()) : "--",
+		 schedule.estimatedEnd ? std::format("dans {}", core::formatDuration(schedule.remaining))
+							   : "après la première manche");
+	tile("DelayTile", "Retard", schedule.delay ? delayText(schedule.delay.value()) : "--",
+		 schedule.plannedEnd ? std::format("prévue {}", core::formatClockNoSecond(schedule.plannedEnd.value()))
+							 : "pas de fin prévue");
+	tile("LeftTile", "Reste à jouer",
+		 std::format("{} manche{}", schedule.subRoundsLeft, schedule.subRoundsLeft > 1 ? "s" : ""),
+		 schedule.pausesLeft == 0
+				 ? std::string{"sans pause"}
+				 : std::format("et {} pause{}", schedule.pausesLeft, schedule.pausesLeft > 1 ? "s" : ""));
+	tile("RhythmTile", "Rythme", schedule.drawInterval ? intervalText(schedule.drawInterval.value()) : "--",
+		 schedule.currentDrawInterval ? std::format("ici : {}", intervalText(schedule.currentDrawInterval.value()))
+									  : "par numéro");
+	tile("AverageTile", "Manche moyenne", durationText(stats.subRoundAverage),
+		 stats.subRoundAverageNb > 0.0 ? std::format("{:.0f} tirages", stats.subRoundAverageNb) : "");
+	tile("DrawsTile", "Numéros tirés", std::format("{}", totalDraws),
+		 std::format("{:.0f} % joué", m_currentEvent.getProgression() * 100.0f));
+	const auto prizes = core::tallyPrizes(m_currentEvent);
+	tile("GivenTile", "Lots distribués", euros(prizes.given),
+		 prizes.unclaimed > 0.0 ? std::format("{:.0f} € non réclamés", prizes.unclaimed) : "");
+	tile("RemainingTile", "Lots restants", euros(prizes.remaining), "encore en jeu");
+	if (index % perRow != 0)
+		ImGui::NewLine();
 
-		// Round duration stats
-		if (ImGui::CollapsingHeader("Durée des parties", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::Text("Plus longue partie: %s", core::formatDuration(stats.roundLongest).c_str());
-			ImGui::Text("Plus courte partie: %s", core::formatDuration(stats.roundShortest).c_str());
-			ImGui::Text("Temps moyen partie: %s", core::formatDuration(stats.roundAverage).c_str());
-		}
-		// Round duration stats
-		if (ImGui::CollapsingHeader("Durée des manches", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::Text("Plus longue manche: %s", core::formatDuration(stats.subRoundLongest).c_str());
-			ImGui::Text("Plus courte manche: %s", core::formatDuration(stats.subRoundShortest).c_str());
-			ImGui::Text("Temps moyen manche: %s", core::formatDuration(stats.subRoundAverage).c_str());
-		}
+	ImGui::SeparatorText("Sorties par numéro");
+	pickChart(counts, utils::em(4.0f));
+	if (totalDraws > 0) {
+		ImGui::TextDisabled("Les plus sortis (%d fois)", stats.mostPickNb);
+		ImGui::SameLine();
+		ImGui::TextWrapped("%s", stats.mostPickStr().c_str());
+		ImGui::TextDisabled("Les moins sortis (%d fois)", stats.lessPickNb);
+		ImGui::SameLine();
+		ImGui::TextWrapped("%s", stats.lessPickStr().c_str());
 	}
-	ImGui::EndChild();
 
-	ImGui::NextColumn();
-
-	if (ImGui::BeginChild("RightColumnStats")) {
-		// Most picked numbers
-		if (ImGui::CollapsingHeader("Numéros le plus sortis", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::TextWrapped("%s", stats.mostPickStr().c_str());
-			ImGui::Text("Nombre de sorties: %d", stats.mostPickNb);
-		}
-
-		// Round draws stats
-		if (ImGui::CollapsingHeader("Tirages par partie", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::Text("Plus nombreux tirages: %d", stats.roundMostNb);
-			ImGui::Text("Moins nombreux tirages: %d", stats.roundLessNb);
-			ImGui::Text("Nombre tirages moyen: %f", stats.roundAverageNb);
-		}
-
-		// Round draws stats
-		if (ImGui::CollapsingHeader("Tirages par manches", ImGuiTreeNodeFlags_DefaultOpen)) {
-			ImGui::Text("Plus nombreux tirages: %d", stats.subRoundMostNb);
-			ImGui::Text("Moins nombreux tirages: %d", stats.subRoundLessNb);
-			ImGui::Text("Nombre tirages moyen: %f", stats.subRoundAverageNb);
-		}
+	ImGui::SeparatorText("Parties et manches");
+	if (ImGui::BeginTable("StatsDetails", 3,
+						  ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_SizingStretchProp)) {
+		ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch, 1.4f);
+		ImGui::TableSetupColumn("Parties", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+		ImGui::TableSetupColumn("Manches", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+		ImGui::TableHeadersRow();
+		const auto row = [](const char* iLabel, const std::string& iRounds, const std::string& iSubRounds) -> void {
+			ImGui::TableNextRow();
+			ImGui::TableNextColumn();
+			ImGui::TextDisabled("%s", iLabel);
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(iRounds.c_str());
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(iSubRounds.c_str());
+		};
+		row("Plus longue", durationText(stats.roundLongest), durationText(stats.subRoundLongest));
+		row("Plus courte", durationText(stats.roundShortest), durationText(stats.subRoundShortest));
+		row("Durée moyenne", durationText(stats.roundAverage), durationText(stats.subRoundAverage));
+		row("Plus de tirages", std::format("{}", stats.roundMostNb), std::format("{}", stats.subRoundMostNb));
+		row("Moins de tirages", std::format("{}", stats.roundLessNb), std::format("{}", stats.subRoundLessNb));
+		row("Tirages moyens", std::format("{:.1f}", stats.roundAverageNb),
+			std::format("{:.1f}", stats.subRoundAverageNb));
+		ImGui::EndTable();
 	}
-	ImGui::EndChild();
-
-	ImGui::Columns(1);
 }
 
 void MainView::renderEventInfo() const {
@@ -426,80 +554,53 @@ void MainView::renderEventInfo() const {
 
 	if (m_currentEvent.getStatus() == core::Event::Status::GameRunning) {
 		const auto start = m_currentEvent.getStarting();
-		const auto end = m_currentEvent.getEnding();
-
 		date = std::format("{}", core::formatCalendar(start));
 		startTime = core::formatClock(start);
-		endTime = core::formatClock(end);
-		const auto dur = end - start;
-		duration = core::formatDuration(dur);
+		// While playing, the end is the one expected; the recorded one only exists after.
+		const auto schedule = core::estimateSchedule(m_currentEvent, Application::getPauseLength(), core::clock::now());
+		endTime = schedule.estimatedEnd ? std::format("~ {}", core::formatClockNoSecond(schedule.estimatedEnd.value()))
+										: std::string{"--"};
+		duration = core::formatDuration(core::clock::now() - start);
 		progress = m_currentEvent.getProgression();
 	}
 
-	ImGui::Columns(2, "EventInfoColumns", true);
-	ImGui::BeginChild("LeftColumnEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
-	// Event information in columns
-	ImGui::Columns(3, "EventInfoColumns", false);
-
-	ImGui::Text("Date:");
-	ImGui::SameLine();
-	ImGui::TextDisabled("%s", date.c_str());
-
-	ImGui::NextColumn();
-	ImGui::Text("Heure de début:");
-	ImGui::SameLine();
-	ImGui::TextDisabled("%s", startTime.c_str());
-
-	ImGui::NextColumn();
-	ImGui::Text("Heure de fin:");
-	ImGui::SameLine();
-	ImGui::TextDisabled("%s", endTime.c_str());
-
-	ImGui::Columns(1);
-
-	ImGui::Separator();
-
-	ImGui::Columns(2, "DurationColumns", false);
-
-	ImGui::Text("Durée:");
-	ImGui::SameLine();
-	ImGui::TextDisabled("%s", duration.c_str());
-
-	ImGui::NextColumn();
-	ImGui::Text("Progression:");
-	ImGui::SameLine();
-	ImGui::ProgressBar(progress, {-1, 0});
-
-	ImGui::Columns(1);
-	ImGui::EndChild();
-
-	ImGui::NextColumn();
-	ImGui::BeginChild("RightColumnEventInfo", ImVec2(0, 0), ImGuiWindowFlags_NoTitleBar);
-	// Large current time display
-	utils::adaptTextToRegion(
-			core::formatClock(core::clock::now()),
-			{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00:00:00"});
-
-	ImGui::EndChild();
-	ImGui::Columns(1);
-}
-
-namespace {
-
-auto screenInfoTolist(std::vector<MonitorInfo> iInfos) -> std::tuple<std::string, std::unordered_map<size_t, size_t>> {
-	std::string monitor_list;
-	std::unordered_map<size_t, size_t> index_map;
-	size_t a = 0;
-	for (size_t i = 0; i < iInfos.size(); ++i) {
-		if (iInfos[i].isMainWindow)
-			continue;
-		index_map[a++] = i;
-		monitor_list += std::format("Écran {}: {}", i + 1, iInfos[i].name) + '\0';
+	// The figures on the left, the clock on the right taking what is left: the clock is
+	// what the presenter reads from afar, the figures are read up close.
+	if (!ImGui::BeginTable("EventInfoLayout", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV,
+						   {-1, -1}))
+		return;
+	ImGui::TableSetupColumn("Chiffres", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+	ImGui::TableSetupColumn("Horloge", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+	ImGui::TableNextRow();
+	ImGui::TableSetColumnIndex(0);
+	if (ImGui::BeginTable("EventFigures", 4, ImGuiTableFlags_SizingFixedFit)) {
+		ImGui::TableSetupColumn("l1", ImGuiTableColumnFlags_WidthFixed);
+		ImGui::TableSetupColumn("v1", ImGuiTableColumnFlags_WidthStretch);
+		ImGui::TableSetupColumn("l2", ImGuiTableColumnFlags_WidthFixed);
+		ImGui::TableSetupColumn("v2", ImGuiTableColumnFlags_WidthStretch);
+		const auto figure = [](const char* iLabel, const std::string& iValue) -> void {
+			ImGui::TableNextColumn();
+			ImGui::TextUnformatted(iLabel);
+			ImGui::TableNextColumn();
+			ImGui::TextDisabled("%s", iValue.c_str());
+		};
+		figure("Date", date);
+		figure("Durée", duration);
+		figure("Début", startTime);
+		figure("Fin", endTime);
+		ImGui::EndTable();
 	}
-	return {monitor_list, index_map};
+	ImGui::ProgressBar(progress, {-1, 0});
+	ImGui::TableSetColumnIndex(1);
+	if (ImGui::BeginChild("EventClock", {0, std::max(ImGui::GetContentRegionAvail().y, ImGui::GetFrameHeight())},
+						  ImGuiChildFlags_None)) {
+		utils::adaptTextToRegion(
+				core::formatClock(core::clock::now()),
+				{.autoRegion = true, .vCenter = true, .hCenter = true, .drawText = true, .textAdapt = "00:00:00"});
+	}
+	ImGui::EndChild();
+	ImGui::EndTable();
 }
-
-}// namespace
 
 void MainView::renderBottomPanel() {
 	// Could be used for notifications or logs in the future
@@ -512,7 +613,7 @@ void MainView::renderBottomPanel() {
 			renderBottomStatisticsPanel();
 			ImGui::EndTabItem();
 		}
-		if (ImGui::BeginTabItem("log")) {
+		if (ImGui::BeginTabItem("Journal")) {
 			renderBottomLogsPanel();
 			ImGui::EndTabItem();
 		}
@@ -551,22 +652,32 @@ void MainView::renderBottomConfigPanel() {
 	{
 		const auto infos = Application::get().getMonitorsInfo();
 		const auto displayView = static_pointer_cast<DisplayView>(Application::get().getView("display_window"));
-		if (displayView == nullptr)
+		if (displayView == nullptr) {
+			ImGui::EndGroup();
+			ImGui::EndChild();
 			return;
-		if (infos.size() == 1)
-			displayView->setFullscreen(false);
-		bool fullscreen = displayView->isFullscreen();
-		//ImGui::SetNextItemWidth(400.0f);
-		if (auto [scr_list_name, scr_list_idx] = screenInfoTolist(infos);
-			ImGui::Combo("##ScreenSelect", &m_selectedScreen, scr_list_name.c_str())) {
-			const size_t monitorIndex = scr_list_idx[static_cast<size_t>(m_selectedScreen)];
-			displayView->setMonitorNumber(monitorIndex);
-			log_info("Changement de l'écran d'affichage: {} ({})", monitorIndex, infos[monitorIndex].name);
 		}
-		if (ImGui::Checkbox("Plein écran", &fullscreen)) {
-			if (infos.size() == 1) {
-				fullscreen = false;
-			} else {
+		const auto candidates = displayCandidates(infos);
+		if (candidates.empty()) {
+			ImGui::TextDisabled("Un seul écran : affichage en fenêtre");
+		} else {
+			const size_t current = displayView->getMonitor(infos);
+			const auto label = [&infos](const size_t iIndex) -> std::string {
+				const auto& info = infos[iIndex];
+				return std::format("Écran {} : {} ({}×{})", iIndex + 1, info.name, info.size.x(), info.size.y());
+			};
+			ImGui::SetNextItemWidth(std::min(ImGui::GetContentRegionAvail().x, 22.0f * ImGui::GetFontSize()));
+			if (ImGui::BeginCombo("##ScreenSelect", label(current).c_str())) {
+				for (const size_t index: candidates) {
+					if (ImGui::Selectable(label(index).c_str(), index == current))
+						displayView->setMonitor(infos[index]);
+					if (index == current)
+						ImGui::SetItemDefaultFocus();
+				}
+				ImGui::EndCombo();
+			}
+			bool fullscreen = displayView->isFullscreen();
+			if (ImGui::Checkbox("Plein écran", &fullscreen)) {
 				displayView->setFullscreen(fullscreen);
 				log_info("Changement du mode plein écran: {}", fullscreen);
 			}
@@ -608,7 +719,7 @@ void MainView::renderBottomStatisticsPanel() const {
 
 	// Timing group
 	ImGui::BeginGroup();
-	ImGui::Text("Timing");
+	ImGui::Text("Durée");
 	ImGui::Separator();
 	ImGui::BeginChild("TimingStat", {timingWidth, 0}, ImGuiChildFlags_Borders);
 	if (currentRound == m_currentEvent.endRounds()) {
@@ -653,11 +764,10 @@ void MainView::renderBottomStatisticsPanel() const {
 		ImGui::Text("%s", currentRound->getStateString().c_str());
 		ImGui::Text("Valeur:");
 		ImGui::SameLine();
-		if (currentRound->getType() == core::GameRound::Type::Pause) {
+		if (const auto sub = currentRound->getCurrentSubRound(); sub == currentRound->endSubRound()) {
 			ImGui::Text("N/A");
 		} else {
-			const auto value = std::format("{:.2f} €", currentRound->getCurrentSubRound()->getValue());
-			ImGui::Text("%s", value.c_str());
+			ImGui::Text("%s", std::format("{:.2f} €", sub->getValue()).c_str());
 		}
 	}
 	ImGui::EndChild();
@@ -673,13 +783,15 @@ void MainView::renderBottomStatisticsPanel() const {
 		ImGui::TextWrapped(" ");
 	} else if (currentRound->getType() == core::GameRound::Type::Pause) {
 		ImGui::TextWrapped("Pas de lots pour une pause.");
+	} else if (currentRound->getCurrentSubRound() == currentRound->endSubRound()) {
+		ImGui::TextDisabled("Partie terminée.");
 	} else if (const auto& prizes = currentRound->getCurrentSubRound()->getPrizes(); prizes.empty()) {
 		ImGui::TextDisabled("Aucun lot pour cette phase.");
 	} else if (ImGui::BeginTable("Prizes", 3, ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
 		// What the presenter reads out during the announcement: the article, what it is
 		// worth, and who to thank for it.
 		ImGui::TableSetupColumn("Article");
-		ImGui::TableSetupColumn("Valeur", ImGuiTableColumnFlags_WidthFixed, 80.0f);
+		ImGui::TableSetupColumn("Valeur", ImGuiTableColumnFlags_WidthFixed, utils::em(4.5f));
 		ImGui::TableSetupColumn("Donateur");
 		ImGui::TableHeadersRow();
 		for (const auto& prize: prizes) {

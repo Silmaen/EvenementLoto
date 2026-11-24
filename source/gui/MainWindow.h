@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "Monitors.h"
 #include "Theme.h"
 
 #include "core/maths/vectors.h"
@@ -32,27 +33,6 @@ struct MainWindowOptions {
 	math::vec2ui size{1280, 800};
 	/// Icon path.
 	std::filesystem::path iconPath;
-};
-
-/**
- * @brief Struct MonitorInfo.
- */
-struct MonitorInfo {
-	/// Monitor name.
-	std::string name;
-	/// Position.
-	math::vec2i position{0, 0};
-	/// Size.
-	math::vec2ui size{0, 0};
-	/// Physical size.
-	math::vec2i physicalSize{0, 0};
-	/// Work area position.
-	math::vec2i workAreaPosition{0, 0};
-	/// Work area size.
-	math::vec2i workAreaSize{0, 0};
-
-	/// Is main window.
-	bool isMainWindow = false;
 };
 
 /**
@@ -187,6 +167,20 @@ public:
 	 * @return The monitor information.
 	 */
 	[[nodiscard]] auto getMonitorsInfo() const -> std::vector<MonitorInfo>;
+
+	/**
+	 * @brief Puts the platform window of a detached view in full screen on a monitor, or
+	 * takes it out.
+	 *
+	 * A borderless window the size of the screen is not full screen to every window
+	 * manager: some keep it below their panels, which pushed the bottom of the players'
+	 * display off the screen. Only a window that asks for it gets the whole screen.
+	 * @param iPlatformHandle The view's platform window; the control window is refused.
+	 * @param iMonitor The monitor index, or nullopt to leave full screen.
+	 * @param iWindowed Where to put the window back when it leaves full screen: position
+	 * then size.
+	 */
+	void bindToMonitor(void* iPlatformHandle, std::optional<size_t> iMonitor, const math::vec4& iWindowed) const;
 
 private:
 	/// Window options.

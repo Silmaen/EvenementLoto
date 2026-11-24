@@ -71,6 +71,12 @@ public:
 	duration subRoundShortest = duration::max();
 	duration subRoundAverage = duration::zero();
 
+	/**
+	 * @brief How often each number came out, number 1 first.
+	 * @return One count per number.
+	 */
+	[[nodiscard]] auto pickCounts() const -> const pick_list& { return m_pickCounts; }
+
 private:
 	int m_nbRounds = 0;
 	int m_nbSubRounds = 0;

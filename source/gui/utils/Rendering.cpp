@@ -10,6 +10,7 @@
 #include "Rendering.h"
 
 #include "Convert.h"
+#include "Layout.h"
 #include "gui/Application.h"
 #include <imgui.h>
 #include <imgui_stdlib.h>
@@ -132,17 +133,35 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptio
 	if (ImGui::BeginChild("PrizeList", vec2ToImVec2(iOptions.size), ImGuiChildFlags_Borders)) {
 		if (ioPrizes.empty())
 			ImGui::TextDisabled("Aucun lot pour cette phase.");
+		// Everything after the donor has a fixed width; the two names share what is left.
+		// Below a certain width they cannot both stay readable, and the designation then
+		// gets a line of its own rather than being cut to a few letters.
+		const auto& style = ImGui::GetStyle();
+		const float checkboxWidth =
+				ImGui::GetFrameHeight() + style.ItemInnerSpacing.x + ImGui::CalcTextSize("enfant").x;
+		const float removeWidth = ImGui::CalcTextSize("Retirer").x + style.FramePadding.x * 2.0f;
+		const float avail = ImGui::GetContentRegionAvail().x;
+		const float wideTail = em(11.5f) + checkboxWidth + removeWidth + style.ItemSpacing.x * 4.0f;
+		const bool compact = avail - wideTail < em(16.0f);
+		// Compact, the names share the first line and the rest gets the whole second one.
+		const float fieldsRoom = compact ? avail - checkboxWidth - removeWidth - style.ItemSpacing.x * 3.0f : em(11.5f);
+		const float valueWidth = std::max(fieldsRoom * 0.48f, em(3.0f));
+		const float appealWidth = std::max(fieldsRoom * 0.52f, em(3.0f));
+		const float tail = compact ? 0.0f : wideTail;
 		for (size_t i = 0; i < ioPrizes.size(); ++i) {
 			auto& prize = ioPrizes[i];
 			ImGui::PushID(static_cast<int>(i));
-			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.35f);
+			if (compact && i > 0)
+				ImGui::Separator();
+			const float names = avail - tail - style.ItemSpacing.x;
+			ImGui::SetNextItemWidth(names * 0.6f);
 			std::string designation = prize.getDesignation();
 			if (ImGui::InputTextWithHint("##designation", "désignation", &designation) && iEditable) {
 				prize.setDesignation(designation);
 				changed = true;
 			}
 			ImGui::SameLine();
-			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.3f);
+			ImGui::SetNextItemWidth(names * 0.4f);
 			std::string donor = prize.getDonor();
 			if (ImGui::InputTextWithHint("##donor", "donateur", &donor) && iEditable) {
 				prize.setDonor(donor);
@@ -150,15 +169,16 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptio
 			}
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Donateur, facultatif");
-			ImGui::SameLine();
-			ImGui::SetNextItemWidth(110);
+			if (!compact)
+				ImGui::SameLine();
+			ImGui::SetNextItemWidth(valueWidth);
 			auto value = static_cast<float>(prize.getValue());
 			if (ImGui::InputFloat("##value", &value, 0.0f, 0.0f, "%.2f €") && iEditable) {
 				prize.setValue(static_cast<double>(value));
 				changed = true;
 			}
 			ImGui::SameLine();
-			ImGui::SetNextItemWidth(120);
+			ImGui::SetNextItemWidth(appealWidth);
 			auto attractiveness = static_cast<int>(prize.getAttractiveness());
 			if (ImGui::SliderInt("##attractiveness", &attractiveness, 0,
 								 static_cast<int>(core::Prize::g_maxAttractiveness), "attrait %d") &&

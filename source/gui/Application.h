@@ -344,6 +344,12 @@ public:
 	 */
 	[[nodiscard]] auto getMonitorsInfo() const -> std::vector<MonitorInfo> { return m_mainWindow.getMonitorsInfo(); }
 
+	/**
+	 * @brief The planned length of a pause, setting `gui/pause_duration` in minutes.
+	 * @return The length; zero when none is planned.
+	 */
+	[[nodiscard]] static auto getPauseLength() -> core::duration;
+
 private:
 	/// The application Instance.
 	static Application* m_instance;

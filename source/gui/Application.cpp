@@ -273,6 +273,11 @@ void Application::setFont(const std::filesystem::path& iPath, const float iSize)
 	m_mainWindow.requestFont(iPath, iSize);
 }
 
+auto Application::getPauseLength() -> core::duration {
+	const auto minutes = core::getSettings()->getValue<float>("gui/pause_duration", 15.0f);
+	return core::duration{std::max(minutes, 0.0f) * 60.0f};
+}
+
 auto Application::getTheme() const -> const Theme& { return m_theme; }
 
 void Application::setTheme(const Theme& iTheme) {

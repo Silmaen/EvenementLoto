@@ -16,6 +16,7 @@
 #include "core/utilities.h"
 #include "gui/Application.h"
 #include "gui/utils/FileDialog.h"
+#include "gui/utils/Layout.h"
 #include "gui/utils/Rendering.h"
 
 #include <cstring>
@@ -25,18 +26,16 @@
 
 namespace evl::gui::views {
 
-constexpr float g_buttonWidth = 100.0f;
-constexpr float g_buttonSectionHeight = 50.0f;
-/// Colonne où commencent les champs, pour que les libellés s'alignent d'une page à l'autre.
-constexpr float g_labelWidth = 200.0f;
-
 namespace {
 
-auto getOffset(const int iNbButtons) -> float {
-	return (ImGui::GetContentRegionAvail().x - g_buttonWidth * static_cast<float>(iNbButtons) +
-			ImGui::GetStyle().ItemSpacing.x * static_cast<float>(iNbButtons - 1)) *
-		   0.5f;
-}
+/// Colonne où commencent les champs, pour que les libellés s'alignent d'une page à l'autre.
+auto labelWidth() -> float { return utils::em(10.0f); }
+
+/// La place laissée à droite d'un champ pour son bouton « ... ».
+auto browseRoom() -> float { return utils::em(2.5f); }
+
+/// La hauteur que le pied de dialogue retire au contenu.
+auto footerRoom() -> float { return utils::dialogFooterHeight() + ImGui::GetStyle().ItemSpacing.y; }
 
 }// namespace
 
@@ -54,8 +53,7 @@ void MainConfigPopups::onPopupUpdate() {
 	// place qu'il lui faut, rien n'est coupé, et les réglages se rangent par sujet — ce
 	// qui vaut pour l'outil, ce qui vaut pour son apparence, ce qui vaut pour l'écran
 	// des joueurs.
-	if (ImGui::BeginChild("ConfigPages", {0, ImGui::GetContentRegionAvail().y - g_buttonSectionHeight},
-						  ImGuiChildFlags_None)) {
+	if (ImGui::BeginChild("ConfigPages", {0, ImGui::GetContentRegionAvail().y - footerRoom()}, ImGuiChildFlags_None)) {
 		if (ImGui::BeginTabBar("ConfigTabs")) {
 			if (ImGui::BeginTabItem("Général")) {
 				renderGeneralTab();
@@ -74,37 +72,35 @@ void MainConfigPopups::onPopupUpdate() {
 	}
 	ImGui::EndChild();
 
-	ImGui::Separator();
-
-	// Boutons Reset/Restaurer/Ok/Appliquer/Annuler
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(5));
-	if (ImGui::Button("Reset", ImVec2(g_buttonWidth, 0)))
+	utils::beginDialogFooter(5);
+	if (utils::dialogButton("Défauts"))
 		m_data = {};
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Revenir aux valeurs d'origine de tous les réglages.");
 	ImGui::SameLine();
-	if (ImGui::Button("Restaurer", ImVec2(g_buttonWidth, 0)))
+	if (utils::dialogButton("Restaurer"))
 		settingsToData();
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Oublier les modifications en cours.");
 	ImGui::SameLine();
-	if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
+	if (utils::dialogButton("Ok")) {
 		dataToSettings();
 		ImGui::CloseCurrentPopup();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0)))
+	if (utils::dialogButton("Appliquer"))
 		dataToSettings();
 	ImGui::SameLine();
-	if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0)))
+	if (utils::dialogButton("Annuler"))
 		ImGui::CloseCurrentPopup();
 }
 
 void MainConfigPopups::renderGeneralTab() {
 	ImGui::SeparatorText("Répertoires par défaut");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Données");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(-80);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(-browseRoom());
 	std::string originalPath = m_data.dataLocation.string();
 	if (ImGui::InputText("##DataLocation", &originalPath))
 		m_data.dataLocation = originalPath;
@@ -117,22 +113,34 @@ void MainConfigPopups::renderGeneralTab() {
 		ImGui::SetTooltip("Parcourir...");
 
 	ImGui::SeparatorText("Tirage");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Délai de réactivation");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(140);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(utils::em(7.0f));
 	ImGui::DragFloat("##DrawDelay", &m_data.drawDelay, 0.1f, 0.0f, 30.0f, "%.1f s");
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Temps pendant lequel les commandes de tirage restent bloquées après un\n"
 						  "numéro, pour donner le tempo. Zéro désactive le blocage.");
+
+	ImGui::SeparatorText("Programme");
+	ImGui::AlignTextToFramePadding();
+	ImGui::Text("Durée d'une pause");
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(utils::em(7.0f));
+	ImGui::DragFloat("##PauseDuration", &m_data.pauseDuration, 0.5f, 0.0f, 120.0f, "%.0f min");
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Sert à estimer l'heure de fin, et à annoncer aux joueurs l'heure de reprise.\n"
+						  "Zéro : aucune heure de reprise n'est affichée.");
 
 #ifdef EVL_PLATFORM_LINUX
 	// Le choix n'a de sens que sous Linux, et seulement tant que Wayland ne permet pas
 	// d'envoyer l'affichage sur un second écran : il est donc présenté avec sa
 	// conséquence, pas comme une préférence anodine.
 	ImGui::SeparatorText("Serveur d'affichage");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Serveur demandé");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(140);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(utils::em(7.0f));
 	{
 		constexpr std::array<const char*, 3> values{{"x11", "wayland", "auto"}};
 		int selected = 0;
@@ -152,9 +160,10 @@ void MainConfigPopups::renderGeneralTab() {
 
 void MainConfigPopups::renderAppearanceTab() {
 	ImGui::SeparatorText("Habillage des fenêtres");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Habillage");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(200);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(utils::em(10.0f));
 	{
 		const auto current = Application::get().getTheme().preset;
 		int selected = static_cast<int>(current);
@@ -179,9 +188,11 @@ void MainConfigPopups::renderAppearanceTab() {
 	ImGui::TextDisabled("Le changement est immédiat.");
 
 	ImGui::SeparatorText("Police d'interface");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Fichier");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(-170);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(-(browseRoom() + ImGui::CalcTextSize("Défaut").x + ImGui::GetStyle().FramePadding.x * 2.0f +
+							  ImGui::GetStyle().ItemSpacing.x));
 	std::string fontPath = m_data.fontPath.string();
 	if (ImGui::InputTextWithHint("##FontPath", "police embarquée", &fontPath))
 		m_data.fontPath = fontPath;
@@ -197,9 +208,10 @@ void MainConfigPopups::renderAppearanceTab() {
 		m_data.fontPath.clear();
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Revenir à la police embarquée.");
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Taille");
-	ImGui::SameLine(g_labelWidth);
-	ImGui::SetNextItemWidth(140);
+	ImGui::SameLine(labelWidth());
+	ImGui::SetNextItemWidth(utils::em(7.0f));
 	ImGui::DragFloat("##FontSize", &m_data.fontSize, 0.5f, 10.0f, 48.0f, "%.0f px");
 }
 
@@ -208,43 +220,52 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 	ImGui::TextWrapped("Ce qui suit ne concerne que l'écran vu par les joueurs.");
 	ImGui::Spacing();
 
+	// Measured before the columns open: inside them the region is the first column's,
+	// and taking 12 em off it at every frame squeezed the labels to nothing.
+	const float labelsWidth = std::max(ImGui::GetContentRegionAvail().x - utils::em(12.0f), utils::em(8.0f));
 	ImGui::Columns(2, "ConfigColumns");
-	ImGui::SetColumnWidth(1, 250);
+	ImGui::SetColumnWidth(0, labelsWidth);
 
 	// Échelles
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Facteur d'échelle de titre");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::DragFloat("##TitleScale", &m_data.titleScale, 0.1f, 1.0f, 10.0f, "%.1f");
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Échelle texte grille");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::DragFloat("##GridTextScale", &m_data.gridTextScale, 0.1f, 0.3f, 1.5f, "%.1f");
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Facteur d'échelle prix");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::DragFloat("##ValueScale", &m_data.valueScale, 0.1f, 0.5f, 10.0f, "%.1f");
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Facteur d'échelle texte lots");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::DragFloat("##PriceTextScale", &m_data.priceTextScale, 0.1f, 0.5f, 10.0f, "%.1f");
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Facteur d'échelle horloges");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
-	ImGui::DragFloat("##TimeScale", &m_data.timeScale, 0.1f, 0.5f, 2.5f, "%.1f");
+	ImGui::DragFloat("##TimeScale", &m_data.timeScale, 0.1f, 0.5f, 5.0f, "%.1f");
 	ImGui::NextColumn();
 
 	ImGui::Separator();
 
 	// Couleurs
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Couleur de l'arrière plan");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -252,6 +273,7 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 					  ImGuiColorEditFlags_NoInputs);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Couleur du texte");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -260,6 +282,7 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 
 	ImGui::Separator();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Arrière plan de la grille");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -267,15 +290,16 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 					  ImGuiColorEditFlags_NoInputs);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Espacement de la grille");
 	ImGui::NextColumn();
 	ImGui::BeginGroup();
 	const float gridSize = (ImGui::GetContentRegionAvail().x - style.ItemSpacing.x) * 0.5f;
 	ImGui::SetNextItemWidth(gridSize);
-	ImGui::DragFloat("##GridSpaceX", &m_data.gridSpace.x(), 0.1f, 0.1f, 10.f, "%.1f");
+	ImGui::DragFloat("##GridSpaceX", &m_data.gridSpace.x(), 0.1f, 0.0f, 10.f, "%.1f");
 	ImGui::SameLine();
 	ImGui::SetNextItemWidth(gridSize);
-	ImGui::DragFloat("##GridSpaceY", &m_data.gridSpace.y(), 0.1f, 0.1f, 10.f, "%.1f");
+	ImGui::DragFloat("##GridSpaceY", &m_data.gridSpace.y(), 0.1f, 0.0f, 10.f, "%.1f");
 
 	ImGui::EndGroup();
 
@@ -283,12 +307,14 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 
 	ImGui::Separator();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Tronquer lignes de lots");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::Checkbox("##TruncatePrice", &m_data.truncatePrice);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Max lignes de lots");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -298,6 +324,7 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 	ImGui::Separator();
 
 	// Numéros sélectionnés
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Couleur chiffre sélectionné");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -305,18 +332,21 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 					  ImGuiColorEditFlags_NoInputs);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Fondu de couleur");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::Checkbox("##FadeNumbers", &m_data.fadeNumbers);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Nombre de chiffres fondus");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
 	ImGui::DragInt("##FadeAmount", &m_data.fadeAmount, 1.0f, 0, 10);
 	ImGui::NextColumn();
 
+	ImGui::AlignTextToFramePadding();
 	ImGui::Text("Force du fondu");
 	ImGui::NextColumn();
 	ImGui::SetNextItemWidth(-1);
@@ -329,6 +359,7 @@ void MainConfigPopups::renderPlayerDisplayTab() {
 void MainConfigPopups::dataToSettings() {
 	core::Settings settings;
 	settings.setValue("draw_delay", m_data.drawDelay);
+	settings.setValue("pause_duration", m_data.pauseDuration);
 	settings.setValue("title_scale", m_data.titleScale);
 	settings.setValue("time_scale", m_data.timeScale);
 	settings.setValue("value_scale", m_data.valueScale);
@@ -366,6 +397,7 @@ void MainConfigPopups::settingsToData() {
 	m_data.fontPath = settings.getValue<std::string>("font_path", defaults.fontPath.string());
 	m_data.fontSize = settings.getValue<float>("font_size", defaults.fontSize);
 	m_data.drawDelay = settings.getValue<float>("draw_delay", defaults.drawDelay);
+	m_data.pauseDuration = settings.getValue<float>("pause_duration", defaults.pauseDuration);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
 	m_data.timeScale = settings.getValue<float>("time_scale", defaults.timeScale);
 	m_data.valueScale = settings.getValue<float>("value_scale", defaults.valueScale);
@@ -395,159 +427,136 @@ void EventConfigPopups::onOpen() {
 }
 
 void EventConfigPopups::onPopupUpdate() {
-
 	ImGuiInputTextFlags tags = ImGuiInputTextFlags_None;
 	if (!m_event.isEditable())
 		tags |= ImGuiInputTextFlags_ReadOnly;
-	// Configuration événement
-	if (ImGui::BeginChild("EventConfig", ImVec2(0, 140), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Configuration événement");
-		ImGui::Separator();
+	const bool readOnly = (tags & ImGuiInputTextFlags_ReadOnly) != 0;
+	const auto field = [](const char* iLabel) -> void {
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted(iLabel);
+		ImGui::SameLine(labelWidth());
+	};
 
-		ImGui::Columns(2, "EventColumns");
-		ImGui::SetColumnWidth(0, 200);
-
-		ImGui::Text("Nom de l'événement:");
-		ImGui::NextColumn();
-		ImGui::SetNextItemWidth(-1);
-		std::string eventName = m_event.getName();
-		if (ImGui::InputText("##EventName", &eventName, tags)) {
-			m_event.setName(eventName);
-		}
-		ImGui::NextColumn();
-
-		ImGui::Text("Lieu de l'événement:");
-		ImGui::NextColumn();
-		ImGui::SetNextItemWidth(-1);
-		std::string eventLocation = m_event.getLocation();
-		if (ImGui::InputText("##EventLocation", &eventLocation, tags)) {
-			m_event.setLocation(eventLocation);
-		}
-		ImGui::NextColumn();
-
-		ImGui::Text("Logo de l'événement:");
-		ImGui::NextColumn();
-		ImGui::SetNextItemWidth(-80);
-		std::string eventLogo = m_event.getLogo().string();
-		if (ImGui::InputText("##EventLogo", &eventLogo, tags)) {
-			m_event.setLogo(eventLogo);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("...##SearchEventLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			utils::FileDialog::openFile(utils::g_imageFilter,
-										[this](const std::filesystem::path& iPath) -> void { m_event.setLogo(iPath); });
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Parcourir...");
-		ImGui::NextColumn();
-
-		ImGui::Columns(1);
+	ImGui::SeparatorText("Événement");
+	field("Nom");
+	ImGui::SetNextItemWidth(-1);
+	if (std::string eventName = m_event.getName(); ImGui::InputText("##EventName", &eventName, tags))
+		m_event.setName(eventName);
+	field("Lieu");
+	ImGui::SetNextItemWidth(-1);
+	if (std::string eventLocation = m_event.getLocation(); ImGui::InputText("##EventLocation", &eventLocation, tags))
+		m_event.setLocation(eventLocation);
+	field("Logo");
+	ImGui::SetNextItemWidth(-browseRoom());
+	if (std::string eventLogo = m_event.getLogo().string(); ImGui::InputText("##EventLogo", &eventLogo, tags))
+		m_event.setLogo(eventLogo);
+	ImGui::SameLine();
+	if (ImGui::Button("...##SearchEventLogo", {-1, 0}) && !readOnly) {
+		utils::FileDialog::openFile(utils::g_imageFilter,
+									[this](const std::filesystem::path& iPath) -> void { m_event.setLogo(iPath); });
 	}
-	ImGui::EndChild();
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Parcourir...");
 
-	// Organisateur
-	if (ImGui::BeginChild("Organizer", ImVec2(0, 100), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Organisateur");
-		ImGui::Separator();
-
-		ImGui::Columns(2, "OrganizerColumns");
-		ImGui::SetColumnWidth(0, 200);
-
-		ImGui::Text("Nom de l'organisateur");
-		ImGui::NextColumn();
-		ImGui::SetNextItemWidth(-1);
-		std::string orgaName = m_event.getOrganizerName();
-		if (ImGui::InputText("##OrgaName", &orgaName, tags)) {
-			m_event.setOrganizerName(orgaName);
+	field("Fin prévue");
+	{
+		// Une heure du jour : c'est la référence du retard affiché pendant le jeu.
+		// Still adjustable once the event has started: a programme that slips is
+		// exactly when one wants to set a new target.
+		auto planned = m_event.getPlannedEnd();
+		bool hasPlanned = planned.has_value();
+		const bool frozen = m_event.isFinished();
+		if (frozen)
+			ImGui::BeginDisabled();
+		if (ImGui::Checkbox("##HasPlannedEnd", &hasPlanned))
+			m_event.setPlannedEnd(hasPlanned ? std::optional{std::chrono::minutes{18 * 60}} : std::nullopt);
+		if (hasPlanned && planned.has_value()) {
+			int hours = static_cast<int>(planned->count() / 60);
+			int minutes = static_cast<int>(planned->count() % 60);
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(utils::em(4.5f));
+			bool changed = ImGui::DragInt("##PlannedHour", &hours, 0.1f, 0, 23, "%02d h");
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(utils::em(4.5f));
+			changed |= ImGui::DragInt("##PlannedMinute", &minutes, 0.2f, 0, 59, "%02d min");
+			if (changed)
+				m_event.setPlannedEnd(std::chrono::minutes{std::clamp(hours, 0, 23) * 60 + std::clamp(minutes, 0, 59)});
+		} else {
+			ImGui::SameLine();
+			ImGui::TextDisabled("aucune : pas de retard calculé");
 		}
-		ImGui::NextColumn();
-
-		ImGui::Text("Logo de l'organisateur:");
-		ImGui::NextColumn();
-		ImGui::SetNextItemWidth(-80);
-		std::string orgaLogo = m_event.getOrganizerLogo().string();
-		if (ImGui::InputText("##OrgaLogo", &orgaLogo, tags)) {
-			m_event.setOrganizerLogo(orgaLogo);
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("...##SearchOrgaLogo") && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			utils::FileDialog::openFile(utils::g_imageFilter, [this](const std::filesystem::path& iPath) -> void {
-				m_event.setOrganizerLogo(iPath.string());
-			});
-		}
-		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Parcourir...");
-		ImGui::NextColumn();
-
-		ImGui::Columns(1);
+		if (frozen)
+			ImGui::EndDisabled();
 	}
-	ImGui::EndChild();
 
-	// Règlement
-	if (const float rulesHeight = ImGui::GetContentRegionAvail().y - g_buttonSectionHeight;
-		ImGui::BeginChild("Rules", ImVec2(0, rulesHeight), ImGuiWindowFlags_NoTitleBar)) {
-		ImGui::Text("Règlement");
-		ImGui::Separator();
-
-		const float rulesTextHeight = ImGui::GetContentRegionAvail().y - 40;
-		std::string rules = m_event.getRules();
-		if (ImGui::InputTextMultiline("##Rules", &rules, ImVec2(-1, rulesTextHeight),
-									  tags | ImGuiInputTextFlags_WordWrap)) {
-			m_event.setRules(rules);
-		}
-
-		ImGui::Spacing();
-
-		// Boutons Import/Export
-		if (ImGui::Button("Import", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				try {
-					if (YAML::Node node = YAML::LoadFile(iPath.string()); node["rules"]) {
-						m_event.setRules(node["rules"].as<std::string>());
-					} else {
-						log_warn("No 'rules' field found in file: {}", iPath.string());
-					}
-				} catch (const YAML::Exception& e) { log_error("Failed to load YAML file: {}", e.what()); }
-			});
-		}
-		ImGui::SameLine();
-		const float exportOffset = ImGui::GetContentRegionAvail().x - g_buttonWidth;
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + exportOffset);
-		if (ImGui::Button("Export", ImVec2(g_buttonWidth, 0)) && (tags & ImGuiInputTextFlags_ReadOnly) == 0) {
-			utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				try {
-					YAML::Node node;
-					node["rules"] = m_event.getRules();
-					if (std::ofstream fout(iPath); !fout.is_open()) {
-						log_error("Failed to open file for writing: {}", iPath.string());
-					} else {
-						fout << node;
-						fout.close();
-					}
-				} catch (const YAML::Exception& e) { log_error("Failed to save YAML file: {}", e.what()); }
-			});
-		}
+	ImGui::SeparatorText("Organisateur");
+	field("Nom");
+	ImGui::SetNextItemWidth(-1);
+	if (std::string orgaName = m_event.getOrganizerName(); ImGui::InputText("##OrgaName", &orgaName, tags))
+		m_event.setOrganizerName(orgaName);
+	field("Logo");
+	ImGui::SetNextItemWidth(-browseRoom());
+	if (std::string orgaLogo = m_event.getOrganizerLogo().string(); ImGui::InputText("##OrgaLogo", &orgaLogo, tags))
+		m_event.setOrganizerLogo(orgaLogo);
+	ImGui::SameLine();
+	if (ImGui::Button("...##SearchOrgaLogo", {-1, 0}) && !readOnly) {
+		utils::FileDialog::openFile(utils::g_imageFilter, [this](const std::filesystem::path& iPath) -> void {
+			m_event.setOrganizerLogo(iPath.string());
+		});
 	}
-	ImGui::EndChild();
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Parcourir...");
 
-	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
+	ImGui::SeparatorText("Règlement");
+	// Le règlement prend toute la place qui reste : c'est le seul texte long de la page.
+	const float rulesHeight = std::max(
+			ImGui::GetContentRegionAvail().y - footerRoom() - ImGui::GetFrameHeightWithSpacing(), utils::em(4.0f));
+	if (std::string rules = m_event.getRules();
+		ImGui::InputTextMultiline("##Rules", &rules, {-1, rulesHeight}, tags | ImGuiInputTextFlags_WordWrap)) {
+		m_event.setRules(rules);
+	}
+	if (utils::dialogButton("Importer##Rules") && !readOnly) {
+		utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+			try {
+				if (YAML::Node node = YAML::LoadFile(iPath.string()); node["rules"]) {
+					m_event.setRules(node["rules"].as<std::string>());
+				} else {
+					log_warn("No 'rules' field found in file: {}", iPath.string());
+				}
+			} catch (const YAML::Exception& e) { log_error("Failed to load YAML file: {}", e.what()); }
+		});
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Lire le règlement depuis un fichier YAML.");
+	ImGui::SameLine();
+	if (utils::dialogButton("Exporter##Rules")) {
+		utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+			try {
+				YAML::Node node;
+				node["rules"] = m_event.getRules();
+				if (std::ofstream fout(iPath); !fout.is_open()) {
+					log_error("Failed to open file for writing: {}", iPath.string());
+				} else {
+					fout << node;
+					fout.close();
+				}
+			} catch (const YAML::Exception& e) { log_error("Failed to save YAML file: {}", e.what()); }
+		});
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Enregistrer le règlement dans un fichier YAML.");
 
-	// Boutons Ok/Appliquer/Annuler
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(3));
-	if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
+	utils::beginDialogFooter(3);
+	if (utils::dialogButton("Ok")) {
 		toCurrentEvent();
 		ImGui::CloseCurrentPopup();
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
+	if (utils::dialogButton("Appliquer"))
 		toCurrentEvent();
-	}
 	ImGui::SameLine();
-	if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
+	if (utils::dialogButton("Annuler"))
 		ImGui::CloseCurrentPopup();
-	}
 }
 
 void EventConfigPopups::fromCurrentEvent() {
@@ -603,16 +612,16 @@ void GameRoundConfigPopups::onClose() {
 void GameRoundConfigPopups::onPopupUpdate() {
 	// Variables statiques pour les listes et données
 
-	static float s_edit_ratio = 0.65f;
-	const ImVec2 contentAvail = ImGui::GetContentRegionAvail();
+	static float s_edit_ratio = 0.72f;
+	const ImVec2 contentAvail{ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y - footerRoom()};
 	const ImGuiStyle& style = ImGui::GetStyle();
 
 	// Splitter sizing
-	constexpr float splitterThickness = 6.0f;
-	constexpr float minEditHeight = 100.0f;
-	constexpr float minResultHeight = 100.0f;
+	const float splitterThickness = style.ItemSpacing.y;
+	const float minEditHeight = utils::em(8.0f);
+	const float minResultHeight = utils::em(6.0f);
 	float editHeight = contentAvail.y * s_edit_ratio;
-	float resultHeight = contentAvail.y - editHeight - splitterThickness - style.WindowPadding.y;
+	float resultHeight = contentAvail.y - editHeight - splitterThickness - style.ItemSpacing.y * 2.0f;
 
 	// Clamp to minimums
 	if (editHeight < minEditHeight) {
@@ -631,14 +640,11 @@ void GameRoundConfigPopups::onPopupUpdate() {
 											   ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_NoSavedSettings;
 
 		if (ImGui::BeginTable("EditColumnsTable", 3, tableFlags, ImVec2(-1, -1))) {
-			// Optional: set initial stretch weights
-			ImGui::TableSetupColumn("GameRounds", ImGuiTableColumnFlags_WidthStretch, 1.0f);
-			ImGui::TableSetupColumn("SubRounds", ImGuiTableColumnFlags_WidthStretch, 1.1f);
-			ImGui::TableSetupColumn("PhaseConfig", ImGuiTableColumnFlags_WidthStretch, 1.4f);
-			ImGui::TableHeadersRow();
+			// Each column carries its own title: a header row would only repeat it.
+			ImGui::TableSetupColumn("Parties", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+			ImGui::TableSetupColumn("Phases", ImGuiTableColumnFlags_WidthStretch, 0.9f);
+			ImGui::TableSetupColumn("Phase", ImGuiTableColumnFlags_WidthStretch, 1.6f);
 
-			// Column 1
-			// Column 1
 			ImGui::TableNextRow();
 			ImGui::TableSetColumnIndex(0);
 			renderFirstColumn();
@@ -677,48 +683,39 @@ void GameRoundConfigPopups::onPopupUpdate() {
 			s_edit_ratio = contentAvail.y > 0.0f ? editHeight / contentAvail.y : s_edit_ratio;
 		}
 	}
-	// Section résultats (GroupResult)
-	if (ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Borders)) {
+	if (ImGui::BeginChild("GroupResult", ImVec2(0, std::max(resultHeight, minResultHeight)), ImGuiChildFlags_Borders))
 		renderResult();
-		ImGui::Separator();
-		ImGui::Spacing();
-
-		// Boutons Ok/Appliquer/Annuler/Import/Export
-		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + getOffset(5));
-		if (ImGui::Button("Ok", ImVec2(g_buttonWidth, 0))) {
-			toCurrentEvent();
-			onClose();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Appliquer", ImVec2(g_buttonWidth, 0))) {
-			toCurrentEvent();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0))) {
-			onClose();
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Importer", ImVec2(g_buttonWidth, 0))) {
-			// Action import
-			utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				if (m_event.importYaml(iPath)) {
-					m_selectedGameRound = 0;
-					m_selectedSubRound = 0;
-					return;
-				}
-				Application::get().tell("Import", "Ce fichier n'est pas un événement lisible.", iPath.string());
-			});
-		}
-		ImGui::SameLine();
-		if (ImGui::Button("Exporter", ImVec2(g_buttonWidth, 0))) {
-			// Action export
-			utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
-				if (!m_event.exportYaml(iPath))
-					Application::get().tell("Export", "L'événement n'a pas pu être exporté.", iPath.string());
-			});
-		}
-	}
 	ImGui::EndChild();
+
+	utils::beginDialogFooter(5);
+	if (utils::dialogButton("Importer")) {
+		utils::FileDialog::openFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+			if (m_event.importYaml(iPath)) {
+				m_selectedGameRound = 0;
+				m_selectedSubRound = 0;
+				return;
+			}
+			Application::get().tell("Import", "Ce fichier n'est pas un événement lisible.", iPath.string());
+		});
+	}
+	ImGui::SameLine();
+	if (utils::dialogButton("Exporter")) {
+		utils::FileDialog::saveFile(utils::g_yamlFilter, [this](const std::filesystem::path& iPath) -> void {
+			if (!m_event.exportYaml(iPath))
+				Application::get().tell("Export", "L'événement n'a pas pu être exporté.", iPath.string());
+		});
+	}
+	ImGui::SameLine();
+	if (utils::dialogButton("Ok")) {
+		toCurrentEvent();
+		onClose();
+	}
+	ImGui::SameLine();
+	if (utils::dialogButton("Appliquer"))
+		toCurrentEvent();
+	ImGui::SameLine();
+	if (utils::dialogButton("Annuler"))
+		onClose();
 }
 
 void GameRoundConfigPopups::fromCurrentEvent() {
@@ -736,7 +733,7 @@ void GameRoundConfigPopups::toCurrentEvent() const {
 
 void GameRoundConfigPopups::renderFirstColumn() {
 	if (ImGui::BeginChild("GroupGameRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
-		ImGui::Text("Liste des Parties");
+		ImGui::TextUnformatted("Parties");
 		ImGui::Separator();
 
 		// Boutons de gestion
@@ -793,12 +790,14 @@ void GameRoundConfigPopups::renderSecondColumn() {
 		return;
 	}
 	if (ImGui::BeginChild("GroupSubRound", ImVec2(0, 0), ImGuiChildFlags_Borders)) {
-		ImGui::Text("Phases de la partie");
+		ImGui::TextUnformatted("Phases de la partie");
 		ImGui::Separator();
 
 		// Type de partie
-		ImGui::Text("Type de partie:");
-		ImGui::SetNextItemWidth(-140);
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted("Type");
+		ImGui::SameLine(utils::em(4.0f));
+		ImGui::SetNextItemWidth(-1);
 		int currentGameRoundType = static_cast<int>(currentRound->getType()) - 1;// skipping display of id 0 == Invalid
 		if (ImGui::Combo("##GameRoundTypes", &currentGameRoundType, getRoundTypes().c_str())) {
 			const bool wasPause = currentRound->isPause();
@@ -812,10 +811,10 @@ void GameRoundConfigPopups::renderSecondColumn() {
 				currentRound->setId(m_event.nextFreeRoundId(currentRound->isPause()));
 			}
 		}
-		ImGui::SameLine();
-		ImGui::Text("N°");
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(100);
+		ImGui::AlignTextToFramePadding();
+		ImGui::TextUnformatted("N°");
+		ImGui::SameLine(utils::em(4.0f));
+		ImGui::SetNextItemWidth(-1);
 		int id = currentRound->getId();
 		if (ImGui::InputInt("##RoundNumber", &id, 1, 100, ImGuiInputTextFlags_CharsDecimal)) {
 			currentRound->setId(id);
@@ -863,7 +862,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 	}
 
 	if (ImGui::BeginChild("GroupPhase", ImVec2(0, 0), ImGuiChildFlags_Borders, ImGuiWindowFlags_None)) {
-		ImGui::Text("Configuration de la phase:");
+		ImGui::TextUnformatted("Phase sélectionnée");
 		ImGui::Separator();
 
 		// Onglets selon le type
@@ -877,7 +876,7 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			// Partie normale
 			const auto subRound = currentRound->getSubRound(static_cast<uint32_t>(m_selectedSubRound));
 
-			ImGui::Text("Condition de victoire:");
+			ImGui::TextDisabled("Condition de victoire");
 			ImGui::SetNextItemWidth(-1);
 			{
 				std::string subRoundName = subRound->getTypeStr();
@@ -885,14 +884,17 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			}
 			const bool editable = subRound->isEditable();
 			ImGui::Spacing();
-			ImGui::Text("Valeur Totale : %.2f €", subRound->getValue());
+			ImGui::Text("Valeur totale : %.2f €", subRound->getValue());
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("Somme des valeurs des articles ci-dessous.");
 
 			ImGui::Spacing();
-			ImGui::Text("Lots à gagner :");
+			ImGui::TextDisabled("Lots à gagner");
 			auto prizes = subRound->getPrizes();
-			if (utils::renderPrizeList(prizes, {.editable = editable, .size = {0, -80}}) && editable)
+			if (utils::renderPrizeList(
+						prizes,
+						{.editable = editable, .size = {0, -(ImGui::GetFrameHeightWithSpacing() + utils::em(1.5f))}}) &&
+				editable)
 				subRound->setPrizes(prizes);
 		} else {
 			// Pause
@@ -911,11 +913,11 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			if (pauseDiapo) {
 				ImGui::Spacing();
 				ImGui::Text("Répertoire de diapo");
-				ImGui::SetNextItemWidth(-80);
+				ImGui::SetNextItemWidth(-browseRoom());
 				auto [folderPath, delay] = currentRound->getDiapo();
 				auto f_path = folderPath.string();
 				if (ImGui::InputText("##PauseDiapoFolder", &f_path)) {
-					currentRound->setDiapo(folderPath.string(), delay);
+					currentRound->setDiapo(f_path, delay);
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("...##BrowseDiapo")) {
@@ -963,71 +965,47 @@ void GameRoundConfigPopups::renderThirdColumn() {
 }
 
 void GameRoundConfigPopups::renderResult() {
-	if (const float resultHeight = ImGui::GetContentRegionAvail().y - 50;
-		ImGui::BeginChild("GroupResult", ImVec2(0, resultHeight), ImGuiChildFlags_Borders)) {
-
-		ImGui::Text("Résultats de la partie");
-		ImGui::Separator();
-		// Validate selected game round
-		if (m_selectedGameRound >= m_event.sizeRounds()) {
-			ImGui::Text("Aucune partie sélectionnée");
-			ImGui::EndChild();
-			ImGui::Spacing();
-			return;
-		}
-		const auto gr = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
-
-		ImGui::Columns(3, "ResultColumns", false);
-
-		std::string start_date = "--";
-		std::string end_date = "--";
-		std::string duration = "--";
-		std::string num_draws = "--";
-		if (gr->isFinished()) {
-			start_date = std::format("{}", gr->getStarting());
-			end_date = std::format("{}", gr->getEnding());
-			duration = std::format("{}", gr->getEnding() - gr->getStarting());
-			num_draws = std::format("{}", gr->getAllDraws().size());
-		}
-		// Colonne 1: Dates et durée
-		if (ImGui::BeginChild("ResultDates", ImVec2(0, 0), ImGuiChildFlags_None)) {
-			ImGui::Text("Début:");
-			ImGui::SameLine();
-			ImGui::InputText("##StartDate", &start_date, ImGuiInputTextFlags_ReadOnly);
-			ImGui::Text("Fin:");
-			ImGui::SameLine();
-			ImGui::InputText("##EndDate", &end_date, ImGuiInputTextFlags_ReadOnly);
-			ImGui::Text("Durée:");
-			ImGui::SameLine();
-			ImGui::InputText("##Duration", &duration, ImGuiInputTextFlags_ReadOnly);
-			ImGui::Text("Nombre de Tirages:");
-			ImGui::SameLine();
-			ImGui::InputText("##NumDraws", &num_draws, ImGuiInputTextFlags_ReadOnly);
-		}
-		ImGui::EndChild();
-		ImGui::NextColumn();
-
-		// Colonne 2: Tirages
-		if (ImGui::BeginChild("ResultDraws", ImVec2(0, 0), ImGuiChildFlags_None)) {
-			ImGui::Text("Tirages:");
-			std::string drawStr = gr->getDrawStr();
-			ImGui::InputTextMultiline("##TextDraws", &drawStr, ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
-		}
-		ImGui::EndChild();
-		ImGui::NextColumn();
-
-		// Colonne 3: Gagnants
-		if (ImGui::BeginChild("ResultWinners", ImVec2(0, 0), ImGuiChildFlags_None)) {
-			ImGui::Text("Noms des gagnants:");
-			std::string winnerStr = gr->getWinnerStr();
-			ImGui::InputTextMultiline("##ListWinners", &winnerStr, ImVec2(-1, -1), ImGuiInputTextFlags_ReadOnly);
-		}
-		ImGui::EndChild();
-
-		ImGui::Columns(1);
+	ImGui::TextUnformatted("Résultats de la partie");
+	ImGui::Separator();
+	if (m_selectedGameRound >= m_event.sizeRounds()) {
+		ImGui::TextDisabled("Aucune partie sélectionnée");
+		return;
 	}
-	ImGui::EndChild();
-	ImGui::Spacing();
+	const auto gr = m_event.getGameRound(static_cast<uint32_t>(m_selectedGameRound));
+	if (!gr->isFinished()) {
+		ImGui::TextDisabled("La partie n'a pas encore été jouée.");
+		return;
+	}
+	if (!ImGui::BeginTable("ResultColumns", 3, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV,
+						   {-1, -1}))
+		return;
+	ImGui::TableSetupColumn("Chiffres", ImGuiTableColumnFlags_WidthStretch, 1.0f);
+	ImGui::TableSetupColumn("Tirages", ImGuiTableColumnFlags_WidthStretch, 1.2f);
+	ImGui::TableSetupColumn("Gagnants", ImGuiTableColumnFlags_WidthStretch, 1.2f);
+	ImGui::TableNextRow();
+
+	ImGui::TableSetColumnIndex(0);
+	const auto figure = [](const char* iLabel, const std::string& iValue) -> void {
+		ImGui::TextDisabled("%s", iLabel);
+		ImGui::SameLine(utils::em(5.0f));
+		ImGui::TextUnformatted(iValue.c_str());
+	};
+	figure("Début", std::format("{}", gr->getStarting()));
+	figure("Fin", std::format("{}", gr->getEnding()));
+	figure("Durée", std::format("{}", gr->getEnding() - gr->getStarting()));
+	figure("Tirages", std::format("{}", gr->getAllDraws().size()));
+
+	ImGui::TableSetColumnIndex(1);
+	ImGui::TextDisabled("Tirages");
+	std::string drawStr = gr->getDrawStr();
+	ImGui::InputTextMultiline("##TextDraws", &drawStr, {-1, -1},
+							  ImGuiInputTextFlags_ReadOnly | ImGuiInputTextFlags_WordWrap);
+
+	ImGui::TableSetColumnIndex(2);
+	ImGui::TextDisabled("Gagnants");
+	std::string winnerStr = gr->getWinnerStr();
+	ImGui::InputTextMultiline("##ListWinners", &winnerStr, {-1, -1}, ImGuiInputTextFlags_ReadOnly);
+	ImGui::EndTable();
 }
 
 void GameRoundConfigPopups::addGameRound() {

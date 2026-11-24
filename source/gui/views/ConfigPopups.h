@@ -51,6 +51,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration générale"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {42.0f, 30.0f}}; }
 
 protected:
 	/**
@@ -68,12 +69,13 @@ private:
 		std::filesystem::path fontPath{};
 		float fontSize{20.0f};
 		float drawDelay{0.0f};
+		float pauseDuration{15.0f};
 		float titleScale{4.0f};
 		float valueScale{3.f};
 		float priceTextScale{2.5f};
-		float timeScale{1.6f};
+		float timeScale{2.4f};
 		float gridTextScale{0.9f};
-		math::vec2f gridSpace{4.0f, 4.0f};
+		math::vec2f gridSpace{0.0f, 0.0f};
 		math::vec4 backgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
 		math::vec4 gridBackgroundColor{0.94f, 0.94f, 0.94f, 1.0f};
 		math::vec4 textColor{0.0f, 0.0f, 0.0f, 1.0f};
@@ -135,6 +137,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration événement"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {40.0f, 32.0f}}; }
 
 protected:
 	/**
@@ -191,6 +194,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Configuration parties"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {66.0f, 42.0f}}; }
 
 protected:
 	/**

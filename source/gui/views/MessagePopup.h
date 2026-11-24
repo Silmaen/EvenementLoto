@@ -46,6 +46,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return m_title; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {28.0f, 0.0f}, .fitHeight = true}; }
 
 	/**
 	 * @brief Show the popup with the given content.

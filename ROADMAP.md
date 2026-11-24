@@ -8,9 +8,6 @@ lots qui était prévue plus tard. Ce qui reste demande un retour d'usage ou une
 ## 0.6.0
 
 * Habillages : retours d'usage sur « Ardoise » et « Salle », ajustements.
-* Fenêtres flottantes sous Wayland : aide à côté de la fenêtre principale, grille
-  détachable, aperçu en mono-écran. Le protocole interdisant à un client de placer ses
-  fenêtres, le compromis acceptable reste à décider.
 
 ## 0.7.0
 

@@ -39,6 +39,12 @@ public:
 	 */
 	[[nodiscard]] auto getName() const -> std::string override { return "status_bar"; }
 
+	/**
+	 * @brief The height of the bar: one line of text and the window padding around it.
+	 * @return The height in pixels.
+	 */
+	[[nodiscard]] static auto height() -> float;
+
 private:
 };
 

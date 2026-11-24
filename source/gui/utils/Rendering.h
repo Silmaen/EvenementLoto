@@ -34,6 +34,18 @@ constexpr float g_actionIconPadding = 6.0f;
  */
 [[nodiscard]] constexpr auto actionButtonHeight() -> float { return g_actionIconSize + 2.0f * g_actionIconPadding; }
 
+/// Marge de la barre d'outils, fixe pour la même raison que celle des boutons d'action.
+constexpr float g_toolBarPadding = 8.0f;
+
+/**
+ * @brief Hauteur de la barre d'outils, la même dans tous les habillages.
+ *
+ * La barre d'outils et la vue principale, qui se place dessous, la prennent toutes deux
+ * ici : si elles divergent, la vue recouvre la barre ou laisse un trou.
+ * @return La hauteur, en pixels.
+ */
+[[nodiscard]] constexpr auto toolBarHeight() -> float { return actionButtonHeight() + 2.0f * g_toolBarPadding; }
+
 /**
  * @brief Options for action buttons.
  */

@@ -182,12 +182,7 @@ public:
 	 * @brief Définit le numéro du gagnant
 	 * @param iWinner Le numéro de la grille gagnante
 	 */
-	void setWinner(const std::string& iWinner) {
-		if (m_status == Status::Running) {
-			m_winner = iWinner;
-			nextStatus();
-		}
-	}
+	void setWinner(const std::string& iWinner);
 
 	/**
 	 * @brief Corrige le nom du gagnant, sans toucher au déroulement.

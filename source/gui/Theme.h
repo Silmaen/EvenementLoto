@@ -123,6 +123,7 @@ struct Theme {
 
 	float controlsRounding{5.0f};
 
+	math::vec2 windowPadding{8.0f, 8.0f};
 	math::vec2 itemSpacing{8.0f, 4.0f};
 	math::vec2 itemInnerSpacing{4.0f, 4.0f};
 	math::vec2 cellPadding{4.0f, 2.0f};
@@ -132,6 +133,7 @@ struct Theme {
 	math::vec2 displayWindowPadding{19.0f, 19.0f};
 	math::vec2 displaySafeAreaPadding{3.0f, 3.0f};
 
+	float scrollbarSize{14.0f};
 	float mouseCursorScale{1.0f};
 
 	/**

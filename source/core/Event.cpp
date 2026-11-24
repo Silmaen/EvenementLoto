@@ -129,11 +129,24 @@ auto Event::readBody(std::istream& iBs, const ReadContext& iContext) -> bool {
 		return false;
 	// version 9
 	m_catalogue.clear();
+	m_plannedEnd.reset();
 	if (iContext.version > 8) {
 		if (!readCatalogue(iBs, iContext))
 			return false;
 		// Un catalogue d'avant la version 10 n'a pas d'identifiants.
 		assignPrizeIds();
+		// version 11
+		if (iContext.version > 10) {
+			int16_t plannedEnd = -1;
+			if (!readRaw(iBs, plannedEnd))
+				return false;
+			if (plannedEnd < -1 || plannedEnd >= 24 * 60) {
+				iBs.setstate(std::ios::failbit);
+				return false;
+			}
+			if (plannedEnd >= 0)
+				m_plannedEnd = std::chrono::minutes{plannedEnd};
+		}
 		return true;
 	}
 	// Un fichier d'avant le catalogue : ses lots sont dans ses manches, réparties à la
@@ -175,6 +188,8 @@ void Event::write(std::ostream& oBs) const {
 	// version >= 9
 	writeLength(body, m_catalogue.size());
 	for (const auto& prize: m_catalogue) prize.write(body);
+	// version >= 11
+	writeRaw(body, static_cast<int16_t>(m_plannedEnd.has_value() ? m_plannedEnd->count() : -1));
 	writeFrame(oBs, getSaveVersion(), body.str());
 }
 
@@ -390,6 +405,15 @@ void Event::setBasePath(const std::filesystem::path& iBasePath) {
 		m_organizerLogo = t_org_logo;
 	else
 		m_organizerLogo = relative(t_org_logo, m_basePath);
+}
+
+void Event::setPlannedEnd(const std::optional<std::chrono::minutes> iPlannedEnd) {
+	if (isFinished())
+		return;
+	if (iPlannedEnd.has_value() &&
+		(iPlannedEnd.value() < std::chrono::minutes::zero() || iPlannedEnd.value() >= std::chrono::hours{24}))
+		return;
+	m_plannedEnd = iPlannedEnd;
 }
 
 void Event::setRules(const std::string& iNewRules) {

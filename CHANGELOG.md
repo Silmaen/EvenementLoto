@@ -63,13 +63,43 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Un lot importé sans désignation ne s'appelle plus « null ».
 * Un SVG qui n'en est pas un est refusé au lieu de partir sur la carte graphique.
 * Aucune texture n'est tentée sans périphérique graphique.
-* Format de sauvegarde 10 ; les fichiers des versions 3 à 9 se relisent.
 * Anciens formats : la valeur d'un lot d'avant la version 8 est portée par son premier
   article, et un catalogue d'avant la version 9 est reconstitué depuis les parties.
 * Dépôt et CI passés sur GitLab : `.gitlab-ci.yml` remplace la configuration TeamCity.
 * Constats de style et d'analyse affichés sur la merge request par le rapport Code Quality.
 * Résultats des tests et couverture des lignes visibles dans la merge request.
 * Compilation avec clang 23, connu de Conan à partir de la 2.34.
+* Jobs Linux de la CI réservés aux runners `amd64` : plus aucun ne part sur le runner arm64.
+* Écran d'affichage jamais envoyé sur l'écran de la fenêtre de contrôle tant qu'il en existe un autre.
+* Choix de l'écran d'affichage retenu d'un démarrage à l'autre, même si l'ordre des écrans change.
+* Plein écran sur tout l'écran et non sur sa zone de travail : plus de liseré en bas.
+* Plein écran demandé au gestionnaire de fenêtres : l'affichage n'est plus décalé sous un panneau, bas de l'écran tronqué.
+* Écran public aux métriques fixes, indépendantes de l'habillage : son bas de page ne déborde plus.
+* Grille publique sans cadre ni espacement entre les numéros, et sans changement de couleur au survol.
+* Onglet « Affichage joueurs » des paramètres : les libellés ne s'écrasent plus à gauche.
+* Plus de plantage à la mise en pause : démarrer une pause, qui n'a pas de manche, écrivait hors mémoire.
+* « Passer » dans la saisie du gagnant termine vraiment la manche, sans gagnant, au lieu de ne rien faire.
+* Écran public : logo centré et aussi grand que la place le permet entre le numéro tiré et les horloges.
+* Horloges de l'écran public plus grandes par défaut, réglables jusqu'à 5 fois, sans jamais se chevaucher.
+* Durée prévue d'une pause réglable, et heure de reprise annoncée aux joueurs pendant la pause.
+* Estimation de l'heure de fin, d'après la durée moyenne des manches jouées et les pauses restantes.
+* Onglet « Statistiques » refait : tuiles de synthèse, histogramme des sorties par numéro, tableau parties et manches.
+* Une pause dont le dossier de diaporama est vide affiche son message au lieu d'un « `<no logo>` » géant.
+* Dossier de diaporama vide ou absent lu une seule fois, et non plus à chaque image de la pause.
+* Durée de l'événement en cours calculée jusqu'à maintenant, et non jusqu'à une fin encore inconnue.
+* Heure de fin prévue de l'événement, et retard ou avance sur le programme dans les statistiques.
+* Rythme de tirage : temps moyen entre deux numéros sur l'après-midi et dans la manche en cours.
+* Valeur des lots déjà distribués, restés sans gagnant et encore en jeu.
+* Format de sauvegarde 11 ; les fichiers des versions 3 à 10 se relisent.
+* Nouveau logo, plat et aux couleurs de l'habillage « Ardoise », lisible dès 32 px ; source SVG dans le dépôt.
+* Perte du périphérique graphique avec l'affichage sur un second écran : le rendu se refait au lieu de planter.
+* Fenêtres de dialogue centrées sur la fenêtre de contrôle et jamais plus grandes qu'elle.
+* Tailles exprimées en hauteurs de police : les fenêtres suivent la taille de police choisie.
+* Thème complété : cases cochées, liens, curseurs et arrondis ne gardent plus le style ImGui par défaut.
+* Configuration de l'événement et des parties réorganisées, sans cadres à hauteur fixe qui coupaient le contenu.
+* Liste des lots sur deux lignes quand la place manque, au lieu de champs rognés.
+* Barre d'état en français : événement, partie en cours et fichier enregistré.
+* Chemin de diaporama saisi au clavier enfin pris en compte.
 
 ## 0.5.1 — 26 septembre 2026
 

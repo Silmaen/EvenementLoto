@@ -48,6 +48,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Catalogue des lots"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {64.0f, 40.0f}}; }
 
 	/**
 	 * @brief Demande l'affichage de la page « Répartition » à la prochaine image.

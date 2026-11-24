@@ -217,6 +217,21 @@ public:
 	 */
 	void setRules(const std::string& iNewRules);
 
+	/**
+	 * @brief L'heure à laquelle l'événement doit finir, en minutes après minuit.
+	 *
+	 * Une heure du jour et non une date : le programme se prépare souvent avant de savoir
+	 * quel jour il sera joué. C'est la référence du retard affiché pendant le jeu.
+	 * @return L'heure prévue, vide quand aucune n'est fixée.
+	 */
+	[[nodiscard]] auto getPlannedEnd() const -> std::optional<std::chrono::minutes> { return m_plannedEnd; }
+
+	/**
+	 * @brief Fixe l'heure de fin prévue.
+	 * @param iPlannedEnd L'heure, en minutes après minuit ; vide pour n'en fixer aucune.
+	 */
+	void setPlannedEnd(std::optional<std::chrono::minutes> iPlannedEnd);
+
 	// ----- Manipulation des rounds ----
 	/**
 	 * @brief Renvoie l’itérateur constant de début de parties.
@@ -517,6 +532,8 @@ private:
 
 	/// Tous les lots dont l'organisateur dispose, avant répartition.
 	prizes_type m_catalogue;
+	/// L'heure de fin prévue, en minutes après minuit.
+	std::optional<std::chrono::minutes> m_plannedEnd;
 
 	/// La date et heure de début de l’événement
 	time_point m_start;

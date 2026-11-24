@@ -9,6 +9,8 @@
 
 #include "FileDialog.h"
 
+#include "Layout.h"
+
 #include "core/Log.h"
 #include "core/Settings.h"
 #include "core/utilities.h"
@@ -22,9 +24,7 @@ namespace evl::gui::utils {
 namespace {
 
 /// Width of the left pane, holding the recent paths and the tree.
-constexpr float g_sidePaneWidth = 280.0f;
-/// Width of the two closing buttons.
-constexpr float g_buttonWidth = 120.0f;
+auto sidePaneWidth() -> float { return std::min(em(14.0f), ImGui::GetContentRegionAvail().x * 0.35f); }
 
 /// What a request asks for, and what to do with the answer.
 struct Request {
@@ -503,7 +503,7 @@ void drawFilterRow(const Request& iRequest) {
 		const auto index = std::min(s.filterIndex, filters.size() - 1);
 		ImGui::TextDisabled("Type");
 		ImGui::SameLine();
-		ImGui::SetNextItemWidth(280);
+		ImGui::SetNextItemWidth(em(14.0f));
 		if (ImGui::BeginCombo("##Filter", filters[index].name.c_str())) {
 			for (size_t i = 0; i < filters.size(); ++i) {
 				if (ImGui::Selectable(filters[i].name.c_str(), i == index)) {
@@ -536,26 +536,27 @@ auto drawDecision(const Request& iRequest) -> Decision {
 	if (s.confirmOverwrite) {
 		ImGui::TextUnformatted("Ce fichier existe déjà. Le remplacer ?");
 		ImGui::SameLine();
-		if (ImGui::Button("Remplacer", ImVec2(g_buttonWidth, 0))) {
+		if (ImGui::Button("Remplacer", ImVec2(dialogButtonWidth(), 0))) {
 			ImGui::CloseCurrentPopup();
 			return {.outcome = Outcome::Chosen, .path = target};
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Retour", ImVec2(g_buttonWidth, 0)))
+		if (ImGui::Button("Retour", ImVec2(dialogButtonWidth(), 0)))
 			s.confirmOverwrite = false;
 		return {};
 	}
 
 	// The two buttons sit at the right end of the row, where a dialog ends.
-	const float offset = ImGui::GetContentRegionAvail().x - 2.0f * g_buttonWidth - ImGui::GetStyle().ItemSpacing.x;
+	const float offset =
+			ImGui::GetContentRegionAvail().x - 2.0f * dialogButtonWidth() - ImGui::GetStyle().ItemSpacing.x;
 	if (offset > 0.0f)
 		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 	const char* accept = iRequest.mode == FileDialogMode::Save ? "Enregistrer" : "Choisir";
 	ImGui::BeginDisabled(target.empty());
-	const bool accepted = ImGui::Button(accept, ImVec2(g_buttonWidth, 0));
+	const bool accepted = ImGui::Button(accept, ImVec2(dialogButtonWidth(), 0));
 	ImGui::EndDisabled();
 	ImGui::SameLine();
-	const bool cancelled = ImGui::Button("Annuler", ImVec2(g_buttonWidth, 0));
+	const bool cancelled = ImGui::Button("Annuler", ImVec2(dialogButtonWidth(), 0));
 	if (accepted) {
 		std::error_code error;
 		// Replacing a file is asked once, on this same window, rather than in a third
@@ -582,7 +583,7 @@ auto drawContent(const Request& iRequest) -> Decision {
 	// Two panes: where to go on the left, what is there on the right.
 	const float rows = iRequest.mode == FileDialogMode::Save ? 3.0f : 2.0f;
 	const float panes = ImGui::GetContentRegionAvail().y - rows * ImGui::GetFrameHeightWithSpacing();
-	if (ImGui::BeginChild("Tree", ImVec2(g_sidePaneWidth, panes), ImGuiChildFlags_Borders)) {
+	if (ImGui::BeginChild("Tree", ImVec2(sidePaneWidth(), panes), ImGuiChildFlags_Borders)) {
 		decision = drawRecents(iRequest);
 		if (decision.outcome == Outcome::Pending) {
 			for (const auto& root: treeRoots()) drawTreeNode(root, root.string());
@@ -647,13 +648,18 @@ void FileDialog::draw(const void* iOwner) {
 		return;
 
 	const char* title = titleOf(s.request->mode);
+	// Like every dialog: centred on the control window and kept inside it.
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	const ImVec2 room{viewport->WorkSize.x * 0.96f, viewport->WorkSize.y * 0.96f};
 	if (!s.opened) {
-		ImGui::SetNextWindowSize(ImVec2(760, 560), ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowPos(viewport->GetWorkCenter(), ImGuiCond_Always, {0.5f, 0.5f});
+		ImGui::SetNextWindowSize({std::min(em(40.0f), room.x), std::min(em(28.0f), room.y)}, ImGuiCond_Always);
 		ImGui::OpenPopup(title);
 		s.opened = true;
 	}
+	ImGui::SetNextWindowSizeConstraints({std::min(em(24.0f), room.x), std::min(em(14.0f), room.y)}, room);
 	Decision decision;
-	if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_None)) {
+	if (ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoSavedSettings)) {
 		decision = drawContent(*s.request);
 		ImGui::EndPopup();
 	}

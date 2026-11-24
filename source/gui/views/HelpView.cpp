@@ -13,6 +13,8 @@
 #include "core/utilities.h"
 #include "gui/Application.h"
 
+#include "gui/utils/Layout.h"
+
 #include <imgui.h>
 #include <stb_image.h>
 
@@ -214,7 +216,11 @@ void HelpView::renderElement(const utils::MarkdownElement& iElement, const size_
 void HelpView::onUpdate() {
 	loadIfNeeded();
 
-	ImGui::SetNextWindowSize(ImVec2(700, 600), ImGuiCond_FirstUseEver);
+	const ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->GetWorkCenter(), ImGuiCond_FirstUseEver, {0.5f, 0.5f});
+	ImGui::SetNextWindowSize({std::min(utils::em(36.0f), viewport->WorkSize.x * 0.9f),
+							  std::min(utils::em(30.0f), viewport->WorkSize.y * 0.9f)},
+							 ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Aide", &visibility())) {
 		ImGui::End();
 		return;

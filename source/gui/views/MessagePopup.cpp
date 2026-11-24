@@ -9,6 +9,8 @@
 
 #include "MessagePopup.h"
 
+#include "gui/utils/Layout.h"
+
 #include <imgui.h>
 
 namespace evl::gui::views {
@@ -27,12 +29,13 @@ void PopupMessage::onPopupUpdate() {
 	ImGui::TextWrapped("%s", m_message.c_str());
 	if (!m_detail.empty()) {
 		ImGui::Spacing();
-		ImGui::TextDisabled("%s", m_detail.c_str());
+		ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+		ImGui::TextWrapped("%s", m_detail.c_str());
+		ImGui::PopStyleColor();
 	}
 	ImGui::Spacing();
-	ImGui::Separator();
-	ImGui::Spacing();
-	if (ImGui::Button("Fermer"))
+	utils::beginDialogFooter(1);
+	if (utils::dialogButton("Fermer"))
 		ImGui::CloseCurrentPopup();
 }
 

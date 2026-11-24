@@ -32,7 +32,8 @@ void ToolBar::onUpdate() {
 	// Dimensionnée sur le bouton d'action et non sur la hauteur de ligne du thème : la
 	// barre d'outils garde ainsi la même taille dans tous les habillages, et aucune
 	// icône n'y est rognée.
-	ImGui::SetNextWindowSize({viewport->Size.x, utils::actionButtonHeight() + ImGui::GetStyle().WindowPadding.y * 2});
+	ImGui::SetNextWindowSize({viewport->Size.x, utils::toolBarHeight()});
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {utils::g_toolBarPadding, utils::g_toolBarPadding});
 	// Create the toolbar window
 	ImGui::Begin("Tool Bar", nullptr,
 				 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
@@ -58,6 +59,7 @@ void ToolBar::onUpdate() {
 	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick");
 	utils::defineActionButtonItem("Annuler dernier tirage", "cancel_pick");
 	ImGui::End();
+	ImGui::PopStyleVar();
 }
 
 }// namespace evl::gui::views

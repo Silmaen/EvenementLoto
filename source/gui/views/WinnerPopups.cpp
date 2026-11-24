@@ -12,14 +12,14 @@
 #include "core/Log.h"
 #include "gui/Application.h"
 
+#include "gui/utils/Layout.h"
+
 #include <imgui.h>
 #include <imgui_stdlib.h>
 
 namespace evl::gui::views {
 
 namespace {
-
-constexpr float g_buttonWidth = 100.0f;
 
 /**
  * @brief Describe the running sub-round, so the organizer sees what is being awarded.
@@ -32,7 +32,10 @@ auto runningLabels(const core::Event& iEvent) -> std::pair<std::string, std::str
 	const auto round = iEvent.getCurrentCGameRound();
 	if (round == iEvent.endRounds() || round->getType() == core::GameRound::Type::Pause)
 		return {};
-	return {round->getName(), round->getCurrentSubRound()->getTypeStr()};
+	const auto sub = round->getCurrentSubRound();
+	if (sub == round->endSubRound())
+		return {};
+	return {round->getName(), sub->getTypeStr()};
 }
 
 }// namespace
@@ -63,7 +66,8 @@ void PopupWinner::onPopupUpdate() {
 	const auto [roundName, subRoundType] = runningLabels(event);
 	if (roundName.empty()) {
 		ImGui::TextDisabled("Aucune manche en cours.");
-		if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+		utils::beginDialogFooter(1);
+		if (utils::dialogButton("Fermer"))
 			ImGui::CloseCurrentPopup();
 		return;
 	}
@@ -75,7 +79,10 @@ void PopupWinner::onPopupUpdate() {
 	ImGui::Separator();
 
 	ImGui::Text("Prétendants");
-	if (ImGui::BeginChild("Claimants", {0, ImGui::GetContentRegionAvail().y - 90}, ImGuiChildFlags_Borders)) {
+	const float below =
+			ImGui::GetFrameHeightWithSpacing() + utils::dialogFooterHeight() + ImGui::GetStyle().ItemSpacing.y;
+	if (ImGui::BeginChild("Claimants", {0, std::max(ImGui::GetContentRegionAvail().y - below, utils::em(4.0f))},
+						  ImGuiChildFlags_Borders)) {
 		for (size_t i = 0; i < m_claimants.size(); ++i) {
 			ImGui::PushID(static_cast<int>(i));
 			if (m_claimants.size() > 1) {
@@ -84,7 +91,8 @@ void PopupWinner::onPopupUpdate() {
 					m_selected = i;
 				ImGui::SameLine();
 			}
-			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - g_buttonWidth);
+			ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize("Retirer").x -
+									ImGui::GetStyle().FramePadding.x * 2.0f - ImGui::GetStyle().ItemSpacing.x);
 			ImGui::InputText("##claimant", &m_claimants[i]);
 			ImGui::SameLine();
 			if (ImGui::Button("Retirer") && m_claimants.size() > 1) {
@@ -112,18 +120,18 @@ void PopupWinner::onPopupUpdate() {
 		ImGui::TextDisabled("retenu : %s", m_claimants[m_selected].c_str());
 	}
 
-	ImGui::Separator();
+	utils::beginDialogFooter(3);
 	const bool hasWinner = !m_claimants[m_selected].empty();
 	if (!hasWinner)
 		ImGui::BeginDisabled();
-	if (ImGui::Button("Valider", {g_buttonWidth, 0})) {
+	if (utils::dialogButton("Valider")) {
 		settle(m_claimants[m_selected]);
 		ImGui::CloseCurrentPopup();
 	}
 	if (!hasWinner)
 		ImGui::EndDisabled();
 	ImGui::SameLine();
-	if (ImGui::Button("Passer", {g_buttonWidth, 0})) {
+	if (utils::dialogButton("Passer")) {
 		// Nobody claimed it: the round moves on all the same.
 		log_info("Manche validée sans gagnant.");
 		settle({});
@@ -132,7 +140,7 @@ void PopupWinner::onPopupUpdate() {
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Passer l'étape sans enregistrer de gagnant.");
 	ImGui::SameLine();
-	if (ImGui::Button("Annuler", {g_buttonWidth, 0}))
+	if (utils::dialogButton("Annuler"))
 		ImGui::CloseCurrentPopup();
 }
 
@@ -145,7 +153,10 @@ void PopupWinners::onPopupUpdate() {
 	auto& event = Application::get().getCurrentEvent();
 	bool edited = false;
 
-	if (ImGui::BeginChild("WinnersList", {0, ImGui::GetContentRegionAvail().y - 40}, ImGuiChildFlags_Borders)) {
+	if (ImGui::BeginChild(
+				"WinnersList",
+				{0, ImGui::GetContentRegionAvail().y - utils::dialogFooterHeight() - ImGui::GetStyle().ItemSpacing.y},
+				ImGuiChildFlags_Borders)) {
 		bool anyPlayed = false;
 		for (uint32_t roundIndex = 0; roundIndex < static_cast<uint32_t>(event.sizeRounds()); ++roundIndex) {
 			const auto round = event.getGameRound(roundIndex);
@@ -156,8 +167,9 @@ void PopupWinners::onPopupUpdate() {
 			for (uint32_t subIndex = 0; subIndex < static_cast<uint32_t>(round->sizeSubRound()); ++subIndex) {
 				const auto subRound = round->getSubRound(subIndex);
 				ImGui::PushID(static_cast<int>(subIndex));
+				ImGui::AlignTextToFramePadding();
 				ImGui::Text("%s", subRound->getTypeStr().c_str());
-				ImGui::SameLine(200);
+				ImGui::SameLine(utils::em(10.0f));
 				ImGui::SetNextItemWidth(-1);
 				if (subRound->isFinished()) {
 					anyPlayed = true;
@@ -183,8 +195,8 @@ void PopupWinners::onPopupUpdate() {
 		Application::get().saveProgress();
 	}
 
-	ImGui::Separator();
-	if (ImGui::Button("Fermer", {g_buttonWidth, 0}))
+	utils::beginDialogFooter(1);
+	if (utils::dialogButton("Fermer"))
 		ImGui::CloseCurrentPopup();
 }
 

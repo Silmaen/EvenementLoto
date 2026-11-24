@@ -44,6 +44,7 @@ public:
 	 * @return The popup title.
 	 */
 	[[nodiscard]] auto getPopupTitle() const -> std::string override { return "Partie interrompue"; }
+	[[nodiscard]] auto layout() const -> Layout override { return {.size = {32.0f, 0.0f}, .fitHeight = true}; }
 
 	/**
 	 * @brief Show the popup for the given interrupted game.

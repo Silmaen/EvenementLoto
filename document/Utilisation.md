@@ -56,6 +56,12 @@ numéro : le bouton de tirage aléatoire affiche le temps restant et la grille m
 de l'annonce, le temps qu'il faut au numéro pour atteindre le fond de la salle. Zéro désactive le blocage. Annuler un
 tirage, ou changer de phase, réarme les commandes immédiatement.
 
+#### Durée d'une pause
+
+La section "Programme" porte la durée prévue d'une pause, en minutes. Elle sert à estimer l'heure de fin de
+l'événement, et pendant une pause l'écran des joueurs annonce "Reprise vers" l'heure correspondante. Zéro n'annonce
+aucune heure de reprise.
+
 #### Serveur d'affichage (Linux)
 
 L'onglet "Général" permet de demander **X11** ou **Wayland**, ou de laisser le choix à la bibliothèque graphique. Le
@@ -132,6 +138,10 @@ Trois paramètres sont obligatoires pour passer à la phase de réglage des part
 
 Il est toutefois conseillé de renseigner les autres paramètres, pour un meilleur affichage et une meilleure
 identification de l'événement.
+
+La "Fin prévue", facultative, est l'heure à laquelle l'événement doit se terminer. Pendant le jeu, l'onglet
+"Statistiques" compare l'heure de fin estimée à celle-ci et affiche le retard, ou l'avance. Elle reste modifiable une
+fois l'événement commencé, quand le programme glisse et qu'il faut se fixer un nouvel objectif.
 
 ### Réglage des parties
 
@@ -348,6 +358,22 @@ l'aide d'un boulier traditionnel puis clique sur le bouton correspondant sur le 
 
 Bien qu'il soit possible de faire les deux modes, il est recommandé de choisir un mode de tirage pour chaque partie, et
 de s'y tenir pour éviter la confusion.
+
+### Statistiques
+
+L'onglet "Statistiques" de l'écran de contrôle résume l'après-midi en quelques tuiles :
+
+* **Fin estimée** : chaque manche restante compte pour la durée moyenne des manches déjà jouées, chaque pause pour sa
+  durée prévue. Pas d'estimation avant la première manche jouée.
+* **Retard** : l'écart entre la fin estimée et la fin prévue de l'événement, "+" quand on est en retard.
+* **Reste à jouer** : les manches et les pauses encore au programme.
+* **Rythme** : le temps moyen entre deux numéros, vérifications et annonces comprises, et celui de la manche en cours.
+* **Manche moyenne**, **Numéros tirés** : la durée et le nombre de tirages d'une manche, le total des numéros sortis.
+* **Lots distribués**, **Lots restants** : la valeur des lots déjà gagnés, dont ceux restés sans gagnant, et de ceux
+  encore en jeu.
+
+Dessous, l'histogramme des sorties par numéro (survoler une barre donne le numéro et son nombre de sorties) et le
+détail des parties et des manches : plus longues, plus courtes, nombres de tirages.
 
 ### Partie improvisée
 

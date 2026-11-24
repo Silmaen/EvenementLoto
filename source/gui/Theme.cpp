@@ -64,7 +64,9 @@ void applyPalette(Theme& ioTheme, const Palette& iPalette) {
 	ioTheme.frameBackgroundActive = mix(sunken, accent, 0.40f);
 
 	ioTheme.titleBar = raised;
-	ioTheme.titleBarActive = mix(raised, accent, 0.45f);
+	// Une barre de titre teintée, pas peinte : l'accent reste réservé à ce qui se
+	// manipule, et une fenêtre active n'a pas à crier plus fort que son contenu.
+	ioTheme.titleBarActive = mix(raised, accent, 0.28f);
 	ioTheme.titleBarCollapsed = raised;
 	ioTheme.menubarBackground = raised;
 
@@ -169,6 +171,8 @@ auto Theme::fromPreset(const Preset iPreset) -> Theme {
 			theme.framePadding = {8.0f, 5.0f};
 			theme.cellPadding = {6.0f, 3.0f};
 			theme.indentSpacing = 14.0f;
+			theme.windowPadding = {12.0f, 10.0f};
+			theme.scrollbarSize = 12.0f;
 			break;
 		case Preset::Salle:
 			// Une salle des fêtes est mal éclairée et l'écran de contrôle est souvent vu
@@ -189,6 +193,8 @@ auto Theme::fromPreset(const Preset iPreset) -> Theme {
 			theme.framePadding = {10.0f, 7.0f};
 			theme.cellPadding = {8.0f, 4.0f};
 			theme.indentSpacing = 16.0f;
+			theme.windowPadding = {14.0f, 12.0f};
+			theme.scrollbarSize = 18.0f;
 			break;
 	}
 	return theme;
@@ -297,6 +303,7 @@ void Theme::loadFromSettings(const core::Settings& iSettings) {
 
 	controlsRounding = iSettings.getValue("ControlsRounding", controlsRounding);
 
+	windowPadding = iSettings.getValue("WindowPadding", windowPadding);
 	itemSpacing = iSettings.getValue("ItemSpacing", itemSpacing);
 	itemInnerSpacing = iSettings.getValue("ItemInnerSpacing", itemInnerSpacing);
 	cellPadding = iSettings.getValue("CellPadding", cellPadding);
@@ -306,6 +313,7 @@ void Theme::loadFromSettings(const core::Settings& iSettings) {
 	displayWindowPadding = iSettings.getValue("DisplayWindowPadding", displayWindowPadding);
 	displaySafeAreaPadding = iSettings.getValue("DisplaySafeAreaPadding", displaySafeAreaPadding);
 
+	scrollbarSize = iSettings.getValue("ScrollbarSize", scrollbarSize);
 	mouseCursorScale = iSettings.getValue("MouseCursorScale", mouseCursorScale);
 }
 
@@ -398,6 +406,7 @@ auto Theme::saveToSettings() -> core::Settings {
 
 	settings.setValue("ControlsRounding", controlsRounding);
 
+	settings.setValue("WindowPadding", windowPadding);
 	settings.setValue("ItemSpacing", itemSpacing);
 	settings.setValue("ItemInnerSpacing", itemInnerSpacing);
 	settings.setValue("CellPadding", cellPadding);
@@ -407,6 +416,7 @@ auto Theme::saveToSettings() -> core::Settings {
 	settings.setValue("DisplayWindowPadding", displayWindowPadding);
 	settings.setValue("DisplaySafeAreaPadding", displaySafeAreaPadding);
 
+	settings.setValue("ScrollbarSize", scrollbarSize);
 	settings.setValue("MouseCursorScale", mouseCursorScale);
 
 	return settings;

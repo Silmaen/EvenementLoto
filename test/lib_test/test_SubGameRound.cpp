@@ -57,6 +57,18 @@ TEST(SubGameRound, flow) {
 	EXPECT_EQ(partie.getDraws().size(), 3);
 }
 
+TEST(SubGameRound, settlingWithoutAWinnerEndsTheRound) {
+	// « Passer » in the winner dialog: nobody claimed the prize, the round is over anyway.
+	// It used to stay running, so the button did what « Annuler » does.
+	SubGameRound partie(SubGameRound::Type::OneQuine, "un jambon", 45.0);
+	partie.nextStatus();
+	partie.nextStatus();
+	ASSERT_EQ(partie.getStatus(), SubGameRound::Status::Running);
+	partie.setWinner({});
+	EXPECT_TRUE(partie.isFinished());
+	EXPECT_TRUE(partie.getWinner().empty());
+}
+
 TEST(SubGameRound, editWinnerOnlyOnceFinished) {
 	SubGameRound partie(SubGameRound::Type::OneQuine, "un panier garni", 25.0);
 	// A name typed too fast, before the round is over: nothing to correct yet.
