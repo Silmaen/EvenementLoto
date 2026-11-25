@@ -26,6 +26,76 @@ namespace evl::gui::views {
 
 namespace {
 
+/// Smallest font scale of the prize list: a squeezed region must never give a zero or
+/// negative scale, which hands the GPU degenerate glyphs.
+constexpr float g_minPrizeScale = 0.1f;
+
+/// The prizes worth a line: the empty articles show nothing on the public screen.
+auto shownPrizes(const core::SubGameRound& iSub, const bool iGroupBySets, const int iMaxLines)
+		-> std::vector<core::AnnouncedPrize> {
+	auto shown = core::announcedPrizes(iSub.getPrizes(), iGroupBySets);
+	if (iMaxLines > 0 && std::cmp_greater(shown.size(), iMaxLines))
+		shown.resize(static_cast<size_t>(iMaxLines));
+	return shown;
+}
+
+/// Size, at the current font scale, of the list drawn by drawPrizeLines().
+auto prizeBlockSize(const std::vector<core::AnnouncedPrize>& iPrizes, const bool iTruncated) -> ImVec2 {
+	const float gap = ImGui::CalcTextSize("MMMM").x;
+	ImVec2 size{0.0f, 0.0f};
+	for (const auto& entry: iPrizes) {
+		const auto* prize = entry.prize;
+		if (entry.firstOfSet) {
+			size.x = std::max(size.x, ImGui::CalcTextSize(std::format("Gagnant {}", entry.set).c_str()).x);
+			size.y += ImGui::GetTextLineHeight();
+		}
+		const auto line = ImGui::CalcTextSize(prize->getDesignation().c_str());
+		const auto donor = ImGui::CalcTextSize(prize->getDonor().c_str());
+		size.x = std::max(size.x, line.x + (prize->getDonor().empty() ? 0.0f : gap + donor.x));
+		size.y += ImGui::GetTextLineHeight();
+	}
+	if (iTruncated)
+		size.y += ImGui::GetTextLineHeight();
+	return size;
+}
+
+/// One line per prize: the designation on the left, the donor flush right on the same line.
+/// A children's round titles each set « Gagnant N »; the sets of the first @p iWinnersFound winners
+/// are already given away: they stay readable but step back.
+void drawPrizeLines(const std::vector<core::AnnouncedPrize>& iPrizes, const float iWidth, const bool iTruncated,
+					const size_t iWinnersFound = 0) {
+	const float gap = ImGui::CalcTextSize("MMMM").x;
+	const float left = ImGui::GetCursorPosX();
+	// Lines packed like a single multi-line text: the block height is lines × line height.
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, {ImGui::GetStyle().ItemSpacing.x, 0.0f});
+	for (const auto& entry: iPrizes) {
+		const auto* prize = entry.prize;
+		const bool given = entry.set != 0 && entry.set <= iWinnersFound;
+		if (entry.firstOfSet)
+			ImGui::TextDisabled("Gagnant %u", entry.set);
+		if (given)
+			ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+		const auto popGiven = [given]() -> void {
+			if (given)
+				ImGui::PopStyleColor();
+		};
+		ImGui::TextUnformatted(prize->getDesignation().c_str());
+		if (prize->getDonor().empty()) {
+			popGiven();
+			continue;
+		}
+		const float designationWidth = ImGui::CalcTextSize(prize->getDesignation().c_str()).x;
+		const float donorWidth = ImGui::CalcTextSize(prize->getDonor().c_str()).x;
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(left + std::max(iWidth - donorWidth, designationWidth + gap));
+		ImGui::TextUnformatted(prize->getDonor().c_str());
+		popGiven();
+	}
+	if (iTruncated)
+		ImGui::TextUnformatted("...");
+	ImGui::PopStyleVar();
+}
+
 void drawImage(const std::string& iTextureName, const math::vec2& iPosition, const math::vec2& iSize) {
 	// A cursor move must be followed by an item, or ImGui cannot grow the parent and
 	// says so through an assertion. When the region is degenerate — a panel squeezed by
@@ -376,7 +446,10 @@ void DisplayView::renderRoundReady() const {
 		currentSubRound = currentRound->getSubRound(static_cast<uint32_t>(m_previewSubRound));
 
 	// Part title
-	const std::string title = std::format("{} - {}", currentRound->getName(), currentSubRound->getTypeStr());
+	const std::string title = std::format("{} - {}", currentRound->getDisplayName(),
+								 currentRound->getSubRoundLabel(static_cast<size_t>(
+										 std::distance<core::GameRound::sub_rounds_type::const_iterator>(
+												currentRound->beginSubRound(), currentSubRound))));
 	renderTitle(title, region, 1.5f);
 	const float titleHeight = ImGui::GetCursorPosY();
 	region.y() -= titleHeight;
@@ -396,31 +469,53 @@ void DisplayView::renderRoundReady() const {
 	ImGui::SetCursorPosX((region.x() - frameWidth) * 0.5f);
 	if (ImGui::BeginChild("RoundInfoFrame", {frameWidth, frameHeight}, ImGuiChildFlags_Borders)) {
 		// SubRound prices
-		if (price_scale > 0.0f)
-			setFontScale(price_scale);
-		ImGui::Text("%s", currentSubRound->getPrices().c_str());
+		// The font shrinks until the whole list fits above the value area, however many prizes.
+		setFontScale(1.0f);
+		const bool showPrizes = currentRound->isShowingPrizes();
+		const bool childRound = currentRound->getType() == core::GameRound::Type::Enfant;
+		const auto shown =
+				showPrizes ? shownPrizes(*currentSubRound, childRound, 0) : std::vector<core::AnnouncedPrize>{};
+		const auto block = prizeBlockSize(shown, false);
+		const float availWidth = ImGui::GetContentRegionAvail().x;
+		const float availHeight = std::max(frameHeight - valueHeight - ImGui::GetCursorPosY(), 1.0f);
+		float scale = price_scale > 0.0f ? price_scale : 1.0f;
+		if (block.y * scale > availHeight)
+			scale = availHeight / block.y;
+		if (block.x * scale > availWidth)
+			scale = availWidth / block.x;
+		setFontScale(std::max(scale, g_minPrizeScale));
+		drawPrizeLines(shown, availWidth, false);
 		setFontScale(1.0f);
 
-		// Value area at bottom of frame
-		ImGui::SetCursorPosY(frameHeight - valueHeight);
-		ImGui::Separator();
-		// Value label
-		ImGui::SetCursorPosX((frameWidth - vSize.x) * 0.5f);
-		ImGui::Text("Valeur");
-		// Value display
-		ImGui::SetCursorPosX((frameWidth - valueSize.x * value_scale) * 0.5f);
-		if (value_scale > 0.0f)
-			setFontScale(value_scale);
-		ImGui::Text("%s", valueText.c_str());
-		setFontScale(1.0f);
+		// Value area at bottom of frame — left empty with the prizes: the page is shown, not filled.
+		if (showPrizes) {
+			ImGui::SetCursorPosY(frameHeight - valueHeight);
+			ImGui::Separator();
+			// Value label
+			ImGui::SetCursorPosX((frameWidth - vSize.x) * 0.5f);
+			ImGui::Text("Valeur");
+			// Value display
+			ImGui::SetCursorPosX((frameWidth - valueSize.x * value_scale) * 0.5f);
+			if (value_scale > 0.0f)
+				setFontScale(value_scale);
+			ImGui::Text("%s", valueText.c_str());
+			setFontScale(1.0f);
+		} else {
+			// A cursor move is always followed by an item.
+			ImGui::Dummy({0.0f, 0.0f});
+		}
 	}
 	ImGui::EndChild();
 
 	// Logo area (centered, large)
-	if (const float logoHeight = region.y() * 0.35f;
-		ImGui::BeginChild("LogoArea", {0, logoHeight}, ImGuiChildFlags_None)) {
-		const float size = std::min(ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y);
-		drawImage("logo_organizer", {(ImGui::GetContentRegionAvail().x - size) * 0.5f, 0}, {size, size});
+	// Everything that is left under the frame, whatever the window size: the logo fits
+	// that box by itself, keeping its proportions (drawImage), so nothing is guessed.
+	const float logoHeight = std::max(ImGui::GetContentRegionAvail().y - style.ItemSpacing.y, 1.0f);
+	if (ImGui::BeginChild("LogoArea", {0, logoHeight}, ImGuiChildFlags_None,
+						  ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+		// A pixel or two of margin: the image's own rounding must not trigger a scroll.
+		const auto avail = ImGui::GetContentRegionAvail();
+		drawImage("logo_organizer", {0, 0}, {avail.x, avail.y - 2.0f});
 	}
 	ImGui::EndChild();
 }
@@ -441,7 +536,10 @@ void DisplayView::renderRoundRunning() const {
 
 	// Part title
 	ImGui::SetCursorPosY(region.y() * 0.05f);
-	const std::string title = std::format("{} - {}", currentRound->getName(), currentSubRound->getTypeStr());
+	const std::string title = std::format("{} - {}", currentRound->getDisplayName(),
+								 currentRound->getSubRoundLabel(static_cast<size_t>(
+										 std::distance<core::GameRound::sub_rounds_type::const_iterator>(
+												currentRound->beginSubRound(), currentSubRound))));
 	if (const auto scale = gui_settings.getValue("title_scale", 4.0f); scale > 0.0f) {
 		setFontScale(scale);
 	}
@@ -586,7 +684,7 @@ void DisplayView::renderRoundRunning() const {
 
 	// Subround info at bottom
 	ImGui::SetCursorPosY(nextPos);
-	if (ImGui::BeginChild("SubRoundInfo", {leftPanelWidth, 0}, ImGuiChildFlags_None)) {
+	if (ImGui::BeginChild("SubRoundInfo", {leftPanelWidth, 0}, ImGuiChildFlags_None) && currentRound->isShowingPrizes()) {
 		const auto currentWidth = ImGui::GetContentRegionAvail().x;
 		const auto truncate_price = gui_settings.getValue("truncate_price", false);
 		const auto truncate_price_lines = gui_settings.getValue("truncate_price_lines", 3);
@@ -595,31 +693,24 @@ void DisplayView::renderRoundRunning() const {
 		const std::string priceText = std::format("{:.2f} €", currentSubRound->getValue());
 		const auto valueSize =
 				std::max(ImGui::CalcTextSize(priceText.c_str()).x, ImGui::CalcTextSize("Valeur").x) * value_scale;
-		std::string all_prices = currentSubRound->getPrices();
-		if (auto nbLine = std::ranges::count(all_prices, '\n'); truncate_price && nbLine > truncate_price_lines) {
-			// Truncate to specified number of lines
-			size_t pos = 0;
-			int line_count = 0;
-			while (line_count < truncate_price_lines && pos != std::string::npos) {
-				pos = all_prices.find('\n', pos);
-				if (pos != std::string::npos) {
-					++line_count;
-					++pos;
-				}
-			}
-			all_prices = all_prices.substr(0, pos) + "\n...";
-		}
-		auto tSize = ImGui::CalcTextSize(all_prices.c_str());
+		// A children's round gives one set after the other: the one at stake must stay visible.
+		const bool isChild = currentRound->getType() == core::GameRound::Type::Enfant;
+		const auto allShown = shownPrizes(*currentSubRound, isChild, 0);
+		const auto shown = shownPrizes(*currentSubRound, isChild, truncate_price && !isChild ? truncate_price_lines : 0);
+		const bool truncated = shown.size() < allShown.size();
+		const float blockWidth = std::max(currentWidth - valueSize - style.WindowPadding.x * 2.0f, 1.0f);
+		auto tSize = prizeBlockSize(shown, truncated);
 		tSize.x *= (price_scale > 0.0f ? price_scale : 1.0f);
 		tSize.y *= (price_scale > 0.0f ? price_scale : 1.0f);
 		if (tSize.y > ImGui::GetContentRegionAvail().y) {
 			// Adjust size to fit
 			price_scale *= ImGui::GetContentRegionAvail().y / tSize.y;
 		}
+		if (tSize.x > blockWidth)
+			price_scale *= blockWidth / tSize.x;
 		ImGui::BeginGroup();
-		if (price_scale > 0.0f)
-			setFontScale(price_scale);
-		ImGui::Text("%s", all_prices.c_str());
+		setFontScale(std::max(price_scale, g_minPrizeScale));
+		drawPrizeLines(shown, blockWidth, truncated, isChild ? currentSubRound->getWinnersFound() : 0);
 		setFontScale(1.0f);
 		ImGui::EndGroup();
 
@@ -642,7 +733,11 @@ void DisplayView::renderRoundRunning() const {
 void DisplayView::renderRoundEnd() const {
 	if (m_previewMode)// nothing to render in preview mode
 		return;
-	renderTitle("Fin de la partie", {ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y}, 2.0f);
+	// The end screen of a pause is the call back to the game, not the end of one.
+	const auto round = m_currentEvent.getCurrentGameRound();
+	const bool afterPause = round != m_currentEvent.endRounds() && round->getType() == core::GameRound::Type::Pause;
+	renderTitle(afterPause ? "Reprise du Jeu" : "Fin de la partie",
+				{ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y}, 2.0f);
 	drawImage("logo_organizer", {0, 0},
 			  {ImGui::GetContentRegionAvail().x * 0.1f, ImGui::GetContentRegionAvail().x * 0.1f});
 	drawImage("logo_organizer", {ImGui::GetContentRegionAvail().x * 0.9f, 0},
@@ -650,10 +745,11 @@ void DisplayView::renderRoundEnd() const {
 
 
 	setFontScale(1.5f);
-	const ImVec2 msgSize = ImGui::CalcTextSize("Veuillez démarquer vos cartons.");
+	const char* message = afterPause ? "Veuillez regagner vos places." : "Veuillez démarquer vos cartons.";
+	const ImVec2 msgSize = ImGui::CalcTextSize(message);
 	ImGui::SetCursorPos({(ImGui::GetContentRegionAvail().x - msgSize.x) * 0.5f,
 						 ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.15f});
-	ImGui::Text("Veuillez démarquer vos cartons.");
+	ImGui::TextUnformatted(message);
 	setFontScale(1.0f);
 
 	ImGui::SetCursorPos({0, ImGui::GetCursorPosY() + ImGui::GetContentRegionAvail().y * 0.3f});

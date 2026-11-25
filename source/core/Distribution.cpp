@@ -129,7 +129,7 @@ auto overview(const Event& iEvent) -> DistributionOverview {
 			result.subRounds.push_back({.round = roundIndex,
 										.subRound = subIndex,
 										.roundName = round->getName(),
-										.subRoundName = sub->getTypeStr(),
+										.subRoundName = round->getSubRoundLabel(subIndex),
 										.value = sub->getValue(),
 										.count = sub->getPrizes().size(),
 										.editable = sub->isEditable()});

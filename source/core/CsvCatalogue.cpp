@@ -18,7 +18,7 @@ namespace evl::core {
 namespace {
 
 /// Les colonnes que l'on sait reconnaître.
-enum struct Column : uint8_t { Designation, Donor, Value, Attractiveness, ChildFriendly, Unknown };
+enum struct Column : uint8_t { Designation, Donor, Value, Attractiveness, ChildFriendly, Round, Phase, Set, Unknown };
 
 /// L'ordre supposé quand aucun en-tête n'est reconnu.
 constexpr std::array<Column, 5> g_defaultOrder{
@@ -62,7 +62,7 @@ auto normalise(std::string_view iText) -> std::string {
 /// À quelle colonne un en-tête correspond.
 auto columnOf(const std::string_view iHeader) -> Column {
 	const auto key = normalise(iHeader);
-	static constexpr std::array<std::pair<std::string_view, Column>, 16> names{
+	static constexpr std::array<std::pair<std::string_view, Column>, 26> names{
 			{{"designation", Column::Designation},
 			 {"libelle", Column::Designation},
 			 {"article", Column::Designation},
@@ -78,7 +78,17 @@ auto columnOf(const std::string_view iHeader) -> Column {
 			 {"attractivite", Column::Attractiveness},
 			 {"note", Column::Attractiveness},
 			 {"enfant", Column::ChildFriendly},
-			 {"enfantcompatible", Column::ChildFriendly}}};
+			 {"enfantcompatible", Column::ChildFriendly},
+			 {"partie", Column::Round},
+			 {"round", Column::Round},
+			 {"numeropartie", Column::Round},
+			 {"phase", Column::Phase},
+			 {"manche", Column::Phase},
+			 {"numerophase", Column::Phase},
+			 {"gagnant", Column::Set},
+			 {"numerogagnant", Column::Set},
+			 {"set", Column::Set},
+			 {"lotdugagnant", Column::Set}}};
 	for (const auto& [name, column]: names) {
 		if (key == name)
 			return column;
@@ -183,6 +193,24 @@ auto parseAttractiveness(const std::string_view iText) -> std::optional<uint8_t>
 	} catch (const std::exception&) { return std::nullopt; }
 }
 
+/// Un numéro de partie ou de phase : le premier entier trouvé, au moins 1.
+auto parseIndex(const std::string_view iText) -> std::optional<uint32_t> {
+	std::string digits;
+	for (const char character: iText) {
+		if (std::isdigit(static_cast<unsigned char>(character)) == 0) {
+			if (!digits.empty())
+				break;
+			continue;
+		}
+		digits += character;
+	}
+	// Quatre chiffres au plus : de quoi tenir dans un entier, bien au-delà d'un programme réel.
+	if (digits.empty() || digits.size() > 4)
+		return std::nullopt;
+	const auto value = static_cast<uint32_t>(std::stoul(digits));
+	return value >= 1 ? std::optional<uint32_t>{value} : std::nullopt;
+}
+
 /// Une case à cocher, dans les mots qu'un tableur y met.
 auto parseBool(const std::string_view iText) -> std::optional<bool> {
 	const auto key = normalise(iText);
@@ -233,6 +261,8 @@ auto parseCatalogueCsv(const std::string_view iContent) -> CsvImport {
 		const auto fields = splitLine(lines[index], separator);
 		Prize prize;
 		bool hasSomething = false;
+		std::optional<uint32_t> round;
+		std::optional<uint32_t> phase;
 		for (std::size_t column = 0; column < fields.size(); ++column) {
 			const auto role = column < layout.size() ? layout[column] : Column::Unknown;
 			const auto field = trim(fields[column]);
@@ -260,6 +290,16 @@ auto parseCatalogueCsv(const std::string_view iContent) -> CsvImport {
 					if (const auto flag = parseBool(field); flag.has_value())
 						prize.setChildFriendly(flag.value());
 					break;
+				case Column::Round:
+					round = parseIndex(field);
+					break;
+				case Column::Phase:
+					phase = parseIndex(field);
+					break;
+				case Column::Set:
+					if (const auto winner = parseIndex(field); winner.has_value())
+						prize.setSet(static_cast<uint8_t>(std::min<uint32_t>(*winner, Prize::g_maxSet)));
+					break;
 				case Column::Unknown:
 					break;
 			}
@@ -268,13 +308,47 @@ auto parseCatalogueCsv(const std::string_view iContent) -> CsvImport {
 			++result.skipped;
 			continue;
 		}
+		if (round.has_value())
+			result.placements.push_back({.prize = result.prizes.size(), .round = *round, .phase = phase.value_or(1)});
 		result.prizes.push_back(prize);
 	}
 
 	result.summary = std::format("{} lot(s) lus", result.prizes.size());
+	if (!result.placements.empty())
+		result.summary += std::format(" dont {} déjà répartis", result.placements.size());
 	if (result.skipped > 0)
 		result.summary += std::format(", {} ligne(s) sans désignation ni valeur ignorée(s)", result.skipped);
 	result.summary += ".";
+	return result;
+}
+
+auto placeImported(Event& ioEvent, const std::size_t iFirstNew, const CsvImport& iImport) -> CsvPlacementResult {
+	CsvPlacementResult result;
+	for (const auto& placement: iImport.placements) {
+		const auto index = iFirstNew + placement.prize;
+		auto phase = placement.phase;
+		// A children's round has a single phase: the « phase » column then names the winner
+		// who takes the article, the set it belongs to.
+		const auto round = std::ranges::find_if(ioEvent.beginRounds(), ioEvent.endRounds(),
+												[&placement](const GameRound& iRound) -> bool {
+													return !iRound.isPause() &&
+														   iRound.getId() == static_cast<int>(placement.round);
+												});
+		const bool child = round != ioEvent.endRounds() && round->getType() == GameRound::Type::Enfant;
+		if (child && index < ioEvent.getCatalogue().size()) {
+			auto catalogue = ioEvent.getCatalogue();
+			catalogue[index].setSet(static_cast<uint8_t>(std::min<uint32_t>(phase, Prize::g_maxSet)));
+			ioEvent.setCatalogue(catalogue);
+			phase = 1;
+		}
+		const auto slot = ioEvent.slotAt(placement.round, phase);
+		if (index >= ioEvent.getCatalogue().size() || !slot.has_value() ||
+			!ioEvent.assignPrize(ioEvent.getCatalogue()[index].getId(), slot)) {
+			++result.refused;
+			continue;
+		}
+		++result.placed;
+	}
 	return result;
 }
 

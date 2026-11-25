@@ -1,0 +1,232 @@
+partie ,phase,Désignation,donateur,valeur,attrait,enfant
+1,1,Bouteille de bière,Brasserie Dulion,3 € ,3,1
+1,1,Lampe LED sans fil,Auchan,24 € ,3,1
+1,1,Matelas gonflable,Auchan,30 € ,3,1
+1,1,Raquettes de plage,La maison jaune,4 € ,3,1
+1,1,Sécateur,Ciffreo Bona,25 € ,3,1
+1,1,Un savon,Olive et moi,5 € ,3,1
+1,2,Bon pour 2 cocktails et une planche apéro ,Restaurant La villa ,30 € ,3,1
+1,2,Bon pour une boite de 12 macarons,Pâtisserie Lejeune,21 € ,3,1
+1,2,Bouteille de bière,Brasserie Dulion,3 € ,3,1
+1,2,Coupe poils de nez,Auchan,5 € ,3,1
+1,2,Kit peinture créative,Spécifique Immobilier,8 € ,3,1
+1,2,Lampe LED sans fil,Auchan,24 € ,3,1
+1,2,Pantalon de chantier,Ciffreo Bona,20 € ,3,1
+1,2,Un savon,Olive et moi,5 € ,3,1
+1,3,Bêche de jardin,Auchan,20 € ,3,1
+1,3,Bon d'achat de 20€,Boucherie Besseas,20 € ,3,1
+1,3,Bouteille de bière,Brasserie Dulion,3 € ,3,1
+1,3,Enceinte bluetooth Hama,Auchan,25 € ,3,1
+1,3,Lot de 5 savons,Olive et moi,25 € ,3,1
+1,3,Tablier en cuir,Auchan,40 € ,3,1
+1,3,Un saucisson,Marché de Genay : Boucherie du petit moulin,7 € ,3,1
+2,1,Adaptateur prise universel,Auchan,15 € ,3,1
+2,1,Bon pour un saucisson à cuire,La ferme de Collonges,7 € ,3,1
+2,1,Bouteille de bière,Brasserie Dulion,3 € ,3,1
+2,1,Casier à clés,Spécifique Immobilier,8 € ,3,1
+2,1,Lampe LED sans fil,Auchan,24 € ,3,1
+2,1,Paire de solaires enfant,Les petites lunettes d'Eloïse,30 € ,3,1
+2,1,Poêle Tefal ingénio 28cm,Auchan,30 € ,3,1
+2,1,Un savon,Olive et moi,5 € ,3,1
+2,2,1 bouteille de bière,Brasserie NEPO,3 € ,3,1
+2,2,Bon d'achat de 10€,Marché de Genay : Les Jardins du Jarez Lionel grange légumes,10 € ,3,1
+2,2,Bon pour un forfait shampoing-coupe-brushing,L'univers de Coralie,35 € ,3,1
+2,2,Bon pour une pizza,Pizza du cèdre,12 € ,3,1
+2,2,Bouteille de bière,Brasserie Dulion,3 € ,3,1
+2,2,Gaufrier,Spécifique Immobilier,30 € ,3,1
+2,2,Tablier en cuir,Auchan,40 € ,3,1
+2,2,Un savon,Olive et moi,5 € ,3,1
+2,3,Bon cadeau de 10€,La panière,10 € ,3,1
+2,3,Bon cadeau de 40€,Resturants Bocuse,40 € ,3,1
+2,3,Bon d'achat de 10€,Marché de Genay : Fromages La Ferme de la Garde,10 € ,3,1
+2,3,Bon pour une coupe garçon enfant,Coiffeur l'antre coupe,19 € ,3,1
+2,3,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+2,3,Calendrier de l'avent chocolats,Aurélien Plassard chocolatier,25 € ,3,1
+2,3,Coffret de 4 bouteilles de bière,Brasserie NEPO,8 € ,3,1
+2,3,Lot de 5 savons,Olive et moi,25 € ,3,1
+2,3,Multi-crêpe Party,Auchan,61 € ,3,1
+2,3,Poêle Tefal ingénio 24cm,Auchan,28 € ,3,1
+2,3,Set ustensiles de cuisine,Spécifique Immobilier,12 € ,3,1
+3,1,Adaptateur prise Europe-UK,Auchan,15 € ,3,1
+3,1,Bon d'achat de 30€,Cigale des mers,30 € ,3,1
+3,1,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+3,1,Moulin à poivre,Spécifique Immobilier,18 € ,3,1
+3,1,Pantalon de chantier,Ciffreo Bona,20 € ,3,1
+3,1,Parure de lit 1 personne,Auchan,30 € ,3,1
+3,1,Téléphone 4G,Auchan,20 € ,3,1
+3,1,Un savon,Olive et moi,5 € ,3,1
+3,2,2 places de concert,Auditorium de Lyon,40 € ,3,1
+3,2,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+3,2,Brosse à barbecue et pics à brochette,Auchan,11 € ,3,1
+3,2,Epilateur lumière pulsée Babyliss,Auchan,60 € ,3,1
+3,2,Lot de 6 tasses à café,Spécifique Immobilier,18 € ,3,1
+3,2,Set apéro,Spécifique Immobilier,9 € ,3,1
+3,2,Tablier en cuir,Auchan,40 € ,3,1
+3,2,Un savon,Olive et moi,5 € ,3,1
+3,2,Une pose de vernis classique,Institut Déclic Beauté,15 € ,3,1
+3,3,Bon d'achat de 50€,Nany's nails,50 € ,3,1
+3,3,Bon pour une consultation,Ostéo C. Leprat,60 € ,3,1
+3,3,Bon pour une pizza,Pizza du cèdre,12 € ,3,1
+3,3,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+3,3,Coffret de 4 bouteilles de bière,Brasserie NEPO,8 € ,3,1
+3,3,Lot de 6 savons,Olive et moi,30 € ,3,1
+3,3,Mini hub USB-C,Auchan,14 € ,3,1
+3,3,Panier garni,La vie Claire,16 € ,3,1
+3,3,Pelle de déneigement ,Auchan,14 € ,3,1
+3,3,Robot pâtissier,Auchan,100 € ,3,1
+4,1,Bon d'achat de 10€,Marché de Genay : Les Jardins du Jarez Lionel grange légumes,10 € ,3,1
+4,1,Bon pour un menu Kebab,Restaurant Karaman,12 € ,3,1
+4,1,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+4,1,Chargeur sans fil Samsung,Auchan,40 € ,3,1
+4,1,Gâche à plâtre,Ciffreo Bona,10 € ,3,1
+4,1,Genouillères de chantier,Ciffreo Bona,10 € ,3,1
+4,1,Grille pain,Auchan,35 € ,3,1
+4,1,Poêle Tefal ingénio 24cm,Auchan,28 € ,3,1
+4,1,Un savon,Olive et moi,5 € ,3,1
+4,1,Un sweat Timberland,Destock Jeans Villefranche ,80 € ,3,1
+4,2,2 bracelets,Les caprices d'MA,10 € ,3,1
+4,2,Anneau à pizza pour barbecue,Auchan,55 € ,3,1
+4,2,Bon d'achat de 10€,La ferme de Piamot,10 € ,3,1
+4,2,Bon d'achat de 25€,Comptoir des pommes,25 € ,3,1
+4,2,Bon pour 5 séances ,Cross Fit,90 € ,3,1
+4,2,Bon pour une pizza,Pizza du cèdre,12 € ,3,1
+4,2,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+4,2,Ciseaux a pizza,Auchan,5 € ,3,1
+4,2,Tablier en cuir,Auchan,40 € ,3,1
+4,2,Un savon,Olive et moi,5 € ,3,1
+4,2,Un sweat Timberland,Destock Jeans Villefranche ,80 € ,3,1
+4,3,4 places pour le spectacle de Noël,Cirque Imagine,68 € ,3,1
+4,3,8 assiettes à dessert,Auchan,28 € ,3,1
+4,3,Bigoudis Cosmopolitan,Spécifique Immobilier,13 € ,3,1
+4,3,Bon d'achat de 15€,La maison by Delphine,15 € ,3,1
+4,3,Bon d'achat de 15€,"Marché de Genay : ""Mon maraicher"" Primeur",15 € ,3,1
+4,3,Bon d'achat de 40€,Poissonnerie Grandguillaume,40 € ,3,1
+4,3,Bon pour un drainage visage,Ostéo Axelle Pellicciotta,75 € ,3,1
+4,3,Bon pour une pizza,Pizza du cèdre,12 € ,3,1
+4,3,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+4,3,Lot de 6 savons,Olive et moi,30 € ,3,1
+4,3,Machine à café Nespresso Delonghi,Abeille assurance,150 € ,3,1
+4,3,Miroir,Spécifique Immobilier,13 € ,3,1
+4,3,Paquet de fourchettes à fondue,Palace de Mélissa,15 € ,3,1
+4,3,Téléphone 4G,Auchan,20 € ,3,1
+5,1,Adaptateur prise universel,Auchan,15 € ,3,1
+5,1,Bon d'achat de 10€,Body & Salopette,10 € ,3,1
+5,1,Bon d'achat de 110€,Jérôme langillier pâtiss' connect,110 € ,3,1
+5,1,Bon d'achat de 15€,Marché de Genay : Le gone Peyquet,15 € ,3,1
+5,1,Bon pour un bilan personnalisé + un soin,Millenium minceur et beauté ,110 € ,3,1
+5,1,Bon pour un repas du jour Entrée+Plat+Dessert,Restaurant L'encrier,22 € ,3,1
+5,1,Bon shampoing+coupe+brush cheveux courts,Calicea,40 € ,3,1
+5,1,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+5,1,Epilateur Silk Epil Braun,Auchan,25 € ,3,1
+5,1,Lot de 3 produits,Au bon vapoteur,10 € ,3,1
+5,1,Lot de 6 savons,Olive et moi,30 € ,3,1
+5,1,Mini bluetooth speaker Qilive,Auchan,20 € ,3,1
+5,1,Modelage Éveil Précieux 25 min,Moment Précieux ,32 € ,3,1
+5,1,Multicuiseur Moulinex Cookeo+,Géomètre Jérôme Combecave,250 € ,3,1
+5,1,Une bouteille de rosé,La cave de Massieux ,10 € ,3,1
+6,1,2 repas offerts pour un vendredi midi,Café du parc,26 € ,3,1
+6,1,3 bouteilles de jus de fruit,Comptoir des pommes,8 € ,3,1
+6,1,Bon d'achat de 30€,Les petites lunettes d'Eloïse,30 € ,3,1
+6,1,Bon pour 1 gateau 6 personnes ,Marché de Genay : Bonin Patisserie,28 € ,3,1
+6,1,Bon pour un saucisson à cuire,La ferme de Collonges,7 € ,3,1
+6,1,Bon pour un soin,Marionnaud,35 € ,3,1
+6,1,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+6,1,Brosse à cheveux séchante volumisante,Auchan,20 € ,3,1
+6,1,Chargeur sans fil Samsung,Auchan,40 € ,3,1
+6,1,Lot de 3 savons,Olive et moi,15 € ,3,1
+6,1,Parure de lit 2 personnes,Auchan,36 € ,3,1
+6,1,Soin Hydradermique,Institut Guinot,95 € ,3,1
+6,1,Un sweat Timberland,Destock Jeans Villefranche ,80 € ,3,1
+6,1,Une coupe homme (sauf samedi),Mod Hair'N Création,23 € ,3,1
+6,2,2 entrées enfant,Parc de Courzieu,28 € ,3,1
+6,2,6 mugs,Auchan,18 € ,3,1
+6,2,Adaptateur prise secteur - USB,Auchan,10 € ,3,1
+6,2,Barbecue à charbon,Auchan,25 € ,3,1
+6,2,Bon d'achat de 100€ sur une révision,Garage Renault MONNIER,100 € ,3,1
+6,2,Bon d'achat de 20€,Opticien KLS,20 € ,3,1
+6,2,Bon pour un bilan personnalisé + deux soins,Millenium minceur et beauté ,170 € ,3,1
+6,2,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+6,2,Lot de 5 savons,Olive et moi,25 € ,3,1
+6,2,Paquet de fourchettes à fondue,Palace de Mélissa,15 € ,3,1
+6,2,Set ustensiles de cuisine,Spécifique Immobilier,12 € ,3,1
+6,2,Tablier en cuir,Auchan,40 € ,3,1
+6,2,Un brush (sauf samedi),Mod Hair'N Création,22 € ,3,1
+6,2,Un repas pour 2 personnes,Restaurant Le Block,50 € ,3,1
+6,2,Un sweat Timberland,Destock Jeans Villefranche ,80 € ,3,1
+6,3,Bon cadeau de 40€,Resturants Bocuse,40 € ,3,1
+6,3,Bon cadeau de 70€,Nelly Cosseron Mazanon - Bien-être périnatal et parental,70 € ,3,1
+6,3,Bon d'achat de 10€,Marché de Genay : Les Jardins du Jarez Lionel grange légumes,10 € ,3,1
+6,3,Bon d'achat de 110€,Jérôme langillier pâtiss' connect,110 € ,3,1
+6,3,Bon d'achat de 20€,Boucherie Besseas,20 € ,3,1
+6,3,Bon pour 1 heure d'atelier valable 3mois,Les récreations d'Hortense,24 € ,3,1
+6,3,Bon pour un drainage corps,Ostéo Axelle Pellicciotta,150 € ,3,1
+6,3,Bon pour une pizza,Pizza du cèdre,12 € ,3,1
+6,3,Bouilloire,Spécifique Immobilier,12 € ,3,1
+6,3,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+6,3,Bracelet,Astrée,35 € ,3,1
+6,3,Deux entrées Enfant,Zoo d'Upie,25 € ,3,1
+6,3,Lot de 6 savons,Olive et moi,30 € ,3,1
+6,3,Mug en porcelaine,Palace de Mélissa,15 € ,3,1
+6,3,"Tablette Samsung 10"" avec enceinte JBL ",Sou des écoles de Genay,430 € ,3,1
+6,3,Une bouteille de rosé,La cave de Massieux ,10 € ,3,1
+7,1,2 bouteilles,La Cave du Moulin,15 € ,3,1
+7,1,Blouson de moto,Moto virus,120 € ,3,1
+7,1,Bon cadeau spa 1h,La maison du bien-être,27 € ,3,1
+7,1,Bon d'achat de 10€,La ferme de Piamot,10 € ,3,1
+7,1,Bon d'achat de 200€,Bis repetita Réemploi,200 € ,3,1
+7,1,Bon d'achat de 40€,Poissonnerie Grandguillaume,40 € ,3,1
+7,1,Bon pour 1 nuit pour 2 personnes + petits déjeuners ,Hôtel Accor Massieux Greet,65 € ,3,1
+7,1,Bon pour un bilan personnalisé + trois soins,Millenium minceur et beauté ,230 € ,3,1
+7,1,Bon pour un repas pour 2 personnes,Restaurant L'épicurieux ,70 € ,3,1
+7,1,Bon pour une révision,Relais Pneus,150 € ,3,1
+7,1,Bon voyage de 800€,Sou des écoles & Fontana,800 € ,3,1
+7,1,Bougie parfumée XXL,Spécifique Immobilier,15 € ,3,1
+7,1,Bouteille de bière,Brasserie Dulion,6 € ,3,1
+7,1,Casque de moto,Moto virus,100 € ,3,1
+7,1,Coffret écouteurs & enceinte,Auchan,25 € ,3,1
+7,1,Collier Cluse,Bijouterie Aigue Marine ,55 € ,3,1
+7,1,Fontaine à chocolat,Spécifique Immobilier,16 € ,3,1
+7,1,Huile de massage ,Passion Mistral,15 € ,3,1
+7,1,"Kit pour piscine (brassards, gilet, bouée, bouée siège, set de water polo)",Auchan,32 € ,3,1
+7,1,Lot de 7 savons,Olive et moi,35 € ,3,1
+8,6,Bougie parfumée Stitch,Spécifique Immobilier,5 € ,3,1
+8,6,Deux feutres et une règle,La maison jaune,8 € ,3,1
+8,6,Jeu Cherche et trouve Minnie,Spécifique Immobilier,10 € ,3,1
+8,6,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,6,Poster à sticker,Poppik,17 € ,3,1
+8,6,Yoyo,Moulin Roty,6 € ,3,1
+8,5,Boite de 30 feutres,Auchan,15 € ,3,1
+8,5,Bon pour un stage d'une journée Baby,Neuville gym,15 € ,3,1
+8,5,Cape Serpentard ,Auchan,14 € ,3,1
+8,5,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,5,Poster à sticker,Poppik,17 € ,3,1
+8,5,Yoyo,Moulin Roty,6 € ,3,1
+8,4,Boite de 30 feutres,Auchan,15 € ,3,1
+8,4,Bon pour un stage d'une journée Baby,Neuville gym,15 € ,3,1
+8,4,Figurine DC Comics,Auchan,20 € ,3,1
+8,4,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,4,Poster à sticker,Poppik,17 € ,3,1
+8,4,Yoyo,Moulin Roty,6 € ,3,1
+8,3,Bon pour un stage d'une journée Kids,Neuville gym,25 € ,3,1
+8,3,Figurine DC Comics,Auchan,20 € ,3,1
+8,3,Jeu Cherche et trouve Stitch,Spécifique Immobilier,10 € ,3,1
+8,3,Lot de 2 cages de foot pop-up,Auchan,8 € ,3,1
+8,3,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,3,Poster à sticker,Poppik,17 € ,3,1
+8,3,Sac à dos Pokémon,Spécifique Immobilier,16 € ,3,1
+8,2,Boite de 30 feutres,Auchan,15 € ,3,1
+8,2,Bon pour un stage d'une journée Kids,Neuville gym,25 € ,3,1
+8,2,Jeu Le sapin magique,Moulin Roty,13 € ,3,1
+8,2,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,2,Microscope 15 expériences ,Sou des écoles de Genay,24 € ,3,1
+8,2,Poster à sticker,Poppik,17 € ,3,1
+8,2,Raquettes de plage enfant,Auchan,3 € ,3,1
+8,1,Bon pour un atelier enfant,Chocolaterie Richart,30 € ,3,1
+8,1,Drone pour enfants,Sou des écoles de Genay,34 € ,3,1
+8,1,Jeu de quilles,Auchan,4 € ,3,1
+8,1,Lot de deux jeux de cartes BioViva,Sou des écoles de Genay,20 € ,3,1
+8,1,Mikado géant,Auchan,12 € ,3,1
+8,1,Porte clés Galaxias,La maison jaune,- € ,3,1
+8,1,Poster à sticker,Poppik,17 € ,3,1
+8,1,Yoyo,Moulin Roty,6 € ,3,1
+#N/A,#N/A,Paire de skis Junior,Rossignol,230 € ,3,1

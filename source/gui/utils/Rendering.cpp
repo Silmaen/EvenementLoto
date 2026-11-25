@@ -115,6 +115,26 @@ void defineActionButtonItem(const std::string& iLabel, const std::string& iActio
 	}
 }
 
+auto confirmDialog(const char* iTitle, const std::string& iMessage, const char* iConfirmLabel) -> bool {
+	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, {0.5f, 0.5f});
+	bool confirmed = false;
+	if (ImGui::BeginPopupModal(iTitle, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings)) {
+		ImGui::PushTextWrapPos(em(28.0f));
+		ImGui::TextWrapped("%s", iMessage.c_str());
+		ImGui::PopTextWrapPos();
+		ImGui::Spacing();
+		if (ImGui::Button(iConfirmLabel)) {
+			confirmed = true;
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Annuler"))
+			ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+	return confirmed;
+}
+
 auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptions) -> bool {
 	const bool iEditable = iOptions.editable;
 	bool changed = false;
@@ -125,6 +145,14 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptio
 			ImGui::BeginDisabled();
 		if (ImGui::Button("Ajouter un lot")) {
 			ioPrizes.emplace_back();
+			changed = true;
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Vider la liste") && !ioPrizes.empty())
+			ImGui::OpenPopup("Vider la liste ?");
+		if (confirmDialog("Vider la liste ?", std::format("Retirer les {} lot(s) de cette liste ?", ioPrizes.size()),
+						  "Vider")) {
+			ioPrizes.clear();
 			changed = true;
 		}
 		if (!iEditable)
@@ -141,10 +169,14 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptio
 				ImGui::GetFrameHeight() + style.ItemInnerSpacing.x + ImGui::CalcTextSize("enfant").x;
 		const float removeWidth = ImGui::CalcTextSize("Retirer").x + style.FramePadding.x * 2.0f;
 		const float avail = ImGui::GetContentRegionAvail().x;
-		const float wideTail = em(11.5f) + checkboxWidth + removeWidth + style.ItemSpacing.x * 4.0f;
+		// Two arrow buttons move the article up or down: that is the order it is shown in.
+		const float arrowsWidth = ImGui::GetFrameHeight() * 2.0f + style.ItemSpacing.x * 2.0f;
+		const float setWidth = iOptions.withSets ? em(6.5f) + style.ItemSpacing.x : 0.0f;
+		const float wideTail =
+				em(11.5f) + checkboxWidth + removeWidth + arrowsWidth + setWidth + style.ItemSpacing.x * 4.0f;
 		const bool compact = avail - wideTail < em(16.0f);
 		// Compact, the names share the first line and the rest gets the whole second one.
-		const float fieldsRoom = compact ? avail - checkboxWidth - removeWidth - style.ItemSpacing.x * 3.0f : em(11.5f);
+		const float fieldsRoom = compact ? avail - checkboxWidth - removeWidth - arrowsWidth - setWidth - style.ItemSpacing.x * 3.0f : em(11.5f);
 		const float valueWidth = std::max(fieldsRoom * 0.48f, em(3.0f));
 		const float appealWidth = std::max(fieldsRoom * 0.52f, em(3.0f));
 		const float tail = compact ? 0.0f : wideTail;
@@ -196,6 +228,34 @@ auto renderPrizeList(core::prizes_type& ioPrizes, const PrizeListOptions& iOptio
 			}
 			if (ImGui::IsItemHovered())
 				ImGui::SetTooltip("L'article peut être mis en jeu dans une partie enfant.");
+			if (iOptions.withSets) {
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(em(6.5f));
+				auto set = static_cast<int>(prize.getSet());
+				if (ImGui::SliderInt("##set", &set, 0, static_cast<int>(core::Prize::g_maxSet), "gagnant %d") &&
+					iEditable) {
+					prize.setSet(static_cast<uint8_t>(set));
+					changed = true;
+				}
+				if (ImGui::IsItemHovered())
+					ImGui::SetTooltip("Le gagnant qui emporte cet article, avec les autres du même numéro.\n"
+									  "0 : l'article suit celui qui le précède dans la liste.");
+			}
+			ImGui::SameLine();
+			// A move changes the list under the loop: the frame ends there, like a removal.
+			const bool moveUp = ImGui::ArrowButton("##up", ImGuiDir_Up) && iEditable && i > 0;
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Monter : le lot s'affiche plus tôt.");
+			ImGui::SameLine();
+			const bool moveDown = ImGui::ArrowButton("##down", ImGuiDir_Down) && iEditable && i + 1 < ioPrizes.size();
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Descendre : le lot s'affiche plus tard.");
+			if (moveUp || moveDown) {
+				std::swap(ioPrizes[i], ioPrizes[moveUp ? i - 1 : i + 1]);
+				ImGui::PopID();
+				ImGui::EndChild();
+				return true;
+			}
 			ImGui::SameLine();
 			if (ImGui::Button("Retirer") && iEditable) {
 				ioPrizes.erase(ioPrizes.begin() + static_cast<ptrdiff_t>(i));
@@ -224,22 +284,31 @@ auto getNextStepStr(const core::Event& iEvent) -> std::string {
 		case core::Event::Status::GameRunning:
 			{
 				const auto currentRound = iEvent.getCurrentCGameRound();
+				if (currentRound == iEvent.endRounds())
+					return "Terminer l'événement";
 				if (currentRound->getType() == core::GameRound::Type::Pause) {
 					return "Fin de la pause";
 				}
-				if (currentRound->getStatus() == core::GameRound::Status::Running) {
-					if (currentRound->isCurrentSubRoundLast()) {
-						if (iEvent.isCurrentGameRoundLast()) {
-							return "Terminer l'événement";
-						}
-						if (iEvent.getNextCGameRound()->getType() == core::GameRound::Type::Pause) {
-							return "Aller en pause";
-						}
-						return "Passer à la partie suivante";
-					}
-					return "Passer à la phase suivante";
+				const auto sub = currentRound->getCurrentSubRound();
+				const bool running = currentRound->getStatus() == core::GameRound::Status::Running &&
+									 sub != currentRound->endSubRound();
+				if (running) {
+					// What the button does depends on the phase, not on how many are left: the lots
+					// are shown first, then the draws run until somebody wins.
+					if (sub->getStatus() == core::SubGameRound::Status::PreScreen)
+						return "Lancer les tirages";
+					if (currentRound->getType() == core::GameRound::Type::Enfant)
+						return "Désigner les gagnants";
+					return "Désigner le gagnant";
 				}
-				return "Lancer la partie";
+				if (currentRound->getStatus() == core::GameRound::Status::Ready)
+					return "Lancer la partie";
+				// The round is over and its end screen is up: the button leaves it.
+				if (iEvent.isCurrentGameRoundLast())
+					return "Terminer l'événement";
+				if (iEvent.getNextCGameRound()->getType() == core::GameRound::Type::Pause)
+					return "Aller en pause";
+				return "Passer à la partie suivante";
 			}
 		case core::Event::Status::EventEnding:
 			return "Terminer l'événement";

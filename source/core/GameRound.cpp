@@ -88,6 +88,40 @@ void GameRound::setType(const Type& iType) {
 	}
 }
 
+void GameRound::migrateChildPhases() {
+	if (m_type != Type::Enfant || m_subGames.size() < 2)
+		return;
+	SubGameRound merged;
+	merged.mergeChildPhases(m_subGames);
+	m_subGames.assign(1, merged);
+}
+
+auto GameRound::setChildWinnerCount(const uint32_t iCount) -> bool {
+	if (m_type != Type::Enfant || !isEditable() || m_subGames.empty())
+		return false;
+	m_subGames.front().setWinnerTarget(iCount);
+	return true;
+}
+
+void GameRound::awardChildWinners(const uint32_t iCount) {
+	const auto sub = getCurrentSubRound();
+	if (m_type != Type::Enfant || m_status != Status::Running || sub == m_subGames.end())
+		return;
+	if (sub->awardWinners(iCount))
+		nextStatus();
+}
+
+auto GameRound::getSubRoundLabel(const size_t iIndex) const -> std::string {
+	if (iIndex >= m_subGames.size())
+		return {};
+	const auto& sub = m_subGames[iIndex];
+	if (m_type != Type::Enfant)
+		return sub.getTypeStr();
+	// How many children win, not which one is being looked for.
+	const auto count = sub.getWinnerTarget();
+	return std::format("{} gagnant{}", count, count > 1 ? "s" : "");
+}
+
 // ---- manipulation du statut ----
 auto GameRound::getStatusStr() const -> std::string { return std::string(enumLabel(g_statusLabels, m_status)); }
 
@@ -130,7 +164,8 @@ auto GameRound::getStateString() const -> std::string {
 		if (m_status == Status::Running) {
 			const auto sub = getCurrentSubRound();
 			if (sub != m_subGames.cend())
-				result += std::format(" - {} - {}", sub->getTypeStr(), sub->getStatusStr());
+				result += std::format(" - {} - {}", getSubRoundLabel(static_cast<size_t>(sub - m_subGames.cbegin())),
+									  sub->getStatusStr());
 		}
 	}
 	return result;
@@ -198,12 +233,28 @@ void GameRound::read(std::istream& iBs, const ReadContext& iContext) {
 		std::string diapo;
 		if (!readString(iBs, diapo))
 			return;
-		if (diapo.empty())
-			return;
-		m_diapoPath = diapo;
-		if (!readRaw(iBs, m_diapoDelay))
-			return;
+		if (!diapo.empty()) {
+			m_diapoPath = diapo;
+			if (!readRaw(iBs, m_diapoDelay))
+				return;
+		}
 	}
+	m_numberHidden = false;
+	m_showPrizes = true;
+	if (iContext.version > 11) {
+		uint8_t hidden = 0;
+		if (!readRaw(iBs, hidden))
+			return;
+		m_numberHidden = hidden != 0;
+	}
+	if (iContext.version > 12) {
+		uint8_t show = 1;
+		if (!readRaw(iBs, show))
+			return;
+		m_showPrizes = show != 0;
+	}
+	if (iContext.version < 13)
+		migrateChildPhases();
 }
 
 void GameRound::write(std::ostream& iBs) const {
@@ -220,6 +271,8 @@ void GameRound::write(std::ostream& iBs) const {
 		if (!diapo.empty())
 			writeRaw(iBs, m_diapoDelay);
 	}
+	writeRaw(iBs, static_cast<uint8_t>(m_numberHidden ? 1 : 0));
+	writeRaw(iBs, static_cast<uint8_t>(m_showPrizes ? 1 : 0));
 }
 
 auto GameRound::toJson() const -> Json::Value {
@@ -228,6 +281,8 @@ auto GameRound::toJson() const -> Json::Value {
 	Json::Value result;
 	result["type"] = getTypeStr();
 	result["Id"] = m_id;
+	result["HideNumber"] = m_numberHidden;
+	result["ShowPrizes"] = m_showPrizes;
 	result["subGames"] = sub;
 	return result;
 }
@@ -235,14 +290,19 @@ auto GameRound::toJson() const -> Json::Value {
 void GameRound::fromJson(const Json::Value& iJson) {
 	m_type = enumFromLabel(g_typeLabels, iJson.get("type", "").asString(), m_type);
 	m_id = iJson.get("Id", 0).asInt();
+	m_numberHidden = iJson.get("HideNumber", false).asBool();
+	m_showPrizes = iJson.get("ShowPrizes", true).asBool();
 	m_subGames.clear();
 	for (auto& jj: iJson.get("subGames", Json::Value::null)) { m_subGames.emplace_back().fromJson(jj); }
+	migrateChildPhases();
 }
 
 auto GameRound::toYaml() const -> YAML::Node {
 	YAML::Node node;
 	node["type"] = getTypeStr();
 	node["Id"] = m_id;
+	node["HideNumber"] = m_numberHidden;
+	node["ShowPrizes"] = m_showPrizes;
 	YAML::Node subGamesNode;
 	for (const auto& game: m_subGames) { subGamesNode.push_back(game.toYaml()); }
 	node["subGames"] = subGamesNode;
@@ -254,6 +314,8 @@ void GameRound::fromYaml(const YAML::Node& iNode) {
 	// donner une partie incomplète, pas une exception au milieu d'une image.
 	m_type = enumFromLabel(g_typeLabels, yamlValue(iNode, "type", std::string{}), m_type);
 	m_id = yamlValue(iNode, "Id", 0);
+	m_numberHidden = yamlValue(iNode, "HideNumber", false);
+	m_showPrizes = yamlValue(iNode, "ShowPrizes", true);
 	m_subGames.clear();
 	if (const auto subGames = yamlChild(iNode, "subGames"); subGames.IsSequence()) {
 		for (const auto& jj: subGames) {
@@ -262,6 +324,7 @@ void GameRound::fromYaml(const YAML::Node& iNode) {
 			m_subGames.push_back(sgr);
 		}
 	}
+	migrateChildPhases();
 	if (m_subGames.empty()) {
 		// Sans sous-partie, la partie serait injouable : son type en redonne la liste.
 		setType(m_type);
@@ -305,18 +368,22 @@ auto GameRound::getSubRound(const uint32_t iIndex) const -> std::vector<SubGameR
 	return std::next(m_subGames.cbegin(), iIndex);
 }
 
-auto GameRound::getName() const -> std::string {
+auto GameRound::getName() const -> std::string { return buildName(false); }
+
+auto GameRound::getDisplayName() const -> std::string { return buildName(m_numberHidden); }
+
+auto GameRound::buildName(const bool iWithoutNumber) const -> std::string {
 	std::stringstream res;
 	// Une pause n'est pas une partie : l'appeler « Partie 3 Pause » trompait l'affichage
 	// comme le rapport. Elle porte son propre nom et sa propre numérotation.
 	if (m_type == Type::Pause) {
 		res << "Pause";
-		if (m_id > 0)
+		if (m_id > 0 && !iWithoutNumber)
 			res << " " << m_id;
 		return res.str();
 	}
 	res << "Partie";
-	if (m_id > 0)
+	if (m_id > 0 && !iWithoutNumber)
 		res << " " << m_id;
 	if (m_type != Type::OneTwoQuineFullCard)
 		res << " " << getTypeStr();

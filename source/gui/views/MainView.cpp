@@ -70,14 +70,17 @@ void MainView::onUpdate() {
 		// Initialize splitter positions if needed
 		// In font heights, so a larger font does not squeeze the panels it fills.
 		const float minBottom = utils::em(12.0f) / size.y;
-		// The bottom panel holds a tab bar and the three draw modes: what it needs to show
-		// them all without a scrollbar.
-		const float maxBottom = 1.f - utils::em(11.0f) / size.y;
+		// What the bottom panel needs to show its tab bar and the three draw modes without a
+		// scrollbar, and the same for the right one: where the splitters start. They can be
+		// pushed further, down to a strip: that panel then scrolls.
+		const float defaultBottom = 1.f - utils::em(11.0f) / size.y;
+		const float defaultLeft = 1.f - utils::em(17.0f) / size.x;
+		const float maxBottom = 1.f - utils::em(4.0f) / size.y;
 		const float minLeft = utils::em(14.0f) / size.x;
-		const float maxLeft = 1.f - utils::em(17.0f) / size.x;
+		const float maxLeft = 1.f - utils::em(6.0f) / size.x;
 		if (resized) {
-			m_leftRightSplit = maxLeft;
-			m_topBottomSplit = maxBottom;
+			m_leftRightSplit = std::min(defaultLeft, maxLeft);
+			m_topBottomSplit = std::min(defaultBottom, maxBottom);
 			log_debug("MainView splitters reset due to resize: Left-Right {}, Top-Bottom {}", m_leftRightSplit,
 					  m_topBottomSplit);
 		}
@@ -157,7 +160,149 @@ void MainView::renderLeftPanel() const {
 	ImGui::EndChild();
 }
 
+auto MainView::renderPrizeAnnouncement() const -> bool {
+	if (m_currentEvent.getStatus() != core::Event::Status::GameRunning)
+		return false;
+	const auto round = m_currentEvent.getCurrentCGameRound();
+	if (round == m_currentEvent.endRounds() || round->getType() == core::GameRound::Type::Pause ||
+		round->getStatus() != core::GameRound::Status::Running)
+		return false;
+	const auto sub = round->getCurrentSubRound();
+	if (sub == round->endSubRound() || sub->getStatus() != core::SubGameRound::Status::PreScreen)
+		return false;
+
+	const auto index = static_cast<size_t>(std::distance(round->beginSubRound(), sub));
+	ImGui::SetWindowFontScale(1.4f);
+	ImGui::Text("%s — %s", round->getName().c_str(), round->getSubRoundLabel(index).c_str());
+	ImGui::SetWindowFontScale(1.0f);
+	ImGui::TextDisabled("Les lots sont à l'écran : à énoncer avant de lancer les tirages.");
+	ImGui::Separator();
+
+	// Everything must be readable at once, with no scrolling: the font shrinks, and the list
+	// goes on to several columns, until the whole of it fits the room that is left.
+	// A children's round announces one set of prizes per winner.
+	const auto prizes =
+			core::announcedPrizes(sub->getPrizes(), round->getType() == core::GameRound::Type::Enfant);
+	const auto detailsOf = [](const core::Prize& iPrize) -> std::string {
+		std::string details;
+		if (!iPrize.getDonor().empty())
+			details = "offert par " + iPrize.getDonor();
+		if (iPrize.getValue() > 0.0)
+			details += std::format("{}valeur {:.2f} €", details.empty() ? "" : "  —  ", iPrize.getValue());
+		return details;
+	};
+	constexpr float detailsFactor = 0.7f;
+	constexpr float setTitleFactor = 0.8f;
+	const std::string total = std::format("Valeur totale : {:.2f} €", sub->getValue());
+	const ImVec2 room = ImGui::GetContentRegionAvail();
+	const float columnGap = utils::em(1.5f);
+	const float totalHeight = ImGui::GetTextLineHeightWithSpacing();
+	const float availHeight = std::max(room.y - totalHeight * 1.5f - ImGui::GetStyle().ItemSpacing.y, 1.0f);
+
+	// Height of one column holding a slice of the prizes, at a given scale and column width.
+	const auto sliceHeight = [&](const size_t iFirst, const size_t iLast, const float iScale,
+								 const float iWidth) -> float {
+		float height = 0.0f;
+		for (size_t i = iFirst; i < iLast; ++i) {
+			const std::string& head = prizes[i].prize->getDesignation();
+			// The spacing between two items does not follow the font scale.
+			if (prizes[i].firstOfSet)
+				height += ImGui::GetTextLineHeight() * iScale * setTitleFactor + ImGui::GetStyle().ItemSpacing.y;
+			height += ImGui::CalcTextSize(head.c_str(), nullptr, false, iWidth / iScale).y * iScale +
+					  ImGui::GetStyle().ItemSpacing.y;
+			if (const auto details = detailsOf(*prizes[i].prize); !details.empty()) {
+				const float small = iScale * detailsFactor;
+				height += ImGui::CalcTextSize(details.c_str(), nullptr, false, iWidth / small).y * small +
+						  ImGui::GetStyle().ItemSpacing.y;
+			}
+		}
+		return height;
+	};
+	const auto fits = [&](const size_t iColumns, const float iScale) -> bool {
+		const float width = (room.x - columnGap * static_cast<float>(iColumns - 1)) / static_cast<float>(iColumns);
+		const size_t perColumn = (prizes.size() + iColumns - 1) / iColumns;
+		for (size_t first = 0; first < prizes.size(); first += perColumn) {
+			if (sliceHeight(first, std::min(first + perColumn, prizes.size()), iScale, width) > availHeight)
+				return false;
+		}
+		return true;
+	};
+	// The largest scale that fits, for each number of columns, and the best of the five.
+	constexpr float maxScale = 3.0f;
+	constexpr float minScale = 0.3f;
+	size_t bestColumns = 1;
+	float bestScale = minScale;
+	for (size_t columns = 1; columns <= 5; ++columns) {
+		float low = minScale;
+		float high = maxScale;
+		for (int step = 0; step < 14; ++step) {
+			const float middle = (low + high) * 0.5f;
+			(fits(columns, middle) ? low : high) = middle;
+		}
+		if (low > bestScale * 1.05f) {
+			bestScale = low;
+			bestColumns = columns;
+		}
+	}
+
+	const float width = (room.x - columnGap * static_cast<float>(bestColumns - 1)) / static_cast<float>(bestColumns);
+	const size_t perColumn = std::max<size_t>((prizes.size() + bestColumns - 1) / bestColumns, 1);
+	// In a child of the room left: should even the smallest type not fit, it scrolls instead of
+	// running over what is below.
+	ImGui::BeginChild("PrizeAnnouncement", {0, availHeight + ImGui::GetStyle().ItemSpacing.y}, ImGuiChildFlags_None);
+	const ImVec2 origin = ImGui::GetCursorPos();
+	for (size_t i = 0; i < prizes.size(); ++i) {
+		const size_t column = i / perColumn;
+		// An item always starts a new line at the left of the window: the column's own left
+		// edge has to be given again before every one.
+		const float columnX = origin.x + static_cast<float>(column) * (width + columnGap);
+		if (i % perColumn == 0)
+			ImGui::SetCursorPos({columnX, origin.y});
+		ImGui::SetCursorPosX(columnX);
+		ImGui::PushTextWrapPos(columnX + width);
+		if (prizes[i].firstOfSet) {
+			ImGui::SetWindowFontScale(bestScale * setTitleFactor);
+			ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "Gagnant %u", prizes[i].set);
+			ImGui::SetCursorPosX(columnX);
+		}
+		ImGui::SetWindowFontScale(bestScale);
+		ImGui::TextUnformatted(prizes[i].prize->getDesignation().c_str());
+		if (const auto details = detailsOf(*prizes[i].prize); !details.empty()) {
+			ImGui::SetCursorPosX(columnX);
+			ImGui::SetWindowFontScale(bestScale * detailsFactor);
+			ImGui::TextDisabled("%s", details.c_str());
+		}
+		ImGui::SetWindowFontScale(1.0f);
+		ImGui::PopTextWrapPos();
+	}
+	ImGui::EndChild();
+	ImGui::Separator();
+	ImGui::SetWindowFontScale(1.2f);
+	ImGui::TextUnformatted(total.c_str());
+	ImGui::SetWindowFontScale(1.0f);
+	return true;
+}
+
 void MainView::renderDrawnNumbersTab() const {
+	// While the lots are on the players' screen, the presenter reads them here instead.
+	if (renderPrizeAnnouncement())
+		return;
+	// The end screen is up: no number to draw, the presenter is told what the room sees.
+	if (m_currentEvent.getStatus() == core::Event::Status::GameRunning) {
+		const auto round = m_currentEvent.getCurrentCGameRound();
+		if (round != m_currentEvent.endRounds() && round->getStatus() == core::GameRound::Status::PostScreen) {
+			const char* message = round->getType() == core::GameRound::Type::Pause ? "Reprise du jeu" : "Fin de partie";
+			const float scale = 3.0f;
+			ImGui::SetWindowFontScale(scale);
+			const ImVec2 size = ImGui::CalcTextSize(message);
+			const ImVec2 avail = ImGui::GetContentRegionAvail();
+			ImGui::SetCursorPos({ImGui::GetCursorPosX() + std::max((avail.x - size.x) * 0.5f, 0.0f),
+								 ImGui::GetCursorPosY() + std::max((avail.y - size.y) * 0.4f, 0.0f)});
+			ImGui::TextUnformatted(message);
+			ImGui::SetWindowFontScale(1.0f);
+			return;
+		}
+	}
 	// Get current event and round
 	if (!m_currentEvent.canDraw()) {
 		ImGui::TextDisabled("Aucun événement en cours");

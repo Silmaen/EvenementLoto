@@ -9,6 +9,26 @@ Une ligne par changement. Ce qui est prévu est dans [ROADMAP.md](ROADMAP.md).
 * Étape du gagnant passable, une manche que personne ne réclame n'arrête plus la partie.
 * Correction des noms de gagnant après la manche, par le menu « Jeu » > « Gagnants ».
 * Lots saisis article par article : désignation, donateur, valeur, attrait, compatibilité enfant.
+* Lots réordonnables par des flèches, dans toutes les listes : c'est l'ordre d'affichage.
+* Bouton « Vider la liste », avec confirmation, dans le catalogue et dans les listes de lots des phases.
+* Bouton « étape suivante » : libellé juste à chaque état (lots affichés, tirages, fin de partie, pause).
+* Fenêtre principale : les panneaux du bas et de droite se réduisent beaucoup plus.
+* Pendant l'affichage des lots, la fenêtre principale les détaille en gros caractères à la place des numéros, pour les énoncer.
+* Écran de fin de partie : la fenêtre principale affiche « Fin de partie » à la place des numéros ; après une pause, les joueurs voient « Reprise du Jeu ».
+* « Tirage aléatoire » grisé (barre d'outils comprise) tant que les lots sont affichés ou que la phase est finie.
+* Catalogue : export PDF des lots, une page par partie et par phase, en gros caractères de taille unique pour le jour J, sans les lots non répartis.
+* Partie enfant : chaque lot porte un numéro de gagnant ; les lots d'un même gagnant sont regroupés en set (« Gagnant N ») dans le PDF, la fenêtre principale et l'écran des joueurs.
+* Import CSV : en partie enfant, la colonne phase est le numéro du gagnant ; la colonne « gagnant » est aussi reconnue.
+* Réglages par défaut : habillage Ardoise, police de 24 px.
+* Partie enfant : une phase, plusieurs gagnants non nommés ; les ex æquo sont départagés au sort et prennent les lots dans l'ordre.
+* Option par partie : afficher ou non les lots aux joueurs (page affichée, mais non remplie).
+* Sauvegarde de secours seulement une fois la partie démarrée, plus pendant la définition du programme.
+* Numéro de partie masquable à l'affichage joueurs ; le tableur importé désigne la partie par ce numéro, non par son rang.
+* Format de sauvegarde 13.
+* Import d'un tableur déjà réparti : colonnes « partie » et « phase », lots mis en jeu dans l'ordre des lignes.
+* Écran des joueurs et aperçu du présentateur : le donateur est aligné à droite de chaque lot.
+* Police et habillage : le changement ne se fait qu'avec « Appliquer » ou « Ok », la taille de police est prise en compte tout de suite.
+* Logos copiés à l'enregistrement dans « <nom>_data », à côté de la partie, et retrouvés si elle change de machine.
 * Liste détaillée des lots sur l'écran de contrôle, avec valeur et donateur.
 * Partie improvisée : ajoutée en cours d'événement, lots facultatifs, jamais devant
   la partie en cours.

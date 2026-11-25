@@ -28,7 +28,10 @@ auto makeEvent() -> Event {
 	event.setOrganizerName("Amicale");
 	event.setLocation("Salle des fêtes");
 	event.setRules("Une ligne\nUne autre");
-	const GameRound round{GameRound::Type::OneTwoQuineFullCard};
+	GameRound round{GameRound::Type::OneTwoQuineFullCard};
+	Prize ham{"un jambon", 45.0};
+	ham.setSet(2);
+	round.getSubRound(0)->setPrizes({ham});
 	event.pushGameRound(round);
 	GameRound pause{GameRound::Type::Pause};
 	pause.setDiapo("images", 5.0);
@@ -95,9 +98,10 @@ static auto readFile(const std::filesystem::path& iPath) -> std::string {
 ///
 /// Every format change adds a file here and keeps the previous ones: a relabelled copy
 /// of the current body would only ever test itself.
-constexpr std::string_view g_currentReference = "reference-v11.lev";
-constexpr std::array<std::string_view, 4> g_legacyReferences{
-		{"reference-v7.lev", "reference-v8.lev", "reference-v9.lev", "reference-v10.lev"}};
+constexpr std::string_view g_currentReference = "reference-v14.lev";
+constexpr std::array<std::string_view, 7> g_legacyReferences{
+		{"reference-v7.lev", "reference-v8.lev", "reference-v9.lev", "reference-v10.lev", "reference-v11.lev",
+		 "reference-v12.lev", "reference-v13.lev"}};
 
 /// The path of a reference file.
 static auto referencePath(const std::string_view iName) -> std::filesystem::path {
@@ -208,7 +212,7 @@ TEST(Serialization, WritingIsDeterministic) {
 }
 
 TEST(Serialization, MatchesTheReferenceFile) {
-	// `test/lib_test/reference-v11.lev` was produced once by the GCC x64 build and is
+	// `test/lib_test/reference-v14.lev` was produced once by the GCC x64 build and is
 	// checked in. Comparing against it is what makes the format verifiably portable:
 	// every toolchain the CI runs — GCC, Clang, MinGW GCC, MinGW Clang — checks the very
 	// same bytes, with nothing to orchestrate.
@@ -277,4 +281,18 @@ TEST(Serialization, AbsurdLengthIsRejected) {
 	std::memcpy(buffer.data() + lengthOffset, &absurd, sizeof(absurd));
 	reSign(buffer);
 	EXPECT_FALSE(tryRead(buffer));
+}
+
+TEST(Serialization, aVersion12FileFromADevelopmentBuildStillReads) {
+	// Version 12 already wrote the hidden-number flag; the prize display and the winner
+	// counts came with 13. The reference below is such a version 12 body.
+	const auto reference = readFile(referencePath("reference-v12.lev"));
+	ASSERT_FALSE(reference.empty());
+	std::istringstream stream(reference, std::ios::in | std::ios::binary);
+	Event restored;
+	restored.read(stream, {});
+	EXPECT_TRUE(stream.good());
+	ASSERT_GT(restored.sizeRounds(), 0);
+	EXPECT_TRUE(restored.getGameRound(0)->isShowingPrizes());
+	EXPECT_EQ(restored.getGameRound(0)->getSubRound(0)->getWinnerTarget(), 1);
 }

@@ -27,6 +27,8 @@ class Prize final : public Serializable {
 public:
 	/// La note d'attractivité la plus haute.
 	static constexpr uint8_t g_maxAttractiveness = 5;
+	/// Le plus grand numéro de gagnant pour un set de lots, comme le nombre de gagnants d'une phase.
+	static constexpr uint8_t g_maxSet = 20;
 
 	/**
 	 * @brief Constructeur.
@@ -119,6 +121,22 @@ public:
 	void setChildFriendly(const bool iChildFriendly) { m_childFriendly = iChildFriendly; }
 
 	/**
+	 * @brief Renvoie le numéro du gagnant dont l'article fait partie du set de lots.
+	 *
+	 * Dans une partie enfant, chaque gagnant emporte un set de lots. Zéro : l'article suit
+	 * celui qui le précède dans la liste.
+	 *
+	 * @return Le numéro du gagnant, de 1 à g_maxSet, ou zéro.
+	 */
+	[[nodiscard]] auto getSet() const -> uint8_t { return m_set; }
+
+	/**
+	 * @brief Définit le numéro du gagnant dont l'article fait partie du set.
+	 * @param iSet Le numéro, borné à g_maxSet.
+	 */
+	void setSet(const uint8_t iSet) { m_set = std::min(iSet, g_maxSet); }
+
+	/**
 	 * @brief Renvoie si l'article est vide, donc sans rien à afficher.
 	 * @return True si rien n'est renseigné.
 	 */
@@ -174,10 +192,33 @@ private:
 	uint8_t m_attractiveness = 0;
 	/// Si l'article peut être mis en jeu dans une partie enfant.
 	bool m_childFriendly = true;
+	/// Le gagnant dont l'article fait partie du set, zéro pour suivre l'article précédent.
+	uint8_t m_set = 0;
 };
 
 /// La liste des articles d'un lot.
 using prizes_type = std::vector<Prize>;
+
+/// Un article tel qu'on l'annonce : à sa place dans l'ordre d'annonce, et dans quel set.
+struct AnnouncedPrize {
+	const Prize* prize = nullptr;///< L'article.
+	uint32_t set = 0;///< Le numéro de gagnant de son set, zéro hors partie enfant.
+	bool firstOfSet = false;///< Premier article de son set : c'est là qu'on titre le set.
+};
+
+/**
+ * @brief Les articles à annoncer, ceux sans désignation écartés.
+ *
+ * Dans une partie enfant, chaque gagnant emporte un set : les articles sont regroupés par
+ * numéro de gagnant, dans l'ordre de ces numéros. Un article sans numéro suit celui qui le
+ * précède, le premier sans numéro étant au gagnant 1. Hors partie enfant, la liste reste dans
+ * son ordre et ne porte aucun set.
+ *
+ * @param iPrizes La liste d'articles.
+ * @param iGroupBySets True pour une partie enfant.
+ * @return Les articles dans l'ordre d'annonce.
+ */
+[[nodiscard]] auto announcedPrizes(const prizes_type& iPrizes, bool iGroupBySets) -> std::vector<AnnouncedPrize>;
 
 /**
  * @brief Somme des valeurs d'une liste d'articles.

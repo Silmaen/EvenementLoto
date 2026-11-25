@@ -69,6 +69,7 @@ Author: Silmaen
   pushed to the next day — and the draw rhythm. `tallyPrizes()` splits the prizes into
   given, unclaimed and remaining; `pauseResumesAt()` gives the time announced on the
   pause screen
+- `PrizePdf` - `buildPrizePdf()` / `writePrizePdf()`: the prize list as a hand-written PDF (standard Helvetica, WinAnsi, no dependency), one page per phase, one text size for the whole document (the largest the fullest phase fits), the longest lists on to further pages
 - `Report` - `buildReport()`: the end-of-event report in Markdown, the single source for
   what the popup shows and what is written to disk
 - `Distribution` - `overview()` dresses the state of the distribution — one entry per
@@ -126,9 +127,13 @@ out-of-range round index used to take the process down.
 Save formats: **8** turned the prizes of a sub-round into a list of articles instead of a
 multi-line string with one value; **9** added the event catalogue; **10** gave each
 article an identifier; **11** added the planned end of the event (a time of day, minutes
-after midnight, −1 for none). Files from versions 3 to 10 still read.
-`test/lib_test/reference-v11.lev` is the checked-in byte reference every toolchain is
-compared against, and `reference-v7/8/9/10.lev` are the compatibility fixtures — every format
+after midnight, −1 for none); **12** lets a round hide its number from the players
+(`GameRound::isNumberHidden()`, `getDisplayName()`); **13** adds `GameRound::isShowingPrizes()` and, per
+sub-round, the number of winners to find and how many were found (a children's round has one phase and several
+winners); **14** gives each prize the number of the winner whose set it belongs to
+(`Prize::getSet()`, `announcedPrizes()` groups a children's round by set). Files from versions 3 to 13 still read.
+`test/lib_test/reference-v14.lev` is the checked-in byte reference every toolchain is
+compared against, and `reference-v7/8/9/10/11/12/13.lev` are the compatibility fixtures — every format
 change adds one and keeps the previous ones, listed in `g_legacyReferences`. A test that
 fabricates an old body byte by byte has to be rewritten at every bump for less than the
 shipped files in `data/` already prove.

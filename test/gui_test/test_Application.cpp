@@ -12,6 +12,7 @@
 #include "gui/utils/Rendering.h"
 
 #include "core/Distribution.h"
+#include "core/Rescue.h"
 #include "gui/views/CataloguePopup.h"
 
 #include <string>
@@ -260,6 +261,47 @@ TEST(gui_Application, ChangesTheFontSizeAtRuntime) {
 	app->run();
 	ASSERT_EQ(app->getState(), Application::State::Closed);
 	EXPECT_GT(ImGui::GetIO().Fonts->Fonts.Size, 0);
+}
+
+namespace {
+/// Asks for another font size once the application runs, and records the size drawn.
+class FontSizeChanger final : public views::View {
+public:
+	void onUpdate() override {
+		++m_frame;
+		if (m_frame == 3)
+			m_before = ImGui::GetFontSize();
+		if (m_frame == 4)
+			Application::get().setFont({}, 34.0f);
+		m_after = ImGui::GetFontSize();
+		m_base = ImGui::GetStyle().FontSizeBase;
+	}
+	[[nodiscard]] auto getName() const -> std::string override { return "font_size_changer"; }
+	[[nodiscard]] auto before() const -> float { return m_before; }
+	[[nodiscard]] auto after() const -> float { return m_after; }
+	[[nodiscard]] auto base() const -> float { return m_base; }
+
+private:
+	int m_frame = 0;
+	float m_before = 0.0f;
+	float m_after = 0.0f;
+	float m_base = 0.0f;
+};
+}// namespace
+
+TEST(gui_Application, TheDrawnFontSizeFollowsTheRequest) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	const auto changer = std::make_shared<FontSizeChanger>();
+	app->addView(changer);
+	app->setMaxFrame(10);
+	app->run();
+	// What is drawn, not only what was stored: the size the style hands to every window.
+	EXPECT_NEAR(changer->base(), 34.0f, 0.5f);
+	EXPECT_NE(changer->after(), changer->before());
+	EXPECT_NEAR(changer->after(), 34.0f, 0.5f);
 }
 
 TEST(gui_Application, RebuildsTheRendererWithoutLosingTheEvent) {
@@ -568,4 +610,75 @@ TEST(gui_Application, DrawsAnEventWhoseLogosAreNotImages) {
 	app->run();
 	EXPECT_EQ(app->getState(), Application::State::Closed);
 	remove_all(tmp);
+}
+
+TEST(gui_Application, NoRescueWhileTheProgrammeIsBeingDefined) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	evl::core::archiveRescue();
+	ASSERT_FALSE(evl::core::findRescue().has_value());
+	ASSERT_TRUE(app->getCurrentEvent().isEditable());
+	app->saveProgress();
+	EXPECT_FALSE(evl::core::findRescue().has_value());
+}
+
+TEST(gui_Application, TheNextStepButtonFollowsTheStateOfTheGame) {
+	using evl::core::Event;
+	using evl::core::GameRound;
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound child{GameRound::Type::Enfant};
+	child.setId(1);
+	child.setChildWinnerCount(2);
+	child.getSubRound(0)->setPrizes({evl::core::Prize{"un jouet", 5.0}, evl::core::Prize{"un livre", 4.0}});
+	event.pushGameRound(child);
+	event.pushGameRound(GameRound{GameRound::Type::Pause});
+	GameRound last{GameRound::Type::OneQuine};
+	last.setId(2);
+	event.pushGameRound(last);
+	ASSERT_EQ(event.getStatus(), Event::Status::Ready);
+	event.nextState();// event starting screen
+	event.nextState();// first round, its lots on screen
+	ASSERT_EQ(event.getStatus(), Event::Status::GameRunning);
+	// The lots are shown: the button starts the draws, it does not announce the pause.
+	EXPECT_EQ(utils::getNextStepStr(event), "Lancer les tirages");
+	event.nextState();
+	EXPECT_EQ(utils::getNextStepStr(event), "Désigner les gagnants");
+	event.awardChildWinnersToCurrentRound(1);
+	EXPECT_EQ(utils::getNextStepStr(event), "Désigner les gagnants");
+	event.awardChildWinnersToCurrentRound(1);
+	// The round is over, its end screen is up, and the pause comes next.
+	EXPECT_EQ(utils::getNextStepStr(event), "Aller en pause");
+	event.nextState();
+	EXPECT_EQ(utils::getNextStepStr(event), "Fin de la pause");
+}
+
+TEST(gui_Application, DrawsThePrizesForThePresenterWhileTheyAreOnScreen) {
+	if (g_needsDisplay)
+		GTEST_SKIP() << "pas de session graphique sur cet agent";
+	const auto app = createApplication(0, nullptr);
+	ASSERT_NE(app, nullptr);
+	using evl::core::Event;
+	using evl::core::GameRound;
+	auto& event = app->getCurrentEvent();
+	event = Event{};
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound round{GameRound::Type::OneQuine};
+	round.setId(1);
+	evl::core::Prize ham{"un jambon", 40.0};
+	ham.setDonor("Boucherie Martin");
+	round.getSubRound(0)->setPrizes({ham, evl::core::Prize{"un panier garni", 25.0}});
+	event.pushGameRound(round);
+	event.nextState();
+	event.nextState();
+	ASSERT_EQ(event.getStatus(), Event::Status::GameRunning);
+	ASSERT_EQ(event.getCurrentCGameRound()->getCurrentSubRound()->getStatus(),
+			  evl::core::SubGameRound::Status::PreScreen);
+	app->setMaxFrame(6);
+	app->run();
+	EXPECT_EQ(app->getState(), Application::State::Closed);
 }

@@ -56,7 +56,10 @@ void ToolBar::onUpdate() {
 	ImGui::SameLine();
 	ImGui::SeparatorEx(ImGuiSeparatorFlags_Vertical);
 	utils::defineActionButtonItem(utils::getNextStepStr(Application::get().getCurrentEvent()), "game_next_step");
-	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick");
+	// Only while numbers can be drawn; the main view also arms it for the draw mode.
+	const auto& event = Application::get().getCurrentEvent();
+	utils::defineActionButtonItem("Tirage Aléatoire", "random_pick",
+								  {.disabled = !event.canDraw() || Application::get().isDrawHeld()});
 	utils::defineActionButtonItem("Annuler dernier tirage", "cancel_pick");
 	ImGui::End();
 	ImGui::PopStyleVar();

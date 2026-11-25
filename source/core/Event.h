@@ -175,7 +175,7 @@ public:
 	[[nodiscard]] auto getOrganizerLogoFull() const -> std::filesystem::path {
 		if (m_organizerLogo.empty())
 			return m_organizerLogo;
-		return getBasePath() / getOrganizerLogo();
+		return resolveAsset(getOrganizerLogo());
 	}
 	/**
 	 * @brief Definition du logo de l’organisateur.
@@ -196,7 +196,7 @@ public:
 	[[nodiscard]] auto getLogoFull() const -> std::filesystem::path {
 		if (m_logo.empty())
 			return m_logo;
-		return getBasePath() / getLogo();
+		return resolveAsset(getLogo());
 	}
 
 	/**
@@ -344,6 +344,14 @@ public:
 	[[nodiscard]] auto findPrizeSlot(uint32_t iId) const -> std::optional<PrizeSlot>;
 
 	/**
+	 * @brief La manche que désignent un numéro de partie et un numéro de phase.
+	 * @param iRound Le numéro défini de la partie (son champ « N° »), non son rang : les pauses ont leur numérotation.
+	 * @param iPhase Le numéro de la phase dans la partie, à partir de 1.
+	 * @return L'emplacement, rien si la partie ou la phase n'existe pas.
+	 */
+	[[nodiscard]] auto slotAt(uint32_t iRound, uint32_t iPhase) const -> std::optional<PrizeSlot>;
+
+	/**
 	 * @brief Déplace un article du catalogue vers une manche, ou l'en retire.
 	 *
 	 * L'ajustement à la main d'une répartition : l'article quitte la manche où il était
@@ -355,6 +363,18 @@ public:
 	 * @return True si l'article est à l'endroit demandé.
 	 */
 	auto assignPrize(uint32_t iId, const std::optional<PrizeSlot>& iTarget) -> bool;
+
+	/**
+	 * @brief Fixe le gagnant dont un article fait partie du set, dans une partie enfant.
+	 *
+	 * Le numéro est écrit au catalogue, qui reste la liste de référence, et sur la copie en
+	 * jeu tant que sa manche n'est pas entamée.
+	 *
+	 * @param iId L'identifiant de l'article, qui doit être au catalogue.
+	 * @param iSet Le numéro de gagnant.
+	 * @return True si l'article a été trouvé.
+	 */
+	auto setPrizeSet(uint32_t iId, uint8_t iSet) -> bool;
 
 	/**
 	 * @brief Fait entrer au catalogue les lots des parties qui n'y sont pas.
@@ -373,6 +393,14 @@ public:
 	 * @return Le nombre d'articles nouvellement entrés au catalogue.
 	 */
 	auto adoptOrphanPrizes() -> std::size_t;
+
+	/**
+	 * @brief Vide le catalogue, et retire des manches modifiables les articles qu'il y avait placés.
+	 *
+	 * Une manche déjà entamée garde ses lots : ce qui est en jeu est en jeu.
+	 * @return Le nombre d'articles retirés du catalogue.
+	 */
+	auto clearCatalogue() -> std::size_t;
 
 	/**
 	 * @brief Remplace le catalogue des lots.
@@ -435,6 +463,12 @@ public:
 	void addWinnerToCurrentRound(const std::string& iWin);
 
 	/**
+	 * @brief Désigne des enfants gagnants dans la partie enfant en cours, sans les nommer.
+	 * @param iCount Le nombre d'enfants qui viennent de gagner.
+	 */
+	void awardChildWinnersToCurrentRound(uint32_t iCount);
+
+	/**
 	 * @brief Passe l’événement en mode d’affichage des règles.
 	 * resumeEvent() permet de retourner au statut précédent.
 	 */
@@ -478,6 +512,15 @@ public:
 	 * @param iBasePath Le chemin vers l’événement
 	 */
 	void setBasePath(const std::filesystem::path& iBasePath);
+
+	/**
+	 * @brief Copie les logos à côté du fichier de partie, dans « <nom>_data ».
+	 *
+	 * Après l'appel, les logos sont relatifs à ce dossier : la partie et ses images se
+	 * déplacent ensemble. Un logo introuvable est laissé tel quel.
+	 * @param iFile Le fichier de partie en cours d'enregistrement.
+	 */
+	void bundleAssets(const std::filesystem::path& iFile);
 
 	/**
 	 * @brief Renvoie le nombre de tirages et la liste des numéros les moins tirés
@@ -581,6 +624,16 @@ private:
 	auto readCatalogue(std::istream& iBs, const ReadContext& iContext) -> bool;
 
 	std::filesystem::path m_basePath;
+
+	/**
+	 * @brief Chemin complet d'une ressource stockée relativement au fichier de partie.
+	 *
+	 * Si elle n'est pas là où le chemin l'annonce (partie copiée sur une autre machine),
+	 * le nom du fichier est cherché à côté de la partie et dans son dossier « *_data ».
+	 * @param iRelative Le chemin stocké.
+	 * @return Le chemin à ouvrir.
+	 */
+	[[nodiscard]] auto resolveAsset(const std::filesystem::path& iRelative) const -> std::filesystem::path;
 
 	/// status change
 	bool m_changed = false;

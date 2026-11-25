@@ -467,3 +467,67 @@ TEST(Event, YamlSerialize) {
 				 "un bon pour un tour à l’urinoir\nun colonel");
 	remove_all(tmp);
 }
+
+TEST(Event, LogosTravelWithTheGameFile) {
+	namespace fs = std::filesystem;
+	const fs::path root = fs::temp_directory_path() / "evl-assets-test";
+	remove_all(root);
+	create_directories(root / "old" / "images");
+	create_directories(root / "new");
+	{
+		std::ofstream(root / "old" / "images" / "logo.svg") << "<svg/>";
+	}
+	Event evt;
+	evt.setBasePath(root / "old" / "partie.lev");
+	evt.setLogo(root / "old" / "images" / "logo.svg");
+	// Saving elsewhere copies the logo next to the new file.
+	const fs::path file = root / "new" / "partie.lev";
+	evt.setBasePath(file);
+	evt.bundleAssets(file);
+	EXPECT_TRUE(exists(root / "new" / "partie_data" / "evenement.svg"));
+	EXPECT_EQ(evt.getLogoFull(), root / "new" / "partie_data" / "evenement.svg");
+	// The whole folder moved to another place: the logo is still found.
+	fs::rename(root / "new", root / "moved");
+	Event moved;
+	moved.setBasePath(root / "moved" / "partie.lev");
+	moved.setLogo("partie_data/evenement.svg");
+	EXPECT_TRUE(exists(moved.getLogoFull()));
+	// A stale relative path is looked up by file name beside the game.
+	moved.setLogo("../../elsewhere/evenement.svg");
+	EXPECT_TRUE(exists(moved.getLogoFull()));
+	remove_all(root);
+}
+
+TEST(Event, cannotDrawWhileThePrizesAreOnTheScreen) {
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Sou");
+	GameRound round{GameRound::Type::OneQuine};
+	round.setId(1);
+	round.getSubRound(0)->setPrizes({Prize{"un jambon", 45.0}});
+	event.pushGameRound(round);
+	event.nextState();// EventStarting
+	event.nextState();// GameRunning
+	for (int step = 0; step < 3 && event.getCurrentCGameRound()->getCurrentSubRound()->getStatus() !=
+										   SubGameRound::Status::PreScreen;
+		 ++step)
+		event.nextState();
+	ASSERT_EQ(event.getCurrentCGameRound()->getCurrentSubRound()->getStatus(), SubGameRound::Status::PreScreen);
+	EXPECT_FALSE(event.canDraw());
+	event.nextState();// the draws start
+	EXPECT_TRUE(event.canDraw());
+}
+
+TEST(Event, aWinnerNumberIsKeptInTheCatalogueAndTheCopyInPlay) {
+	Event event;
+	GameRound child{GameRound::Type::Enfant};
+	child.setId(1);
+	event.pushGameRound(child);
+	event.setCatalogue({Prize{"un jouet", 5.0}});
+	const auto id = event.getCatalogue()[0].getId();
+	ASSERT_TRUE(event.assignPrize(id, Event::PrizeSlot{.round = 0, .subRound = 0}));
+	EXPECT_TRUE(event.setPrizeSet(id, 3));
+	EXPECT_EQ(event.getCatalogue()[0].getSet(), 3);
+	EXPECT_EQ(event.getGameRound(0)->getSubRound(0)->getPrizes()[0].getSet(), 3);
+	EXPECT_FALSE(event.setPrizeSet(9999, 1));
+}

@@ -184,6 +184,52 @@ public:
 	 */
 	void setWinner(const std::string& iWinner);
 
+	/// Le plus grand nombre de gagnants d'une même manche.
+	static constexpr uint32_t g_maxWinners = 20;
+
+	/**
+	 * @brief Le nombre de gagnants que la manche désigne avant de finir.
+	 *
+	 * Un seul pour une manche ordinaire. La partie enfant en a plusieurs dans la même
+	 * manche : le premier enfant à remplir une ligne gagne le premier lot et sort du jeu,
+	 * puis le deuxième le lot suivant, sans que leurs noms soient notés.
+	 * @return Le nombre de gagnants prévu.
+	 */
+	[[nodiscard]] auto getWinnerTarget() const -> uint32_t { return m_winnerTarget; }
+
+	/**
+	 * @brief Règle le nombre de gagnants prévu, de 1 à `g_maxWinners`.
+	 * @param iCount Le nombre voulu.
+	 */
+	void setWinnerTarget(uint32_t iCount);
+
+	/**
+	 * @brief Le nombre de gagnants déjà désignés dans cette manche.
+	 * @return Le nombre de gagnants trouvés.
+	 */
+	[[nodiscard]] auto getWinnersFound() const -> uint32_t { return m_winnersFound; }
+
+	/**
+	 * @brief Fond en une seule manche les phases d'une ancienne partie enfant.
+	 *
+	 * Avant la version 13, une partie enfant avait une phase par gagnant. Elles deviennent
+	 * une phase à plusieurs gagnants : les lots se suivent dans l'ordre des phases, chaque
+	 * phase terminée compte pour un gagnant trouvé, et la manche garde l'état et les tirages
+	 * de la première phase restée en cours, ou de la dernière si toutes sont finies.
+	 * @param iPhases Les phases d'origine, au moins une.
+	 */
+	void mergeChildPhases(const std::vector<SubGameRound>& iPhases);
+
+	/**
+	 * @brief Désigne des gagnants sans les nommer : ils prennent les lots suivants.
+	 *
+	 * La manche reste en cours tant que le nombre prévu n'est pas atteint, et se termine
+	 * dès qu'il l'est. Des gagnants en trop sont ignorés.
+	 * @param iCount Combien d'enfants viennent de gagner, à égalité s'ils sont plusieurs.
+	 * @return True si la manche est terminée.
+	 */
+	auto awardWinners(uint32_t iCount) -> bool;
+
 	/**
 	 * @brief Corrige le nom du gagnant, sans toucher au déroulement.
 	 *
@@ -287,6 +333,10 @@ private:
 	prizes_type m_prizes;
 	/// Le nom du gagnant
 	std::string m_winner;
+	/// Le nombre de gagnants à désigner avant que la manche finisse.
+	uint8_t m_winnerTarget = 1;
+	/// Le nombre de gagnants déjà désignés.
+	uint8_t m_winnersFound = 0;
 	/// La liste des numéros tirés.
 	draws_type m_draws;
 	/// La date et heure de début de partie

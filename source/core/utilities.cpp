@@ -22,7 +22,11 @@ namespace evl::core {
 // 10: every prize article carries an identifier, which is what links an article of the
 // catalogue to the copy placed in a sub-round. Articles read from an older file are
 // given one by the event.
-constexpr uint16_t g_currentSaveVersion = 11;
+// 12: a game round can hide its number from the players.
+// 13: a game round can keep its prizes off the players' screen, and a sub-round carries a
+// number of winners to find (a children's round has several) and how many were found.
+// 14: a prize carries the number of the winner whose set of prizes it belongs to.
+constexpr uint16_t g_currentSaveVersion = 14;
 
 namespace {
 

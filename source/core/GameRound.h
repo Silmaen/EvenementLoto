@@ -77,6 +77,54 @@ public:
 	 */
 	void setType(const Type& iType);
 
+	/**
+	 * @brief Règle le nombre de gagnants d'une partie enfant.
+	 *
+	 * Une partie enfant n'a qu'une phase, mais plusieurs gagnants : le premier enfant qui
+	 * remplit une ligne gagne le premier lot et sort du jeu, puis le deuxième le lot
+	 * suivant, jusqu'à épuiser le nombre prévu. Leurs noms ne sont pas notés.
+	 *
+	 * @param iCount Le nombre de gagnants, ramené entre 1 et `SubGameRound::g_maxWinners`.
+	 * @return True si la partie est une partie enfant encore modifiable.
+	 */
+	auto setChildWinnerCount(uint32_t iCount) -> bool;
+
+	/**
+	 * @brief Désigne des enfants gagnants dans la phase en cours, sans les nommer.
+	 *
+	 * À égalité, ils prennent les lots dans l'ordre où le départage les a classés. La
+	 * partie avance d'elle-même quand le dernier gagnant prévu est trouvé.
+	 * @param iCount Le nombre d'enfants qui viennent de gagner.
+	 */
+	void awardChildWinners(uint32_t iCount);
+
+	/**
+	 * @brief Dit si la partie affiche ses lots aux joueurs.
+	 *
+	 * Éteint, la page s'affiche comme d'habitude mais sans être remplie.
+	 * @return True si les lots sont affichés.
+	 */
+	[[nodiscard]] auto isShowingPrizes() const -> bool { return m_showPrizes; }
+
+	/**
+	 * @brief Affiche ou cache les lots aux joueurs.
+	 * @param iShow True pour les afficher.
+	 */
+	void setShowPrizes(const bool iShow) {
+		if (!isEditable()) {
+			log_warn("Impossible de modifier l'affichage des lots d'une partie non éditable");
+			return;
+		}
+		m_showPrizes = iShow;
+	}
+
+	/**
+	 * @brief Le nom d'une phase, qui dit le rang du gagnant dans une partie enfant.
+	 * @param iIndex L'index de la phase.
+	 * @return « 6 gagnants » pour une partie enfant, le type de la phase sinon.
+	 */
+	[[nodiscard]] auto getSubRoundLabel(size_t iIndex) const -> std::string;
+
 	// ---- manipulation du statut ----
 	/**
 	 * @brief Renvoie une chaine contenant le statut de la partie.
@@ -248,6 +296,27 @@ public:
 	}
 
 	/**
+	 * @brief Dit si le numéro de la partie reste caché aux joueurs.
+	 *
+	 * Une partie hors numérotation, la partie enfant par exemple, garde un numéro en
+	 * interne — c'est lui que le tableur d'import désigne — sans l'afficher.
+	 * @return True si le numéro n'est pas affiché.
+	 */
+	[[nodiscard]] auto isNumberHidden() const -> bool { return m_numberHidden; }
+
+	/**
+	 * @brief Cache ou montre le numéro de la partie aux joueurs.
+	 * @param iHidden True pour le cacher.
+	 */
+	void setNumberHidden(const bool iHidden) {
+		if (!isEditable()) {
+			log_warn("Impossible de modifier l'affichage du numéro d'une partie non éditable");
+			return;
+		}
+		m_numberHidden = iHidden;
+	}
+
+	/**
 	 * @brief Renvoie le numéro d'affichage de la partie
 	 * @return Le numéro d'affichage
 	 */
@@ -262,6 +331,12 @@ public:
 	 * @return Nom du round
 	 */
 	[[nodiscard]] auto getName() const -> std::string;
+
+	/**
+	 * @brief Le nom tel que les joueurs le voient : sans le numéro s'il est caché.
+	 * @return Le nom d'affichage.
+	 */
+	[[nodiscard]] auto getDisplayName() const -> std::string;
 
 	/**
 	 * @brief Renvoie si cette partie n'est qu'une pause.
@@ -347,8 +422,18 @@ public:
 	[[nodiscard]] auto isEditable() const -> bool;
 
 private:
+	/// Ramène à une phase les anciennes parties enfant, qui en avaient une par gagnant.
+	void migrateChildPhases();
+
+	/// Le nom de la partie, avec ou sans son numéro.
+	[[nodiscard]] auto buildName(bool iWithoutNumber) const -> std::string;
+
 	/// Le numéro de la partie (à ne pas afficher si négatif)
 	int m_id = 0;
+	/// Le numéro est bien là, mais les joueurs ne le voient pas.
+	bool m_numberHidden = false;
+	/// Les lots sont montrés aux joueurs.
+	bool m_showPrizes = true;
 
 	/// Le type de partie.
 	Type m_type = Type::OneTwoQuineFullCard;

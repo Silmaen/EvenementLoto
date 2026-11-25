@@ -115,7 +115,7 @@ Application::Application() {
 	setTheme(m_theme);
 	// La police retenue au dernier lancement, honorée à la première image.
 	m_mainWindow.requestFont(core::getSettings()->getValue<std::string>("gui/font_path", {}),
-							 core::getSettings()->getValue<float>("gui/font_size", 20.0f));
+							 core::getSettings()->getValue<float>("gui/font_size", Theme::g_defaultFontSize));
 
 	m_mainWindow.setEventCallback([this]<typename T>(T&& ioEvent) -> auto { onEvent(std::forward<T>(ioEvent)); });
 
@@ -393,8 +393,9 @@ void Application::setDisplayPreview(const bool iDisplay) {
 }
 
 void Application::autoSave(const bool iForce) {
-	const auto status = m_currentEvent.getStatus();
-	if (status == core::Event::Status::Invalid || status == core::Event::Status::Finished)
+	// Nothing to rescue while the programme is still being defined: a rescue file is the
+	// trace of a game that was started, and the .lev saved by hand covers the rest.
+	if (m_currentEvent.isEditable() || m_currentEvent.getStatus() == core::Event::Status::Finished)
 		return;
 	const auto now = core::clock::now();
 	if (!iForce && core::durationSeconds(now - m_lastAutoSave) < g_autoSavePeriodSeconds)

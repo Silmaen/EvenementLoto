@@ -66,6 +66,14 @@ private:
 	 */
 	static void settle(const std::string& iWinner);
 
+	/// The step of a children's round: who is next, without names. Drawn instead of the claimants.
+	void renderChildWinners();
+
+	/// How many children won at once, an index-free count.
+	int m_tieCount = 1;
+	/// The order the tie-break gave them, empty before the draw: child i takes the i-th prize.
+	std::vector<size_t> m_order;
+
 	/// What the room called out, one entry per claimant.
 	std::vector<std::string> m_claimants;
 	/// Which claimant carries the prize, an index in the list above.

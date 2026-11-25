@@ -165,27 +165,22 @@ void MainConfigPopups::renderAppearanceTab() {
 	ImGui::SameLine(labelWidth());
 	ImGui::SetNextItemWidth(utils::em(10.0f));
 	{
-		const auto current = Application::get().getTheme().preset;
-		int selected = static_cast<int>(current);
+		int selected = static_cast<int>(m_data.themePreset);
 		std::string names;
 		for (const auto& candidate: magic_enum::enum_values<Theme::Preset>()) {
 			names += Theme::presetName(candidate);
 			names += '\0';
 		}
 		names += '\0';
-		if (ImGui::Combo("##ThemePreset", &selected, names.c_str())) {
-			Application::get().setTheme(Theme::fromPreset(static_cast<Theme::Preset>(selected)));
-			log_info("Habillage appliqué : {}", Theme::presetName(static_cast<Theme::Preset>(selected)));
-		}
+		if (ImGui::Combo("##ThemePreset", &selected, names.c_str()))
+			m_data.themePreset = static_cast<Theme::Preset>(selected);
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Réappliquer")) {
-		const auto current = Application::get().getTheme().preset;
-		Application::get().setTheme(Theme::fromPreset(current));
-	}
+	if (ImGui::Button("Réappliquer"))
+		m_data.resetTheme = true;
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Revenir aux couleurs de l'habillage, en oubliant les retouches.");
-	ImGui::TextDisabled("Le changement est immédiat.");
+	ImGui::TextDisabled("Pris en compte avec « Appliquer » ou « Ok ».");
 
 	ImGui::SeparatorText("Police d'interface");
 	ImGui::AlignTextToFramePadding();
@@ -385,6 +380,13 @@ void MainConfigPopups::dataToSettings() {
 	// La police n'est pas qu'un réglage : elle demande la reconstruction de l'atlas, qui
 	// aura lieu au début de l'image suivante.
 	Application::get().setFont(m_data.fontPath, m_data.fontSize);
+	// The look changes here and nowhere else: choosing in the list only prepares it. Left
+	// alone when nothing was asked, so the colours edited since are not reset.
+	if (const auto current = Application::get().getTheme().preset; m_data.resetTheme || m_data.themePreset != current) {
+		Application::get().setTheme(Theme::fromPreset(m_data.themePreset));
+		log_info("Habillage appliqué : {}", Theme::presetName(m_data.themePreset));
+	}
+	m_data.resetTheme = false;
 }
 
 void MainConfigPopups::settingsToData() {
@@ -396,6 +398,8 @@ void MainConfigPopups::settingsToData() {
 	m_data.displayServer = settings.getValue<std::string>("display_server", defaults.displayServer);
 	m_data.fontPath = settings.getValue<std::string>("font_path", defaults.fontPath.string());
 	m_data.fontSize = settings.getValue<float>("font_size", defaults.fontSize);
+	m_data.themePreset = Application::get().getTheme().preset;
+	m_data.resetTheme = false;
 	m_data.drawDelay = settings.getValue<float>("draw_delay", defaults.drawDelay);
 	m_data.pauseDuration = settings.getValue<float>("pause_duration", defaults.pauseDuration);
 	m_data.titleScale = settings.getValue<float>("title_scale", defaults.titleScale);
@@ -819,14 +823,40 @@ void GameRoundConfigPopups::renderSecondColumn() {
 		if (ImGui::InputInt("##RoundNumber", &id, 1, 100, ImGuiInputTextFlags_CharsDecimal)) {
 			currentRound->setId(id);
 		}
+		bool hideNumber = currentRound->isNumberHidden();
+		if (ImGui::Checkbox("Numéro caché aux joueurs", &hideNumber))
+			currentRound->setNumberHidden(hideNumber);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Pour une partie hors numérotation, la partie enfant par exemple : le numéro reste\n"
+							  "celui que désigne un tableur importé, mais l'écran des joueurs ne l'affiche pas.");
+		bool showPrizes = currentRound->isShowingPrizes();
+		if (ImGui::Checkbox("Afficher les lots aux joueurs", &showPrizes))
+			currentRound->setShowPrizes(showPrizes);
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Décoché, la page des lots s'affiche comme d'habitude, mais sans être remplie.");
+
+		if (currentRound->getType() == core::GameRound::Type::Enfant) {
+			ImGui::AlignTextToFramePadding();
+			ImGui::TextUnformatted("Gagnants");
+			ImGui::SameLine(utils::em(4.0f));
+			ImGui::SetNextItemWidth(-1);
+			int winners = static_cast<int>(currentRound->getSubRound(0)->getWinnerTarget());
+			if (ImGui::InputInt("##ChildWinners", &winners, 1, 5))
+				currentRound->setChildWinnerCount(static_cast<uint32_t>(std::max(winners, 1)));
+			if (ImGui::IsItemHovered())
+				ImGui::SetTooltip("Une seule phase, plusieurs gagnants : le premier enfant qui remplit une ligne gagne\n"
+								  "le premier lot et sort du jeu, puis le deuxième le lot suivant, et ainsi de suite.\n"
+								  "Les noms ne sont pas notés : prévoir autant de lots que de gagnants.");
+		}
 
 		ImGui::Spacing();
 
 		// Liste des sous-parties
 		if (ImGui::BeginListBox("##SubRoundList", ImVec2(-1, -1))) {
 			for (size_t i = 0; i < currentRound->sizeSubRound(); ++i) {
-				const auto subRound = currentRound->getSubRound(static_cast<uint32_t>(i));
-				const std::string name = std::format("Phase {} : {}", i, subRound->getTypeStr());
+				const std::string name = currentRound->getType() == core::GameRound::Type::Enfant
+												 ? currentRound->getSubRoundLabel(i)
+												 : std::format("Phase {} : {}", i + 1, currentRound->getSubRoundLabel(i));
 				if (const bool isSelected = m_selectedSubRound == i; ImGui::Selectable(name.c_str(), isSelected)) {
 					m_selectedSubRound = i;
 				}
@@ -893,7 +923,9 @@ void GameRoundConfigPopups::renderThirdColumn() {
 			auto prizes = subRound->getPrizes();
 			if (utils::renderPrizeList(
 						prizes,
-						{.editable = editable, .size = {0, -(ImGui::GetFrameHeightWithSpacing() + utils::em(1.5f))}}) &&
+						{.editable = editable,
+						 .size = {0, -(ImGui::GetFrameHeightWithSpacing() + utils::em(1.5f))},
+						 .withSets = currentRound->getType() == core::GameRound::Type::Enfant}) &&
 				editable)
 				subRound->setPrizes(prizes);
 		} else {

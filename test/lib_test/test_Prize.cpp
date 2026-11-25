@@ -152,3 +152,41 @@ TEST(Prize, anArticleWithoutAnIdentifierStillReads) {
 	EXPECT_STREQ(restored.getDesignation().c_str(), "un lot ancien");
 	EXPECT_NEAR(restored.getValue(), 12.0, 0.001);
 }
+
+TEST(Prize, announcedKeepsTheListOrderOutsideAChildRound) {
+	Prize a{"A"};
+	a.setSet(2);
+	const prizes_type prizes{a, Prize{"B"}, Prize{}};
+	const auto announced = announcedPrizes(prizes, false);
+	ASSERT_EQ(announced.size(), 2);
+	EXPECT_EQ(announced[0].set, 0);
+	EXPECT_FALSE(announced[0].firstOfSet);
+}
+
+TEST(Prize, anArticleWithoutASetFollowsThePreviousOne) {
+	Prize a{"A"};
+	a.setSet(2);
+	Prize c{"C"};
+	c.setSet(1);
+	const prizes_type prizes{Prize{"first"}, a, Prize{"B"}, c};
+	const auto announced = announcedPrizes(prizes, true);
+	ASSERT_EQ(announced.size(), 4);
+	// « first » has no set before it: winner 1, with C. A and B are winner 2's.
+	EXPECT_EQ(announced[0].set, 1);
+	EXPECT_EQ(announced[1].set, 1);
+	EXPECT_EQ(announced[2].set, 2);
+	EXPECT_EQ(announced[3].set, 2);
+	EXPECT_TRUE(announced[2].firstOfSet);
+}
+
+TEST(Prize, theSetIsBoundedAndSurvivesSerialization) {
+	Prize prize{"A"};
+	prize.setSet(200);
+	EXPECT_EQ(prize.getSet(), Prize::g_maxSet);
+	std::ostringstream out(std::ios::out | std::ios::binary);
+	prize.write(out);
+	std::istringstream in(out.str(), std::ios::in | std::ios::binary);
+	Prize back;
+	back.read(in, {.version = getSaveVersion()});
+	EXPECT_EQ(back.getSet(), Prize::g_maxSet);
+}

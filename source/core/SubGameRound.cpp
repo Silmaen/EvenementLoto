@@ -81,6 +81,46 @@ void SubGameRound::setWinner(const std::string& iWinner) {
 	m_end = clock::now();
 }
 
+void SubGameRound::mergeChildPhases(const std::vector<SubGameRound>& iPhases) {
+	if (iPhases.empty())
+		return;
+	const auto unfinished = std::ranges::find_if(iPhases, [](const SubGameRound& iPhase) -> bool { return !iPhase.isFinished(); });
+	const auto& reference = unfinished != iPhases.end() ? *unfinished : iPhases.back();
+	auto merged = iPhases.front();
+	merged.m_prizes.clear();
+	uint32_t finished = 0;
+	for (const auto& phase: iPhases) {
+		merged.m_prizes.insert(merged.m_prizes.end(), phase.m_prizes.begin(), phase.m_prizes.end());
+		if (phase.isFinished())
+			++finished;
+	}
+	merged.m_status = reference.m_status;
+	merged.m_draws = reference.m_draws;
+	merged.m_end = reference.m_end;
+	merged.m_winnerTarget = static_cast<uint8_t>(std::clamp(static_cast<uint32_t>(iPhases.size()), 1U, g_maxWinners));
+	merged.m_winnersFound = static_cast<uint8_t>(std::min<uint32_t>(finished, merged.m_winnerTarget));
+	merged.m_winner = unfinished == iPhases.end() ? std::format("{} gagnant(s)", merged.m_winnerTarget) : std::string{};
+	*this = merged;
+}
+
+void SubGameRound::setWinnerTarget(const uint32_t iCount) {
+	if (!isEditable()) {
+		log_warn("Impossible de modifier le nombre de gagnants d'une manche non éditable");
+		return;
+	}
+	m_winnerTarget = static_cast<uint8_t>(std::clamp(iCount, 1U, g_maxWinners));
+}
+
+auto SubGameRound::awardWinners(const uint32_t iCount) -> bool {
+	if (m_status != Status::Running)
+		return false;
+	m_winnersFound = static_cast<uint8_t>(std::min<uint32_t>(m_winnersFound + iCount, m_winnerTarget));
+	if (m_winnersFound < m_winnerTarget)
+		return false;
+	setWinner(std::format("{} gagnant(s)", m_winnerTarget));
+	return true;
+}
+
 void SubGameRound::read(std::istream& iBs, const ReadContext& iContext) {
 	if (iContext.version > getSaveVersion()) {
 		iBs.setstate(std::ios::failbit);
@@ -113,6 +153,20 @@ void SubGameRound::read(std::istream& iBs, const ReadContext& iContext) {
 		return;
 	if (iContext.version > 5 && (!readTimePoint(iBs, m_start) || !readTimePoint(iBs, m_end)))
 		return;
+	m_winnerTarget = 1;
+	m_winnersFound = 0;
+	if (iContext.version > 12) {
+		uint8_t target = 1;
+		uint8_t found = 0;
+		if (!readRaw(iBs, target) || !readRaw(iBs, found))
+			return;
+		if (target < 1 || target > g_maxWinners || found > target) {
+			iBs.setstate(std::ios::failbit);
+			return;
+		}
+		m_winnerTarget = target;
+		m_winnersFound = found;
+	}
 }
 
 auto SubGameRound::readPrizes(std::istream& iBs, const ReadContext& iContext) -> bool {
@@ -137,12 +191,16 @@ void SubGameRound::write(std::ostream& iBs) const {
 	writeVector(iBs, m_draws);
 	writeTimePoint(iBs, m_start);
 	writeTimePoint(iBs, m_end);
+	writeRaw(iBs, m_winnerTarget);
+	writeRaw(iBs, m_winnersFound);
 }
 
 auto SubGameRound::toJson() const -> Json::Value {
 	Json::Value value;
 	value["type"] = getTypeStr();
 	value["winner"] = m_winner;
+	value["winnerTarget"] = m_winnerTarget;
+	value["winnersFound"] = m_winnersFound;
 	Json::Value prizesArray(Json::arrayValue);
 	for (const auto& prize: m_prizes) { prizesArray.append(prize.toJson()); }
 	value["prizes"] = prizesArray;
@@ -159,6 +217,8 @@ void SubGameRound::fromJson(const Json::Value& iJson) {
 	if (const auto val = iJson.get("winner", ""); val.isString()) {
 		m_winner = val.asString();
 	}
+	m_winnerTarget = static_cast<uint8_t>(std::clamp(iJson.get("winnerTarget", 1).asInt(), 1, static_cast<int>(g_maxWinners)));
+	m_winnersFound = static_cast<uint8_t>(std::clamp(iJson.get("winnersFound", 0).asInt(), 0, static_cast<int>(m_winnerTarget)));
 	if (const auto val = iJson.get("prizes", ""); val.isArray()) {
 		m_prizes.clear();
 		for (const auto& item: val) {
@@ -187,6 +247,8 @@ auto SubGameRound::toYaml() const -> YAML::Node {
 	YAML::Node node;
 	node["type"] = getTypeStr();
 	node["winner"] = m_winner;
+	node["winnerTarget"] = static_cast<int>(m_winnerTarget);
+	node["winnersFound"] = static_cast<int>(m_winnersFound);
 	YAML::Node prizesNode;
 	for (const auto& prize: m_prizes) { prizesNode.push_back(prize.toYaml()); }
 	node["prizes"] = prizesNode;
@@ -199,6 +261,8 @@ auto SubGameRound::toYaml() const -> YAML::Node {
 void SubGameRound::fromYaml(const YAML::Node& iNode) {
 	m_type = enumFromLabel(g_typeLabels, yamlValue(iNode, "type", std::string{}), m_type);
 	m_winner = yamlValue(iNode, "winner", std::string{});
+	m_winnerTarget = static_cast<uint8_t>(std::clamp(yamlValue(iNode, "winnerTarget", 1), 1, static_cast<int>(g_maxWinners)));
+	m_winnersFound = static_cast<uint8_t>(std::clamp(yamlValue(iNode, "winnersFound", 0), 0, static_cast<int>(m_winnerTarget)));
 	m_prizes.clear();
 	if (const auto prizesNode = yamlChild(iNode, "prizes"); prizesNode.IsSequence()) {
 		for (const auto& item: prizesNode) {

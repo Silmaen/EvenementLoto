@@ -51,6 +51,7 @@ void loadFrom(const std::filesystem::path& iFile) {
 void saveTo(const std::filesystem::path& iFile) {
 	auto& app = Application::get();
 	app.getCurrentEvent().setBasePath(iFile);
+	app.getCurrentEvent().bundleAssets(iFile);
 	if (!core::writeFileAtomically(iFile,
 								   [&app](std::ostream& oStream) -> void { app.getCurrentEvent().write(oStream); })) {
 		log_error("Failed to save file '{}'.", iFile.string());

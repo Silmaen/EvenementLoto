@@ -313,3 +313,104 @@ TEST(GameRound, APauseStepsWithoutSubRounds) {
 	pause.nextStatus();
 	EXPECT_TRUE(pause.isFinished());
 }
+
+TEST(GameRound, aChildRoundHasOnePhaseAndSeveralWinners) {
+	GameRound child{GameRound::Type::Enfant};
+	EXPECT_EQ(child.sizeSubRound(), 1);
+	EXPECT_TRUE(child.setChildWinnerCount(3));
+	EXPECT_EQ(child.sizeSubRound(), 1);
+	EXPECT_EQ(child.getSubRound(0)->getWinnerTarget(), 3);
+	EXPECT_STREQ(child.getSubRoundLabel(0).c_str(), "3 gagnants");
+	EXPECT_TRUE(child.setChildWinnerCount(0));
+	EXPECT_EQ(child.getSubRound(0)->getWinnerTarget(), 1);
+	EXPECT_STREQ(child.getSubRoundLabel(0).c_str(), "1 gagnant");
+	EXPECT_TRUE(child.setChildWinnerCount(1000));
+	EXPECT_EQ(child.getSubRound(0)->getWinnerTarget(), SubGameRound::g_maxWinners);
+	// The other types do not have several winners.
+	GameRound normal{GameRound::Type::OneTwoQuineFullCard};
+	EXPECT_FALSE(normal.setChildWinnerCount(5));
+	EXPECT_EQ(normal.sizeSubRound(), 3);
+}
+
+TEST(GameRound, childWinnersTakeThePrizesOneAfterTheOther) {
+	GameRound child{GameRound::Type::Enfant};
+	ASSERT_TRUE(child.setChildWinnerCount(3));
+	child.nextStatus();// the round runs
+	child.getCurrentSubRound()->nextStatus();
+	ASSERT_EQ(child.getCurrentSubRound()->getStatus(), SubGameRound::Status::Running);
+	child.awardChildWinners(1);
+	EXPECT_EQ(child.getCurrentSubRound()->getWinnersFound(), 1);
+	EXPECT_STREQ(child.getSubRoundLabel(0).c_str(), "3 gagnants");
+	EXPECT_EQ(child.getCurrentSubRound()->getStatus(), SubGameRound::Status::Running);
+	// A tie: two children at once take the two last prizes, and the phase is over.
+	child.awardChildWinners(2);
+	EXPECT_EQ(child.getSubRound(0)->getWinnersFound(), 3);
+	EXPECT_TRUE(child.getSubRound(0)->isFinished());
+	// Too many winners are ignored.
+	child.awardChildWinners(5);
+	EXPECT_EQ(child.getSubRound(0)->getWinnersFound(), 3);
+}
+
+TEST(GameRound, theWinnerProgressOfAChildRoundSurvivesASave) {
+	GameRound child{GameRound::Type::Enfant};
+	ASSERT_TRUE(child.setChildWinnerCount(4));
+	child.nextStatus();
+	child.getCurrentSubRound()->nextStatus();
+	child.awardChildWinners(2);
+	std::stringstream stream;
+	child.write(stream);
+	GameRound read;
+	read.read(stream, {.version = getSaveVersion(), .wideEnums = false});
+	EXPECT_EQ(read.getSubRound(0)->getWinnerTarget(), 4);
+	EXPECT_EQ(read.getSubRound(0)->getWinnersFound(), 2);
+}
+
+TEST(GameRound, thePrizesCanBeKeptOffTheScreen) {
+	GameRound round{GameRound::Type::OneQuine};
+	EXPECT_TRUE(round.isShowingPrizes());
+	round.setShowPrizes(false);
+	std::stringstream stream;
+	round.write(stream);
+	GameRound read;
+	read.read(stream, {.version = getSaveVersion(), .wideEnums = false});
+	EXPECT_FALSE(read.isShowingPrizes());
+}
+
+TEST(GameRound, aHiddenNumberIsKeptButNotShown) {
+	GameRound child{GameRound::Type::Enfant};
+	child.setId(12);
+	child.setNumberHidden(true);
+	EXPECT_EQ(child.getId(), 12);
+	EXPECT_EQ(child.getName().find("12") != std::string::npos, true);
+	EXPECT_EQ(child.getDisplayName().find("12"), std::string::npos);
+	std::stringstream stream;
+	child.write(stream);
+	GameRound read;
+	read.read(stream, {.version = getSaveVersion(), .wideEnums = false});
+	EXPECT_TRUE(read.isNumberHidden());
+	EXPECT_EQ(read.getId(), 12);
+	GameRound shown{GameRound::Type::OneQuine};
+	shown.setId(3);
+	EXPECT_NE(shown.getDisplayName().find('3'), std::string::npos);
+}
+
+TEST(GameRound, anOldChildRoundWithOnePhasePerWinnerIsMerged) {
+	// Before version 13 a children's round had a phase per winner, each with its prize.
+	GameRound source{GameRound::Type::Enfant};
+	auto node = source.toYaml();
+	YAML::Node subs;
+	for (const auto* prize: {"un jouet", "un livre", "des bonbons"}) {
+		SubGameRound phase{SubGameRound::Type::OneQuine};
+		phase.setPrizes({Prize{prize, 5.0}});
+		subs.push_back(phase.toYaml());
+	}
+	node["subGames"] = subs;
+	GameRound merged;
+	merged.fromYaml(node);
+	ASSERT_EQ(merged.sizeSubRound(), 1);
+	const auto sub = merged.getSubRound(0);
+	EXPECT_EQ(sub->getWinnerTarget(), 3);
+	ASSERT_EQ(sub->getPrizes().size(), 3);
+	EXPECT_STREQ(sub->getPrizes()[0].getDesignation().c_str(), "un jouet");
+	EXPECT_STREQ(sub->getPrizes()[2].getDesignation().c_str(), "des bonbons");
+}

@@ -114,12 +114,13 @@ void appendRounds(std::string& ioReport, const Event& iEvent) {
 
 		ioReport += "| Manche | Lots | Valeur | Gagnant |\n|---|---|---|---|\n";
 		for (auto sub = round->beginSubRound(); sub != round->endSubRound(); ++sub) {
+			const auto label = round->getSubRoundLabel(static_cast<size_t>(std::distance(round->beginSubRound(), sub)));
 			std::string winner = sub->getWinner();
 			if (!sub->isFinished())
 				winner = "manche non jouée";
 			else if (winner.empty())
 				winner = "sans gagnant";
-			ioReport += std::format("| {} | {} | {} | {} |\n", cell(sub->getTypeStr()), cell(sub->getPrices()),
+			ioReport += std::format("| {} | {} | {} | {} |\n", cell(label), cell(sub->getPrices()),
 									cell(euros(sub->getValue())), cell(winner));
 		}
 		ioReport += "\n";

@@ -14,11 +14,13 @@
 #include "external/spdlog.h"
 #include "utilities.h"
 
+#include <fstream>
 #include <iostream>
+#include <mutex>
 EVL_DIAG_PUSH
 EVL_DIAG_DISABLE_CLANG("-Wweak-vtables")
 EVL_DIAG_DISABLE_CLANG("-Wundefined-func-template")
-#include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/base_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 EVL_DIAG_POP
 
@@ -51,6 +53,79 @@ constexpr std::size_t g_logMaxSize = 5UL * 1024UL * 1024UL;
 /// Number of past log files kept beside the current one.
 constexpr std::size_t g_logMaxFiles = 5;
 
+/**
+ * @brief Appending file sink that starts a new file past a size limit.
+ *
+ * Replaces spdlog's rotating sink, whose file name formatting crashed with this
+ * toolchain the moment a log reached its limit — that is, right at the next start-up.
+ * Never throws: a log that cannot be written must not take the application down.
+ */
+class RotatingFileSink final : public spdlog::sinks::base_sink<std::mutex> {
+public:
+	RotatingFileSink(std::filesystem::path iPath, const std::size_t iMaxSize, const std::size_t iMaxFiles) :
+		m_path(std::move(iPath)), m_maxSize(iMaxSize), m_maxFiles(iMaxFiles) {
+		std::error_code ec;
+		m_size = exists(m_path, ec) ? static_cast<std::size_t>(std::filesystem::file_size(m_path, ec)) : 0;
+		if (ec)
+			m_size = 0;
+		if (m_size >= m_maxSize)
+			rotate();
+		else
+			open(std::ios::app);
+	}
+
+protected:
+	void sink_it_(const spdlog::details::log_msg& iMsg) override {
+		spdlog::memory_buf_t formatted;
+		formatter_->format(iMsg, formatted);
+		if (m_size + formatted.size() > m_maxSize)
+			rotate();
+		m_file.write(formatted.data(), static_cast<std::streamsize>(formatted.size()));
+		m_size += formatted.size();
+	}
+
+	void flush_() override { m_file.flush(); }
+
+private:
+	void open(const std::ios::openmode iMode) {
+		m_file.close();
+		m_file.clear();
+		m_file.open(m_path, std::ios::out | std::ios::binary | iMode);
+	}
+
+	[[nodiscard]] auto numbered(const std::size_t iIndex) const -> std::filesystem::path {
+		if (iIndex == 0)
+			return m_path;
+		auto name = m_path.stem().string();
+		name += '.';
+		name += std::to_string(iIndex);
+		name += m_path.extension().string();
+		return m_path.parent_path() / name;
+	}
+
+	void rotate() {
+		m_file.close();
+		std::error_code ec;
+		for (std::size_t i = m_maxFiles; i > 0; --i) {
+			const auto source = numbered(i - 1);
+			if (!exists(source, ec))
+				continue;
+			const auto target = numbered(i);
+			std::filesystem::remove(target, ec);
+			std::filesystem::rename(source, target, ec);
+		}
+		// Whatever happened to the renames, the current file starts again empty.
+		open(std::ios::trunc);
+		m_size = 0;
+	}
+
+	std::filesystem::path m_path;
+	std::size_t m_maxSize;
+	std::size_t m_maxFiles;
+	std::size_t m_size = 0;
+	std::ofstream m_file;
+};
+
 }// namespace
 
 auto getLogPath() -> std::filesystem::path { return core::getExecPath() / "exec.log"; }
@@ -66,10 +141,7 @@ void Log::init(const Level& iLevel) {
 	std::vector<spdlog::sink_ptr> logSinks;
 	logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 	// Rotating and appending: relaunching after a crash must not erase its trace.
-	// std::string, not the path: spdlog's filename_t is a narrow string, and a path
-	// converts implicitly to std::wstring on Windows.
-	logSinks.emplace_back(
-			std::make_shared<spdlog::sinks::rotating_file_sink_mt>(getLogPath().string(), g_logMaxSize, g_logMaxFiles));
+	logSinks.emplace_back(std::make_shared<RotatingFileSink>(getLogPath(), g_logMaxSize, g_logMaxFiles));
 
 	g_logger = std::make_shared<spdlog::logger>("EVL", begin(logSinks), end(logSinks));
 	register_logger(g_logger);

@@ -27,6 +27,11 @@ void Prize::read(std::istream& iBs, const ReadContext& iContext) {
 	uint8_t childFriendly = 0;
 	if (!readRaw(iBs, attractiveness) || !readRaw(iBs, childFriendly))
 		return;
+	// version 14 : le set de lots du gagnant.
+	uint8_t set = 0;
+	if (iContext.version > 13 && !readRaw(iBs, set))
+		return;
+	setSet(set);
 	// Bornée à la lecture : un fichier abîmé ne doit pas faire sortir la note de
 	// l'échelle sur laquelle l'interface la dessine.
 	setAttractiveness(attractiveness);
@@ -41,6 +46,7 @@ void Prize::write(std::ostream& iBs) const {
 	writeRaw(iBs, m_value);
 	writeRaw(iBs, m_attractiveness);
 	writeRaw(iBs, static_cast<uint8_t>(m_childFriendly ? 1 : 0));
+	writeRaw(iBs, m_set);
 }
 
 auto Prize::toJson() const -> Json::Value {
@@ -51,6 +57,7 @@ auto Prize::toJson() const -> Json::Value {
 	value["value"] = m_value;
 	value["attractiveness"] = m_attractiveness;
 	value["child_friendly"] = m_childFriendly;
+	value["set"] = m_set;
 	return value;
 }
 
@@ -67,6 +74,8 @@ void Prize::fromJson(const Json::Value& iJson) {
 		setAttractiveness(static_cast<uint8_t>(std::clamp(val.asInt(), 0, static_cast<int>(g_maxAttractiveness))));
 	if (const auto val = iJson.get("child_friendly", true); val.isBool())
 		m_childFriendly = val.asBool();
+	if (const auto val = iJson.get("set", 0); val.isNumeric())
+		setSet(static_cast<uint8_t>(std::clamp(val.asInt(), 0, static_cast<int>(g_maxSet))));
 }
 
 auto Prize::toYaml() const -> YAML::Node {
@@ -77,6 +86,7 @@ auto Prize::toYaml() const -> YAML::Node {
 	node["value"] = m_value;
 	node["attractiveness"] = static_cast<int>(m_attractiveness);
 	node["child_friendly"] = m_childFriendly;
+	node["set"] = static_cast<int>(m_set);
 	return node;
 }
 
@@ -88,6 +98,28 @@ void Prize::fromYaml(const YAML::Node& iNode) {
 	setAttractiveness(static_cast<uint8_t>(
 			std::clamp(yamlValue(iNode, "attractiveness", 0), 0, static_cast<int>(g_maxAttractiveness))));
 	m_childFriendly = yamlValue(iNode, "child_friendly", true);
+	setSet(static_cast<uint8_t>(std::clamp(yamlValue(iNode, "set", 0), 0, static_cast<int>(g_maxSet))));
+}
+
+auto announcedPrizes(const prizes_type& iPrizes, const bool iGroupBySets) -> std::vector<AnnouncedPrize> {
+	std::vector<AnnouncedPrize> announced;
+	uint32_t current = 1;
+	for (const auto& prize: iPrizes) {
+		// The set is tracked on every article, named or not: an empty line keeps the run going.
+		if (prize.getSet() > 0)
+			current = prize.getSet();
+		if (prize.getDesignation().empty())
+			continue;
+		announced.push_back({.prize = &prize, .set = iGroupBySets ? current : 0U, .firstOfSet = false});
+	}
+	if (!iGroupBySets)
+		return announced;
+	std::ranges::stable_sort(announced, [](const AnnouncedPrize& iLeft, const AnnouncedPrize& iRight) -> bool {
+		return iLeft.set < iRight.set;
+	});
+	for (size_t i = 0; i < announced.size(); ++i)
+		announced[i].firstOfSet = i == 0 || announced[i].set != announced[i - 1].set;
+	return announced;
 }
 
 auto totalValue(const prizes_type& iPrizes) -> double {

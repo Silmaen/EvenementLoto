@@ -14,8 +14,10 @@
 
 #include "gui/utils/Layout.h"
 
+#include <algorithm>
 #include <imgui.h>
 #include <imgui_stdlib.h>
+#include <numeric>
 
 namespace evl::gui::views {
 
@@ -35,7 +37,7 @@ auto runningLabels(const core::Event& iEvent) -> std::pair<std::string, std::str
 	const auto sub = round->getCurrentSubRound();
 	if (sub == round->endSubRound())
 		return {};
-	return {round->getName(), sub->getTypeStr()};
+	return {round->getName(), round->getSubRoundLabel(static_cast<size_t>(std::distance(round->beginSubRound(), sub)))};
 }
 
 }// namespace
@@ -46,6 +48,81 @@ PopupWinner::~PopupWinner() = default;
 void PopupWinner::onOpen() {
 	m_claimants.assign(1, std::string{});
 	m_selected = 0;
+	m_tieCount = 1;
+	m_order.clear();
+}
+
+void PopupWinner::renderChildWinners() {
+	auto& app = Application::get();
+	const auto round = app.getCurrentEvent().getCurrentCGameRound();
+	const auto sub = round->getCurrentSubRound();
+	const auto found = static_cast<int>(sub->getWinnersFound());
+	const auto remaining = static_cast<int>(sub->getWinnerTarget()) - found;
+	const auto announced = core::announcedPrizes(sub->getPrizes(), true);
+	// What the child of that rank takes: the set of prizes numbered after him.
+	const auto prizeName = [&announced](const size_t iRank) -> std::string {
+		std::string names;
+		for (const auto& entry: announced) {
+			if (entry.set != iRank + 1)
+				continue;
+			names += (names.empty() ? "" : ", ") + entry.prize->getDesignation();
+		}
+		return names.empty() ? std::format("set n° {} (vide)", iRank + 1) : names;
+	};
+
+	ImGui::TextWrapped("Gagnant %d sur %u — set en cours : %s", found + 1, sub->getWinnerTarget(),
+					   prizeName(static_cast<size_t>(found)).c_str());
+	ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+	ImGui::TextWrapped("Les enfants ne sont pas nommés : le premier à remplir une ligne prend le set en cours et sort.");
+	ImGui::PopStyleColor();
+	ImGui::Separator();
+
+	ImGui::AlignTextToFramePadding();
+	ImGui::TextUnformatted("Enfants qui viennent de gagner");
+	ImGui::SameLine();
+	ImGui::SetNextItemWidth(utils::em(7.0f));
+	if (ImGui::InputInt("##tie", &m_tieCount, 1, 1)) {
+		m_tieCount = std::clamp(m_tieCount, 1, remaining);
+		m_order.clear();
+	}
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Plusieurs à la fois : ils sont départagés au sort, le gagnant du tirage prend le set en cours,\n"
+						  "le perdant le set suivant, et ainsi de suite.");
+	if (m_tieCount > 1) {
+		ImGui::SameLine();
+		const bool redraw = ImGui::Button("Tirer au sort");
+		if (redraw || m_order.size() != static_cast<size_t>(m_tieCount)) {
+			m_order.resize(static_cast<size_t>(m_tieCount));
+			std::iota(m_order.begin(), m_order.end(), size_t{0});
+			std::ranges::shuffle(m_order, m_rng);
+		}
+		ImGui::Spacing();
+		for (size_t rank = 0; rank < m_order.size(); ++rank) {
+			ImGui::Bullet();
+			ImGui::TextWrapped("enfant %zu  →  %s", m_order[rank] + 1,
+							   prizeName(static_cast<size_t>(found) + rank).c_str());
+		}
+	}
+
+	utils::beginDialogFooter(2);
+	if (utils::dialogButton("Valider")) {
+		auto& event = app.getCurrentEvent();
+		event.awardChildWinnersToCurrentRound(static_cast<uint32_t>(m_tieCount));
+		if (const auto current = event.getCurrentCGameRound();
+			current != event.endRounds() && current->getType() != core::GameRound::Type::Pause &&
+			current->drawsCount() == 0) {
+			app.getRng().resetPick();
+		}
+		app.clearDrawDelay();
+		app.saveProgress();
+		m_tieCount = 1;
+		m_order.clear();
+		// The phase goes on while winners are still to be found: the popup closes either way.
+		ImGui::CloseCurrentPopup();
+	}
+	ImGui::SameLine();
+	if (utils::dialogButton("Annuler"))
+		ImGui::CloseCurrentPopup();
 }
 
 void PopupWinner::settle(const std::string& iWinner) {
@@ -73,6 +150,10 @@ void PopupWinner::onPopupUpdate() {
 	}
 
 	ImGui::Text("%s — %s", roundName.c_str(), subRoundType.c_str());
+	if (event.getCurrentCGameRound()->getType() == core::GameRound::Type::Enfant) {
+		renderChildWinners();
+		return;
+	}
 	const auto subRound = event.getCurrentCGameRound()->getCurrentSubRound();
 	if (const auto& prices = subRound->getPrices(); !prices.empty())
 		ImGui::TextWrapped("Lots : %s (%.2f €)", prices.c_str(), subRound->getValue());
@@ -160,7 +241,8 @@ void PopupWinners::onPopupUpdate() {
 		bool anyPlayed = false;
 		for (uint32_t roundIndex = 0; roundIndex < static_cast<uint32_t>(event.sizeRounds()); ++roundIndex) {
 			const auto round = event.getGameRound(roundIndex);
-			if (round->getType() == core::GameRound::Type::Pause)
+			// A children's round has no names to correct: its winners are not recorded.
+			if (round->getType() == core::GameRound::Type::Pause || round->getType() == core::GameRound::Type::Enfant)
 				continue;
 			ImGui::PushID(static_cast<int>(roundIndex));
 			ImGui::SeparatorText(round->getName().c_str());
@@ -168,7 +250,7 @@ void PopupWinners::onPopupUpdate() {
 				const auto subRound = round->getSubRound(subIndex);
 				ImGui::PushID(static_cast<int>(subIndex));
 				ImGui::AlignTextToFramePadding();
-				ImGui::Text("%s", subRound->getTypeStr().c_str());
+				ImGui::Text("%s", round->getSubRoundLabel(subIndex).c_str());
 				ImGui::SameLine(utils::em(10.0f));
 				ImGui::SetNextItemWidth(-1);
 				if (subRound->isFinished()) {

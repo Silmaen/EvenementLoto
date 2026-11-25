@@ -89,7 +89,22 @@ struct PrizeListOptions {
 	 * places it in a toolbar of its own.
 	 */
 	bool withAddButton = true;
+	/// Show, per article, the winner whose set of prizes it belongs to (a children's round).
+	bool withSets = false;
 };
+
+/**
+ * @brief A modal asking for confirmation before something that cannot be undone.
+ *
+ * Opened by the caller with `ImGui::OpenPopup(iTitle)` at the same level of the ID stack,
+ * and drawn every frame.
+ *
+ * @param iTitle The title, which is also the popup's identifier.
+ * @param iMessage What is about to happen.
+ * @param iConfirmLabel The label of the confirming button.
+ * @return True on the frame the user confirms.
+ */
+auto confirmDialog(const char* iTitle, const std::string& iMessage, const char* iConfirmLabel) -> bool;
 
 /**
  * @brief Draw an editable list of prize articles.

@@ -160,3 +160,104 @@ TEST(CsvCatalogue, binaryRubbishIsReadWithoutDamage) {
 	const auto result = parseCatalogueCsv(rubbish);
 	EXPECT_TRUE(result.read);
 }
+
+TEST(CsvCatalogue, aDistributedFileKeepsItsPlacesAndItsOrder) {
+	const auto result = parseCatalogueCsv("Désignation;Valeur;Partie;Phase\n"
+										  "jambon;40;1;1\n"
+										  "bon d'achat;100;1;3\n"
+										  "téléviseur;300;5;3\n"
+										  "vase;5;;\n"
+										  "ailleurs;9;7;1\n");
+	ASSERT_EQ(result.prizes.size(), 5);
+	ASSERT_EQ(result.placements.size(), 4);
+	EXPECT_EQ(result.placements[1].prize, 1);
+	EXPECT_EQ(result.placements[1].round, 1);
+	EXPECT_EQ(result.placements[1].phase, 3);
+
+	// « Partie 5 » is the game numbered 5, whatever its rank, and a pause never answers.
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound first{GameRound::Type::OneTwoQuineFullCard};
+	first.setId(1);
+	event.pushGameRound(first);
+	GameRound pause{GameRound::Type::Pause};
+	pause.setId(5);
+	event.pushGameRound(pause);
+	GameRound fifth{GameRound::Type::OneTwoQuineFullCard};
+	fifth.setId(5);
+	event.pushGameRound(fifth);
+	event.setCatalogue(result.prizes);
+	const auto placed = placeImported(event, 0, result);
+	EXPECT_EQ(placed.placed, 3);
+	EXPECT_EQ(placed.refused, 1);// no game is numbered 7
+	const auto second = std::next(event.beginRounds(), 2);
+	ASSERT_EQ(second->getSubRound(2)->getPrizes().size(), 1);
+	EXPECT_STREQ(second->getSubRound(2)->getPrizes()[0].getDesignation().c_str(), "téléviseur");
+	EXPECT_EQ(event.getGameRound(0)->getSubRound(0)->getPrizes().size(), 1);
+}
+
+TEST(CsvCatalogue, linesOfAPhaseKeepTheirOrderOfAppearance) {
+	const auto result = parseCatalogueCsv("Désignation;Partie;Phase\nC;1;1\nA;1;1\nB;1;1\n");
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound only{GameRound::Type::OneTwoQuineFullCard};
+	only.setId(1);
+	event.pushGameRound(only);
+	event.setCatalogue(result.prizes);
+	EXPECT_EQ(placeImported(event, 0, result).placed, 3);
+	const auto& prizes = event.getGameRound(0)->getSubRound(0)->getPrizes();
+	ASSERT_EQ(prizes.size(), 3);
+	EXPECT_STREQ(prizes[0].getDesignation().c_str(), "C");
+	EXPECT_STREQ(prizes[1].getDesignation().c_str(), "A");
+	EXPECT_STREQ(prizes[2].getDesignation().c_str(), "B");
+}
+
+TEST(CsvCatalogue, emptyingTheCatalogueAlsoEmptiesTheEditablePhases) {
+	const auto result = parseCatalogueCsv("Désignation;Partie;Phase\nA;1;1\nB;1;2\nC\n");
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound only{GameRound::Type::OneTwoQuineFullCard};
+	only.setId(1);
+	event.pushGameRound(only);
+	event.setCatalogue(result.prizes);
+	ASSERT_EQ(placeImported(event, 0, result).placed, 2);
+	EXPECT_EQ(event.clearCatalogue(), 3);
+	EXPECT_TRUE(event.getCatalogue().empty());
+	EXPECT_TRUE(event.getGameRound(0)->getSubRound(0)->getPrizes().empty());
+	EXPECT_TRUE(event.getGameRound(0)->getSubRound(1)->getPrizes().empty());
+}
+
+TEST(CsvCatalogue, inAChildRoundThePhaseIsTheWinnerNumber) {
+	const auto result = parseCatalogueCsv("Désignation;Partie;Phase\nA;1;2\nB;1;1\nC;1;2\n");
+	Event event;
+	event.setName("Loto");
+	event.setOrganizerName("Amicale");
+	GameRound child{GameRound::Type::Enfant};
+	child.setId(1);
+	event.pushGameRound(child);
+	event.setCatalogue(result.prizes);
+	EXPECT_EQ(placeImported(event, 0, result).placed, 3);
+	const auto& prizes = event.getGameRound(0)->getSubRound(0)->getPrizes();
+	ASSERT_EQ(prizes.size(), 3);
+	EXPECT_EQ(prizes[0].getSet(), 2);
+	EXPECT_EQ(prizes[1].getSet(), 1);
+	// The catalogue keeps it too, so a new distribution does not lose it.
+	EXPECT_EQ(event.getCatalogue()[0].getSet(), 2);
+	// Grouped by winner for the announcement: B first, then A and C.
+	const auto announced = announcedPrizes(prizes, true);
+	ASSERT_EQ(announced.size(), 3);
+	EXPECT_STREQ(announced[0].prize->getDesignation().c_str(), "B");
+	EXPECT_TRUE(announced[0].firstOfSet);
+	EXPECT_STREQ(announced[1].prize->getDesignation().c_str(), "A");
+	EXPECT_TRUE(announced[1].firstOfSet);
+	EXPECT_FALSE(announced[2].firstOfSet);
+}
+
+TEST(CsvCatalogue, aWinnerColumnGivesTheSetDirectly) {
+	const auto result = parseCatalogueCsv("Désignation;Gagnant\nA;3\n");
+	ASSERT_EQ(result.prizes.size(), 1);
+	EXPECT_EQ(result.prizes[0].getSet(), 3);
+}

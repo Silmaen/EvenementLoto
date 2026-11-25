@@ -47,6 +47,14 @@ private:
 	void renderStatisticsTab() const;
 	void renderEventInfo() const;
 	void renderDrawnNumbersTab() const;
+
+	/**
+	 * @brief The prizes of the phase, in large type, for the presenter to read out loud.
+	 *
+	 * Shown in place of the number grid while the lots are on the players' screen.
+	 * @return True if the prizes were drawn, false when no phase is waiting to start.
+	 */
+	[[nodiscard]] auto renderPrizeAnnouncement() const -> bool;
 	static void renderPresenterTab();
 	void renderCommandsTab() const;
 	void renderBottomPanel();

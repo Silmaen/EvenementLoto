@@ -34,6 +34,8 @@ struct Theme {
 
 	/// L'habillage retenu par défaut, celui d'une installation neuve.
 	static constexpr Preset g_defaultPreset = Preset::Ardoise;
+	/// The interface font size, in pixels, until the user picks another.
+	static constexpr float g_defaultFontSize = 24.0f;
 
 	/// L'habillage dont les couleurs sont issues.
 	Preset preset{Preset::Nuit};

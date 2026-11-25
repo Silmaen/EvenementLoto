@@ -61,7 +61,7 @@ void vkErrorCallback(const VkResult iResult) { vulkan::VulkanContext::checkVkRes
 constexpr const char* g_applicationId = "EvenementLoto";
 
 /// Taille de police par défaut, en pixels.
-constexpr float g_defaultFontSize = 20.0f;
+constexpr float g_defaultFontSize = Theme::g_defaultFontSize;
 
 }// namespace
 
@@ -591,6 +591,12 @@ void MainWindow::requestFont(const std::filesystem::path& iPath, const float iSi
 	m_fontRequest = std::make_pair(iPath, iSize > 0.0f ? iSize : g_defaultFontSize);
 }
 
+namespace {
+/// The size drawn is the style's, not the one given to the font. It is set once the faces
+/// are added: adding one rebinds the current font at the old size and writes it back.
+void applyFontSize(const float iSize) { ImGui::GetStyle().FontSizeBase = iSize; }
+}// namespace
+
 void MainWindow::applyFontRequest() {
 	if (!m_fontRequest.has_value())
 		return;
@@ -608,12 +614,14 @@ void MainWindow::applyFontRequest() {
 			io.Fonts->AddFontFromMemoryTTF(m_fontBytes.data(), static_cast<int>(m_fontBytes.size()), size, &fontConfig);
 			// Les coupes embarquées restent derrière, pour le gras et l'italique.
 			addEmbeddedFonts(io, size);
+			applyFontSize(size);
 			log_info("Police d'interface : '{}' à {} px.", path.string(), size);
 			return;
 		}
 		log_warn("Retour à la police embarquée.");
 	}
 	addEmbeddedFonts(io, size);
+	applyFontSize(size);
 	log_info("Police d'interface embarquée à {} px.", size);
 }
 

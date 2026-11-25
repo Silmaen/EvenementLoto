@@ -192,8 +192,15 @@ Détail des types de parties :
 | Inverse         | 1               | Partie classique, le gagnant est le dernier qui ne remplit aucune case de son carton.               |
 | enfant          | n               | partie spéciale enfant. Le premier gagnant est le premier à remplir une quine, puis le second, etc. |
 
-La partie enfant est une partie spéciale, qui permet de faire gagner plusieurs participants. Le nombre de phases est
-déterminé par le nombre de gagnants que vous souhaitez faire gagner.
+La partie enfant n'a qu'une phase, mais plusieurs gagnants : le premier enfant qui remplit une ligne gagne le premier
+set de lots et sort du jeu, puis le deuxième le set suivant, et ainsi de suite. Le nombre de gagnants se règle avec le champ
+**Gagnants** du réglage de la partie ; prévoyez un set de lots par gagnant (voir plus bas). Les noms ne sont pas notés : à la fin de
+la phase, la fenêtre demande seulement combien d'enfants viennent de gagner. S'ils sont plusieurs à égalité, le tirage de
+départage les classe, le gagnant du tirage prend le set en cours, le perdant le set d'après. Sur l'écran des joueurs, les
+sets déjà remis s'estompent.
+
+Chaque partie peut aussi **cacher son numéro** aux joueurs (la partie enfant, hors numérotation) et **ne pas afficher
+ses lots** : la page s'affiche alors sans être remplie.
 
 Bien signaler qu'il ne faut pas démarquer les cartons entre chaque phase, mais seulement entre chaque partie, pour que
 les gagnants puissent continuer à jouer pour les phases suivantes. Par exemple, dans une partie normale, le premier
@@ -215,6 +222,16 @@ Trois boutons garnissent le catalogue, au-dessus de la liste :
 * **Reprendre les lots des parties** fait entrer au catalogue les lots déjà placés dans les parties qui n'y sont pas
   encore — il n'enlève jamais rien.
 
+**Exporter en PDF...** écrit la liste des lots en gros caractères, une page par partie et par phase, dans l'ordre d'annonce, d'une taille unique pour tout le document, avec la valeur totale.
+
+En partie enfant, chaque lot a un numéro de gagnant (réglable dans la liste des lots de la phase, et dans la colonne « Gagnant » de la page Répartition du catalogue, pour les seuls articles placés dans une partie enfant) : les lots du même numéro forment le set de ce gagnant. Un lot sans numéro suit celui qui le précède. Le PDF, la fenêtre principale et l'écran des joueurs montrent les sets sous « Gagnant 1 », « Gagnant 2 »… À l'import CSV d'une partie enfant, la colonne phase est ce numéro de gagnant.
+
+**Vider la liste** retire tous les lots après confirmation. Dans le catalogue, les articles sont aussi retirés des parties
+pas encore entamées où ils étaient placés ; une partie entamée garde ses lots.
+
+Dans toutes ces listes, les flèches en bout de ligne montent ou descendent un lot : c'est l'ordre dans lequel il
+s'affiche pour les joueurs.
+
 Un lot saisi directement dans le réglage des parties rejoint le catalogue de lui-même : il n'y a pas deux endroits où
 tenir la même liste.
 
@@ -226,10 +243,17 @@ Le fichier attendu est un CSV tel qu'un tableur l'exporte. Le logiciel s'adapte 
 * guillemets pour protéger un séparateur à l'intérieur d'un champ ;
 * virgule décimale acceptée autant que le point, symbole euro et espaces des milliers ignorés ;
 * colonnes reconnues sur leur nom, dans n'importe quel ordre, accentué ou non : **désignation** (ou article, lot,
-  libellé), **donateur**, **valeur** (ou prix), **attrait** (ou attractivité, note), **enfant** ;
+  libellé), **donateur**, **valeur** (ou prix), **attrait** (ou attractivité, note), **enfant**, et pour une partie enfant **gagnant** (ou set) ;
 * une colonne inconnue est ignorée sans décaler les autres ;
 * sans en-tête reconnu, l'ordre désignation, donateur, valeur, attrait, enfant est supposé ;
 * la colonne enfant accepte oui/non, vrai/faux, 1/0 ou une croix.
+
+Un fichier **déjà réparti** ailleurs porte en plus deux colonnes, **partie** et **phase**. La partie est désignée par son
+**numéro défini** (le champ « N° » du réglage de la partie), et non par son rang dans le programme ; la phase compte à
+partir de 1. Chaque lot est alors mis en jeu là où le fichier le dit, sans
+répartition automatique, et l'ordre des lignes d'une phase est celui de l'affichage. Sans colonne phase, la première
+est supposée. Pour une partie enfant, qui n'a qu'une phase, la colonne phase est le **numéro du gagnant** qui emporte le lot. Un lot dont la place n'existe pas, ou dont la phase est déjà entamée, reste au catalogue, et le message
+affiché après l'import le dit.
 
 Seule la désignation compte vraiment : tout le reste peut manquer. Les lignes vides en fin de fichier sont comptées comme
 ignorées, ce n'est pas une erreur, et le nombre de lots lus s'affiche après l'import.
@@ -350,6 +374,15 @@ L'écran de contrôle principal affiche les informations suivantes :
 En bas à droite de l'écran de contrôle, il y a les boutons de contrôle pour passer d'une partie à l'autre, et pour gérer
 les différentes phases de chaque partie.
 
+Pendant que les lots sont affichés aux joueurs, l'onglet « Numéros tirés » les détaille à la place de la grille de
+numéros, pour les énoncer au micro : le texte s'agrandit autant que possible et se répartit en colonnes pour tout
+montrer d'un coup, sans défilement. En partie enfant, les lots sont groupés par gagnant. Pendant l'écran de fin de
+partie, l'onglet affiche « Fin de partie » ; à la fin d'une pause, les joueurs voient « Reprise du Jeu ». Les panneaux du
+bas et de droite se réduisent beaucoup pour laisser de la place à cet onglet.
+
+Le bouton **Tirage aléatoire** (barre d'outils comprise) n'est actif que lorsqu'un tirage est possible : il est grisé
+pendant l'affichage des lots, pendant une pause et une fois la phase terminée.
+
 Une fois la première partie démarrée, plusieurs modes de tirage sont disponibles pour faire avancer le jeu, le mode
 aléatoire où c'est l'ordinateur qui tire les numéros, et le mode manuel où c'est l'organisateur qui tire les numéros à
 l'aide d'un boulier traditionnel puis clique sur le bouton correspondant sur le panneau de contrôle.
@@ -436,7 +469,7 @@ l'application. Sans ces deux fichiers, la fenêtre reste sans icône.
 
 ## En cas d'incident
 
-Pendant toute la durée d'un événement, le logiciel enregistre automatiquement la partie en cours dans un fichier de
+Dès qu'une partie est démarrée (et pas pendant la définition du programme), le logiciel enregistre automatiquement la partie en cours dans un fichier de
 secours, placé dans le dossier de données choisi dans les réglages globaux. Cet enregistrement a lieu après **chaque**
 changement — un numéro tiré, un numéro annulé, un changement de partie — et de toute façon toutes les dix secondes.
 L'écart entre le numéro annoncé aux joueurs et le numéro enregistré est donc nul. L'ancienne version est conservée : il

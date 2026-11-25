@@ -12,6 +12,7 @@
 #include "core/Event.h"
 #include "core/maths/vectors.h"
 #include "core/utilities.h"
+#include "gui/Theme.h"
 
 
 namespace evl::gui::views {
@@ -67,7 +68,9 @@ private:
 		std::filesystem::path dataLocation{core::getExecPath() / "data"};
 		std::string displayServer{"x11"};
 		std::filesystem::path fontPath{};
-		float fontSize{20.0f};
+		float fontSize{Theme::g_defaultFontSize};
+		Theme::Preset themePreset{Theme::g_defaultPreset};///< Chosen, applied with « Appliquer ».
+		bool resetTheme{false};///< « Réappliquer » asked.
 		float drawDelay{0.0f};
 		float pauseDuration{15.0f};
 		float titleScale{4.0f};

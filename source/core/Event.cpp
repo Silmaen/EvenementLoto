@@ -407,6 +407,51 @@ void Event::setBasePath(const std::filesystem::path& iBasePath) {
 		m_organizerLogo = relative(t_org_logo, m_basePath);
 }
 
+auto Event::resolveAsset(const std::filesystem::path& iRelative) const -> std::filesystem::path {
+	if (iRelative.empty() || iRelative.is_absolute() || m_basePath.empty())
+		return iRelative;
+	std::error_code ec;
+	if (const auto direct = m_basePath / iRelative; exists(direct, ec))
+		return direct;
+	const auto name = iRelative.filename();
+	if (const auto beside = m_basePath / name; exists(beside, ec))
+		return beside;
+	for (const auto& entry: std::filesystem::directory_iterator(m_basePath, ec)) {
+		if (!entry.is_directory(ec) || !entry.path().filename().string().ends_with("_data"))
+			continue;
+		if (const auto inside = entry.path() / name; exists(inside, ec))
+			return inside;
+	}
+	return m_basePath / iRelative;
+}
+
+void Event::bundleAssets(const std::filesystem::path& iFile) {
+	if (m_basePath.empty())
+		return;
+	const auto dir = m_basePath / (iFile.stem().string() + "_data");
+	const auto bundle = [&](std::filesystem::path& ioLogo, const std::string& iName) -> void {
+		if (ioLogo.empty())
+			return;
+		std::error_code ec;
+		const auto source = resolveAsset(ioLogo);
+		if (!exists(source, ec))
+			return;
+		const auto target = dir / (iName + source.extension().string());
+		if (!exists(target, ec) || !equivalent(source, target, ec)) {
+			create_directories(dir, ec);
+			if (!ec)
+				copy_file(source, target, std::filesystem::copy_options::overwrite_existing, ec);
+			if (ec) {
+				log_warn("Impossible de copier '{}' vers '{}' : {}", source.string(), target.string(), ec.message());
+				return;
+			}
+		}
+		ioLogo = relative(target, m_basePath);
+	};
+	bundle(m_organizerLogo, "organisateur");
+	bundle(m_logo, "evenement");
+}
+
 void Event::setPlannedEnd(const std::optional<std::chrono::minutes> iPlannedEnd) {
 	if (isFinished())
 		return;
@@ -433,6 +478,20 @@ void Event::pushGameRound(const GameRound& iRound) {
 	checkValidConfig();
 }
 
+auto Event::clearCatalogue() -> std::size_t {
+	if (isFinished()) {
+		log_warn("Impossible de modifier le catalogue d'un événement terminé");
+		return 0;
+	}
+	const auto count = m_catalogue.size();
+	// Copy of the identifiers: placing an article elsewhere walks the catalogue.
+	std::vector<uint32_t> ids;
+	for (const auto& prize: m_catalogue) ids.push_back(prize.getId());
+	for (const auto id: ids) assignPrize(id, std::nullopt);
+	m_catalogue.clear();
+	return count;
+}
+
 void Event::setCatalogue(const prizes_type& iCatalogue) {
 	if (isFinished()) {
 		log_warn("Impossible de modifier le catalogue d'un événement terminé");
@@ -440,6 +499,26 @@ void Event::setCatalogue(const prizes_type& iCatalogue) {
 	}
 	m_catalogue = iCatalogue;
 	assignPrizeIds();
+}
+
+auto Event::setPrizeSet(const uint32_t iId, const uint8_t iSet) -> bool {
+	const auto catalogued =
+			std::ranges::find_if(m_catalogue, [iId](const Prize& iPrize) -> bool { return iPrize.getId() == iId; });
+	if (iId == 0 || catalogued == m_catalogue.end())
+		return false;
+	catalogued->setSet(iSet);
+	if (const auto slot = findPrizeSlot(iId); slot.has_value()) {
+		const auto sub = getGameRound(slot->round)->getSubRound(slot->subRound);
+		if (sub->isEditable()) {
+			auto prizes = sub->getPrizes();
+			for (auto& prize: prizes) {
+				if (prize.getId() == iId)
+					prize.setSet(iSet);
+			}
+			sub->setPrizes(prizes);
+		}
+	}
+	return true;
 }
 
 auto Event::nextFreePrizeId() const -> uint32_t {
@@ -473,6 +552,22 @@ auto Event::findPrizeSlot(const uint32_t iId) const -> std::optional<PrizeSlot> 
 									[iId](const Prize& iPrize) -> bool { return iPrize.getId() == iId; }))
 				return PrizeSlot{.round = roundIndex, .subRound = subIndex};
 		}
+	}
+	return std::nullopt;
+}
+
+auto Event::slotAt(const uint32_t iRound, const uint32_t iPhase) const -> std::optional<PrizeSlot> {
+	if (iRound == 0 || iPhase == 0)
+		return std::nullopt;
+	for (uint32_t roundIndex = 0; roundIndex < static_cast<uint32_t>(m_gameRounds.size()); ++roundIndex) {
+		const auto& round = m_gameRounds[roundIndex];
+		if (round.isPause())
+			continue;
+		if (round.getId() != static_cast<int>(iRound))
+			continue;
+		if (iPhase > round.sizeSubRound())
+			return std::nullopt;
+		return PrizeSlot{.round = roundIndex, .subRound = iPhase - 1};
 	}
 	return std::nullopt;
 }
@@ -743,6 +838,18 @@ void Event::addWinnerToCurrentRound(const std::string& iWin) {
 	}
 }
 
+void Event::awardChildWinnersToCurrentRound(const uint32_t iCount) {
+	if (m_status != Status::GameRunning)
+		return;
+	const auto round = getCurrentGameRound();
+	if (round == m_gameRounds.end())
+		return;
+	round->awardChildWinners(iCount);
+	if (round->isFinished()) {
+		nextState();
+	}
+}
+
 void Event::displayRules() {
 	if (isEditable())
 		return;
@@ -805,9 +912,8 @@ auto Event::canDraw() const -> bool {
 	const auto subRound = round->getCurrentSubRound();
 	if (subRound == round->endSubRound())
 		return false;
-	if (subRound->isFinished())
-		return false;
-	return true;
+	// Neither while the prizes are on the screen nor once the phase is over.
+	return subRound->getStatus() == SubGameRound::Status::Running;
 }
 
 Serializable::~Serializable() = default;
